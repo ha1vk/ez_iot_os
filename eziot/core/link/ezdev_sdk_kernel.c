@@ -92,41 +92,38 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
             kernel_platform_handle->time_destroy == NULL || kernel_platform_handle->key_value_load == NULL || kernel_platform_handle->key_value_save == NULL || kernel_platform_handle->sdk_kernel_log == NULL ||
             kernel_platform_handle->curing_data_load == NULL || kernel_platform_handle->curing_data_save == NULL)
         {
-            log_print("kernel_platform_handle input err!\n");
             sdk_error = ezdev_sdk_kernel_params_invalid;
             break;
         }
 
         memset(&g_ezdev_sdk_kernel, 0, sizeof(g_ezdev_sdk_kernel));
 
-        //µ±Ç°Éè±¸Ö§³ÖÒ»ÖÖÈÏÖ¤ÀàĞÍECDH
-        //¸ù¾İdev_auth_type_count´óĞ¡£¬Ôö¼Ódev_auth_type_group[1]¡¢dev_auth_type_group[2]......dev_auth_type_group[63]
+        //å½“å‰è®¾å¤‡æ”¯æŒä¸€ç§è®¤è¯ç±»å‹ECDH
+        //æ ¹æ®dev_auth_type_countå¤§å°ï¼Œå¢åŠ dev_auth_type_group[1]ã€dev_auth_type_group[2]......dev_auth_type_group[63]
         g_ezdev_sdk_kernel.dev_def_auth_type = sdk_dev_auth_protocol_ecdh;
         g_ezdev_sdk_kernel.dev_cur_auth_type = sdk_dev_auth_protocol_ecdh;
         g_ezdev_sdk_kernel.dev_last_auth_type = sdk_dev_auth_protocol_ecdh;
         g_ezdev_sdk_kernel.dev_auth_type_count = 1;
         g_ezdev_sdk_kernel.dev_auth_type_group[0] = sdk_dev_auth_protocol_ecdh;
 
-        /* ÉèÖÃÄ¬ÈÏĞÄÌøÊ±¼ä */
+        /* è®¾ç½®é»˜è®¤å¿ƒè·³æ—¶é—´ */
         g_ezdev_sdk_kernel.das_keepalive_interval = ezdev_sdk_das_default_keepaliveinterval;
 
-        /* ÉèÖÃ·şÎñÆ÷ĞÅÏ¢ */
+        /* è®¾ç½®æœåŠ¡å™¨ä¿¡æ¯ */
         strncpy(g_ezdev_sdk_kernel.server_info.server_name, server_name, ezdev_sdk_name_len - 1);
         g_ezdev_sdk_kernel.server_info.server_port = server_port;
 
-        /* ÉèÖÃ»Øµ÷º¯Êı */
+        /* è®¾ç½®å›è°ƒå‡½æ•° */
         memcpy(&g_ezdev_sdk_kernel.platform_handle, kernel_platform_handle, sizeof(ezdev_sdk_kernel_platform_handle));
 
-        /* ½âÎöjsonÊı¾İ£¬²¢ÉèÖÃÉè±¸ĞÅÏ¢ */
+        /* è§£æjsonæ•°æ®ï¼Œå¹¶è®¾ç½®è®¾å¤‡ä¿¡æ¯ */
         sdk_error = mkiE2ezE(json_parse_devinfo(dev_config_info, &g_ezdev_sdk_kernel.dev_info));
         if (sdk_error != ezdev_sdk_kernel_succ)
         {
-            log_print("json_parse_devinfo failed!\n");
             break;
         }
-
         /**
-		 *	Í¨¹ı»Øµ÷»ñÈ¡ÑéÖ¤Âë
+		 *	é€šè¿‡å›è°ƒè·å–éªŒè¯ç 
 		 */
         if (ezdev_sdk_kernel_succ == (sdk_error = kernel_platform_handle->curing_data_load(sdk_curingdata_secretkey, szDev_vcode, &iDev_vcode)) &&
             iDev_vcode <= ezdev_sdk_verify_code_maxlen)
@@ -139,7 +136,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
             break;
         }
 
-        /* ³õÊ¼»¯Á´½Ó×´Ì¬ */
+        /* åˆå§‹åŒ–é“¾æ¥çŠ¶æ€ */
         g_ezdev_sdk_kernel.lbs_redirect_times = 0;
         g_ezdev_sdk_kernel.das_retry_times = 0;
         g_ezdev_sdk_kernel.secretkey_applied = EZDEV_SDK_FALSE;
@@ -150,10 +147,10 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
         g_ezdev_sdk_kernel.cnt_state = sdk_cnt_unredirect;
         g_ezdev_sdk_kernel.cnt_state_timer = g_ezdev_sdk_kernel.platform_handle.time_creator();
 
-        /* ³õÊ¼»¯·ç¿ØĞÅÏ¢ */
+        /* åˆå§‹åŒ–é£æ§ä¿¡æ¯ */
         g_ezdev_sdk_kernel.access_risk = sdk_no_risk_control;
 
-        /* ¼ÓÔØdev_idºÍmasterkey */
+        /* åŠ è½½dev_idå’Œmasterkey */
         g_ezdev_sdk_kernel.platform_handle.key_value_load(sdk_keyvalue_devid, g_ezdev_sdk_kernel.dev_id, ezdev_sdk_devid_len);
         g_ezdev_sdk_kernel.platform_handle.key_value_load(sdk_keyvalue_masterkey, g_ezdev_sdk_kernel.master_key, ezdev_sdk_masterkey_len);
         if (1 > reg_mode || reg_mode > 5)
@@ -165,7 +162,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
             g_ezdev_sdk_kernel.reg_mode = reg_mode;
         }
 
-        if (reg_das_info && reg_das_info->bLightreg) ///<	¿ìËÙ×¢²á
+        if (reg_das_info && reg_das_info->bLightreg) ///<	å¿«é€Ÿæ³¨å†Œ
         {
             g_ezdev_sdk_kernel.redirect_das_info.das_port = reg_das_info->das_port;
             g_ezdev_sdk_kernel.redirect_das_info.das_udp_port = reg_das_info->das_udp_port;
@@ -183,16 +180,15 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
             }
         }
 
-        /* ³õÊ¼»¯ÁìÓòºÍ¹«¹²ÁìÓò */
+        /* åˆå§‹åŒ–é¢†åŸŸå’Œå…¬å…±é¢†åŸŸ */
         common_module_init();
         extend_init(kernel_event_notice_cb);
 
-        /* ³õÊ¼»¯MQTTºÍÏûÏ¢¶ÓÁĞ */
+        /* åˆå§‹åŒ–MQTTå’Œæ¶ˆæ¯é˜Ÿåˆ— */
         das_object_init(&g_ezdev_sdk_kernel);
         g_mutex_lock = g_ezdev_sdk_kernel.platform_handle.thread_mutex_create();
         if(NULL == g_mutex_lock)
         {
-            log_print("g_mutex_lock creat failed!\n");
             sdk_error = ezdev_sdk_kernel_memory;
             break;
         }
@@ -356,7 +352,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_yield_user()
 
 ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
 {
-    /* ÓÉÓÚ¶ÔÓÚbodyµÄ´¦ÀíºóÆÚĞèÒªÓÃase×ö¼ÓÃÜ£¬Ö±½ÓÔÚÕâÀï×öpadding */
+    /* ç”±äºå¯¹äºbodyçš„å¤„ç†åæœŸéœ€è¦ç”¨aseåšåŠ å¯†ï¼Œç›´æ¥åœ¨è¿™é‡Œåšpadding */
     EZDEV_SDK_INT32 input_length_padding = 0;
     ezdev_sdk_kernel_pubmsg_exchange *new_pubmsg_exchange = NULL;
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
@@ -418,7 +414,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
     new_pubmsg_exchange->msg_conntext.msg_body_len = input_length_padding;
     memcpy(new_pubmsg_exchange->msg_conntext.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
     buf_padding(new_pubmsg_exchange->msg_conntext.msg_body, input_length_padding, pubmsg->msg_body_len);
-    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count; //Ä¬ÈÏ×î¶à·¢ËÍ2´Î
+    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count; //é»˜è®¤æœ€å¤šå‘é€2æ¬¡
 
     if (pubmsg->msg_response == 0)
     {
@@ -441,7 +437,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
         new_pubmsg_exchange->msg_conntext.externel_ctx_len = pubmsg->externel_ctx_len;
     }
 
-    /*·Ç×èÈûÊ½ÍùÏûÏ¢¶ÓÁĞÀïpushÄÚÈİ ×îÖÕÓÉSDKbootÄ£¿é´´½¨µÄÖ÷Ïß³ÌÇı¶¯ÏûÏ¢·¢ËÍ*/
+    /*éé˜»å¡å¼å¾€æ¶ˆæ¯é˜Ÿåˆ—é‡Œpushå†…å®¹ æœ€ç»ˆç”±SDKbootæ¨¡å—åˆ›å»ºçš„ä¸»çº¿ç¨‹é©±åŠ¨æ¶ˆæ¯å‘é€*/
     kernel_error = mkiE2ezE(das_send_pubmsg_async(&g_ezdev_sdk_kernel, new_pubmsg_exchange));
     if (kernel_error != ezdev_sdk_kernel_succ)
     {
@@ -467,7 +463,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
 
 ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubmsg)
 {
-    /* ÓÉÓÚ¶ÔÓÚbodyµÄ´¦ÀíºóÆÚĞèÒªÓÃase×ö¼ÓÃÜ£¬Ö±½ÓÔÚÕâÀï×öpadding */
+    /* ç”±äºå¯¹äºbodyçš„å¤„ç†åæœŸéœ€è¦ç”¨aseåšåŠ å¯†ï¼Œç›´æ¥åœ¨è¿™é‡Œåšpadding */
     EZDEV_SDK_INT32 input_length_padding = 0;
     ezdev_sdk_kernel_pubmsg_exchange_v3 *new_pubmsg_exchange = NULL;
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
@@ -479,11 +475,11 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubm
 
     if (pubmsg->msg_body == NULL || pubmsg->msg_body_len == 0)
     {
-        ezdev_sdk_kernel_log_info(0, 0, "v3 send input msg invalid\n");
+        ezdev_sdk_kernel_log_info(0, 0, " _v3 send input msg invalid\n");
         return ezdev_sdk_kernel_params_invalid;
     }
     
-     ezdev_sdk_kernel_log_info(0, 0, "sdk send v3:module:%s ,resource_type:%s,msg_type:%s, method:%s, ext_msg:%s, seq:%d, len:%d, string:%s\n", pubmsg->module,\
+     ezdev_sdk_kernel_log_info(0, 0, "_v3 sdk send:module:%s ,resource_type:%s,msg_type:%s, method:%s, ext_msg:%s, seq:%d, len:%d, string:%s\n", pubmsg->module,\
                               pubmsg->resource_type, pubmsg->msg_type, pubmsg->method, pubmsg->ext_msg, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
 
     if (pubmsg->msg_body_len > ezdev_sdk_send_buf_max)
@@ -491,7 +487,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubm
         return ezdev_sdk_kernel_data_len_range;
     }
     
-    ezdev_sdk_kernel_log_debug(0, 0,"v3 send buffer size: %d\n", ezdev_sdk_send_buf_max);
+    ezdev_sdk_kernel_log_debug(0, 0,"_v3 send buffer size: %d\n", ezdev_sdk_send_buf_max);
 
     new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange_v3 *)malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange_v3));
     if (new_pubmsg_exchange == NULL)
@@ -533,10 +529,10 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubm
     new_pubmsg_exchange->msg_conntext_v3.msg_body_len = input_length_padding;
     memcpy(new_pubmsg_exchange->msg_conntext_v3.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
     buf_padding(new_pubmsg_exchange->msg_conntext_v3.msg_body, input_length_padding, pubmsg->msg_body_len);
-    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count; //Ä¬ÈÏ×î¶à·¢ËÍ2´Î
+    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count; //é»˜è®¤æœ€å¤šå‘é€2æ¬¡
     new_pubmsg_exchange->msg_conntext_v3.msg_seq = pubmsg->msg_seq;
 
-    /*·Ç×èÈûÊ½ÍùÏûÏ¢¶ÓÁĞÀïpushÄÚÈİ ×îÖÕÓÉSDKbootÄ£¿é´´½¨µÄÖ÷Ïß³ÌÇı¶¯ÏûÏ¢·¢ËÍ*/
+    /*éé˜»å¡å¼å¾€æ¶ˆæ¯é˜Ÿåˆ—é‡Œpushå†…å®¹ æœ€ç»ˆç”±SDKbootæ¨¡å—åˆ›å»ºçš„ä¸»çº¿ç¨‹é©±åŠ¨æ¶ˆæ¯å‘é€*/
     kernel_error = mkiE2ezE(das_send_pubmsg_async_v3(&g_ezdev_sdk_kernel, new_pubmsg_exchange));
     if (kernel_error != ezdev_sdk_kernel_succ)
     {
@@ -688,7 +684,7 @@ EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_server_info(ser
 
     if (NULL == ptr_server_info)
     {
-        //ÏÖÔÚÖ»ÓĞÒ»¶ÔLBS¡¢DAS
+        //ç°åœ¨åªæœ‰ä¸€å¯¹LBSã€DAS
         *ptr_count = 1;
         return ezdev_sdk_kernel_succ;
     }
@@ -757,7 +753,7 @@ EZDEV_SDK_KERNEL_API int ezDevSDK_parse_wifi_publish_msg_id(void * buf, int buf_
         return -1;
     }
     
-    ezdev_sdk_kernel_log_debug(0, 0, "parse_publish_msg_id£¬buf_len:%d\n", buf_len);
+    ezdev_sdk_kernel_log_debug(0, 0, "parse_publish_msg_idï¼Œbuf_len:%d\n", buf_len);
     if (MQTTDeserialize_publish(&msg.dup, &intQoS, &msg.retained, &msg.id, &topicName,(unsigned char**)&msg.payload, (int*)&msg.payloadlen, 
                                (unsigned char *)((unsigned char *)buf + ezdev_sdk_tcp_header_len), buf_len - ezdev_sdk_tcp_header_len) != 1)
     {

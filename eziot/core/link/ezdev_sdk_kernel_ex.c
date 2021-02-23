@@ -75,7 +75,7 @@ EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_inter
 			break;
 		}
         memset(new_pubmsg_exchange, 0, sizeof(ezdev_sdk_kernel_pubmsg_exchange));
-		//组织报文
+
         bscJSON_AddNumberToObject(pJsonRoot, "interval", internal);
 		if(NULL == (json_buf = bscJSON_PrintUnformatted(pJsonRoot)))
 		{
@@ -101,16 +101,19 @@ EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_inter
 		memcpy(new_pubmsg_exchange->msg_conntext.msg_body , json_buf,  strlen(json_buf));
 
 		buf_padding(new_pubmsg_exchange->msg_conntext.msg_body, input_length_padding, strlen(json_buf));
-		new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count;	//默认最多发送2次
+		new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count;
 		rv = push_queue_pubmsg_exchange(new_pubmsg_exchange);
 		ezdev_sdk_kernel_log_info(rv, rv, "push msg to queue");
     }while(0);
 
 	if(json_buf)
+	{
         free(json_buf);
-
+	}
     if(pJsonRoot)
+	{
         bscJSON_Delete(pJsonRoot);
+	}
 
 	if (rv != ezdev_sdk_kernel_succ)
 	{
