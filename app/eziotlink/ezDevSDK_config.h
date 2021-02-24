@@ -1,45 +1,33 @@
-/**
- * \file		ezDevSDK_config.h
- *
- * \brief		±¾µØÎÄ¼şµÄ´æÈ¡
- *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		xurongjun
- *
- * \date		2018/6/27
- */
-
 #ifndef H_EZDEVSDK_CONFIG_H_
 #define H_EZDEVSDK_CONFIG_H_
 
 /** 
- *  \brief		devinfoÅäÖÃÎÄ¼şµÄ¶ÁÈ¡
+ *  \brief		devinfoé…ç½®æ–‡ä»¶çš„è¯»å–
  *  \method		get_devinfo_fromconfig
- *  \param[in]	path				Â·¾¶
- *  \param[out]	devinfo_context		Êı¾İµØÖ·
- *  \param[in]	devinfo_context_len	Êı¾İ³¤¶È
- *  \returns    ³É¹¦·µ»Ø0,Ê§°Ü·µ»Ø-1
+ *  \param[in]	path				è·¯å¾„
+ *  \param[out]	devinfo_context		æ•°æ®åœ°å€
+ *  \param[in]	devinfo_context_len	æ•°æ®é•¿åº¦
+ *  \returns    æˆåŠŸè¿”å›0,å¤±è´¥è¿”å›-1
  */
 int get_devinfo_fromconfig(const char* path, char* devinfo_context, int devinfo_context_len);
 
 /** 
- *  \brief		Êı¾İ±£´æÖÁÎÄ¼ş£¬Ä¿Ç°ÓÃÓÚdevidºÍmasterkey
+ *  \brief		æ•°æ®ä¿å­˜è‡³æ–‡ä»¶ï¼Œç›®å‰ç”¨äºdevidå’Œmasterkey
  *  \method		set_file_value
- *  \param[in]	path				Â·¾¶
- *  \param[in]	devinfo_context		Êı¾İµØÖ·
- *  \param[in]	devinfo_context_len	Êı¾İ³¤¶È
- *  \returns    ³É¹¦·µ»Ø0,Ê§°Ü·µ»Ø-1
+ *  \param[in]	path				è·¯å¾„
+ *  \param[in]	devinfo_context		æ•°æ®åœ°å€
+ *  \param[in]	devinfo_context_len	æ•°æ®é•¿åº¦
+ *  \returns    æˆåŠŸè¿”å›0,å¤±è´¥è¿”å›-1
  */
 int set_file_value(const char* path, unsigned char* keyvalue, int keyvalue_size);
 
 /** 
- *  \brief		´ÓÎÄ¼ş¶ÁÈ¡£¬Ä¿Ç°ÓÃÓÚdevidºÍmasterkey£¬¶ÁÈ¡³¤¶ÈĞ¡ÓÚ64×Ö½Ú
+ *  \brief		ä»æ–‡ä»¶è¯»å–ï¼Œç›®å‰ç”¨äºdevidå’Œmasterkeyï¼Œè¯»å–é•¿åº¦å°äº64å­—èŠ‚
  *  \method		get_file_value
- *  \param[in]	path				Â·¾¶
- *  \param[out]	devinfo_context		Êı¾İµØÖ·
- *  \param[in]	devinfo_context_len	Êı¾İ³¤¶È
- *  \returns    ³É¹¦·µ»Ø0,Ê§°Ü·µ»Ø-1
+ *  \param[in]	path				è·¯å¾„
+ *  \param[out]	devinfo_context		æ•°æ®åœ°å€
+ *  \param[in]	devinfo_context_len	æ•°æ®é•¿åº¦
+ *  \returns    æˆåŠŸè¿”å›0,å¤±è´¥è¿”å›-1
  */
 int get_file_value(const char* path, unsigned char* keyvalue, int keyvalue_maxsize);
 

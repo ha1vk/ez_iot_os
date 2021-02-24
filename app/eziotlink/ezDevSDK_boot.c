@@ -3,9 +3,8 @@
 #include "platform_define.h"
 #include "thread_interface.h"
 #include "base_typedef.h"
-#include "ezDevSDK_Common_Module.h"
 #include "net_platform_wrapper.h"
-#include <../src/sdk_kernel_def.h>
+#include "sdk_kernel_def.h"
 #include "ezdev_sdk_kernel_struct.h"
 
 thread_handle g_main_thread = {0};
@@ -65,50 +64,24 @@ unsigned int sdk_user_thread(void *user_data)
     return 0;
 }
 
-static ezdev_sdk_kernel_error common_init(void)
-{
-    ezdevsdk_common_module_error common_error = ezdevsdk_cm_succ;
-    ezdev_sdk_kernel_error sdk_error = ezdev_sdk_kernel_succ;
-
-    common_error = ezDevSDK_Common_Module_Init(BOOT_MAX_COMMON_KEY_SIZE, BOOT_MAX_SETSWITCHENABLE_TYPE_SIZE, BOOT_MAX_QUERYSTATUS_TYPE_SIZE, BOOT_MAX_SETDEVPLAN_TYPE_SIZE, BOOT_MAX_DEFAULT_TYPE_SIZE);
-    if (ezdevsdk_cm_succ != common_error)
-    {
-        switch (common_error)
-        {
-        case ezdevsdk_cm_malloc_error:
-            sdk_error = ezdev_sdk_kernel_memory;
-            break;
-        case ezdevsdk_cm_load_kernel_error:
-        case ezdevsdk_cm_already_construct:
-            sdk_error = ezdev_sdk_kernel_invald_call;
-            break;
-        default:
-            sdk_error = ezdev_sdk_kernel_internal;
-            break;
-        }
-    }
-
-    return sdk_error;
-}
-
 #ifdef _WIN32
 int win_socket_init()
 {
     WORD wVersionRequested;
     WSADATA wsaData;
     int ret;
-    //WinSock初始化
-    wVersionRequested = MAKEWORD(2, 2);            //希望使用的WinSock DLL的版本
-    ret = WSAStartup(wVersionRequested, &wsaData); //加载套接字库
+    
+    wVersionRequested = MAKEWORD(2, 2);            
+    ret = WSAStartup(wVersionRequested, &wsaData); 
     if (ret != 0)
     {
         return -1;
     }
 
-    //确认WinSock DLL支持版本2.2
+    
     if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
     {
-        WSACleanup(); //释放为该程序分配的资源，终止对winsock动态库的使用
+        WSACleanup();
         return -1;
     }
 
@@ -275,7 +248,6 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
 #ifdef _WIN32
     win_socket_init();
 #endif // WIN32
-    ezdev_sdk_kernel_log_debug(0, 0, "ezDevSDK_Init, g_init:%d \n",g_init);
     do
     {
         if (0 != g_init)
@@ -284,21 +256,17 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
             break;
         }
 
-        //检查参数合法性
         if (all_config == NULL || all_config->notice.event_notice == NULL || all_config->notice.log_notice == NULL ||
             all_config->config.curingDataLoadFun == NULL || all_config->config.curingDataSaveFun == NULL)
         {
-            ezdev_sdk_kernel_log_debug(0, 0, " some callback fun is null \n");
             result_code = ezdev_sdk_kernel_params_invalid;
             break;
         }
-
-        //检查参数合法性
         if (0 == all_config->config.bUser)
         {
             if (!strlen(all_config->config.dev_id) || !strlen(all_config->config.dev_masterkey))
             {
-                ezdev_sdk_kernel_log_debug(0, 0, "dev_id or masterkey is null \n");
+                sdk_kernel_logprint(sdk_log_error, 0, 0, "dev_id or masterkey is null \n");
                 result_code = ezdev_sdk_kernel_params_invalid;
                 break;
             }
@@ -307,7 +275,7 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
         {
             if (all_config->config.keyValueLoadFun == NULL || all_config->config.keyValueSaveFun == NULL)
             {
-                ezdev_sdk_kernel_log_debug(0, 0, "keyValueFun is null \n");
+                sdk_kernel_logprint(sdk_log_error, 0, 0, "keyValueFun is null \n");
                 result_code = ezdev_sdk_kernel_params_invalid;
                 break;
             }
@@ -319,11 +287,10 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
         result_code = get_devinfo_fromconfig(g_all_config.config.devinfo_path, devinfo_string, 4 * 1024);
         if (result_code != 0)
         {
-            log_print("get_devinfo_fromconfig error :%d, path:%s", result_code, g_all_config.config.devinfo_path);
+            sdk_kernel_logprint(sdk_log_error, 0, 0, "get_devinfo_fromconfig err ");
             result_code = ezdev_sdk_kernel_value_load;
             break;
         }
-
         kernel_platform_handle.net_work_create = net_create;
         kernel_platform_handle.net_work_connect = net_connect;
         kernel_platform_handle.net_work_read = net_read;
@@ -352,17 +319,9 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
         result_code = ezdev_sdk_kernel_init(server_name, server_port, &kernel_platform_handle, event_notice_from_sdk_kernel, devinfo_string, (kernel_das_info *)all_config->config.reg_das_info, reg_mode);
         if (result_code != ezdev_sdk_kernel_succ)
         {
-            log_print("ezdev_sdk_kernel_init error :%d\n", result_code);
+            sdk_kernel_logprint(sdk_log_error, 0, 0,"ezdev_sdk_kernel_init err\n");
             break;
         }
-
-        result_code = common_init();
-        if (result_code != ezdev_sdk_kernel_succ)
-        {
-            log_print("ezDevSDK_Common_Module_Init error :%d\n", result_code);
-            break;
-        }
-
         g_init = 1;
     } while (0);
 
@@ -371,17 +330,12 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
 
 int ezDevSDK_Fini()
 {
-    ezdev_sdk_kernel_log_debug(0, 0, "ezDevSDK_Fini is g_init:%d \n", g_init);
     if (1 != g_init)
     {
         return ezdev_sdk_kernel_invald_call;
     }
-   
     ezdev_sdk_kernel_fini();
-    ezDevSDK_Common_Module_Fini();
-
     g_init = 0;
-
     return ezdev_sdk_kernel_succ;
 }
 
@@ -417,7 +371,7 @@ int ezDevSDK_Start()
 
     if (result != 0)
     {
-        ezdev_sdk_kernel_log_debug(result, 0, "sdk_thread_create err \n");
+        sdk_kernel_logprint(sdk_log_debug, 0, 0, "sdk_thread_create err \n");
         g_running = 0;
         ezdev_sdk_kernel_stop();
         sdk_thread_destroy(&g_main_thread);
@@ -439,7 +393,7 @@ int ezDevSDK_Stop()
         sdk_thread_destroy(&g_main_thread);
         sdk_thread_destroy(&g_user_thread);
     }
-    ezdev_sdk_kernel_log_debug(0, 0, "ezDevSDK_Stop\n");
+    sdk_kernel_logprint(sdk_log_debug, 0, 0,"ezDevSDK_Stop\n");
     kernel_error = ezdev_sdk_kernel_stop();
     if (kernel_error != ezdev_sdk_kernel_succ)
     {

@@ -1,23 +1,9 @@
-/**
- * \file		ezDevSDK_config.c
- *
- * \brief		本地文件的存取
- *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		xurongjun
- *
- * \date		2018/6/27
- */
-
-
 #include <stdio.h>
 #include <string.h>
 
 int g_testcount = 0;
 int get_devinfo_fromconfig(const char* path, char* devinfo_context, int devinfo_context_len)
 {
-	/* 最后会留一个 \0 */
 	int return_code = 0;
 	int real_read = 0;
 	int total_read = 0;
@@ -27,7 +13,6 @@ int get_devinfo_fromconfig(const char* path, char* devinfo_context, int devinfo_
 	config_file = fopen(path, "r");
 	if (config_file == NULL)
 	{
-//		return_code = GetLastError();
 		return_code = -1;
 		return return_code;
 	}
@@ -246,7 +231,6 @@ int get_file_value(const char* path, unsigned char* keyvalue, int keyvalue_maxsi
 
 	do 
 	{
-		/** 最多读取64个字节 */
 		memset(block, 0, 64);
 		real_read = fread(block, 1, 64, config_file);
 		if (real_read > 64 || real_read <= 0 )
