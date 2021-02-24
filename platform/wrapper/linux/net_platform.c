@@ -1,4 +1,4 @@
-#include "net_platform_wrapper.h"
+
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -10,12 +10,12 @@
 #include <netinet/tcp.h>
 #include<net/if.h>
 //#include <signal.h>
-
+#include "net_platform_wrapper.h"
 #include "ezdev_sdk_kernel_struct.h"
-#include <../src/mkernel_internal_error.h>
+#include "mkernel_internal_error.h"
 
 /**
- * \brief   linux ÊµÏÖ
+ * \brief   linux å®ç°
  */
 
 void signal_callback_handler(int signum){
@@ -60,25 +60,27 @@ char isIPAddress(const char *s)
 }  
 static in_addr_t ParseHost(const char* host, char szRealIp[ezdev_sdk_ip_max_len])
 {
-	if (host == NULL || strlen(host) == 0) {
-		return htonl(INADDR_ANY);
-	}
 	char **iplist;
 	char* invalid_ip ="0.0.0.0";
-
-#if 1
 	char str[128]= {0}; 
-	int ret, herr;
+	int ret =0, herr = 0, i = 0;
 	char buf[1024] = {0};
 	struct hostent entry, *hp;
+	
+	if (host == NULL || strlen(host) == 0) 
+	{
+		return htonl(INADDR_ANY);
+	}
+	
 	ret = gethostbyname_r(host, &entry, buf, 1024, &hp, &herr);
-	if (ret || hp == NULL) {
+	if (ret || hp == NULL)
+	{
 		return INADDR_NONE;
 	}
 
-	for(iplist = entry.h_addr_list; *iplist!= NULL; iplist++)
+	for(i=0,iplist = entry.h_addr_list; *iplist!= NULL; iplist++,i++)
 	{
-		inet_ntop(entry.h_addrtype, entry.h_addr_list, str, sizeof(str));
+		inet_ntop(entry.h_addrtype, entry.h_addr_list[i], str, sizeof(str));
 		if(0 == strcmp(str, invalid_ip))
 		{
 			continue;
@@ -93,61 +95,10 @@ static in_addr_t ParseHost(const char* host, char szRealIp[ezdev_sdk_ip_max_len]
 			strncpy(szRealIp, str, strlen(str));
 		}
 		
-	    return ((struct in_addr*)(entry.h_addr))->s_addr;
+		return ((struct in_addr*)(entry.h_addr_list[i]))->s_addr;
 	}
     
 	return INADDR_NONE;
-	/*const char* szParseIp = inet_ntop(entry.h_addrtype, entry.h_addr, str, sizeof(str));
-	if(NULL == szParseIp)
-	{
-		return INADDR_NONE;
-	}
-	if (strlen(szParseIp) >= ezdev_sdk_ip_max_len)
-	{
-		strncpy(szRealIp, szParseIp, ezdev_sdk_ip_max_len - 1);
-	}
-	else
-	{
-		strncpy(szRealIp, szParseIp, strlen(szParseIp));
-	}
-
-    printf("host parser:address:%s \n", szParseIp);
-	
-	
-	return ((struct in_addr*)(entry.h_addr))->s_addr;*/
-#else
-	in_addr_t raddr;
-	struct addrinfo* ailist, * aip;
-	struct addrinfo hint;
-
-	bzero(&hint, sizeof(hint));
-
-	if (isIPAddress(host)){
-		hint.ai_flags = AI_NUMERICHOST;
-	}
-
-	//DERROR("starto to getaddrinfo... host = %s ai_flags = %d time = %d\n", host, hint.ai_flags, time(NULL));
-	int ret = getaddrinfo(host, NULL, &hint, &ailist);
-	if (ret != 0) {
-		DERROR("getaddrinfo host = %s ai_flags = %d error, return %d: %s\n", host, hint.ai_flags, ret,  gai_strerror(ret));
-		return INADDR_NONE;
-	}
-	//DERROR("after freeaddrinfo... time = %d\n", time(NULL));
-
-	if (ailist == NULL) {
-		DERROR("getaddrinfo error, ailist is NULL\n");
-		return INADDR_NONE;
-	}
-
-	for (aip = ailist; aip != NULL; aip = aip->ai_next) {
-		raddr = ((struct sockaddr_in*)aip->ai_addr)->sin_addr.s_addr;
-		break;
-	}
-	//DERROR("starto to freeaddrinfo... time = %d\n", time(NULL));
-	freeaddrinfo(ailist);
-
-	return raddr;
-#endif
 }
 
 void linuxsocket_setnonblock(int socket_fd)
@@ -180,7 +131,6 @@ mkernel_internal_error linuxsocket_poll(int socket_fd, POLL_TYPE type, int timeo
 	nfds = poll(&poll_fd, 1, timeout);
 	if (nfds < 0) 
 	{
-//		DERROR("poll error, errno %d\n", errno);
 		if (errno == EINTR) 
 		{
 			return mkernel_internal_succ;
@@ -193,7 +143,7 @@ mkernel_internal_error linuxsocket_poll(int socket_fd, POLL_TYPE type, int timeo
 	else if (nfds > 0) 
 	{
 		if (poll_fd.revents & type) 
-		{ // prior to check error
+		{
 			return mkernel_internal_succ;
 		} 
 		else if (poll_fd.revents & (POLLNVAL | POLLERR | POLLHUP)) 
@@ -207,16 +157,15 @@ mkernel_internal_error linuxsocket_poll(int socket_fd, POLL_TYPE type, int timeo
 	} 
 	else 
 	{
-		// timeout
 		return mkernel_internal_net_socket_timeout;
 	}
 }
 
 /** 
- *  \brief		ÍøÂçÁ¬½ÓµÄ´´½¨,Ä¬ÈÏÎªTCPĞ­Òé
+ *  \brief		ç½‘ç»œè¿æ¥çš„åˆ›å»º,é»˜è®¤ä¸ºTCPåè®®
  *  \method		net_create
- *  \param[in] 	nic_name	Íø¿¨Ãû³Æ£¬Èç¹ûnic_name²»Îª¿Õ»òÖ¸ÏòµÄµØÖ·ÊÇÓĞĞ§Öµ£¬´´½¨µÄsocket½«°ó¶¨Õâ¸öÍø¿¨
- *  \return 	³É¹¦·µ»ØÍøÂçÁ¬½ÓÉÏÏÂÎÄ Ê§°Ü·µ»ØNULL
+ *  \param[in] 	nic_name	ç½‘å¡åç§°ï¼Œå¦‚æœnic_nameä¸ä¸ºç©ºæˆ–æŒ‡å‘çš„åœ°å€æ˜¯æœ‰æ•ˆå€¼ï¼Œåˆ›å»ºçš„socketå°†ç»‘å®šè¿™ä¸ªç½‘å¡
+ *  \return 	æˆåŠŸè¿”å›ç½‘ç»œè¿æ¥ä¸Šä¸‹æ–‡ å¤±è´¥è¿”å›NULL
  */
 ezdev_sdk_net_work net_create(char* nic_name)
 {
@@ -299,12 +248,10 @@ mkernel_internal_error net_connect(ezdev_sdk_net_work net_work, const char* serv
 	return_value = poll(&pfd, 1, timeout_ms);
 	if (return_value < 0)
 	{
-		//socket error
 		return mkernel_internal_net_socket_error;
 	}
 	else if (return_value == 0)
 	{
-		//timeout
 		return mkernel_internal_net_socket_timeout;
 	}
 	if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) 
@@ -316,7 +263,6 @@ mkernel_internal_error net_connect(ezdev_sdk_net_work net_work, const char* serv
 	{
 		return mkernel_internal_net_socket_error;
 	}
-	//check the SO_ERROR state
 	if (socket_err != 0) 
 	{
 		errno = socket_err;
@@ -343,19 +289,17 @@ mkernel_internal_error net_read(ezdev_sdk_net_work net_work, unsigned char* read
 		return_value = linuxsocket_poll(linuxnet_work->socket_fd, POLL_RECV, read_timeout_ms);
 		if (return_value != mkernel_internal_succ)
 		{
-			//socket error  or  socket close
 			return return_value;
 		}
 
 		rev_size = recv(linuxnet_work->socket_fd, read_buf + rev_total_size, read_buf_maxsize - rev_total_size, 0);
 		if (rev_size < 0)
 		{
-			//socket error
+			
 			return mkernel_internal_net_socket_error;
 		}
 		else if (rev_size == 0)
 		{
-			// socket close
 			return mkernel_internal_net_socket_closed;
 		}
 		rev_total_size += rev_size;
