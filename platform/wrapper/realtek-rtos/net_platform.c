@@ -1,15 +1,25 @@
-#include "net_platform_wrapper.h"
-#include "ezdev_sdk_kernel_struct.h"
+/*******************************************************************************
+ * Copyright 漏 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
+
 #include "lwip/netdb.h"
 #include "lwip/def.h"
 #include "lwip/sockets.h"
 #include <platform/platform_stdlib.h>
 #include "SysNet_HttpDns.h"
 #include "mkernel_internal_error.h"
-/**
-* \brief  realtek(free rtos) 实现
-*/
- 
+#include "net_platform_wrapper.h"
+#include "ezdev_sdk_kernel_struct.h"
 
 void lwipsocket_setnonblock(int socket_fd)
 {
@@ -25,60 +35,6 @@ void lwipsocket_setnonblock(int socket_fd)
 	return;
 }
 
-// ezdev_sdk_kernel_error linuxsocket_poll(int socket_fd, POLL_TYPE type, int timeout)
-// {
-// 	struct pollfd poll_fd;
-// 	int nfds = 0;
-// 
-// 	poll_fd.fd = socket_fd;
-// 	poll_fd.events = type;
-// 	poll_fd.revents = 0;
-// 	
-// 	if (socket_fd < 0) {
-// 		return ezdev_sdk_kernel_input_param_invalid;
-// 	}
-// 
-// 	nfds = poll(&poll_fd, 1, timeout);
-// 	if (nfds < 0) 
-// 	{
-// //		DERROR("poll error, errno %d\n", errno);
-// 		if (errno == EINTR) 
-// 		{
-// 			return ezdev_sdk_kernel_succ;
-// 		} 
-// 		else
-// 		{
-// 			return ezdev_sdk_kernel_net_socket_error;
-// 		}
-// 	}
-// 	else if (nfds > 0) 
-// 	{
-// 		if (poll_fd.revents & type) 
-// 		{ // prior to check error
-// 			return ezdev_sdk_kernel_succ;
-// 		} 
-// 		else if (poll_fd.revents & (POLLNVAL | POLLERR | POLLHUP)) 
-// 		{
-// 			return ezdev_sdk_kernel_net_socket_error;
-// 		} 
-// 		else 
-// 		{
-// 			return ezdev_sdk_kernel_net_socket_error;
-// 		}
-// 	} 
-// 	else 
-// 	{
-// 		// timeout
-// 		return ezdev_sdk_kernel_net_socket_timeout;
-// 	}
-// }
-
-/** 
- *  \brief		网络连接的创建,默认为TCP协议
- *  \method		net_create
- *  \param[in] 	nic_name	网卡名称，如果nic_name不为空或指向的地址是有效值，创建的socket将绑定这个网卡
- *  \return 	成功返回网络连接上下文 失败返回NULL
- */
 ezdev_sdk_net_work net_create(char* nic_name)
 {
 	freertos_net_work* freertosnet_work = NULL;
@@ -146,10 +102,6 @@ ezdev_sdk_kernel_error ezdev_net_connect(ezdev_sdk_net_work net_work, const char
 		strncpy(szRealIp, szParseIp, strlen(szParseIp));
 	}
 	
-	//printf("host parser:address:%s/%s\r\n", szParseIp, ip_addr);
-    //saddr.sin_family = AF_INET;
-    //saddr.sin_addr.s_addr = inet_addr(server_ip);
-    //saddr.sin_port = htons(server_port);
 #endif
     if( lwip_connect(freertosnet_work->lwip_fd, (struct sockaddr *)&saddr, sizeof(saddr)) != 0)
     {

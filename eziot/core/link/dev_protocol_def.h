@@ -1,101 +1,102 @@
-/**
-*  \file      
-*  \filename  dev_protocol_def.h  
-*  \filepath  e:\workdir\Ð¡ÏîÄ¿\ezDevSDK_v2.0.0\microkernel\src\dev_protocol_def.h
-*  \copyright HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
-*  \brief     Éè±¸Ð­Òé2.0µÄËùÓÐ¶¨Òå
-*  \author    panlong
-*  \date      2017/3/4
-*/
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #ifndef H_DEV_PROTOCOL_DEF_H_ 
 #define H_DEV_PROTOCOL_DEF_H_
 
 
-#define DEV_ACCESS_DOMAIN_VERSION									"V3.1.0"	///<	µ±Ç°½ÓÈëÁìÓòµÄ°æ±¾ºÅ
+#define DEV_ACCESS_DOMAIN_VERSION									"V1.0.0"	///<	å½“å‰æŽ¥å…¥çš„ç‰ˆæœ¬å·
 
 
-#define DEV_PROTOCOL_AUTHENTICATION_I          						0x1			///<	Éè±¸ÓëÆ½Ì¨ÈÏÖ¤_I,ECDHÃÜÔ¿½»»»ÇëÇó
-#define DEV_PROTOCOL_AUTHENTICATION_II          					0x2			///<	Éè±¸ÓëÆ½Ì¨ÈÏÖ¤_II,ECDHÃÜÔ¿½»»»ÏìÓ¦
-#define DEV_PROTOCOL_AUTHENTICATION_III          					0x3			///<	±£Áô
-#define DEV_PROTOCOL_REFRESHSESSIONKEY_REQ          		        0x4			///<	¸üÐÂSessionKeyÇëÇó 
-#define DEV_PROTOCOL_AUTHENTICATION_V          					    0x5			///<	±£Áô
-#define DEV_PROTOCOL_REFRESHSESSIONKEY_RSP          		        0x6			///<	¸üÐÂSessionKeyÏìÓ¦
-#define DEV_PROTOCOL_REQUEST_DEVID       					        0x7			///<	Éè±¸ÏòÆ½Ì¨ÇëÇóÉè±¸ID
-#define DEV_PROTOCOL_RESPONSE_DEVID           					    0x8			///<	Æ½Ì¨ÏòÉè±¸ÏìÓ¦Éè±¸ID
-#define DEV_PROTOCOL_APPLY_DEVID_CFM        				        0x9			///<	Éè±¸ÏòÆ½Ì¨È·ÈÏÉè±¸ID
+#define DEV_PROTOCOL_AUTHENTICATION_I          						0x1			///<	è®¾å¤‡ä¸Žå¹³å°è®¤è¯_I,ECDHå¯†é’¥äº¤æ¢è¯·æ±‚
+#define DEV_PROTOCOL_AUTHENTICATION_II          					0x2			///<	è®¾å¤‡ä¸Žå¹³å°è®¤è¯_II,ECDHå¯†é’¥äº¤æ¢å“åº”
+#define DEV_PROTOCOL_AUTHENTICATION_III          					0x3			///<	ä¿ç•™
+#define DEV_PROTOCOL_REFRESHSESSIONKEY_REQ          		        0x4			///<	æ›´æ–°SessionKeyè¯·æ±‚ 
+#define DEV_PROTOCOL_AUTHENTICATION_V          					    0x5			///<	ä¿ç•™
+#define DEV_PROTOCOL_REFRESHSESSIONKEY_RSP          		        0x6			///<	æ›´æ–°SessionKeyå“åº”
+#define DEV_PROTOCOL_REQUEST_DEVID       					        0x7			///<	è®¾å¤‡å‘å¹³å°è¯·æ±‚è®¾å¤‡ID
+#define DEV_PROTOCOL_RESPONSE_DEVID           					    0x8			///<	å¹³å°å‘è®¾å¤‡å“åº”è®¾å¤‡ID
+#define DEV_PROTOCOL_APPLY_DEVID_CFM        				        0x9			///<	è®¾å¤‡å‘å¹³å°ç¡®è®¤è®¾å¤‡ID
 
-#define DEV_PROTOCOL_CRYPTO_DATA_REQ          						0xA			///<	»ñÈ¡Das(Stun) info requset 
-#define DEV_PROTOCOL_CRYPTO_DATA_RSP          						0xB			///<	»ñÈ¡Das(Stun) info response
-#define DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_I         				0xC			///<	»ñÈ¡Stun infoµÄsessionkey_I 
-#define DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_II          			0xD			///<	»ñÈ¡Stun infoµÄsessionkey_II 
-#define DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_III          			0xE			///<	»ñÈ¡Stun infoµÄsessionkey_III 
-#define DEV_PROTOCOL_GET_SECRETKEY				          			0xF			///<	ÑéÖ¤Âë²»ºÏ¹æÉè±¸ÓÃÀ´ÉêÇësecretkey
+#define DEV_PROTOCOL_CRYPTO_DATA_REQ          						0xA			///<	èŽ·å–Das(Stun) info requset 
+#define DEV_PROTOCOL_CRYPTO_DATA_RSP          						0xB			///<	èŽ·å–Das(Stun) info response
+#define DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_I         				0xC			///<	èŽ·å–Stun infoçš„sessionkey_I 
+#define DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_II          			0xD			///<	èŽ·å–Stun infoçš„sessionkey_II 
+#define DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_III          			0xE			///<	èŽ·å–Stun infoçš„sessionkey_III 
+#define DEV_PROTOCOL_GET_SECRETKEY				          			0xF			///<	éªŒè¯ç ä¸åˆè§„è®¾å¤‡ç”¨æ¥ç”³è¯·secretkey
 
-#define DEV_PROTOCOL_LBS_FORM_VERSION							0x01		///<	ÓëLBS½»»¥Ð­ÒéÐÎÊ½°æ±¾ºÅ
-#define DEV_PROTOCOL_LBS_LOW_TYPE_VERSION						0x01		///<	ÓëLBS½»»¥Ð­ÒéÀàÐÍ°æ±¾ºÅ
-#define DEV_PROTOCOL_LBS_LOW_TYPE_VERSION_LICENSE				0x02		///<	ÓëLBS½»»¥Ð­ÒéÀàÐÍ°æ±¾ºÅ --- Ö§³Ölicense½âÎöµÄ°æ±¾
-#define DEV_PROTOCOL_LBS_HIGH_TYPE_VERSION						0x00		///<	ÓëLBS½»»¥Ð­ÒéÀàÐÍ°æ±¾ºÅ
-
-
-#define DEV_PROTOCOL_LBS						0			///<	³É¹¦
-#define DEV_PROTOCOL_LBS_SIGNCHECK_ERROR		1			///<	signÑéÖ¤Ê§°Ü
-#define DEV_PROTOCOL_LBS_ORDER_ERROR			2			///<	ÐÅÁîÊ±ÐòÓÐÎÊÌâ
-#define DEV_PROTOCOL_LBS_INVALID_DATA			3			///<	ÎÞÐ§Êý¾Ý
-#define DEV_PROTOCOL_LBS_DEVID_INCONFORMITY		4			///<	Éè±¸ÉÏ´«µÄDEVIDÓëÆ½Ì¨¼ÇÂ¼²»Ò»ÖÂ£¨¿ÉÄÜÊÇ´®ºÅÉè±¸£©
-#define DEV_PROTOCOL_LBS_QUERY_AUTHCODE_ERROR	5			///<	²éÑ¯ÑéÖ¤ÂëÊ§°Ü
-#define DEV_PROTOCOL_LBS_QUERY_AUTHCODE_REDIS	6			///<	²éÑ¯redisÊ§°Ü
-#define DEV_PROTOCOL_LBS_DEC_ERROR				7			///<	½âÃÜÊ§°Ü
-#define DEV_PROTOCOL_LBS_ENC_ERROR				8			///<	¼ÓÃÜÊ§°Ü
-#define DEV_PROTOCOL_LBS_GETSTUN_ERROR			9			///<	»ñÈ¡dasÐÅÏ¢»òstunÐÅÏ¢Ê§°Ü
+#define DEV_PROTOCOL_LBS_FORM_VERSION							0x01		///<	ä¸ŽLBSäº¤äº’åè®®å½¢å¼ç‰ˆæœ¬å·
+#define DEV_PROTOCOL_LBS_LOW_TYPE_VERSION						0x01		///<	ä¸ŽLBSäº¤äº’åè®®ç±»åž‹ç‰ˆæœ¬å·
+#define DEV_PROTOCOL_LBS_LOW_TYPE_VERSION_LICENSE				0x02		///<	ä¸ŽLBSäº¤äº’åè®®ç±»åž‹ç‰ˆæœ¬å· --- æ”¯æŒlicenseè§£æžçš„ç‰ˆæœ¬
+#define DEV_PROTOCOL_LBS_HIGH_TYPE_VERSION						0x00		///<	ä¸ŽLBSäº¤äº’åè®®ç±»åž‹ç‰ˆæœ¬å·
 
 
-#define DEV_PROTOCOL_MQTT_SUCC								0			///<	MQTT ³É¹¦
-#define DEV_PROTOCOL_MQTT_NOSUPPORT_PROTOCOL_VERSION		1			///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬²»Ö§³ÖµÄÐ­Òé°æ±¾
-#define DEV_PROTOCOL_MQTT_UNQUALIFIED_CLIENT_ID				2			///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬²»ºÏ¸ñµÄ¿Í»§¶Ë±êÊ¶·û
-#define DEV_PROTOCOL_MQTT_SERVER_UNUSABLE					3			///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬·þÎñ¶Ë²»¿ÉÓÃ
-#define DEV_PROTOCOL_MQTT_INVALID_USERNAME					4			///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬ÎÞÐ§µÄÓÃ»§Ãû»òÃÜÂë
-#define DEV_PROTOCOL_MQTT_UNAUTHORIZED						5			///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬Î´ÊÚÈ¨
-#define DEV_PROTOCOL_MQTT_BLACKLIST							10			///<	Éè±¸±»¼ÓÈëµ½ºÚÃûµ¥
-#define DEV_PROTOCOL_MQTT_REDIRECT							11			///<	Éè±¸»á»°Ê§Ð§(ÐèÒªÖØ¶¨Ïò)
+#define DEV_PROTOCOL_LBS						0			///<	æˆåŠŸ
+#define DEV_PROTOCOL_LBS_SIGNCHECK_ERROR		1			///<	signéªŒè¯å¤±è´¥
+#define DEV_PROTOCOL_LBS_ORDER_ERROR			2			///<	ä¿¡ä»¤æ—¶åºæœ‰é—®é¢˜
+#define DEV_PROTOCOL_LBS_INVALID_DATA			3			///<	æ— æ•ˆæ•°æ®
+#define DEV_PROTOCOL_LBS_DEVID_INCONFORMITY		4			///<	è®¾å¤‡ä¸Šä¼ çš„DEVIDä¸Žå¹³å°è®°å½•ä¸ä¸€è‡´ï¼ˆå¯èƒ½æ˜¯ä¸²å·è®¾å¤‡ï¼‰
+#define DEV_PROTOCOL_LBS_QUERY_AUTHCODE_ERROR	5			///<	æŸ¥è¯¢éªŒè¯ç å¤±è´¥
+#define DEV_PROTOCOL_LBS_QUERY_AUTHCODE_REDIS	6			///<	æŸ¥è¯¢rediså¤±è´¥
+#define DEV_PROTOCOL_LBS_DEC_ERROR				7			///<	è§£å¯†å¤±è´¥
+#define DEV_PROTOCOL_LBS_ENC_ERROR				8			///<	åŠ å¯†å¤±è´¥
+#define DEV_PROTOCOL_LBS_GETSTUN_ERROR			9			///<	èŽ·å–dasä¿¡æ¯æˆ–stunä¿¡æ¯å¤±è´¥
 
 
-#define	DAS_CMD_DOMAIN										1000			///<	Éè±¸½ÓÈë
-#define DAS_CMD_COMMON_FUN									1001			///<	Í¨ÓÃ¹¦ÄÜ
-
-#define DAS_CMD_CENPLT2PUDOMAINCONFIG						0x0001		///<	Æ½Ì¨ÏÂ·¢½ÓÈëÁìÓòÏµÍ³ÅäÖÃ
-#define DAS_CMD_CENPLT2PURISKCONFIG							0x0002		///<	Æ½Ì¨ÏÂ·¢·ç¿ØÖ¸Áî
-#define DAS_CMD_CENPLT2PUOFFLINE							0x0003		///<	Æ½Ì¨Í¨ÖªÉè±¸ÏÂÏß
-// #define DAS_CMD_CENPLT2PUOFFLINEREQ							0x2805		///<	Æ½Ì¨ÒªÇóÉè±¸ÀëÏßÇëÇó
-// #define DAS_CMD_CENPLT2PUOFFLINERSP							0x2806		///<	Æ½Ì¨ÒªÇóÉè±¸ÀëÏßÏìÓ¦
-// #define	DAS_CMD_CENPLT2DASDEVICEKICKOUTREQ					0x301D		///<	Æ½Ì¨ÏòDas·¢ËÍÌßÉè±¸ÏÂÏßÇëÇó
-// #define	DAS_CMD_CENPLT2DASDEVICEKICKOUTRSP					0x301E		///<	Æ½Ì¨ÏòDas·¢ËÍÌßÉè±¸ÏÂÏßÏìÓ¦
-#define DAS_CMD_CENPLT2PUSETKEEPALIVETIMEREQ				0x3450		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃÐÄÌø¼ä¸ôÇëÇó
-#define DAS_CMD_CENPLT2PUSETKEEPALIVETIMERSP				0x3451		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃÐÄÌø¼ä¸ôÏìÓ¦
-#define DAS_CMD_CENPLT2PUSETLBSDOMAINNAMEBYDASREQ			0x3479		///<	Æ½Ì¨ÏòÉè±¸ÏÂ·¢ÖØ¶¨ÏòÇëÇó
-#define DAS_CMD_CENPLT2PUSETLBSDOMAINNAMEBYDASRSP			0x347A		///<	Æ½Ì¨ÏòÉè±¸ÏÂ·¢ÖØ¶¨ÏòÏìÓ¦
-#define DAS_CMD_CENPLT2PUSETLBSDOMAINNAMEREQ				0x491F		///<	Æ½Ì¨ÏòÉè±¸ÏÂ·¢ÖØ¶¨ÏòÇëÇó
-#define DAS_CMD_CENPLT2PUSETLBSDOMAINNAMERSP				0x4920		///<	Æ½Ì¨ÏòÉè±¸ÏÂ·¢ÖØ¶¨ÏòÏìÓ¦
+#define DEV_PROTOCOL_MQTT_SUCC								0			///<	MQTT æˆåŠŸ
+#define DEV_PROTOCOL_MQTT_NOSUPPORT_PROTOCOL_VERSION		1			///<	MQTT è¿žæŽ¥å·²æ‹’ç»ï¼Œä¸æ”¯æŒçš„åè®®ç‰ˆæœ¬
+#define DEV_PROTOCOL_MQTT_UNQUALIFIED_CLIENT_ID				2			///<	MQTT è¿žæŽ¥å·²æ‹’ç»ï¼Œä¸åˆæ ¼çš„å®¢æˆ·ç«¯æ ‡è¯†ç¬¦
+#define DEV_PROTOCOL_MQTT_SERVER_UNUSABLE					3			///<	MQTT è¿žæŽ¥å·²æ‹’ç»ï¼ŒæœåŠ¡ç«¯ä¸å¯ç”¨
+#define DEV_PROTOCOL_MQTT_INVALID_USERNAME					4			///<	MQTT è¿žæŽ¥å·²æ‹’ç»ï¼Œæ— æ•ˆçš„ç”¨æˆ·åæˆ–å¯†ç 
+#define DEV_PROTOCOL_MQTT_UNAUTHORIZED						5			///<	MQTT è¿žæŽ¥å·²æ‹’ç»ï¼ŒæœªæŽˆæƒ
+#define DEV_PROTOCOL_MQTT_BLACKLIST							10			///<	è®¾å¤‡è¢«åŠ å…¥åˆ°é»‘åå•
+#define DEV_PROTOCOL_MQTT_REDIRECT							11			///<	è®¾å¤‡ä¼šè¯å¤±æ•ˆ(éœ€è¦é‡å®šå‘)
 
 
-#define DAS_CMD_COMM_DOMAIN_PU2CENPLTUPDATESTATUS					0x0001		///<	Í¨ÓÃ×´Ì¬ÉÏ±¨
-#define	DAS_CMD_COMM_DOMAIN_CENPLT2PUSETSTATUS						0x0002		///<	Í¨ÓÃ×´Ì¬ÉèÖÃ
+#define	DAS_CMD_DOMAIN										1000			///<	è®¾å¤‡æŽ¥å…¥
+#define DAS_CMD_COMMON_FUN									1001			///<	é€šç”¨åŠŸèƒ½
 
-#define	DAS_CMD_CENPLT2PUSETSWITCHENABLEREQ					0x490B		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃ¿ª¹Ø×´Ì¬ÇëÇó
-#define DAS_CMD_CENPLT2PUSETSWITCHENABLERSP					0x490C		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃ¿ª¹Ø×´Ì¬ÏàÓ¦
+#define DAS_CMD_CENPLT2PUDOMAINCONFIG						0x0001		///<	å¹³å°ä¸‹å‘æŽ¥å…¥é¢†åŸŸç³»ç»Ÿé…ç½®
+#define DAS_CMD_CENPLT2PURISKCONFIG							0x0002		///<	å¹³å°ä¸‹å‘é£ŽæŽ§æŒ‡ä»¤
+#define DAS_CMD_CENPLT2PUOFFLINE							0x0003		///<	å¹³å°é€šçŸ¥è®¾å¤‡ä¸‹çº¿
 
-#define	DAS_CMD_CENPLT2PUQUERYSTATUSREQ						0x3061		///<	Æ½Ì¨ÏòÉè±¸»ñÈ¡×´Ì¬ÇëÇó
+#define DAS_CMD_CENPLT2PUSETKEEPALIVETIMEREQ				0x3450		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®å¿ƒè·³é—´éš”è¯·æ±‚
+#define DAS_CMD_CENPLT2PUSETKEEPALIVETIMERSP				0x3451		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®å¿ƒè·³é—´éš”å“åº”
+#define DAS_CMD_CENPLT2PUSETLBSDOMAINNAMEBYDASREQ			0x3479		///<	å¹³å°å‘è®¾å¤‡ä¸‹å‘é‡å®šå‘è¯·æ±‚
+#define DAS_CMD_CENPLT2PUSETLBSDOMAINNAMEBYDASRSP			0x347A		///<	å¹³å°å‘è®¾å¤‡ä¸‹å‘é‡å®šå‘å“åº”
+#define DAS_CMD_CENPLT2PUSETLBSDOMAINNAMEREQ				0x491F		///<	å¹³å°å‘è®¾å¤‡ä¸‹å‘é‡å®šå‘è¯·æ±‚
+#define DAS_CMD_CENPLT2PUSETLBSDOMAINNAMERSP				0x4920		///<	å¹³å°å‘è®¾å¤‡ä¸‹å‘é‡å®šå‘å“åº”
 
-#define	DAS_CMD_CENPLT2PUSETDEVPLANREQ						0x492B		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃ¼Æ»®ÇëÇó
-#define	DAS_CMD_CENPLT2PUSETDEVPLANRSP						0x492C		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃ¼Æ»®ÏìÓ¦
 
-#define DAS_CMD_CENPLT2PUSETCANARYTESTSTATUSREQ				0x4967		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃ»Ò¶È·¢²¼×´Ì¬ÇëÇó
-#define DAS_CMD_CENPLT2PUSETCANARYTESTSTATUSRSP				0x4968		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃ»Ò¶È·¢²¼×´Ì¬ÏìÓ¦
+#define DAS_CMD_COMM_DOMAIN_PU2CENPLTUPDATESTATUS					0x0001		///<	é€šç”¨çŠ¶æ€ä¸ŠæŠ¥
+#define	DAS_CMD_COMM_DOMAIN_CENPLT2PUSETSTATUS						0x0002		///<	é€šç”¨çŠ¶æ€è®¾ç½®
 
-#define DAS_CMD_PU2CENPLTUPGRADEREQ							0x2863		///<	Éè±¸ÏòÆ½Ì¨²éÑ¯Éý¼¶ÇëÇó	
-#define DAS_CMD_PU2CENPLTUPGRADERSP							0x2864		///<	Éè±¸ÏòÆ½Ì¨²éÑ¯Éý¼¶ÏìÓ¦
-#define DAS_CMD_PU2CENPLTSETKEEPALIVETIMEREQ                0X3452      ///<    Éè±¸ÏòÆ½Ì¨ÉèÖÃÐÄÌø¼ä¸ôÇëÇó
-#define DAS_CMD_PU2CENPLTSETKEEPALIVETIMERSP                0X3453      ///<    Éè±¸ÏòÆ½Ì¨ÉèÖÃÐÄÌø¼ä¸ôÏìÓ¦
+#define	DAS_CMD_CENPLT2PUSETSWITCHENABLEREQ					0x490B		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®å¼€å…³çŠ¶æ€è¯·æ±‚
+#define DAS_CMD_CENPLT2PUSETSWITCHENABLERSP					0x490C		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®å¼€å…³çŠ¶æ€ç›¸åº”
 
-#define DEV_COMMON_CENPLT2PUSETKEYVALUEREQ					0x498D		///<	Æ½Ì¨ÏòÉè±¸ÉèÖÃ¼üÖµÀà×´Ì¬ÇëÇó
+#define	DAS_CMD_CENPLT2PUQUERYSTATUSREQ						0x3061		///<	å¹³å°å‘è®¾å¤‡èŽ·å–çŠ¶æ€è¯·æ±‚
+
+#define	DAS_CMD_CENPLT2PUSETDEVPLANREQ						0x492B		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®è®¡åˆ’è¯·æ±‚
+#define	DAS_CMD_CENPLT2PUSETDEVPLANRSP						0x492C		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®è®¡åˆ’å“åº”
+
+#define DAS_CMD_CENPLT2PUSETCANARYTESTSTATUSREQ				0x4967		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®ç°åº¦å‘å¸ƒçŠ¶æ€è¯·æ±‚
+#define DAS_CMD_CENPLT2PUSETCANARYTESTSTATUSRSP				0x4968		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®ç°åº¦å‘å¸ƒçŠ¶æ€å“åº”
+
+#define DAS_CMD_PU2CENPLTUPGRADEREQ							0x2863		///<	è®¾å¤‡å‘å¹³å°æŸ¥è¯¢å‡çº§è¯·æ±‚	
+#define DAS_CMD_PU2CENPLTUPGRADERSP							0x2864		///<	è®¾å¤‡å‘å¹³å°æŸ¥è¯¢å‡çº§å“åº”
+#define DAS_CMD_PU2CENPLTSETKEEPALIVETIMEREQ                0X3452      ///<    è®¾å¤‡å‘å¹³å°è®¾ç½®å¿ƒè·³é—´éš”è¯·æ±‚
+#define DAS_CMD_PU2CENPLTSETKEEPALIVETIMERSP                0X3453      ///<    è®¾å¤‡å‘å¹³å°è®¾ç½®å¿ƒè·³é—´éš”å“åº”
+
+#define DEV_COMMON_CENPLT2PUSETKEYVALUEREQ					0x498D		///<	å¹³å°å‘è®¾å¤‡è®¾ç½®é”®å€¼ç±»çŠ¶æ€è¯·æ±‚
 
 #endif

@@ -1,23 +1,24 @@
-/**
- * \file		time_platform.c
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
  *
- * \brief		Ê±¼äÏà¹Ø½Ó¿ÚµÄWindowsÊµÏÖ
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		xurongjun
- *
- * \date		2018/6/27
- */
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 #include "time_platform_wrapper.h"
 #include <time.h>
 #include "ezdev_sdk_kernel_struct.h"
 
 /** 
- *  \brief		´´½¨Ê±¼ä¶ÔÏó
+ *  \brief		åˆ›å»ºæ—¶é—´å¯¹è±¡
  *  \method		Platform_TimerCreater
- *  \return 	³É¹¦·µ»ØÊ±¼ä¶ÔÏó Ê§°Ü·µ»ØNULL
+ *  \return 	æˆåŠŸè¿”å›žæ—¶é—´å¯¹è±¡ å¤±è´¥è¿”å›žNULL
  */
 ezdev_sdk_time Platform_TimerCreater()
 {
@@ -33,12 +34,12 @@ ezdev_sdk_time Platform_TimerCreater()
 }
 
 /** 
- *  \brief		ÅÐ¶ÏÊÇ·ñ¹ýÆÚ
- *  \note		ÏÖÔÚµÄÊ±¼äºÍ¹ýÈ¥µÄÊ±¼äsdktimeÏà±È£¬ÊÇ·ñÒÑ¾­³¬¹ýÁËtime_ms£¬³¬¹ýÁËÎª¹ýÆÚ
+ *  \brief		åˆ¤æ–­æ˜¯å¦è¿‡æœŸ
+ *  \note		çŽ°åœ¨çš„æ—¶é—´å’Œè¿‡åŽ»çš„æ—¶é—´sdktimeç›¸æ¯”ï¼Œæ˜¯å¦å·²ç»è¶…è¿‡äº†time_msï¼Œè¶…è¿‡äº†ä¸ºè¿‡æœŸ
  *  \method		Platform_TimeIsExpired_Bydiff
- *  \param[in] 	sdktime Ö®Ç°µÄÊ±¼ä¶ÔÏó
- *  \param[in] 	time_ms Ê±¼äÅÐ¶Ï»ù×¼
- *  \return 	¹ýÆÚ·µ1 Î´¹ýÆÚ·µ0
+ *  \param[in] 	sdktime ä¹‹å‰çš„æ—¶é—´å¯¹è±¡
+ *  \param[in] 	time_ms æ—¶é—´åˆ¤æ–­åŸºå‡†
+ *  \return 	è¿‡æœŸè¿”1 æœªè¿‡æœŸè¿”0
  */
 char Platform_TimeIsExpired_Bydiff(ezdev_sdk_time sdktime, EZDEV_SDK_UINT32 time_ms)
 {
@@ -61,19 +62,14 @@ char Platform_TimeIsExpired_Bydiff(ezdev_sdk_time sdktime, EZDEV_SDK_UINT32 time
 }
 
 /** 
- *  \brief		ÅÐ¶ÏÊÇ·ñ¹ýÆÚ
- *  \note		ÅÐ¶ÏsdktimeÊÇ·ñÒÑ¹ýÆÚ£¬±ÈÏÖÔÚÔçµÄ»°Îª¹ýÆÚ
+ *  \brief		åˆ¤æ–­æ˜¯å¦è¿‡æœŸ
+ *  \note		åˆ¤æ–­sdktimeæ˜¯å¦å·²è¿‡æœŸï¼Œæ¯”çŽ°åœ¨æ—©çš„è¯ä¸ºè¿‡æœŸ
  *  \method		Platform_TimerIsExpired
- *  \param[in] 	sdktime Ê±¼ä¶ÔÏó
- *  \return 	¹ýÆÚ·µ1 Î´¹ýÆÚ·µ0
+ *  \param[in] 	sdktime æ—¶é—´å¯¹è±¡
+ *  \return 	è¿‡æœŸè¿”1 æœªè¿‡æœŸè¿”0
  */
 char Platform_TimerIsExpired(ezdev_sdk_time sdktime)
 {
-	// 	struct timeval now, res;
-	// 	gettimeofday(&now, NULL);
-	// 	timersub(&timer->end_time, &now, &res);		
-	// 	return res.tv_sec < 0 || (res.tv_sec == 0 && res.tv_usec <= 0);
-
 	time_t now_t = 0;
 	win_time* wintime = (win_time*)sdktime;
 	if (wintime == NULL)
@@ -94,10 +90,10 @@ char Platform_TimerIsExpired(ezdev_sdk_time sdktime)
 }
 
 /** 
- *  \brief		»ñÈ¡Î´À´¶àÉÙºÁÃëºóµÄÊÇÊ±¼ä
+ *  \brief		èŽ·å–æœªæ¥å¤šå°‘æ¯«ç§’åŽçš„æ˜¯æ—¶é—´
  *  \method		Platform_TimerCountdownMS
- *  \param[in] 	sdktime Ê±¼ä¶ÔÏó
- *  \param[in] 	timeout Î´À´¶àÉÙºÁÃë
+ *  \param[in] 	sdktime æ—¶é—´å¯¹è±¡
+ *  \param[in] 	timeout æœªæ¥å¤šå°‘æ¯«ç§’
  */
 void Platform_TimerCountdownMS(ezdev_sdk_time sdktime, unsigned int timeout)
 {
@@ -121,10 +117,10 @@ void Platform_TimerCountdownMS(ezdev_sdk_time sdktime, unsigned int timeout)
 }
 
 /** 
- *  \brief		»ñÈ¡Î´À´¶àÉÙÃëºóµÄÊÇÊ±¼ä
+ *  \brief		èŽ·å–æœªæ¥å¤šå°‘ç§’åŽçš„æ˜¯æ—¶é—´
  *  \method		Platform_TimerCountdown
- *  \param[in] 	sdktime Ê±¼ä¶ÔÏó
- *  \param[in] 	timeout Î´À´¶àÉÙÃë
+ *  \param[in] 	sdktime æ—¶é—´å¯¹è±¡
+ *  \param[in] 	timeout æœªæ¥å¤šå°‘ç§’
  */
 void Platform_TimerCountdown(ezdev_sdk_time sdktime, unsigned int timeout)
 {
@@ -147,10 +143,10 @@ void Platform_TimerCountdown(ezdev_sdk_time sdktime, unsigned int timeout)
 }
 
 /** 
- *  \brief		»ñÈ¡Ê£ÓàÊ±¼ä ÓÃÀ´µ¹¼ÆÊ±
+ *  \brief		èŽ·å–å‰©ä½™æ—¶é—´ ç”¨æ¥å€’è®¡æ—¶
  *  \method		Platform_TimerCountdown
- *  \param[in] 	sdktime µ¹¼ÆÊ±¶ÔÏó
- *  \return 	·µ»ØÊ£ÓàÊ±¼ä Èç¹ûÒÑ¹ýÆÚ·µ»Ø0
+ *  \param[in] 	sdktime å€’è®¡æ—¶å¯¹è±¡
+ *  \return 	è¿”å›žå‰©ä½™æ—¶é—´ å¦‚æžœå·²è¿‡æœŸè¿”å›ž0
  */
 EZDEV_SDK_UINT32 Platform_TimerLeftMS(ezdev_sdk_time sdktime)
 {
@@ -179,9 +175,9 @@ EZDEV_SDK_UINT32 Platform_TimerLeftMS(ezdev_sdk_time sdktime)
 }
 
 /** 
- *  \brief		Ïú»ÙÊ±¼ä¶ÔÏó
+ *  \brief		é”€æ¯æ—¶é—´å¯¹è±¡
  *  \method		Platform_TimeDestroy
- *  \param[in] 	sdktime Ê±¼ä¶ÔÏó
+ *  \param[in] 	sdktime æ—¶é—´å¯¹è±¡
  */
 void Platform_TimeDestroy(ezdev_sdk_time sdktime)
 {

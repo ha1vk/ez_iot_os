@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright 漏 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #include "ezdev_sdk_kernel_risk_control.h"
 #include "base_typedef.h"
 #include "sdk_kernel_def.h"
@@ -59,7 +72,7 @@ char check_cmd_risk_control(ezdev_sdk_kernel* sdk_kernel, EZDEV_SDK_UINT32 domai
 {
 	int index = 0;
 	ezdev_sdk_kernel_domain_info*  domain_info = NULL;
-	//特殊处理公共领域不做风控
+
 	if (DAS_CMD_COMMON_FUN == domain_id|| DAS_CMD_DOMAIN == domain_id || ezdev_sdk_offline_cmd_id == cmd_id)
 	{
 		return 0;

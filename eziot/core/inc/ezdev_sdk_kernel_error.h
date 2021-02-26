@@ -1,19 +1,18 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 /**
- * \file		ezdev_sdk_kernel_error.h
- *
- * \brief		¶¨ÒåÉè±¸SDKÎ¢ÄÚºËµÄ´íÎóÐÅÏ¢
- *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		panlong
- *
- * \date		2017/3/2
- */
-
-/**
-* @addtogroup micro_kernel 
+* @addtogroup ez_iot_c 
 *
-* @section Î¢ÄÚºË´íÎóÂëÐÅÏ¢
 *
 *  \sa ezdev_sdk_kernel_error
 * 
@@ -45,58 +44,58 @@
 
 typedef enum 
 {
-	ezdev_sdk_kernel_succ 						= 0,								///< ³É¹¦
-	ezdev_sdk_kernel_internal					= BASE_ERROR+1,						///< ÄÚ²¿´íÎó
-	ezdev_sdk_kernel_invald_call				= BASE_ERROR+2,						///< µ÷ÓÃÁ÷³ÌÓÐÎó
-	ezdev_sdk_kernel_params_invalid				= BASE_ERROR+3,						///< ²ÎÊý·Ç·¨
-	ezdev_sdk_kernel_buffer_too_small			= BASE_ERROR+4,						///< »º³åÇø´óÐ¡²»×ã
-	ezdev_sdk_kernel_data_len_range				= BASE_ERROR+5,						///< Êý¾Ý´óÐ¡³¬³ö·¶Î§
-	ezdev_sdk_kernel_memory						= BASE_ERROR+6,						///< ÄÚ´æÒì³£
-	ezdev_sdk_kernel_json_invalid				= BASE_ERROR+7,						///< ·Ç·¨µÄjsonÊý¾Ý
-	ezdev_sdk_kernel_json_format				= BASE_ERROR+8,						///< jsonÊý¾ÝÓÐÎó
-	ezdev_sdk_kernel_extend_no_find				= BASE_ERROR+9,						///< ÐÅÁîÂ·ÓÉÕÒ²»µ½¶ÔÓ¦µÄ×¢²áÁìÓò
-	ezdev_sdk_kernel_extend_full				= BASE_ERROR+10,					///< À©Õ¹×¢²áÒÑÂú
-	ezdev_sdk_kernel_extend_existed				= BASE_ERROR+11,					///< À©Õ¹ÒÑ¾­×¢²á
-	ezdev_sdk_kernel_queue_full					= BASE_ERROR+12,					///< ÏûÏ¢¶ÓÁÐÒÑÂú
-	ezdev_sdk_kernel_value_load					= BASE_ERROR+13,					///< »ñÈ¡Éè±¸Êý¾ÝÊ§°Ü
-	ezdev_sdk_kernel_value_save					= BASE_ERROR+14,					///< ±£´æÊý¾ÝÖÁÉè±¸Ê§°Ü
-    ezdev_sdk_kernel_msg_stop_distribute	    = BASE_ERROR+15,					///< Éè±¸ÕýÔÚÍ£Ö¹,ÉÏ²ãÏûÏ¢Í£Ö¹ÏÂ·¢
+	ezdev_sdk_kernel_succ 						= 0,								///< æˆåŠŸ
+	ezdev_sdk_kernel_internal					= BASE_ERROR+1,						///< å†…éƒ¨é”™è¯¯
+	ezdev_sdk_kernel_invald_call				= BASE_ERROR+2,						///< è°ƒç”¨æµç¨‹æœ‰è¯¯
+	ezdev_sdk_kernel_params_invalid				= BASE_ERROR+3,						///< å‚æ•°éžæ³•
+	ezdev_sdk_kernel_buffer_too_small			= BASE_ERROR+4,						///< ç¼“å†²åŒºå¤§å°ä¸è¶³
+	ezdev_sdk_kernel_data_len_range				= BASE_ERROR+5,						///< æ•°æ®å¤§å°è¶…å‡ºèŒƒå›´
+	ezdev_sdk_kernel_memory						= BASE_ERROR+6,						///< å†…å­˜å¼‚å¸¸
+	ezdev_sdk_kernel_json_invalid				= BASE_ERROR+7,						///< éžæ³•çš„jsonæ•°æ®
+	ezdev_sdk_kernel_json_format				= BASE_ERROR+8,						///< jsonæ•°æ®æœ‰è¯¯
+	ezdev_sdk_kernel_extend_no_find				= BASE_ERROR+9,						///< ä¿¡ä»¤è·¯ç”±æ‰¾ä¸åˆ°å¯¹åº”çš„æ³¨å†Œé¢†åŸŸ
+	ezdev_sdk_kernel_extend_full				= BASE_ERROR+10,					///< æ‰©å±•æ³¨å†Œå·²æ»¡
+	ezdev_sdk_kernel_extend_existed				= BASE_ERROR+11,					///< æ‰©å±•å·²ç»æ³¨å†Œ
+	ezdev_sdk_kernel_queue_full					= BASE_ERROR+12,					///< æ¶ˆæ¯é˜Ÿåˆ—å·²æ»¡
+	ezdev_sdk_kernel_value_load					= BASE_ERROR+13,					///< èŽ·å–è®¾å¤‡æ•°æ®å¤±è´¥
+	ezdev_sdk_kernel_value_save					= BASE_ERROR+14,					///< ä¿å­˜æ•°æ®è‡³è®¾å¤‡å¤±è´¥
+    ezdev_sdk_kernel_msg_stop_distribute	    = BASE_ERROR+15,					///< è®¾å¤‡æ­£åœ¨åœæ­¢,ä¸Šå±‚æ¶ˆæ¯åœæ­¢ä¸‹å‘
 
-	ezdev_sdk_kernel_net_create					= (BASE_ERROR+NET_ERROR)+1,			///< ´´½¨socketÊ§°Ü
-	ezdev_sdk_kernel_net_connect				= (BASE_ERROR+NET_ERROR)+2,			///< ÍøÂçÁ¬½ÓÊ§°Ü
-	ezdev_sdk_kernel_net_disconnected			= (BASE_ERROR+NET_ERROR)+3,			///< ÍøÂçÁ¬½Ó¶Ï¿ª
-	ezdev_sdk_kernel_net_transmit				= (BASE_ERROR+NET_ERROR)+4,			///< Êý¾Ý´«ÊäÊ§°Ü
-	ezdev_sdk_kernel_net_dns					= (BASE_ERROR+NET_ERROR)+5,			///< ÓòÃû½âÎöÊ§°Ü
+	ezdev_sdk_kernel_net_create					= (BASE_ERROR+NET_ERROR)+1,			///< åˆ›å»ºsocketå¤±è´¥
+	ezdev_sdk_kernel_net_connect				= (BASE_ERROR+NET_ERROR)+2,			///< ç½‘ç»œè¿žæŽ¥å¤±è´¥
+	ezdev_sdk_kernel_net_disconnected			= (BASE_ERROR+NET_ERROR)+3,			///< ç½‘ç»œè¿žæŽ¥æ–­å¼€
+	ezdev_sdk_kernel_net_transmit				= (BASE_ERROR+NET_ERROR)+4,			///< æ•°æ®ä¼ è¾“å¤±è´¥
+	ezdev_sdk_kernel_net_dns					= (BASE_ERROR+NET_ERROR)+5,			///< åŸŸåè§£æžå¤±è´¥
 
-	ezdev_sdk_kernel_lbs_authcode_mismatch		= (BASE_ERROR+LBS_ERROR)+1,			///< ÑéÖ¤Âë²»Ò»ÖÂ
-	ezdev_sdk_kernel_lbs_invalid_call			= (BASE_ERROR+LBS_ERROR)+2,			///< ºÍ·þÎñÆ÷µÄ½»»¥Á÷³ÌÓÐÎÊÌâ
-	ezdev_sdk_kernel_lbs_invalid_data			= (BASE_ERROR+LBS_ERROR)+3,			///< ·þÎñÆ÷ÊÕµ½´íÎóÊý¾Ý
-	ezdev_sdk_kernel_lbs_devid_mismatch			= (BASE_ERROR+LBS_ERROR)+4,			///< devid²»Ò»ÖÂ
-	ezdev_sdk_kernel_lbs_masterkey_mismatch		= (BASE_ERROR+LBS_ERROR)+5,			///< masterkey²»Ò»ÖÂ
-	ezdev_sdk_kernel_lbs_sessionkey_mismatch	= (BASE_ERROR+LBS_ERROR)+6,			///< sessionkey²»Ò»ÖÂ
-	ezdev_sdk_kernel_lbs_invalid_dev			= (BASE_ERROR+LBS_ERROR)+7,			///< ÎÞÐ§Éè±¸
-	ezdev_sdk_kernel_lbs_server_crypto			= (BASE_ERROR+LBS_ERROR)+8,			///< ·þÎñÆ÷¼Ó½âÃÜÊ§°Ü
-	ezdev_sdk_kernel_lbs_get_data				= (BASE_ERROR+LBS_ERROR)+9,			///< »ñÈ¡das»òÕßstunÐÅÏ¢Ê§°Ü
-	ezdev_sdk_kernel_lbs_server_exception		= (BASE_ERROR+LBS_ERROR)+10,		///< ·þÎñÆ÷ÄÚ²¿Òì³£
-	ezdev_sdk_kernel_lbs_check_sessionkey_fail  = (BASE_ERROR+LBS_ERROR)+11,		///< sessionkeyÑéÖ¤Ê§°Ü
-	ezdev_sdk_kernel_lbs_sign_check_fail        = (BASE_ERROR+LBS_ERROR)+12,		///< auth_iÐ£ÑésignÊ§°Ü¡¢ÉêÇëdevice idÐ£ÑésignÊ§°Ü(¿ÉÄÜÑéÖ¤Âë³ö´í)
+	ezdev_sdk_kernel_lbs_authcode_mismatch		= (BASE_ERROR+LBS_ERROR)+1,			///< éªŒè¯ç ä¸ä¸€è‡´
+	ezdev_sdk_kernel_lbs_invalid_call			= (BASE_ERROR+LBS_ERROR)+2,			///< å’ŒæœåŠ¡å™¨çš„äº¤äº’æµç¨‹æœ‰é—®é¢˜
+	ezdev_sdk_kernel_lbs_invalid_data			= (BASE_ERROR+LBS_ERROR)+3,			///< æœåŠ¡å™¨æ”¶åˆ°é”™è¯¯æ•°æ®
+	ezdev_sdk_kernel_lbs_devid_mismatch			= (BASE_ERROR+LBS_ERROR)+4,			///< devidä¸ä¸€è‡´
+	ezdev_sdk_kernel_lbs_masterkey_mismatch		= (BASE_ERROR+LBS_ERROR)+5,			///< masterkeyä¸ä¸€è‡´
+	ezdev_sdk_kernel_lbs_sessionkey_mismatch	= (BASE_ERROR+LBS_ERROR)+6,			///< sessionkeyä¸ä¸€è‡´
+	ezdev_sdk_kernel_lbs_invalid_dev			= (BASE_ERROR+LBS_ERROR)+7,			///< æ— æ•ˆè®¾å¤‡
+	ezdev_sdk_kernel_lbs_server_crypto			= (BASE_ERROR+LBS_ERROR)+8,			///< æœåŠ¡å™¨åŠ è§£å¯†å¤±è´¥
+	ezdev_sdk_kernel_lbs_get_data				= (BASE_ERROR+LBS_ERROR)+9,			///< èŽ·å–dasæˆ–è€…stunä¿¡æ¯å¤±è´¥
+	ezdev_sdk_kernel_lbs_server_exception		= (BASE_ERROR+LBS_ERROR)+10,		///< æœåŠ¡å™¨å†…éƒ¨å¼‚å¸¸
+	ezdev_sdk_kernel_lbs_check_sessionkey_fail  = (BASE_ERROR+LBS_ERROR)+11,		///< sessionkeyéªŒè¯å¤±è´¥
+	ezdev_sdk_kernel_lbs_sign_check_fail        = (BASE_ERROR+LBS_ERROR)+12,		///< auth_iæ ¡éªŒsignå¤±è´¥ã€ç”³è¯·device idæ ¡éªŒsignå¤±è´¥(å¯èƒ½éªŒè¯ç å‡ºé”™)
 
-	ezdev_sdk_kernel_secretkey_decrypt_fail 	= (BASE_ERROR+SECRETKEY_ERROR)+0,	///< ÉêÇësecretkey±¨ÎÄÆ½Ì¨½âÃÜÊ§°Ü
-	ezdev_sdk_kernel_secretkey_overflow_windows = (BASE_ERROR+SECRETKEY_ERROR)+1,	///< ÉêÇësecretkeyÇëÇó²»ÔÚ´°¿ÚÆÚ
-	ezdev_sdk_kernel_secretkey_no_user			= (BASE_ERROR+SECRETKEY_ERROR)+2,	///< Éè±¸Î´°ó¶¨ÓÃ»§
-	ezdev_sdk_kernel_secretkey_sn_not_exist		= (BASE_ERROR+SECRETKEY_ERROR)+3,	///< Éè±¸²»´æÔÚ
-	ezdev_sdk_kernel_secretkey_again			= (BASE_ERROR+SECRETKEY_ERROR)+4,	///< Éè±¸ÖØ¸´ÉêÇë
+	ezdev_sdk_kernel_secretkey_decrypt_fail 	= (BASE_ERROR+SECRETKEY_ERROR)+0,	///< ç”³è¯·secretkeyæŠ¥æ–‡å¹³å°è§£å¯†å¤±è´¥
+	ezdev_sdk_kernel_secretkey_overflow_windows = (BASE_ERROR+SECRETKEY_ERROR)+1,	///< ç”³è¯·secretkeyè¯·æ±‚ä¸åœ¨çª—å£æœŸ
+	ezdev_sdk_kernel_secretkey_no_user			= (BASE_ERROR+SECRETKEY_ERROR)+2,	///< è®¾å¤‡æœªç»‘å®šç”¨æˆ·
+	ezdev_sdk_kernel_secretkey_sn_not_exist		= (BASE_ERROR+SECRETKEY_ERROR)+3,	///< è®¾å¤‡ä¸å­˜åœ¨
+	ezdev_sdk_kernel_secretkey_again			= (BASE_ERROR+SECRETKEY_ERROR)+4,	///< è®¾å¤‡é‡å¤ç”³è¯·
 
- 	ezdev_sdk_kernel_das_nosupport_protocol_ver	= (BASE_ERROR+DAS_ERROR)+1,			///< ²»Ö§³ÖµÄÐ­Òé°æ±¾
- 	ezdev_sdk_kernel_das_client_id_invalid		= (BASE_ERROR+DAS_ERROR)+2,			///< ²»ºÏ¸ñµÄ¿Í»§¶Ë±êÊ¶·û
- 	ezdev_sdk_kernel_das_server_unusable		= (BASE_ERROR+DAS_ERROR)+3,			///< ·þÎñ¶Ë²»¿ÉÓÃ(·þÎñÆ÷ÄÚ²¿Òì³£)
- 	ezdev_sdk_kernel_das_invalid_username		= (BASE_ERROR+DAS_ERROR)+4,			///< ÎÞÐ§µÄÓÃ»§Ãû»òÃÜÂë£¨ÏÖ½×¶ÎÔÝ²»Ê¹ÓÃ£©
- 	ezdev_sdk_kernel_das_unauthorized			= (BASE_ERROR+DAS_ERROR)+5,			///< Î´ÊÚÈ¨£¨ÏÖ½×¶ÎÔÝ²»Ê¹ÓÃ£©
-	ezdev_sdk_kernel_das_session_invaild		= (BASE_ERROR+DAS_ERROR)+6,			///< ½ÓÈë»á»°Ê§Ð§
-	ezdev_sdk_kernel_das_force_offline			= (BASE_ERROR+DAS_ERROR)+7,			///< Éè±¸±»Ç¿ÖÆÏÂÏß
- 	ezdev_sdk_kernel_das_force_dev_risk			= (BASE_ERROR+DAS_ERROR)+8,			///< Éè±¸±»·ç¿Ø£¨ºÚÃûµ¥£©
-	ezdev_sdk_kernel_das_force_domain_risk		= (BASE_ERROR+DAS_ERROR)+9,			///< ÁìÓò±»·ç¿Ø
-	ezdev_sdk_kernel_das_force_cmd_risk			= (BASE_ERROR+DAS_ERROR)+10,		///< Ö¸Áî±»·ç¿Ø
+ 	ezdev_sdk_kernel_das_nosupport_protocol_ver	= (BASE_ERROR+DAS_ERROR)+1,			///< ä¸æ”¯æŒçš„åè®®ç‰ˆæœ¬
+ 	ezdev_sdk_kernel_das_client_id_invalid		= (BASE_ERROR+DAS_ERROR)+2,			///< ä¸åˆæ ¼çš„å®¢æˆ·ç«¯æ ‡è¯†ç¬¦
+ 	ezdev_sdk_kernel_das_server_unusable		= (BASE_ERROR+DAS_ERROR)+3,			///< æœåŠ¡ç«¯ä¸å¯ç”¨(æœåŠ¡å™¨å†…éƒ¨å¼‚å¸¸)
+ 	ezdev_sdk_kernel_das_invalid_username		= (BASE_ERROR+DAS_ERROR)+4,			///< æ— æ•ˆçš„ç”¨æˆ·åæˆ–å¯†ç ï¼ˆçŽ°é˜¶æ®µæš‚ä¸ä½¿ç”¨ï¼‰
+ 	ezdev_sdk_kernel_das_unauthorized			= (BASE_ERROR+DAS_ERROR)+5,			///< æœªæŽˆæƒï¼ˆçŽ°é˜¶æ®µæš‚ä¸ä½¿ç”¨ï¼‰
+	ezdev_sdk_kernel_das_session_invaild		= (BASE_ERROR+DAS_ERROR)+6,			///< æŽ¥å…¥ä¼šè¯å¤±æ•ˆ
+	ezdev_sdk_kernel_das_force_offline			= (BASE_ERROR+DAS_ERROR)+7,			///< è®¾å¤‡è¢«å¼ºåˆ¶ä¸‹çº¿
+ 	ezdev_sdk_kernel_das_force_dev_risk			= (BASE_ERROR+DAS_ERROR)+8,			///< è®¾å¤‡è¢«é£ŽæŽ§ï¼ˆé»‘åå•ï¼‰
+	ezdev_sdk_kernel_das_force_domain_risk		= (BASE_ERROR+DAS_ERROR)+9,			///< é¢†åŸŸè¢«é£ŽæŽ§
+	ezdev_sdk_kernel_das_force_cmd_risk			= (BASE_ERROR+DAS_ERROR)+10,		///< æŒ‡ä»¤è¢«é£ŽæŽ§
 }ezdev_sdk_kernel_error;
 
 #endif

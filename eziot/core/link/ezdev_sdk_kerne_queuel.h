@@ -1,16 +1,15 @@
-/**
- * \file		ezdev_sdk_kerne_queuel.h
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
  *
- * \brief		ÏûÏ¢¶ÓÁĞµÄºê¶¨Òå
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * \note		ÏûÏ¢µÄ½á¹¹Ìå¡¢³õÊ¼»¯¡¢Ìí¼Ó¡¢É¾³ıµÈº¯ÊıÔÚ±àÒëÊ±¸ù¾İµ÷ÓÃÇé¿öÕ¹¿ª
- *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		panlong
- *
- * \date		2017/3/2
- */
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 #ifndef H_EZDEV_SDK_KERNE_QUEUEL_H_
 #define H_EZDEV_SDK_KERNE_QUEUEL_H_
@@ -20,9 +19,7 @@
 #include "base_typedef.h"
 #include "sdk_kernel_def.h"
 
-/**
- *	ÏûÏ¢ÔªËØ
- */
+
 #define QUEUE_DEFINE(MSGTYPE)						\
 typedef struct 	tag_queque_element_##MSGTYPE		\
 {													\
@@ -46,7 +43,7 @@ QUEUE_DEFINE(submsg_v3)
 QUEUE_DEFINE(pubmsg_exchange_v3)
 
 /**
- *	\brief ¶ÓÁĞ³õÊ¼»¯º¯Êı
+ *	\brief é˜Ÿåˆ—åˆå§‹åŒ–å‡½æ•°
  */
 #define QUEUE_INIT(MSGTYPE)													\
 mkernel_internal_error init_queue_##MSGTYPE(EZDEV_SDK_UINT16 max_size)			\
@@ -62,7 +59,7 @@ mkernel_internal_error init_queue_##MSGTYPE(EZDEV_SDK_UINT16 max_size)			\
 }
 
 /**
- *	\brief ¶ÓÁĞ·´³õÊ¼»¯º¯Êı
+ *	\brief é˜Ÿåˆ—ååˆå§‹åŒ–å‡½æ•°
  */
 #define QUEUE_FINI(MSGTYPE)													\
 void fini_queue_##MSGTYPE()													\
@@ -86,7 +83,7 @@ void fini_queue_##MSGTYPE()													\
 
 
 /**
- *	\brief Í¸´«¶ÓÁĞ·´³õÊ¼»¯º¯Êı
+ *	\brief é€ä¼ é˜Ÿåˆ—ååˆå§‹åŒ–å‡½æ•°
  */
 #define QUEUE_FINI_V3(MSGTYPE)													\
 void fini_queue_v3_##MSGTYPE()													\
@@ -110,7 +107,7 @@ void fini_queue_v3_##MSGTYPE()													\
 
 
 /**
- *	\brief ´Ó¶ÓÁĞÍ·²¿È¡³öÒ»¸öÏûÏ¢
+ *	\brief ä»é˜Ÿåˆ—å¤´éƒ¨å–å‡ºä¸€ä¸ªæ¶ˆæ¯
  */
 #define QUEUE_POP(MSGTYPE) \
 mkernel_internal_error pop_queue_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE** submsg)			\
@@ -145,7 +142,7 @@ mkernel_internal_error pop_queue_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE** submsg)	
 }
 
  /**
- *	\brief ´Ó¶ÓÁĞÍ·²¿È¡³öÒ»¸öÏûÏ¢,get·½·¨,(ÏûÏ¢È¡µ½ºó£¬¶ÓÁĞ²»±ä)
+ *	\brief ä»é˜Ÿåˆ—å¤´éƒ¨å–å‡ºä¸€ä¸ªæ¶ˆæ¯,getæ–¹æ³•,(æ¶ˆæ¯å–åˆ°åï¼Œé˜Ÿåˆ—ä¸å˜)
  */
 #define QUEUE_GET(MSGTYPE) \
 mkernel_internal_error get_queue_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE** submsg)			\
@@ -165,7 +162,7 @@ mkernel_internal_error get_queue_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE** submsg)	
 	return mkernel_internal_succ;															\
 }
 /**
- *	\brief Íù¶ÓÁĞÎ²²¿Ìí¼ÓÒ»¸öÏûÏ¢
+ *	\brief å¾€é˜Ÿåˆ—å°¾éƒ¨æ·»åŠ ä¸€ä¸ªæ¶ˆæ¯
  */
 #define QUEUE_PUSH(MSGTYPE)																\
 mkernel_internal_error push_queue_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE* submsg)					\
@@ -202,7 +199,7 @@ mkernel_internal_error push_queue_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE* submsg)	
 }
 
 /**
- *	\brief Íù¶ÓÁĞÍ·²¿Ìí¼ÓÒ»¸öÏûÏ¢
+ *	\brief å¾€é˜Ÿåˆ—å¤´éƒ¨æ·»åŠ ä¸€ä¸ªæ¶ˆæ¯
  */
 #define QUEUE_PUSH_HEAD(MSGTYPE)			\
 mkernel_internal_error push_queue_head_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE* submsg)		\

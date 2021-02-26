@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "diag.h"
@@ -128,55 +141,55 @@ void extend_basefuntion_data_route_cb(ezdev_sdk_kernel_submsg* ptr_submsg ,EZDEV
 	int ret = 0;
 	switch(dwCMD)
 	{
-        case 0x300f: /* ¿ª¹Ø¿ØÖÆ -- ÀÏ½Ó¿Ú */
+        case 0x300f: /* å¼€å…³æ§åˆ¶ -- è€æ¥å£ */
            // ret = process_das_process_switch_swset_old(RootData);
           //  process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x2843: /* ×¢²áÅĞ¶Ï */
+        case 0x2843: /* æ³¨å†Œåˆ¤æ–­ */
            // ret = process_das_process_CenPlt2PuVerifyChallengeCodeReq(RootData);
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x3450: /* ÉèÖÃĞÄÌøÊ±¼ä */
+        case 0x3450: /* è®¾ç½®å¿ƒè·³æ—¶é—´ */
             //ret = process_das_process_CenPlt2PuSetKeepAliveTimeReq(RootData);
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x280B: /* ÉèÖÃ±¨¾¯·şÎñÆ÷ */
+        case 0x280B: /* è®¾ç½®æŠ¥è­¦æœåŠ¡å™¨ */
             //ret = process_das_process_CenPlt2PuSetAlarmCenterReq(RootData);
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x2804: /* ĞÄÌø */
+        case 0x2804: /* å¿ƒè·³ */
            // timenoupdate = 0;
             ret = -1;
             break;
-        case 0X3013: /* Éı¼¶ÇëÇó */
+        case 0X3013: /* å‡çº§è¯·æ±‚ */
            // upgradeflg = 1;
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x3020: /* Ğ£Ê± */
+        case 0x3020: /* æ ¡æ—¶ */
             //process_das_process_GetServerTimeStampRsp(RootData);
             break;
-        case 0X2864: /* Éı¼¶httpÓÃµÄ */
+        case 0X2864: /* å‡çº§httpç”¨çš„ */
            // process_das_process_UpgradeRsp(RootData);
             break;
-        case 0X3031: /* ÉÏ±¨Í³Ò»Ó¦´ğ½Ó¿Ú */
+        case 0X3031: /* ä¸ŠæŠ¥ç»Ÿä¸€åº”ç­”æ¥å£ */
             break;
-        case 0X3446: /* userid·µ»Ø */
+        case 0X3446: /* useridè¿”å› */
             //process_das_process_userid(RootData);
             break;
-        case 0x490b: /* ÉèÖÃÆÁÄ»,led,ÓïÒô Ê¹ÄÜ¿ª¹Ø */
+        case 0x490b: /* è®¾ç½®å±å¹•,led,è¯­éŸ³ ä½¿èƒ½å¼€å…³ */
            // ret= process_das_process_CenPlt2PuSetSwitchEnableReq( RootData);
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0X4E03: /* Æ½Ì¨ÏòÉè±¸Ó¦´ğtvoc,pm25ãĞÖµ */
+        case 0X4E03: /* å¹³å°å‘è®¾å¤‡åº”ç­”tvoc,pm25é˜ˆå€¼ */
           //  ret = process_das_process_Plt2CenGetThresholdValueRsp(RootData);
             break;
-        case 0X4E04: /* »ñÈ¡´«¸ĞÆ÷¼´Ê±Êı¾İ */
+        case 0X4E04: /* è·å–ä¼ æ„Ÿå™¨å³æ—¶æ•°æ® */
            // ret = process_das_process_getSensorData(RootData, socket, dwseq);
             break;
-        case 0X4E07: /* Æ½Ì¨ÏòÉè±¸Ó¦´ğµçÁ¿Ç·Ñ¹Öµ  0X4E07*/
+        case 0X4E07: /* å¹³å°å‘è®¾å¤‡åº”ç­”ç”µé‡æ¬ å‹å€¼  0X4E07*/
            // ret = process_das_process_CenPlt2PuSetLowerPowerRsp(RootData);
             break;
-        case 0X498D: /* Æ½Ì¨ÏòÉè±¸ÉèÖÃÎÂÊª¶ÈãĞÖµ */
+        case 0X498D: /* å¹³å°å‘è®¾å¤‡è®¾ç½®æ¸©æ¹¿åº¦é˜ˆå€¼ */
            // ret = process_das_process_CenPlt2PuSetTempatureHumity(RootData);
             //process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
@@ -222,7 +235,7 @@ void extend_alarm_data_route_cb(ezdev_sdk_kernel_submsg* ptr_submsg ,EZDEV_SDK_P
 	int ret = 0;
 	switch(dwCMD)
 	{
-        case 0x1006: /* ¿ª¹Ø¿ØÖÆ -- ÀÏ½Ó¿Ú */
+        case 0x1006: /* å¼€å…³æ§åˆ¶ -- è€æ¥å£ */
            // ret = process_das_process_switch_swset_old(RootData);
           //  process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
@@ -269,55 +282,55 @@ void extend_general_function_data_route_cb(ezdev_sdk_kernel_submsg* ptr_submsg ,
 	int ret = 0;
 	switch(dwCMD)
 	{
-        case 0x300f: /* ¿ª¹Ø¿ØÖÆ -- ÀÏ½Ó¿Ú */
+        case 0x300f: /* å¼€å…³æ§åˆ¶ -- è€æ¥å£ */
            // ret = process_das_process_switch_swset_old(RootData);
           //  process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x2843: /* ×¢²áÅĞ¶Ï */
+        case 0x2843: /* æ³¨å†Œåˆ¤æ–­ */
            // ret = process_das_process_CenPlt2PuVerifyChallengeCodeReq(RootData);
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x3450: /* ÉèÖÃĞÄÌøÊ±¼ä */
+        case 0x3450: /* è®¾ç½®å¿ƒè·³æ—¶é—´ */
             //ret = process_das_process_CenPlt2PuSetKeepAliveTimeReq(RootData);
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x280B: /* ÉèÖÃ±¨¾¯·şÎñÆ÷ */
+        case 0x280B: /* è®¾ç½®æŠ¥è­¦æœåŠ¡å™¨ */
             //ret = process_das_process_CenPlt2PuSetAlarmCenterReq(RootData);
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x2804: /* ĞÄÌø */
+        case 0x2804: /* å¿ƒè·³ */
            // timenoupdate = 0;
             ret = -1;
             break;
-        case 0X3013: /* Éı¼¶ÇëÇó */
+        case 0X3013: /* å‡çº§è¯·æ±‚ */
            // upgradeflg = 1;
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0x3020: /* Ğ£Ê± */
+        case 0x3020: /* æ ¡æ—¶ */
             //process_das_process_GetServerTimeStampRsp(RootData);
             break;
-        case 0X2864: /* Éı¼¶httpÓÃµÄ */
+        case 0X2864: /* å‡çº§httpç”¨çš„ */
            // process_das_process_UpgradeRsp(RootData);
             break;
-        case 0X3031: /* ÉÏ±¨Í³Ò»Ó¦´ğ½Ó¿Ú */
+        case 0X3031: /* ä¸ŠæŠ¥ç»Ÿä¸€åº”ç­”æ¥å£ */
             break;
-        case 0X3446: /* userid·µ»Ø */
+        case 0X3446: /* useridè¿”å› */
             //process_das_process_userid(RootData);
             break;
-        case 0x490b: /* ÉèÖÃÆÁÄ»,led,ÓïÒô Ê¹ÄÜ¿ª¹Ø */
+        case 0x490b: /* è®¾ç½®å±å¹•,led,è¯­éŸ³ ä½¿èƒ½å¼€å…³ */
            // ret= process_das_process_CenPlt2PuSetSwitchEnableReq( RootData);
            // process_das_req(socket, dwCMD+1, ret, dwseq);
             break;
-        case 0X4E03: /* Æ½Ì¨ÏòÉè±¸Ó¦´ğtvoc,pm25ãĞÖµ */
+        case 0X4E03: /* å¹³å°å‘è®¾å¤‡åº”ç­”tvoc,pm25é˜ˆå€¼ */
           //  ret = process_das_process_Plt2CenGetThresholdValueRsp(RootData);
             break;
-        case 0X4E04: /* »ñÈ¡´«¸ĞÆ÷¼´Ê±Êı¾İ */
+        case 0X4E04: /* è·å–ä¼ æ„Ÿå™¨å³æ—¶æ•°æ® */
            // ret = process_das_process_getSensorData(RootData, socket, dwseq);
             break;
-        case 0X4E07: /* Æ½Ì¨ÏòÉè±¸Ó¦´ğµçÁ¿Ç·Ñ¹Öµ  0X4E07*/
+        case 0X4E07: /* å¹³å°å‘è®¾å¤‡åº”ç­”ç”µé‡æ¬ å‹å€¼  0X4E07*/
            // ret = process_das_process_CenPlt2PuSetLowerPowerRsp(RootData);
             break;
-        case 0X498D: /* Æ½Ì¨ÏòÉè±¸ÉèÖÃÎÂÊª¶ÈãĞÖµ */
+        case 0X498D: /* å¹³å°å‘è®¾å¤‡è®¾ç½®æ¸©æ¹¿åº¦é˜ˆå€¼ */
            // ret = process_das_process_CenPlt2PuSetTempatureHumity(RootData);
             //process_das_req(socket, dwCMD+1, ret, dwseq);
             break;

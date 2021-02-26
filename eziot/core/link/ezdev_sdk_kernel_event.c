@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #include "ezdev_sdk_kernel_event.h"
 #include "ezdev_sdk_kerne_queuel.h"
 #include "mkernel_internal_error.h"
@@ -5,10 +18,10 @@
 EXTERN_QUEUE_FUN(inner_cb_notic)
 EXTERN_QUEUE_BASE_FUN
 /** 
- *  \brief		Ìí¼ÓÒ»ÌõÏûÏ¢ÖÁ±¾µØÏûÏ¢¶ÓÁĞ
+ *  \brief		æ·»åŠ ä¸€æ¡æ¶ˆæ¯è‡³æœ¬åœ°æ¶ˆæ¯é˜Ÿåˆ—
  *  \method		push_event_to_queue
- *  \param[in] 	prt_inner_cb_notic	ÏûÏ¢¶ÔÏó
- *  \return 	³É¹¦·µ0 Ê§°Ü·µ»Ø¶ÔÓ¦´íÎóÂë
+ *  \param[in] 	prt_inner_cb_notic	æ¶ˆæ¯å¯¹è±¡
+ *  \return 	æˆåŠŸè¿”0 å¤±è´¥è¿”å›å¯¹åº”é”™è¯¯ç 
  */
 static mkernel_internal_error push_event_to_queue(ezdev_sdk_kernel_inner_cb_notic *prt_inner_cb_notic)
 {
@@ -45,10 +58,10 @@ static mkernel_internal_error push_event_to_queue(ezdev_sdk_kernel_inner_cb_noti
 }
 
 /** 
- *  \brief		¹ã²¥Ò»ÌõÎ¢ÄÚºËÆô¶¯ÏûÏ¢
- *	\note		½ÓÊÕ¶ÔÏó ÒÑÏòÎ¢ÄÚºË×¢²áµÄËùÓĞÁìÓò
+ *  \brief		å¹¿æ’­ä¸€æ¡å¾®å†…æ ¸å¯åŠ¨æ¶ˆæ¯
+ *	\note		æ¥æ”¶å¯¹è±¡ å·²å‘å¾®å†…æ ¸æ³¨å†Œçš„æ‰€æœ‰é¢†åŸŸ
  *  \method		broadcast_user_start
- *  \return 	³É¹¦·µ0 Ê§°Ü·µ»Ø¶ÔÓ¦´íÎóÂë
+ *  \return 	æˆåŠŸè¿”0 å¤±è´¥è¿”å›å¯¹åº”é”™è¯¯ç 
  */
 mkernel_internal_error broadcast_user_start()
 {
@@ -69,10 +82,10 @@ mkernel_internal_error broadcast_user_start()
 }
 
 /** 
- *  \brief		¹ã²¥Ò»ÌõÎ¢ÄÚºËÍ£Ö¹ÏûÏ¢
- *	\note		½ÓÊÕ¶ÔÏó ÒÑÏòÎ¢ÄÚºË×¢²áµÄËùÓĞÁìÓò
+ *  \brief		å¹¿æ’­ä¸€æ¡å¾®å†…æ ¸åœæ­¢æ¶ˆæ¯
+ *	\note		æ¥æ”¶å¯¹è±¡ å·²å‘å¾®å†…æ ¸æ³¨å†Œçš„æ‰€æœ‰é¢†åŸŸ
  *  \method		broadcast_user_stop
- *  \return 	³É¹¦·µ0 Ê§°Ü·µ»Ø¶ÔÓ¦´íÎóÂë
+ *  \return 	æˆåŠŸè¿”0 å¤±è´¥è¿”å›å¯¹åº”é”™è¯¯ç 
  */
 mkernel_internal_error broadcast_user_stop()
 {

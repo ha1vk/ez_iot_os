@@ -1,19 +1,21 @@
-#include "log_platform_wrapper.h"
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 #include "esp_common.h"
-
-
-//xtensa-lx106-elf(free rtos) ÊµÏÖ
-
-
+#include "log_platform_wrapper.h"
 
 void time_print(int sdk_error, int othercode, const char * buf)
 {
-// 	char now_time[16];
-// 	time_t t = time(0);
-// 	strftime(now_time, 16, "%m-%d %H:%M:%S", localtime(&t));
-
-	os_printf("[NULL][%d][%d]sdk_error:%d, othercode:%d, info:%s \n", 0, 0, sdk_error, othercode, buf);
 }
 
 

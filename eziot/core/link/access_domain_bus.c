@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 #include "access_domain_bus.h"
 #include "dev_protocol_def.h"
 #include "mkernel_internal_error.h"
@@ -36,11 +48,11 @@ static mkernel_internal_error bus_handle_domainconfig_keepalive(ezdev_sdk_kernel
 	}
 
 	/**
-	* \brief   ¸üĞÂĞÄÌøÊ±¼ä
+	* \brief   æ›´æ–°å¿ƒè·³æ—¶é—´
 	*/
 	sdk_kernel->das_keepalive_interval = json_interval->valueint;
 	/**
-	* \brief   ĞÄÌøÊ±¼ä¸Ä±äÊÂ¼ş»Øµ÷
+	* \brief   å¿ƒè·³æ—¶é—´æ”¹å˜äº‹ä»¶å›è°ƒ
 	*/
 	das_keepalive_interval_changed_event_cb(sdk_kernel->das_keepalive_interval);
 
@@ -83,7 +95,7 @@ static mkernel_internal_error bus_handle_domainconfig_ntp(ezdev_sdk_kernel *sdk_
 	// 	strncpy(ntp_event.ntp_timezone, json_Timezone->valuestring, ezdev_sdk_timezone_max_len -1);
 	//
 	/**
-	* \brief   ½«NTPĞÅÏ¢»Øµ÷³öÈ¥
+	* \brief   å°†NTPä¿¡æ¯å›è°ƒå‡ºå»
 	*/
 	//sdk_kernel->kernel_event_notice_cb(sdk_kernel_event_ntp_info, (void*)(&ntp_event));
 
@@ -172,7 +184,7 @@ static mkernel_internal_error bus_handle_set_keeplive_time_rsp(ezdev_sdk_kernel 
 static mkernel_internal_error bus_handle_dev_redirect(ezdev_sdk_kernel *sdk_kernel, const ezdev_sdk_kernel_submsg *ptr_submsg)
 {
 	/**
-	* \brief   ÖØ¶¨Ïò entr_state ±ê¼ÇÓÉÓÚÆ½Ì¨Ô­Òòµ¼ÖÂÇĞ»»µÄ cnt_state ±ê¼ÇĞèÒªÖØĞÂ×öÖØ¶¨Ïò
+	* \brief   é‡å®šå‘ entr_state æ ‡è®°ç”±äºå¹³å°åŸå› å¯¼è‡´åˆ‡æ¢çš„ cnt_state æ ‡è®°éœ€è¦é‡æ–°åšé‡å®šå‘
 	*/
 	char domain_name[ezdev_sdk_name_len] = {0};
 	mkernel_internal_error sdk_error = mkernel_internal_succ;

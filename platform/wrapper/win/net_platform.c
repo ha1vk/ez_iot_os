@@ -1,13 +1,20 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 /**
  * \file		net_platform.c
  *
- * \brief		ÍøÂçÏà¹Ø½Ó¿ÚµÄWindowsÊµÏÖ
+ * \brief		ç½‘ç»œç›¸å…³æ¥å£çš„Windowså®ç°
  *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		xurongjun
- *
- * \date		2018/6/27
  */
 
 #include "net_platform_wrapper.h"
@@ -20,10 +27,10 @@
 #include <../src/mkernel_internal_error.h>
 
 /** 
- *  \brief		ÅĞ¶ÏÊÇ·ñÊÇºÏ·¨µÄIPµØÖ·
+ *  \brief		åˆ¤æ–­æ˜¯å¦æ˜¯åˆæ³•çš„IPåœ°å€
  *  \method		isIPAddress
- *  \param[in] 	s IPµØÖ·
- *  \return 	³É¹¦·µ»Ø1 Ê§°Ü·µ»Ø0
+ *  \param[in] 	s IPåœ°å€
+ *  \return 	æˆåŠŸè¿”å›1 å¤±è´¥è¿”å›0
  */
 char isIPAddress(const char *s)  
 {  
@@ -63,11 +70,11 @@ char isIPAddress(const char *s)
 }
 
 /** 
- *  \brief		ÅĞ¶ÏÊÇ·ñÊÇºÏ·¨µÄIPµØÖ·
+ *  \brief		åˆ¤æ–­æ˜¯å¦æ˜¯åˆæ³•çš„IPåœ°å€
  *  \method		parse_host
- *  \param[in] 	host ÓòÃû»òIP
- *  \param[out] ±£´æIPµÄ»º³åÇø
- *  \return 	³É¹¦·µ»ØIPµØÖ· Ê§°Ü·µ»ØINADDR_NONE
+ *  \param[in] 	host åŸŸåæˆ–IP
+ *  \param[out] ä¿å­˜IPçš„ç¼“å†²åŒº
+ *  \return 	æˆåŠŸè¿”å›IPåœ°å€ å¤±è´¥è¿”å›INADDR_NONE
  */
 unsigned long parse_host(const char* host, char szRealIp[ezdev_sdk_ip_max_len])
 {
@@ -119,10 +126,10 @@ unsigned long parse_host(const char* host, char szRealIp[ezdev_sdk_ip_max_len])
 }
 
 /** 
- *  \brief		ÍøÂçÁ¬½ÓµÄ´´½¨,Ä¬ÈÏÎªTCPĞ­Òé
+ *  \brief		ç½‘ç»œè¿æ¥çš„åˆ›å»º,é»˜è®¤ä¸ºTCPåè®®
  *  \method		net_create
- *  \param[in] 	nic_name	Íø¿¨Ãû³Æ£¬Èç¹ûnic_name²»Îª¿Õ»òÖ¸ÏòµÄµØÖ·ÊÇÓĞĞ§Öµ£¬´´½¨µÄsocket½«°ó¶¨Õâ¸öÍø¿¨
- *  \return 	³É¹¦·µ»ØÍøÂçÁ¬½ÓÉÏÏÂÎÄ Ê§°Ü·µ»ØNULL
+ *  \param[in] 	nic_name	ç½‘å¡åç§°ï¼Œå¦‚æœnic_nameä¸ä¸ºç©ºæˆ–æŒ‡å‘çš„åœ°å€æ˜¯æœ‰æ•ˆå€¼ï¼Œåˆ›å»ºçš„socketå°†ç»‘å®šè¿™ä¸ªç½‘å¡
+ *  \return 	æˆåŠŸè¿”å›ç½‘ç»œè¿æ¥ä¸Šä¸‹æ–‡ å¤±è´¥è¿”å›NULL
  */
 ezdev_sdk_net_work net_create(char* nic_name)
 {
@@ -153,13 +160,13 @@ ezdev_sdk_net_work net_create(char* nic_name)
 }
 
 /** 
- *  \brief		ÍøÂçÁ¬½Ó
+ *  \brief		ç½‘ç»œè¿æ¥
  *  \method		net_connect
- *  \param[in] 	net_work	ÍøÂçÁ¬½ÓÉÏÏÂÎÄ
- *  \param[in]	server_ip	·şÎñÆ÷µØÖ·
- *  \param[in]	timeout_ms	Á¬½Ó³¬Ê±Ê±¼ä
- *  \param[out]	szRealIp	·µ»ØIP
- *  \return 	³É¹¦0 Ê§°Ü·µ»Ø¶ÔÓ¦´íÎóÂë
+ *  \param[in] 	net_work	ç½‘ç»œè¿æ¥ä¸Šä¸‹æ–‡
+ *  \param[in]	server_ip	æœåŠ¡å™¨åœ°å€
+ *  \param[in]	timeout_ms	è¿æ¥è¶…æ—¶æ—¶é—´
+ *  \param[out]	szRealIp	è¿”å›IP
+ *  \return 	æˆåŠŸ0 å¤±è´¥è¿”å›å¯¹åº”é”™è¯¯ç 
  */
 mkernel_internal_error net_connect(ezdev_sdk_net_work net_work, const char* server_ip, int server_port,  int timeout_ms, char szRealIp[ezdev_sdk_ip_max_len])
 {
@@ -205,13 +212,13 @@ mkernel_internal_error net_connect(ezdev_sdk_net_work net_work, const char* serv
 }
 
 /** 
- *  \brief		ÍøÂç½ÓÊÕÊı¾İ
+ *  \brief		ç½‘ç»œæ¥æ”¶æ•°æ®
  *  \method		net_read
- *  \param[in] 	net_work			ÍøÂçÁ¬½ÓÉÏÏÂÎÄ
- *  \param[in]	read_buf			½ÓÊÕ»º³åÇø
- *  \param[in]	read_buf_maxsize	½ÓÊÕÊı¾İµÄ´óĞ¡
- *  \param[out]	read_timeout_ms		½ÓÊÕÊı¾İ³¬Ê±Ê±¼ä
- *  \return 	³É¹¦0 Ê§°Ü·µ»Ø¶ÔÓ¦´íÎóÂë
+ *  \param[in] 	net_work			ç½‘ç»œè¿æ¥ä¸Šä¸‹æ–‡
+ *  \param[in]	read_buf			æ¥æ”¶ç¼“å†²åŒº
+ *  \param[in]	read_buf_maxsize	æ¥æ”¶æ•°æ®çš„å¤§å°
+ *  \param[out]	read_timeout_ms		æ¥æ”¶æ•°æ®è¶…æ—¶æ—¶é—´
+ *  \return 	æˆåŠŸ0 å¤±è´¥è¿”å›å¯¹åº”é”™è¯¯ç 
  */
 mkernel_internal_error net_read(ezdev_sdk_net_work net_work, unsigned char* read_buf, int read_buf_maxsize, int read_timeout_ms)
 {
@@ -266,14 +273,14 @@ mkernel_internal_error net_read(ezdev_sdk_net_work net_work, unsigned char* read
 }
 
 /** 
- *  \brief		ÍøÂç·¢ËÍÊı¾İ
+ *  \brief		ç½‘ç»œå‘é€æ•°æ®
  *  \method		net_write
- *  \param[in] 	net_work			ÍøÂçÁ¬½ÓÉÏÏÂÎÄ
- *  \param[in]	write_buf			·¢ËÍ»º³åÇø
- *  \param[in]	write_buf_size		·¢ËÍÊı¾İµÄ´óĞ¡
- *  \param[in]	read_timeout_ms		·¢ËÍÊı¾İ³¬Ê±Ê±¼ä
- *  \param[out]	real_write_buf_size	Êµ¼Ê·¢ËÍµÄ´óĞ¡
- *  \return 	³É¹¦0 Ê§°Ü·µ»Ø¶ÔÓ¦´íÎóÂë
+ *  \param[in] 	net_work			ç½‘ç»œè¿æ¥ä¸Šä¸‹æ–‡
+ *  \param[in]	write_buf			å‘é€ç¼“å†²åŒº
+ *  \param[in]	write_buf_size		å‘é€æ•°æ®çš„å¤§å°
+ *  \param[in]	read_timeout_ms		å‘é€æ•°æ®è¶…æ—¶æ—¶é—´
+ *  \param[out]	real_write_buf_size	å®é™…å‘é€çš„å¤§å°
+ *  \return 	æˆåŠŸ0 å¤±è´¥è¿”å›å¯¹åº”é”™è¯¯ç 
  */
 mkernel_internal_error net_write(ezdev_sdk_net_work net_work, unsigned char* write_buf, int write_buf_size, int send_timeout_ms, int* real_write_buf_size)
 {
@@ -323,9 +330,9 @@ mkernel_internal_error net_write(ezdev_sdk_net_work net_work, unsigned char* wri
 }
 
 /** 
- *  \brief		¶Ï¿ªÍøÂçÁ¬½Ó
+ *  \brief		æ–­å¼€ç½‘ç»œè¿æ¥
  *  \method		net_disconnect
- *  \param[in] 	net_work			ÍøÂçÁ¬½ÓÉÏÏÂÎÄ
+ *  \param[in] 	net_work			ç½‘ç»œè¿æ¥ä¸Šä¸‹æ–‡
  */
 void net_disconnect(ezdev_sdk_net_work net_work)
 {
@@ -339,9 +346,9 @@ void net_disconnect(ezdev_sdk_net_work net_work)
 }
 
 /** 
- *  \brief		Ïú»ÙÍøÂçÁ¬½Ó
+ *  \brief		é”€æ¯ç½‘ç»œè¿æ¥
  *  \method		net_destroy
- *  \param[in] 	net_work			ÍøÂçÁ¬½ÓÉÏÏÂÎÄ
+ *  \param[in] 	net_work			ç½‘ç»œè¿æ¥ä¸Šä¸‹æ–‡
  */
 void net_destroy(ezdev_sdk_net_work net_work)
 {

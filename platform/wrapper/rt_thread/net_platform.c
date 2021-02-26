@@ -1,4 +1,4 @@
-#include "net_platform_wrapper.h"
+
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -9,14 +9,10 @@
 #include <netdb.h>
 #include <netinet/tcp.h>
 #include<net/if.h>
-//#include <signal.h>
-
 #include "ezdev_sdk_kernel_struct.h"
-#include <../src/mkernel_internal_error.h>
+#include "mkernel_internal_error.h"
+#include "net_platform_wrapper.h"
 
-/**
- * \brief   linux ÊµÏÖ
- */
 
 void signal_callback_handler(int signum){
     printf("-----------Caught signal SIGPIPE----------- %d\n", signum);
@@ -60,15 +56,15 @@ char isIPAddress(const char *s)
 }  
 static in_addr_t ParseHost(const char* host, char szRealIp[ezdev_sdk_ip_max_len])
 {
-	if (host == NULL || strlen(host) == 0) {
-		return htonl(INADDR_ANY);
-	}
-
-#if 1
+	
 	char str[128]= {0}; 
 	int ret, herr;
 	char buf[1024];
 	struct hostent entry, *hp;
+
+	if (host == NULL || strlen(host) == 0) {
+		return htonl(INADDR_ANY);
+	}
 	ret = gethostbyname_r(host, &entry, buf, 1024, &hp, &herr);
 	if (ret || hp == NULL) {
 		printf("gethostbyname_r failed , ret:%d, %d, errno:%d\n", ret, hp, herr);
@@ -89,44 +85,9 @@ static in_addr_t ParseHost(const char* host, char szRealIp[ezdev_sdk_ip_max_len]
 	{
 		strncpy(szRealIp, szParseIp, strlen(szParseIp));
 	}
-	
 	printf("host parser:address:%s\n", szParseIp);
-	
-
 	return ((struct in_addr*)(entry.h_addr))->s_addr;
-#else
-	in_addr_t raddr;
-	struct addrinfo* ailist, * aip;
-	struct addrinfo hint;
 
-	bzero(&hint, sizeof(hint));
-
-	if (isIPAddress(host)){
-		hint.ai_flags = AI_NUMERICHOST;
-	}
-
-	//DERROR("starto to getaddrinfo... host = %s ai_flags = %d time = %d\n", host, hint.ai_flags, time(NULL));
-	int ret = getaddrinfo(host, NULL, &hint, &ailist);
-	if (ret != 0) {
-		DERROR("getaddrinfo host = %s ai_flags = %d error, return %d: %s\n", host, hint.ai_flags, ret,  gai_strerror(ret));
-		return INADDR_NONE;
-	}
-	//DERROR("after freeaddrinfo... time = %d\n", time(NULL));
-
-	if (ailist == NULL) {
-		DERROR("getaddrinfo error, ailist is NULL\n");
-		return INADDR_NONE;
-	}
-
-	for (aip = ailist; aip != NULL; aip = aip->ai_next) {
-		raddr = ((struct sockaddr_in*)aip->ai_addr)->sin_addr.s_addr;
-		break;
-	}
-	//DERROR("starto to freeaddrinfo... time = %d\n", time(NULL));
-	freeaddrinfo(ailist);
-
-	return raddr;
-#endif
 }
 
 void linuxsocket_setnonblock(int socket_fd)
@@ -192,10 +153,10 @@ mkernel_internal_error linuxsocket_poll(int socket_fd, POLL_TYPE type, int timeo
 }
 
 /** 
- *  \brief		ÍøÂçÁ¬½ÓµÄ´´½¨,Ä¬ÈÏÎªTCPĞ­Òé
+ *  \brief		ç½‘ç»œè¿æ¥çš„åˆ›å»º,é»˜è®¤ä¸ºTCPåè®®
  *  \method		net_create
- *  \param[in] 	nic_name	Íø¿¨Ãû³Æ£¬Èç¹ûnic_name²»Îª¿Õ»òÖ¸ÏòµÄµØÖ·ÊÇÓĞĞ§Öµ£¬´´½¨µÄsocket½«°ó¶¨Õâ¸öÍø¿¨
- *  \return 	³É¹¦·µ»ØÍøÂçÁ¬½ÓÉÏÏÂÎÄ Ê§°Ü·µ»ØNULL
+ *  \param[in] 	nic_name	ç½‘å¡åç§°ï¼Œå¦‚æœnic_nameä¸ä¸ºç©ºæˆ–æŒ‡å‘çš„åœ°å€æ˜¯æœ‰æ•ˆå€¼ï¼Œåˆ›å»ºçš„socketå°†ç»‘å®šè¿™ä¸ªç½‘å¡
+ *  \return 	æˆåŠŸè¿”å›ç½‘ç»œè¿æ¥ä¸Šä¸‹æ–‡ å¤±è´¥è¿”å›NULL
  */
 ezdev_sdk_net_work net_create(char* nic_name)
 {

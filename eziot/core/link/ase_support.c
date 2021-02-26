@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 #include "ase_support.h"
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
@@ -208,7 +220,7 @@ mkernel_internal_error aes_cbc_128_enc_padding(const unsigned char aes_key[16], 
 // }
 
 
-//Ã÷ÎÄinput_buf²»ĞèÒªÓÃ»§Ìî³ä²¹Æë£¬gcmËã·¨ÄÚ²¿×Ô¶¯´¦Àí£¬Éú³ÉµÄÃÜÎÄoutput_bufÒ²ÊÇ²»°üº¬Ìî³äÄÚÈİµÄ£¬¼´È«²¿ÊÇÃÜÎÄÄÚÈİ
+//æ˜æ–‡input_bufä¸éœ€è¦ç”¨æˆ·å¡«å……è¡¥é½ï¼Œgcmç®—æ³•å†…éƒ¨è‡ªåŠ¨å¤„ç†ï¼Œç”Ÿæˆçš„å¯†æ–‡output_bufä¹Ÿæ˜¯ä¸åŒ…å«å¡«å……å†…å®¹çš„ï¼Œå³å…¨éƒ¨æ˜¯å¯†æ–‡å†…å®¹
 mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], \
                                                 unsigned char *input_buf, EZDEV_SDK_UINT32 input_length, \
                                                 unsigned char *output_buf, EZDEV_SDK_UINT32 *output_length, \
@@ -222,7 +234,7 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
     bscomptls_cipher_id_t cipher = BSCOMPTLS_CIPHER_ID_AES;
     unsigned char iv[iv_len];
 
-//    //µ÷ÊÔ´úÂë£¬ĞèÒªÊ±ºò·Å¿ª
+//    //è°ƒè¯•ä»£ç ï¼Œéœ€è¦æ—¶å€™æ”¾å¼€
 //     unsigned char gcm_key_hex[16 * 2 + 1] = { 0 };
 //     unsigned char iv_hex[iv_len * 2 + 1] = { 0 };
 //     unsigned char input_buf_hex[512];
@@ -247,7 +259,7 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
 
         //GenRandom("mbedtls_IV", iv, iv_len);
 
-//         //µ÷ÊÔ´úÂë£¬ĞèÒªÊ±ºò·Å¿ª
+//         //è°ƒè¯•ä»£ç ï¼Œéœ€è¦æ—¶å€™æ”¾å¼€
 //         bscomptls_hexdump(gcm_key, 16, 1, gcm_key_hex);
 //         bscomptls_hexdump(iv, iv_len, 1, iv_hex);
 //         bscomptls_hexdump(input_buf, input_length, 1, input_buf_hex);
@@ -259,7 +271,7 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
             break;
         }
 
-//         //µ÷ÊÔ´úÂë£¬ĞèÒªÊ±ºò·Å¿ª
+//         //è°ƒè¯•ä»£ç ï¼Œéœ€è¦æ—¶å€™æ”¾å¼€
 //         bscomptls_hexdump(output_tag_buf, tag_buf_len, 1, tag_buf_hex);
 //         bscomptls_hexdump(output_buf, input_length, 1, output_buf_hex);
 
@@ -269,7 +281,7 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
 
     if (sdk_error == mkernel_internal_succ)
     {
-        //output_bufÄÚÈİÓĞ¿ÉÄÜº¬ÓĞ0£¬²»ÄÜÓÃ*output_length = strlen(output_buf);
+        //output_bufå†…å®¹æœ‰å¯èƒ½å«æœ‰0ï¼Œä¸èƒ½ç”¨*output_length = strlen(output_buf);
         *output_length = input_length;
     }
 
@@ -277,7 +289,7 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
 }
 
 
-//ÃÜÎÄinput_buf²»ĞèÒªÓÃ»§Ìî³ä²¹Æë£¬gcmËã·¨ÄÚ²¿×Ô¶¯´¦Àí£¬Éú³ÉµÄÃ÷ÎÄoutput_bufÒ²ÊÇ²»°üº¬Ìî³äÄÚÈİµÄ£¬¼´È«²¿ÊÇÃ÷ÎÄÄÚÈİ
+//å¯†æ–‡input_bufä¸éœ€è¦ç”¨æˆ·å¡«å……è¡¥é½ï¼Œgcmç®—æ³•å†…éƒ¨è‡ªåŠ¨å¤„ç†ï¼Œç”Ÿæˆçš„æ˜æ–‡output_bufä¹Ÿæ˜¯ä¸åŒ…å«å¡«å……å†…å®¹çš„ï¼Œå³å…¨éƒ¨æ˜¯æ˜æ–‡å†…å®¹
 mkernel_internal_error aes_gcm_128_dec_padding(const unsigned char gcm_key[16], \
                                                 const unsigned char *input_buf, EZDEV_SDK_UINT32 input_length, \
                                                 unsigned char *output_buf, EZDEV_SDK_UINT32 *output_buf_len, \
@@ -326,7 +338,7 @@ mkernel_internal_error aes_gcm_128_dec_padding(const unsigned char gcm_key[16], 
 
     if (sdk_error == mkernel_internal_succ)
     {
-        //output_bufÄÚÈİÓĞ¿ÉÄÜº¬ÓĞ0£¬²»ÄÜÓÃ*output_buf_len = strlen(output_buf);
+        //output_bufå†…å®¹æœ‰å¯èƒ½å«æœ‰0ï¼Œä¸èƒ½ç”¨*output_buf_len = strlen(output_buf);
         *output_buf_len = input_length;
     }
 

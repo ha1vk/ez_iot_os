@@ -1,23 +1,15 @@
-/**
- *  \file      
- *  \filename  ezdev_sdk_kernel_ex.h  
- *  \filepath  Y:\makedir\devsdk_v2.0.0\microkernel\src\ezdev_sdk_kernel_ex.h
- *  \copyright HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *  \brief     Î¢ÄÚºË¶îÍâµÄÒ»Ğ©½Ó¿Ú
- *  \author    panlong
- *  \date      2017/6/1
- */
-
-/**
-* @addtogroup micro_kernel
-*
-* @section Î¢ÄÚºË¶îÍâ½Ó¿Ú
-* Ìá¹©Ò»Ğ©Ô­±¾´ÓÖ°ÔğÉÏ²»ÊôÓÚÎ¢ÄÚºËµÄ¹¦ÄÜ 
-*
-*  Î¢ÄÚºË»ñÈ¡STUN·şÎñÆ÷ĞÅÏ¢½Ó¿Ú
-* (see \c ezdev_sdk_kernel_get_stun()).
-* 
-*/
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 #ifndef H_EZDEV_SDK_KERNEL_EX_H_
 #define H_EZDEV_SDK_KERNEL_EX_H_
@@ -31,7 +23,7 @@ extern "C"
 #endif
 
 /** 
- *  \brief		»ñÈ¡STUN·şÎñÆ÷ĞÅÏ¢½Ó¿Ú
+ *  \brief		è·å–STUNæœåŠ¡å™¨ä¿¡æ¯æ¥å£
  *  \method		ezdev_sdk_kernel_get_stun
  *  \param[in] 	stun_info * ptr_stun
  *  \return 	EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error
@@ -39,11 +31,11 @@ extern "C"
 EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_stun(stun_info* ptr_stun, EZDEV_SDK_BOOL bforce_refresh);
 
 /** 
- *  \brief		ÉèÖÃĞÄÌøÊ±¼ä
+ *  \brief		è®¾ç½®å¿ƒè·³æ—¶é—´
  *  \method		ezdev_sdk_kernel_set_keepalive_interval
- *  \param[in] 	EZDEV_SDK_UINT16 internal   ÉèÖÃĞÄÌø¼ä¸ôÊ±¼ä
- *  \param[in]  EZDEV_SDK_UINT16 timeout_s  µÈ´ı·şÎñÆ÷ÏìÓ¦µÄ³¬Ê±Ê±¼ä£¬0±íÊ¾²»µÈ´ı
- *  \return 	Èç¹û²»µÈ´ıÏìÓ¦£¬ĞÅÁîËÍ½ø¶ÓÁĞ·µ»Ø³É¹¦£¬·´Ö®µÈ´ıÆ½Ì¨ÏìÓ¦´íÎóÂë£¬Èç¹û³¬Ê±£¬·µ»ØµÈ´ıĞÅÁî³¬Ê±¡£
+ *  \param[in] 	EZDEV_SDK_UINT16 internal   è®¾ç½®å¿ƒè·³é—´éš”æ—¶é—´
+ *  \param[in]  EZDEV_SDK_UINT16 timeout_s  ç­‰å¾…æœåŠ¡å™¨å“åº”çš„è¶…æ—¶æ—¶é—´ï¼Œ0è¡¨ç¤ºä¸ç­‰å¾…
+ *  \return 	å¦‚æœä¸ç­‰å¾…å“åº”ï¼Œä¿¡ä»¤é€è¿›é˜Ÿåˆ—è¿”å›æˆåŠŸï¼Œåä¹‹ç­‰å¾…å¹³å°å“åº”é”™è¯¯ç ï¼Œå¦‚æœè¶…æ—¶ï¼Œè¿”å›ç­‰å¾…ä¿¡ä»¤è¶…æ—¶ã€‚
  */
 EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SDK_UINT16 internal, EZDEV_SDK_UINT16 timeout_s);
 

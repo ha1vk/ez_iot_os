@@ -1,19 +1,20 @@
-/**
- * \file		mkernel_internal_error.h
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
  *
- * \brief		¶¨ÒåÉè±¸SDKÎ¢ÄÚºËµÄ´íÎóĞÅÏ¢
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		panlong
- *
- * \date		2017/3/2
- */
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 /**
 * @addtogroup micro_kernel 
 *
-* @section Î¢ÄÚºË´íÎóÂëĞÅÏ¢
+* @section å¾®å†…æ ¸é”™è¯¯ç ä¿¡æ¯
 *
 *  \sa mkernel_internal_error
 * 
@@ -24,130 +25,130 @@
 
 typedef enum 
 {
-	mkernel_internal_succ = 0,							///<		³É¹¦
-	mkernel_internal_no_start,							///<		SDKÎ´Æô¶¯
-	mkernel_internal_haven_stop,						///<		SDKÒÑ¾­¹Ø±Õ£¬¶ÔÓÚSDKÀ´Ëµ¿ÉÒÔ½øÈëĞ¶ÔØÁ÷³Ì
-	mkernel_internal_invald_call,						///<		Äú×öÁËÒ»¸ö·Ç·¨µ÷ÓÃ£¬Çë¼ì²éµ÷ÓÃÁ÷³Ì
-	mkernel_internal_das_need_reconnect,				///<		DASĞèÒªÖØÁ¬
-	mkernel_internal_input_param_invalid,				///<		´«ÈëµÄ²ÎÊı·Ç·¨
-	mkernel_internal_lbs_connect_error,					///<		Á¬½Ólbs´íÎó
-	mkernel_internal_mem_lack,							///<		ÅäÖÃµÄÄÚ´æ²»¹»
-	mkernel_internal_net_gethostbyname_error,			///<		ÓòÃû½âÎöÊ§°Ü
-	mkernel_internal_create_sock_error,					///<		´´½¨socketÊ§°Ü
-	mkernel_internal_net_connect_error,					///<		socket Á¬½ÓÊ§°Ü
-	mkernel_internal_net_connect_timeout,				///<		socket Á¬½Ó³¬Ê±
-	mkernel_internal_net_send_error,					///<		lbs ·¢ËÍ´íÎó
-	mkernel_internal_net_read_error,					///<		lbs ½ÓÊÕ´íÎó
-	mkernel_internal_net_read_error_request,			///<		½ÓÊÕµ½´íÎóµÄÏìÓ¦
+	mkernel_internal_succ = 0,							///<		æˆåŠŸ
+	mkernel_internal_no_start,							///<		SDKæœªå¯åŠ¨
+	mkernel_internal_haven_stop,						///<		SDKå·²ç»å…³é—­ï¼Œå¯¹äºSDKæ¥è¯´å¯ä»¥è¿›å…¥å¸è½½æµç¨‹
+	mkernel_internal_invald_call,						///<		æ‚¨åšäº†ä¸€ä¸ªéæ³•è°ƒç”¨ï¼Œè¯·æ£€æŸ¥è°ƒç”¨æµç¨‹
+	mkernel_internal_das_need_reconnect,				///<		DASéœ€è¦é‡è¿
+	mkernel_internal_input_param_invalid,				///<		ä¼ å…¥çš„å‚æ•°éæ³•
+	mkernel_internal_lbs_connect_error,					///<		è¿æ¥lbsé”™è¯¯
+	mkernel_internal_mem_lack,							///<		é…ç½®çš„å†…å­˜ä¸å¤Ÿ
+	mkernel_internal_net_gethostbyname_error,			///<		åŸŸåè§£æå¤±è´¥
+	mkernel_internal_create_sock_error,					///<		åˆ›å»ºsocketå¤±è´¥
+	mkernel_internal_net_connect_error,					///<		socket è¿æ¥å¤±è´¥
+	mkernel_internal_net_connect_timeout,				///<		socket è¿æ¥è¶…æ—¶
+	mkernel_internal_net_send_error,					///<		lbs å‘é€é”™è¯¯
+	mkernel_internal_net_read_error,					///<		lbs æ¥æ”¶é”™è¯¯
+	mkernel_internal_net_read_error_request,			///<		æ¥æ”¶åˆ°é”™è¯¯çš„å“åº”
 	mkernel_internal_net_socket_error,					///<		socket error
 	mkernel_internal_net_socket_timeout,				///<		socket timeout
 	mkernel_internal_net_socket_closed,					///<		socket closed
 	mkernel_internal_net_send_buf_full,					///<		send buf full
-	mkernel_internal_malloc_error,						///<		ÉêÇëÄÚ´æ´íÎó
-	mkernel_internal_json_parse_error,					///<		½âÎöjson´íÎó
-	mkernel_internal_get_error_json,					///<		´íÎójson±¨ÎÄ£¬Ö¸ÁîÓë±¨ÎÄ¸ñÊ½²»Ò»ÖÂ
-	mkernel_internal_json_format_error,					///<		json¸ñÊ½»¯Ê§°Ü
-	mkernel_internal_xml_parse_error,					///<		½âÎöxml´íÎó
-	mkernel_internal_get_error_xml,						///<		´íÎóxml±¨ÎÄ£¬Ö¸ÁîÓë±¨ÎÄ¸ñÊ½²»Ò»ÖÂ
-	mkernel_internal_rev_invalid_packet,				///<		½ÓÊÕµ½Ò»¸ö·Ç·¨±¨ÎÄ
+	mkernel_internal_malloc_error,						///<		ç”³è¯·å†…å­˜é”™è¯¯
+	mkernel_internal_json_parse_error,					///<		è§£æjsoné”™è¯¯
+	mkernel_internal_get_error_json,					///<		é”™è¯¯jsonæŠ¥æ–‡ï¼ŒæŒ‡ä»¤ä¸æŠ¥æ–‡æ ¼å¼ä¸ä¸€è‡´
+	mkernel_internal_json_format_error,					///<		jsonæ ¼å¼åŒ–å¤±è´¥
+	mkernel_internal_xml_parse_error,					///<		è§£æxmlé”™è¯¯
+	mkernel_internal_get_error_xml,						///<		é”™è¯¯xmlæŠ¥æ–‡ï¼ŒæŒ‡ä»¤ä¸æŠ¥æ–‡æ ¼å¼ä¸ä¸€è‡´
+	mkernel_internal_rev_invalid_packet,				///<		æ¥æ”¶åˆ°ä¸€ä¸ªéæ³•æŠ¥æ–‡
 
-	mkernel_internal_force_offline,						///<		Éè±¸±»Ç¿ÖÆÏÂÏß		½ÓÊÕµ½Õâ¸ö´íÎó±íÊ¾Î¢ÄÚºËÄÚ²¿ÒÑ¾­Í£Ö¹¹¤×÷ÁË£¬ĞèÒªÍâ³öÍê³Éµ÷ÓÃ¹Ø±Õ½Ó¿ÚÊÍ·Å×ÊÔ´
-	mkernel_internal_force_domain_risk,					///<		Éè±¸ÁìÓò±»·ç¿ØµôÁË
-	mkernel_internal_force_cmd_risk,					///<		Éè±¸Ö¸Áî±»·ç¿ØµôÁË
+	mkernel_internal_force_offline,						///<		è®¾å¤‡è¢«å¼ºåˆ¶ä¸‹çº¿		æ¥æ”¶åˆ°è¿™ä¸ªé”™è¯¯è¡¨ç¤ºå¾®å†…æ ¸å†…éƒ¨å·²ç»åœæ­¢å·¥ä½œäº†ï¼Œéœ€è¦å¤–å‡ºå®Œæˆè°ƒç”¨å…³é—­æ¥å£é‡Šæ”¾èµ„æº
+	mkernel_internal_force_domain_risk,					///<		è®¾å¤‡é¢†åŸŸè¢«é£æ§æ‰äº†
+	mkernel_internal_force_cmd_risk,					///<		è®¾å¤‡æŒ‡ä»¤è¢«é£æ§æ‰äº†
 
 	mkernel_internal_net_poll_err,						///<		poll error
 	mkernel_internal_net_getsockopt_error,				///<		getsockopt
 	mkernel_internal_net_socket_err,					///<		SO_ERROR
 	mkernel_internal_net_poll_event_err,				///<		poll_event_err
-	mkernel_internal_value_load_err,					///<		»ñÈ¡Êı¾İÊ§°Ü
-	mkernel_internal_value_save_err,					///<		±£´æÊı¾İÊ§°Ü
-	mkernel_internal_internal_err,						///<		ÄÚ²¿´íÎó
-	mkernel_internal_msg_len_overrange,                  ///<        ÏûÏ¢³¤¶È³¬³ö·¶Î§
+	mkernel_internal_value_load_err,					///<		è·å–æ•°æ®å¤±è´¥
+	mkernel_internal_value_save_err,					///<		ä¿å­˜æ•°æ®å¤±è´¥
+	mkernel_internal_internal_err,						///<		å†…éƒ¨é”™è¯¯
+	mkernel_internal_msg_len_overrange,                  ///<        æ¶ˆæ¯é•¿åº¦è¶…å‡ºèŒƒå›´
 	mkernel_internal_das_need_rebuild_session,
 
-	mkernel_internal_call_mqtt_connect = 100,			///<		µ÷ÓÃMQTT ×¢²á
-	mkernel_internal_call_mqtt_sub_error,				///<		µ÷ÓÃMQTT ¶©ÔÄtopic
-	mkernel_internal_call_mqtt_pub_error,				///<		µ÷ÓÃMQTT ·¢²¼Ê§°Ü
-	mkernel_internal_call_mqtt_yield_error,				///<		µ÷ÓÃMQTT Çı¶¯
-	mkernel_internal_call_mqtt_disconnect,				///<		µ÷ÓÃMQTT ×¢Ïú
-	mkernel_internal_call_mqtt_buffer_too_short,		///<		µ÷ÓÃMQTT ·ÖÅä¿Õ¼äÌ«Ğ¡
+	mkernel_internal_call_mqtt_connect = 100,			///<		è°ƒç”¨MQTT æ³¨å†Œ
+	mkernel_internal_call_mqtt_sub_error,				///<		è°ƒç”¨MQTT è®¢é˜…topic
+	mkernel_internal_call_mqtt_pub_error,				///<		è°ƒç”¨MQTT å‘å¸ƒå¤±è´¥
+	mkernel_internal_call_mqtt_yield_error,				///<		è°ƒç”¨MQTT é©±åŠ¨
+	mkernel_internal_call_mqtt_disconnect,				///<		è°ƒç”¨MQTT æ³¨é”€
+	mkernel_internal_call_mqtt_buffer_too_short,		///<		è°ƒç”¨MQTT åˆ†é…ç©ºé—´å¤ªå°
 
-	mkernel_internal_call_coap_connect = 150,           ///<        µ÷ÓÃCOAP ×¢²á
-	mkernel_internal_call_coap_pub_error,               ///<        µ÷ÓÃCOAP ·¢²¼Ê§°Ü
-	mkernel_internal_call_coap_parse_error,             ///<        µ÷ÓÃCOAP ½âÎöÊ§°Ü
-	mkernel_internal_call_coap_yield_error,             ///<        µ÷ÓÃCOAP Çı¶¯
-	mkernel_internal_call_coap_update_sessionkey_error, ///<        µ÷ÓÃCOAP ¸üĞÂsessionKey
-	mkernel_internal_call_coap_udp_port_time_low_error, ///<        µ÷ÓÃCOAP UDP¶Ë¿Ú¼ì²âÊ±¼ä¹ıĞ¡
+	mkernel_internal_call_coap_connect = 150,           ///<        è°ƒç”¨COAP æ³¨å†Œ
+	mkernel_internal_call_coap_pub_error,               ///<        è°ƒç”¨COAP å‘å¸ƒå¤±è´¥
+	mkernel_internal_call_coap_parse_error,             ///<        è°ƒç”¨COAP è§£æå¤±è´¥
+	mkernel_internal_call_coap_yield_error,             ///<        è°ƒç”¨COAP é©±åŠ¨
+	mkernel_internal_call_coap_update_sessionkey_error, ///<        è°ƒç”¨COAP æ›´æ–°sessionKey
+	mkernel_internal_call_coap_udp_port_time_low_error, ///<        è°ƒç”¨COAP UDPç«¯å£æ£€æµ‹æ—¶é—´è¿‡å°
 
-	mkernel_internal_extend_id_error = 200,				///<		À©Õ¹ID´íÎó
-	mkernel_internal_extend_unreg,						///<		À©Õ¹Î´×¢²á
-	mkernel_internal_extend_full,						///<		À©Õ¹×¢²áÒÑÂú
-	mkernel_internal_extend_ready,						///<		À©Õ¹ÒÑ¾­×¢²á
-	mkernel_internal_extend_no_find,					///<		À©Õ¹Î´ÕÒµ½
-	mkernel_internal_common_ready,						///<		Í¨ÓÃÄ£¿éÒÑ¾­×¢²áÁË£¨Ö»Ö§³Ö×¢²áÒ»´Î£©
-	mkernel_internal_aes_input_len = 300,				///<		aesÊäÈëµÄÊı¾İ³¤¶È²»¶Ô
-	mkernel_internal_casll_mbedtls_setdeckey_error,		///<		µ÷ÓÃÉèÖÃÃØÔ¿´íÎó
-	mkernel_internal_casll_mbedtls_crypt_error,			///<		µ÷ÓÃ¼ÓÃÜ½Ó¿Ú´íÎó
-	mkernel_internal_aes_padding_unmatched,				///<		aes padding·½Ê½²»Æ¥Åä
+	mkernel_internal_extend_id_error = 200,				///<		æ‰©å±•IDé”™è¯¯
+	mkernel_internal_extend_unreg,						///<		æ‰©å±•æœªæ³¨å†Œ
+	mkernel_internal_extend_full,						///<		æ‰©å±•æ³¨å†Œå·²æ»¡
+	mkernel_internal_extend_ready,						///<		æ‰©å±•å·²ç»æ³¨å†Œ
+	mkernel_internal_extend_no_find,					///<		æ‰©å±•æœªæ‰¾åˆ°
+	mkernel_internal_common_ready,						///<		é€šç”¨æ¨¡å—å·²ç»æ³¨å†Œäº†ï¼ˆåªæ”¯æŒæ³¨å†Œä¸€æ¬¡ï¼‰
+	mkernel_internal_aes_input_len = 300,				///<		aesè¾“å…¥çš„æ•°æ®é•¿åº¦ä¸å¯¹
+	mkernel_internal_casll_mbedtls_setdeckey_error,		///<		è°ƒç”¨è®¾ç½®ç§˜é’¥é”™è¯¯
+	mkernel_internal_casll_mbedtls_crypt_error,			///<		è°ƒç”¨åŠ å¯†æ¥å£é”™è¯¯
+	mkernel_internal_aes_padding_unmatched,				///<		aes paddingæ–¹å¼ä¸åŒ¹é…
 	mkernel_internal_bscomptls_ecp_group_load_err,       ///< 
 	mkernel_internal_bscomptls_ecdh_read_public_err,
 	mkernel_internal_bscomptls_ecdh_calc_secret_err,
 	
 
-	mkernel_internal_queue_empty = 500,					///<		¶ÓÁĞÎª¿Õ
-	mkernel_internal_queue_uninit,						///<		¶ÓÁĞÎ´³õÊ¼»¯
-	mkernel_internal_queue_error,						///<		¶ÓÁĞÄÚ²¿³öÏÖË³Ğò´íÎó
-	mkernel_internal_queue_full,						///<		¶ÓÁĞÂú
+	mkernel_internal_queue_empty = 500,					///<		é˜Ÿåˆ—ä¸ºç©º
+	mkernel_internal_queue_uninit,						///<		é˜Ÿåˆ—æœªåˆå§‹åŒ–
+	mkernel_internal_queue_error,						///<		é˜Ÿåˆ—å†…éƒ¨å‡ºç°é¡ºåºé”™è¯¯
+	mkernel_internal_queue_full,						///<		é˜Ÿåˆ—æ»¡
 
-	mkernel_internal_platform_appoint_error =600,		///<		½ÓÊÕµ½ÓëĞ­ÒéÔ¼¶¨²»Ò»ÖÂ
-	mkernel_internal_sign_check_error,					///<		Ç©ÃûĞ£Ñé´íÎó
-	mkernel_internal_hmac_error,						///<		hmacÇ©ÃûÊ§°Ü
-	mkernel_internal_dec_error,							///<		½âÃÜÊ§°Ü	
-	mkernel_internal_enc_error,							///<		¼ÓÃÜÊ§°Ü
-	mkernel_internal_random1_check_error,				///<		Ëæ»úÂë1Ğ£Ñé´íÎó
-	mkernel_internal_hmac_compare_error,						///<		hmacÇ©ÃûÊ§°Ü
+	mkernel_internal_platform_appoint_error =600,		///<		æ¥æ”¶åˆ°ä¸åè®®çº¦å®šä¸ä¸€è‡´
+	mkernel_internal_sign_check_error,					///<		ç­¾åæ ¡éªŒé”™è¯¯
+	mkernel_internal_hmac_error,						///<		hmacç­¾åå¤±è´¥
+	mkernel_internal_dec_error,							///<		è§£å¯†å¤±è´¥	
+	mkernel_internal_enc_error,							///<		åŠ å¯†å¤±è´¥
+	mkernel_internal_random1_check_error,				///<		éšæœºç 1æ ¡éªŒé”™è¯¯
+	mkernel_internal_hmac_compare_error,						///<		hmacç­¾åå¤±è´¥
 
-	mkernel_internal_platform_error = 10000,					///<	Æ½Ì¨·µ»Ø´íÎó
-	mkernel_internal_platform_lbs_signcheck_error,				///<	signÑéÖ¤Ê§°Ü,ÑéÖ¤Âë²»Æ¥Åä									
-	mkernel_internal_platform_lbs_order_error,					///<	ĞÅÁîÊ±ĞòÓĞÎÊÌâ
-	mkernel_internal_platform_invalid_data,						///<	ÎŞĞ§Êı¾İ
-	mkernel_internal_platform_devid_inconformity,				///<	Éè±¸ÉÏ´«µÄDEVIDÓëÆ½Ì¨¼ÇÂ¼²»Ò»ÖÂ£¨¿ÉÄÜÊÇ´®ºÅÉè±¸£© ÖØĞÂÉú³Édevid
-	mkernel_internal_platform_query_authcode_error,				///<	²éÑ¯ÑéÖ¤ÂëÊ§°Ü,Ã»ÓĞÕâÌ¨Éè±¸
-	mkernel_internal_platform_query_authcode_redis,				///<	²éÑ¯redisÊ§°Ü
-	mkernel_internal_platform_dec_error,						///<	½âÃÜÊ§°Ü
-	mkernel_internal_platform_enc_error	,						///<	¼ÓÃÜÊ§°Ü
-	mkernel_internal_platform_getstun_error,				 	///<	»ñÈ¡dasĞÅÏ¢»òstunĞÅÏ¢Ê§°Ü
-	mkernel_internal_platform_masterkey_invalid,				///<	maskeyÊ§Ğ§
-	mkernel_internal_platform_stun_sessionkey_inconformity,		///<	»ñÈ¡StunĞÅÏ¢ Éè±¸¶ËÓë·şÎñ¶Ësession key²»Ò»ÖÂ
-	mkernel_internal_platform_stun_process_invalid,				///<	»ñÈ¡StunĞÅÏ¢ Á÷³Ì²»¶Ô
-	mkernel_internal_platform_das_process_invalid,				///<	»ñÈ¡DasĞÅÏ¢ Á÷³Ì²»¶Ô
+	mkernel_internal_platform_error = 10000,					///<	å¹³å°è¿”å›é”™è¯¯
+	mkernel_internal_platform_lbs_signcheck_error,				///<	signéªŒè¯å¤±è´¥,éªŒè¯ç ä¸åŒ¹é…									
+	mkernel_internal_platform_lbs_order_error,					///<	ä¿¡ä»¤æ—¶åºæœ‰é—®é¢˜
+	mkernel_internal_platform_invalid_data,						///<	æ— æ•ˆæ•°æ®
+	mkernel_internal_platform_devid_inconformity,				///<	è®¾å¤‡ä¸Šä¼ çš„DEVIDä¸å¹³å°è®°å½•ä¸ä¸€è‡´ï¼ˆå¯èƒ½æ˜¯ä¸²å·è®¾å¤‡ï¼‰ é‡æ–°ç”Ÿæˆdevid
+	mkernel_internal_platform_query_authcode_error,				///<	æŸ¥è¯¢éªŒè¯ç å¤±è´¥,æ²¡æœ‰è¿™å°è®¾å¤‡
+	mkernel_internal_platform_query_authcode_redis,				///<	æŸ¥è¯¢rediså¤±è´¥
+	mkernel_internal_platform_dec_error,						///<	è§£å¯†å¤±è´¥
+	mkernel_internal_platform_enc_error	,						///<	åŠ å¯†å¤±è´¥
+	mkernel_internal_platform_getstun_error,				 	///<	è·å–dasä¿¡æ¯æˆ–stunä¿¡æ¯å¤±è´¥
+	mkernel_internal_platform_masterkey_invalid,				///<	maskeyå¤±æ•ˆ
+	mkernel_internal_platform_stun_sessionkey_inconformity,		///<	è·å–Stunä¿¡æ¯ è®¾å¤‡ç«¯ä¸æœåŠ¡ç«¯session keyä¸ä¸€è‡´
+	mkernel_internal_platform_stun_process_invalid,				///<	è·å–Stunä¿¡æ¯ æµç¨‹ä¸å¯¹
+	mkernel_internal_platform_das_process_invalid,				///<	è·å–Dasä¿¡æ¯ æµç¨‹ä¸å¯¹
 
-	mkernel_internal_platform_lbs_sign_decrypt_err,             ///<	HMac384Ç©ÃûĞ£Ñé´íÎó
-	mkernel_internal_platform_lbs_gen_keys_err,                 ///<    lbsÉú³ÉÃØÔ¿´íÎó
+	mkernel_internal_platform_lbs_sign_decrypt_err,             ///<	HMac384ç­¾åæ ¡éªŒé”™è¯¯
+	mkernel_internal_platform_lbs_gen_keys_err,                 ///<    lbsç”Ÿæˆç§˜é’¥é”™è¯¯
 	mkernel_internal_platform_lbs_ecdh_check_err,               ///<    lbs ecdh
 	mkernel_internal_platform_lbs_check_ecdh_sign_fail,   
-	mkernel_internal_platform_lbs_check_sessionkey_fail,        ///<   sessionkeyÑéÖ¤Ê§°Ü
-	mkernel_internal_platform_lbs_sign_check_fail,              ///<   auth_iĞ£ÑésignÊ§°Ü¡¢ÉêÇëdevice idĞ£ÑésignÊ§°Ü
+	mkernel_internal_platform_lbs_check_sessionkey_fail,        ///<   sessionkeyéªŒè¯å¤±è´¥
+	mkernel_internal_platform_lbs_sign_check_fail,              ///<   auth_iæ ¡éªŒsignå¤±è´¥ã€ç”³è¯·device idæ ¡éªŒsignå¤±è´¥
 
-    mkernel_internal_platform_lbs_auth_type_need_rematch,       ///<   Éè±¸ÓëÆ½Ì¨µÄÈÏÖ¤ÀàĞÍ²»Æ¥Åä£¨µ±Ç°²»Æ¥Åä£¬¿ÉÖØĞÂÆ¥Åä£©
-    mkernel_internal_platform_lbs_auth_type_match_fail,         ///<   Éè±¸ÓëÆ½Ì¨µÄÈÏÖ¤ÀàĞÍÆ¥ÅäÊ§°Ü£¨ÎŞ·¨Æ¥Åä£©
+    mkernel_internal_platform_lbs_auth_type_need_rematch,       ///<   è®¾å¤‡ä¸å¹³å°çš„è®¤è¯ç±»å‹ä¸åŒ¹é…ï¼ˆå½“å‰ä¸åŒ¹é…ï¼Œå¯é‡æ–°åŒ¹é…ï¼‰
+    mkernel_internal_platform_lbs_auth_type_match_fail,         ///<   è®¾å¤‡ä¸å¹³å°çš„è®¤è¯ç±»å‹åŒ¹é…å¤±è´¥ï¼ˆæ— æ³•åŒ¹é…ï¼‰
 
-	mkernel_internal_platform_secretkey_decrypt_fail = 10100,	///<	½âÃÜÊ§°Ü
-	mkernel_internal_platform_secretkey_overflow_windows,		///<	ÇëÇó²»ÔÚ´°¿ÚÆÚ
-	mkernel_internal_platform_secretkey_no_user,				///<	Éè±¸Î´°ó¶¨ÓÃ»§
-	mkernel_internal_platform_secretkey_serial_not_exist,		///<	Éè±¸²»´æÔÚ
-	mkernel_internal_platform_secretkey_again,					///<	Éè±¸ÖØ¸´ÉêÇë
+	mkernel_internal_platform_secretkey_decrypt_fail = 10100,	///<	è§£å¯†å¤±è´¥
+	mkernel_internal_platform_secretkey_overflow_windows,		///<	è¯·æ±‚ä¸åœ¨çª—å£æœŸ
+	mkernel_internal_platform_secretkey_no_user,				///<	è®¾å¤‡æœªç»‘å®šç”¨æˆ·
+	mkernel_internal_platform_secretkey_serial_not_exist,		///<	è®¾å¤‡ä¸å­˜åœ¨
+	mkernel_internal_platform_secretkey_again,					///<	è®¾å¤‡é‡å¤ç”³è¯·
 	mkernel_internal_platform_error_end = 11000,
 
 	mkernel_internal_mqtt_error_begin = 11000,
- 	mkernel_internal_mqtt_nosupport_protocol_version,			///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬²»Ö§³ÖµÄĞ­Òé°æ±¾
- 	mkernel_internal_mqtt_unqualified_client_id,				///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬²»ºÏ¸ñµÄ¿Í»§¶Ë±êÊ¶·û
- 	mkernel_internal_mqtt_server_unusable,						///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬·şÎñ¶Ë²»¿ÉÓÃ
- 	mkernel_internal_mqtt_invalid_username,						///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬ÎŞĞ§µÄÓÃ»§Ãû»òÃÜÂë
- 	mkernel_internal_mqtt_unauthorized,							///<	MQTT Á¬½ÓÒÑ¾Ü¾ø£¬Î´ÊÚÈ¨
- 	mkernel_internal_mqtt_blacklist =	11010,					///<	Éè±¸±»¼ÓÈëµ½ºÚÃûµ¥
- 	mkernel_internal_mqtt_redirect =	11011,					///<	Éè±¸»á»°Ê§Ğ§
-	mkernel_internal_mqtt_session_exist =	11012,				///<	Éè±¸»á»°ÒÑ´æÔÚ
+ 	mkernel_internal_mqtt_nosupport_protocol_version,			///<	MQTT è¿æ¥å·²æ‹’ç»ï¼Œä¸æ”¯æŒçš„åè®®ç‰ˆæœ¬
+ 	mkernel_internal_mqtt_unqualified_client_id,				///<	MQTT è¿æ¥å·²æ‹’ç»ï¼Œä¸åˆæ ¼çš„å®¢æˆ·ç«¯æ ‡è¯†ç¬¦
+ 	mkernel_internal_mqtt_server_unusable,						///<	MQTT è¿æ¥å·²æ‹’ç»ï¼ŒæœåŠ¡ç«¯ä¸å¯ç”¨
+ 	mkernel_internal_mqtt_invalid_username,						///<	MQTT è¿æ¥å·²æ‹’ç»ï¼Œæ— æ•ˆçš„ç”¨æˆ·åæˆ–å¯†ç 
+ 	mkernel_internal_mqtt_unauthorized,							///<	MQTT è¿æ¥å·²æ‹’ç»ï¼Œæœªæˆæƒ
+ 	mkernel_internal_mqtt_blacklist =	11010,					///<	è®¾å¤‡è¢«åŠ å…¥åˆ°é»‘åå•
+ 	mkernel_internal_mqtt_redirect =	11011,					///<	è®¾å¤‡ä¼šè¯å¤±æ•ˆ
+	mkernel_internal_mqtt_session_exist =	11012,				///<	è®¾å¤‡ä¼šè¯å·²å­˜åœ¨
 	mkernel_internal_mqtt_error_end = 12000,
 }mkernel_internal_error;
 

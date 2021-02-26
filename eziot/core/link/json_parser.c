@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 #include "json_parser.h"
 #include "sdk_kernel_def.h"
 #include "bscJSON.h"
@@ -127,7 +139,7 @@ mkernel_internal_error json_parse_license_devinfo( bscJSON* json_root, dev_basic
 		return mkernel_internal_get_error_json;
 	}
 
-	dev_info->dev_status = 1; //Ĭ��ֵ
+	dev_info->dev_status = 1; //默认值
 
 	sprintf(dev_info->dev_subserial, "%s:%s", json_dev_productKey->valuestring, json_dev_deviceName->valuestring);
 	strncpy(dev_info->dev_verification_code, json_dev_deviceLicense->valuestring, strlen(json_dev_deviceLicense->valuestring));

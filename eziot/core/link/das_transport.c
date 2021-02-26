@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #include "string.h"
 #include "das_transport.h"
 #include "mkernel_internal_error.h"
@@ -32,7 +45,7 @@ MQTTClient g_DasClient;
 Network g_DasNetWork;
 unsigned char g_sendbuf[ezdev_sdk_send_buf_max];
 unsigned char g_readbuf[ezdev_sdk_recv_buf_max];
-EZDEV_SDK_UINT32 g_das_transport_seq; ///<	ÓëDASÍ¨ĞÅÊı¾İ°üseq
+EZDEV_SDK_UINT32 g_das_transport_seq; ///<	ä¸DASé€šä¿¡æ•°æ®åŒ…seq
 static EZDEV_SDK_BOOL g_is_first_session = EZDEV_SDK_TRUE;
 
 static mkernel_internal_error das_subscribe_revc_topic(ezdev_sdk_kernel *sdk_kernel, EZDEV_SDK_INT8 open);
@@ -299,7 +312,7 @@ static mkernel_internal_error serialize_devinfo(ezdev_sdk_kernel *sdk_kernel, un
 static mkernel_internal_error deserialize_common_v3(unsigned char *common_buf, EZDEV_SDK_UINT16 common_buf_len, ezdev_sdk_kernel_submsg_v3 *ptr_submsg)
 {
 	/**
-	* \brief  ½âÎöÍ¨ÓÃĞ­ÒéÌå
+	* \brief  è§£æé€šç”¨åè®®ä½“
 	*/
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	bscJSON *json_item = NULL;
@@ -347,7 +360,7 @@ static mkernel_internal_error deserialize_common_v3(unsigned char *common_buf, E
 static mkernel_internal_error deserialize_common(unsigned char *common_buf, EZDEV_SDK_UINT16 common_buf_len, ezdev_sdk_kernel_submsg *ptr_submsg)
 {
 	/**
-	* \brief  ½âÎöÍ¨ÓÃĞ­ÒéÌå
+	* \brief  è§£æé€šç”¨åè®®ä½“
 	*/
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	bscJSON *json_item = NULL;
@@ -444,7 +457,7 @@ static void handle_sub_msg(ezdev_sdk_kernel_submsg *ptr_submsg)
 	}
 	else if (ptr_submsg->msg_domain_id == DAS_CMD_COMMON_FUN || ptr_submsg->msg_command_id == DAS_CMD_PU2CENPLTUPGRADERSP)
 	{
-		//Í¨ÓÃÁìÓò
+		//é€šç”¨é¢†åŸŸ
 		if (common_module_bus_handle(ptr_submsg))
 		{
 			kernel_error = push_queue_submsg(ptr_submsg);
@@ -528,7 +541,7 @@ static mkernel_internal_error ezdev_parse_topic(ezdev_sdk_kernel_submsg_v3* ptr_
 static void das_message_receive_v3(MessageData *msg_data)
 {
 	/**
-	* \brief  topic /{ÁìÓò±àºÅ}/{Ö¸Áî±àºÅ}
+	* \brief  topic /{é¢†åŸŸç¼–å·}/{æŒ‡ä»¤ç¼–å·}
 	*/
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	ezdev_sdk_kernel_submsg_v3 *ptr_submsg = NULL;
@@ -594,7 +607,7 @@ static void das_message_receive_v3(MessageData *msg_data)
 		   }
         }
 		/**
-		 * \brief   ½«Õû¸ö±¨ÎÄ½âÃÜ
+		 * \brief   å°†æ•´ä¸ªæŠ¥æ–‡è§£å¯†
 		 */
 		output_buf = (unsigned char *)malloc(msg_data->message->payloadlen);
 		if (NULL == output_buf)
@@ -636,9 +649,9 @@ static void das_message_receive_v3(MessageData *msg_data)
 		else
 		{
 			/**
-			* \brief   Êı¾İÎª¿Õ
+			* \brief   æ•°æ®ä¸ºç©º
 			*/
-		    //Êı¾İÎª¿Õ°üµÄÊ±ºò²»ÄÜÖ±½Ó·µ»Ø¿ÕÖ¸Õë,ÕâÀïmallocÒ»¸ö×Ö½ÚµÄ¿Õ¼ä
+		    //æ•°æ®ä¸ºç©ºåŒ…çš„æ—¶å€™ä¸èƒ½ç›´æ¥è¿”å›ç©ºæŒ‡é’ˆ,è¿™é‡Œmallocä¸€ä¸ªå­—èŠ‚çš„ç©ºé—´
 			ptr_submsg->buf = malloc(sizeof(char));
 			if(NULL == ptr_submsg->buf)
 			{  
@@ -657,7 +670,7 @@ static void das_message_receive_v3(MessageData *msg_data)
 	} while (0);
 
 	/**
-	* \brief   ³É¹¦·µ»Ø
+	* \brief   æˆåŠŸè¿”å›
 	*/
 	if (sdk_error == mkernel_internal_succ)
 	{
@@ -805,7 +818,7 @@ fail:
 static void das_message_receive(MessageData *msg_data)
 {
 	/**
-	* \brief  topic /{ÁìÓò±àºÅ}/{Ö¸Áî±àºÅ}
+	* \brief  topic /{é¢†åŸŸç¼–å·}/{æŒ‡ä»¤ç¼–å·}
 	*/
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	ezdev_sdk_kernel_submsg *ptr_submsg = NULL;
@@ -848,7 +861,7 @@ static void das_message_receive(MessageData *msg_data)
 		}
 		
 		/**
-		 * \brief   ½«Õû¸ö±¨ÎÄ½âÃÜ
+		 * \brief   å°†æ•´ä¸ªæŠ¥æ–‡è§£å¯†
 		 */
 		output_buf = (unsigned char *)malloc(msg_data->message->payloadlen);
 		if (NULL == output_buf)
@@ -888,7 +901,7 @@ static void das_message_receive(MessageData *msg_data)
 		}
 		else
 		{
-			//Êı¾İÎª¿Õ°üµÄÊ±ºò²»ÄÜÖ±½Ó·µ»Ø¿ÕÖ¸Õë,ÕâÀïmallocÒ»¸ö×Ö½ÚµÄ¿Õ¼ä
+			//æ•°æ®ä¸ºç©ºåŒ…çš„æ—¶å€™ä¸èƒ½ç›´æ¥è¿”å›ç©ºæŒ‡é’ˆ,è¿™é‡Œmallocä¸€ä¸ªå­—èŠ‚çš„ç©ºé—´
 			ptr_submsg->buf = malloc(sizeof(char));
 			if(NULL == ptr_submsg->buf)
 			{  
@@ -907,7 +920,7 @@ static void das_message_receive(MessageData *msg_data)
 	} while (0);
 
 	/**
-	* \brief   ³É¹¦·µ»Ø
+	* \brief   æˆåŠŸè¿”å›
 	*/
 	if (sdk_error == mkernel_internal_succ)
 	{
@@ -968,7 +981,7 @@ static mkernel_internal_error das_send_pubmsg_v3(ezdev_sdk_kernel *sdk_kernel, e
 		ezdev_sdk_kernel_log_debug(0, 0, "publish topic:%s\n", publish_topic);
 		memset(&mqtt_msg, 0, sizeof(mqtt_msg));
 		mqtt_msg.qos = pubmsg->msg_qos;
-		mqtt_msg.retained = 1; //Æ½Ì¨²»¹ØĞÄ
+		mqtt_msg.retained = 1; //å¹³å°ä¸å…³å¿ƒ
 		mqtt_msg.dup = 0;
 		sdk_error = serialize_payload_common_v3(pubmsg->msg_seq, &common_output_buf, &common_output_buf_len);
 		if (sdk_error != mkernel_internal_succ)
@@ -1056,8 +1069,8 @@ static mkernel_internal_error das_send_pubmsg(ezdev_sdk_kernel *sdk_kernel, ezde
 
 	memset(&mqtt_msg, 0, sizeof(mqtt_msg));
 	mqtt_msg.qos = pubmsg->msg_qos;
-	mqtt_msg.retained = 1; //Æ½Ì¨²»¹ØĞÄ
-	mqtt_msg.dup = 0;	  //0 ·ÇÖØÊÔ  1 ÖØÊÔ
+	mqtt_msg.retained = 1; //å¹³å°ä¸å…³å¿ƒ
+	mqtt_msg.dup = 0;	  //0 éé‡è¯•  1 é‡è¯•
 
 	if (pubmsg->msg_response == 0)
 	{
@@ -1161,7 +1174,7 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
 
 		if (mkernel_internal_call_mqtt_pub_error == sdk_error)
 		{
-			//·¢²¼Ê§°Ü£¬ÖØÁ¬Éè±¸£¬²¢»º´æÖ¸Áî
+			//å‘å¸ƒå¤±è´¥ï¼Œé‡è¿è®¾å¤‡ï¼Œå¹¶ç¼“å­˜æŒ‡ä»¤
 			if (ptr_pubmsg_exchange->max_send_count-- > 1)
 			{
 				ezdev_sdk_kernel_log_info(sdk_error, sdk_error, "v3 msg send failed,das need reconnect, count--:%d", ptr_pubmsg_exchange->max_send_count);
@@ -1183,7 +1196,7 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
 
 		if (mkernel_internal_succ != broadcast_runtime_err(TAG_MSG_ACK_V3, mkiE2ezE(sdk_error), &context, sizeof(context)))
 		{
-            ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err failed,module£º%s ,msg_type:%s\n",context.module, context.msg_type);
+            ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err failed,module:%s ,msg_type:%s\n",context.module, context.msg_type);
 		}
 		if (ptr_pubmsg_exchange->msg_conntext_v3.msg_body)
 			free(ptr_pubmsg_exchange->msg_conntext_v3.msg_body);
@@ -1225,7 +1238,7 @@ static mkernel_internal_error send_message_to_das_v2(ezdev_sdk_kernel *sdk_kerne
 
 		if (mkernel_internal_call_mqtt_pub_error == sdk_error)
 		{
-			//·¢²¼Ê§°Ü£¬ÖØÁ¬Éè±¸£¬²¢»º´æÖ¸Áî
+			//å‘å¸ƒå¤±è´¥ï¼Œé‡è¿è®¾å¤‡ï¼Œå¹¶ç¼“å­˜æŒ‡ä»¤
 			if (ptr_pubmsg_exchange->max_send_count-- > 1)
 			{
 				ezdev_sdk_kernel_log_info(sdk_error, sdk_error, "ptr_pubmsg_exchange send failed,das need reconnect, count--:%d\n", ptr_pubmsg_exchange->max_send_count);
@@ -1305,18 +1318,18 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
 		else
 		{
 			/**
-			* \brief	0£º±íÊ¾Éè±¸¶ÏÏßÖØÁ¬
-			1£º±íÊ¾Éè±¸ÖØĞÂÉÏÏß
+			* \brief	0ï¼šè¡¨ç¤ºè®¾å¤‡æ–­çº¿é‡è¿
+			1ï¼šè¡¨ç¤ºè®¾å¤‡é‡æ–°ä¸Šçº¿
 			*/
 			connectData.cleansession = 1;
 			/**
-			* \brief	0:¶ÏÏßÖØÁ¬ÉÏÏß
-			1:Éè±¸ÖØĞÂÉÏÏß£¬°üº¬ÒÅÖöÏûÏ¢£¨Éè±¸ĞÅÏ¢£©
+			* \brief	0:æ–­çº¿é‡è¿ä¸Šçº¿
+			1:è®¾å¤‡é‡æ–°ä¸Šçº¿ï¼ŒåŒ…å«é—å˜±æ¶ˆæ¯ï¼ˆè®¾å¤‡ä¿¡æ¯ï¼‰
 			*/
 			connectData.willFlag = 1;
 		}
 		/**
-		* \brief		QoS0£º 00	QoS1£º 01	QoS2£º 10	Ê¹ÓÃQoS1
+		* \brief		QoS0ï¼š 00	QoS1ï¼š 01	QoS2ï¼š 10	ä½¿ç”¨QoS1
 		*/
 		connectData.will.qos = 1;
 		connectData.will.retained = 1;
@@ -1431,7 +1444,7 @@ void das_object_init(ezdev_sdk_kernel *sdk_kernel)
         g_DasClientByCoap.genaralSeq = genaral_seq;
     }*/
 
-	/* ³õÊ¼»¯ÏûÏ¢¶ÓÁĞ */
+	/* åˆå§‹åŒ–æ¶ˆæ¯é˜Ÿåˆ— */
 	init_queue(ezdev_sdk_queue_max, ezdev_sdk_queue_max, ezdev_sdk_queue_max * 4);
 }
 
@@ -1504,7 +1517,7 @@ mkernel_internal_error das_light_reg_v2(ezdev_sdk_kernel *sdk_kernel)
 	return sdk_error;
 }
 /** 
-*  \brief		RF¿ìËÙÖØÁ¬
+*  \brief		RFå¿«é€Ÿé‡è¿
 *  \param[in] 	ezdev_sdk_kernel * sdk_kernel
 *  \return 		mkernel_internal_error
 */
@@ -1544,7 +1557,7 @@ mkernel_internal_error das_unreg(ezdev_sdk_kernel *sdk_kernel)
 }
 
 /** 
-*  \brief		·Ç×èÈû·¢²¼ÏûÏ¢
+*  \brief		éé˜»å¡å‘å¸ƒæ¶ˆæ¯
 *  \method		das_send_pubmsg_async
 *  \param[in] 	ezdev_sdk_kernel * sdk_kernel
 *  \param[in] 	const ezdev_sdk_kernel_pubmsg * msg
@@ -1553,7 +1566,7 @@ mkernel_internal_error das_unreg(ezdev_sdk_kernel *sdk_kernel)
 mkernel_internal_error das_send_pubmsg_async(ezdev_sdk_kernel *sdk_kernel, ezdev_sdk_kernel_pubmsg_exchange *msg_exchange)
 {
 	/**
-	* \brief   ½«ÏûÏ¢·Åµ½·¢²¼¶ÓÁĞÖĞÈ¥
+	* \brief   å°†æ¶ˆæ¯æ”¾åˆ°å‘å¸ƒé˜Ÿåˆ—ä¸­å»
 	*/
 	mkernel_internal_error sdk_error = push_queue_pubmsg_exchange(msg_exchange);
 	EZDEV_SDK_UNUSED(sdk_kernel);
@@ -1561,7 +1574,7 @@ mkernel_internal_error das_send_pubmsg_async(ezdev_sdk_kernel *sdk_kernel, ezdev
 }
 
 /** 
-*  \brief		·Ç×èÈû·¢²¼ÏûÏ¢
+*  \brief		éé˜»å¡å‘å¸ƒæ¶ˆæ¯
 *  \method		das_send_pubmsg_async_v3
 *  \param[in] 	ezdev_sdk_kernel * sdk_kernel
 *  \param[in] 	const ezdev_sdk_kernel_pubmsg_v3 * msg
@@ -1570,7 +1583,7 @@ mkernel_internal_error das_send_pubmsg_async(ezdev_sdk_kernel *sdk_kernel, ezdev
 mkernel_internal_error das_send_pubmsg_async_v3(ezdev_sdk_kernel *sdk_kernel, ezdev_sdk_kernel_pubmsg_exchange_v3 *msg_exchange)
 {
 	/**
-	* \brief   ½«ÏûÏ¢·Åµ½·¢²¼¶ÓÁĞÖĞÈ¥
+	* \brief   å°†æ¶ˆæ¯æ”¾åˆ°å‘å¸ƒé˜Ÿåˆ—ä¸­å»
 	*/
 	mkernel_internal_error sdk_error = push_queue_pubmsg_exchange_v3(msg_exchange);
 	EZDEV_SDK_UNUSED(sdk_kernel);
@@ -1592,7 +1605,7 @@ mkernel_internal_error das_change_keep_alive_interval(ezdev_sdk_kernel *sdk_kern
 static mkernel_internal_error das_subscribe_revc_topic(ezdev_sdk_kernel *sdk_kernel, EZDEV_SDK_INT8 open)
 {
 	/**
-	* \brief   ¶©ÔÄtopic À´½ÓÊÕÊı¾İ /Éè±¸ĞòÁĞºÅ/#
+	* \brief   è®¢é˜…topic æ¥æ¥æ”¶æ•°æ® /è®¾å¤‡åºåˆ—å·/#
 	*/
 	EZDEV_SDK_INT32 mqtt_result_code = 0;
 	char subscribe_topic[ezdev_sdk_recv_topic_len];
@@ -1657,7 +1670,7 @@ mkernel_internal_error das_yield(ezdev_sdk_kernel *sdk_kernel)
 	do
 	{
 		/**
-		* \brief   ÅĞ¶Ï´íÎó£¬¿´socketÊÇ·ñÓĞÒì³£
+		* \brief   åˆ¤æ–­é”™è¯¯ï¼Œçœ‹socketæ˜¯å¦æœ‰å¼‚å¸¸
 		*/
 		if (MQTTNetGetLastError() == mkernel_internal_net_socket_error || MQTTNetGetLastError() == mkernel_internal_net_socket_closed)
 		{
@@ -1666,18 +1679,18 @@ mkernel_internal_error das_yield(ezdev_sdk_kernel *sdk_kernel)
 			break;
 		}
 		/**
-		* \brief   ¸üĞÂ³¬Ê±Ê±¼ä
+		* \brief   æ›´æ–°è¶…æ—¶æ—¶é—´
 		*/
 		if (g_DasClient.keepAliveInterval != sdk_kernel->das_keepalive_interval)
 		{
 			g_DasClient.keepAliveInterval = sdk_kernel->das_keepalive_interval;
 		}
 		/**
-		* \brief   ÅĞ¶ÏĞÄÌøÊÇ·ñ³¬Ê±
+		* \brief   åˆ¤æ–­å¿ƒè·³æ˜¯å¦è¶…æ—¶
 		*/
 		if (!TimerIsExpiredByDiff(&g_DasClient.connect_timer, g_DasClient.keepAliveInterval * 2000))
 		{
-			//ĞÅÁî·¢ËÍÊ§°ÜÒÑ¾­ÔÚÄÚ²¿ÉÏÅ×
+			//ä¿¡ä»¤å‘é€å¤±è´¥å·²ç»åœ¨å†…éƒ¨ä¸ŠæŠ›
 
 			if (mkernel_internal_das_need_reconnect != (sdk_error = das_message_send(sdk_kernel)))
 				sdk_error = mkernel_internal_succ;

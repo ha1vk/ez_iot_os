@@ -1,14 +1,16 @@
-/**
- * \file		thread_interface.h
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
  *
- * \brief		Ïß³ÌÏà¹Ø²Ù×÷½Ó¿Ú£¬²»Í¬Æ½Ì¨ÔÚÍ¬²ã´ÎÄ¿Â¼¶¼ÓĞ¶ÔÓ¦µÄÊµÏÖ
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		xurongjun
- *
- * \date		2018/6/27
- */
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #ifndef H_THREAD_INTERFACE_H_
 #define H_THREAD_INTERFACE_H_
 
@@ -16,25 +18,25 @@
 
 
 /** 
- *  \brief		´´½¨Ïß³Ì
+ *  \brief		åˆ›å»ºçº¿ç¨‹
  *  \method		sdk_thread_create
- *  \param[in] 	handle Ïß³ÌÉÏÏÂÎÄ
- *  \return 	³É¹¦·µ»Ø0 Ê§°Ü·µ»Ø-1
+ *  \param[in] 	handle çº¿ç¨‹ä¸Šä¸‹æ–‡
+ *  \return 	æˆåŠŸè¿”å›0 å¤±è´¥è¿”å›-1
  */
 int sdk_thread_create(thread_handle* handle);
 
 /** 
- *  \brief		Ïß³ÌÏú»Ù
+ *  \brief		çº¿ç¨‹é”€æ¯
  *  \method		sdk_thread_destroy
- *  \param[in] 	handle Ïß³ÌÉÏÏÂÎÄ
- *  \return 	³É¹¦·µ»Ø0 Ê§°Ü·µ»Ø-1
+ *  \param[in] 	handle çº¿ç¨‹ä¸Šä¸‹æ–‡
+ *  \return 	æˆåŠŸè¿”å›0 å¤±è´¥è¿”å›-1
  */
 int sdk_thread_destroy(thread_handle* handle);
 
 /** 
- *  \brief		Ïß³ÌĞİÃß
+ *  \brief		çº¿ç¨‹ä¼‘çœ 
  *  \method		sdk_thread_sleep
- *  \param[in] 	time_ms ĞİÃßÊ±¼ä£¨ºÁÃë£©
+ *  \param[in] 	time_ms ä¼‘çœ æ—¶é—´ï¼ˆæ¯«ç§’ï¼‰
  */
 void sdk_thread_sleep(unsigned int time_ms);
 

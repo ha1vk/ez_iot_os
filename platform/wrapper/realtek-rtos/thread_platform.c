@@ -1,9 +1,19 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 #include "thread_interface.h"
 #include "ezdev_sdk_kernel_struct.h"
 #include <platform/platform_stdlib.h>
-//#include "thread_platform_wrapper.h"
-//realtek(free rtos) ÊµÏÖ
-//#include "semphr.h"
+
 static void * sdk_thread_fun(void * aArg)
 {
 	thread_handle* hd = (thread_handle*)aArg;

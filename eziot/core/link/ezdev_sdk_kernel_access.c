@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #include "ezdev_sdk_kernel_access.h"
 #include "mkernel_internal_error.h"
 #include "sdk_kernel_def.h"
@@ -21,8 +34,8 @@ extern ezdev_sdk_kernel g_ezdev_sdk_kernel;
 static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kernel, EZDEV_SDK_UINT8 nUpper)
 {
 	/**
-	* \brief   Æô¶¯SDK ´æÔÚ ¼¸¸öÇé¿ö dev_id ÊÇ·ñ´æÔÚ   masterkeyÊÇ·ñ´æÔÚ
-	*			Íê³ÉÉÏÏß
+	* \brief   å¯åŠ¨SDK å­˜åœ¨ å‡ ä¸ªæƒ…å†µ dev_id æ˜¯å¦å­˜åœ¨   masterkeyæ˜¯å¦å­˜åœ¨
+	*			å®Œæˆä¸Šçº¿
 	*             
 	*/
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
@@ -30,7 +43,7 @@ static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kerne
 	if (strcmp("", (const char*)sdk_kernel->dev_id) == 0)
 	{
 		/**
-		* \brief   ×ßÈÏÖ¤ÉÏÏßÁ÷³Ì ĞèÒª´´½¨das_id  masterkey
+		* \brief   èµ°è®¤è¯ä¸Šçº¿æµç¨‹ éœ€è¦åˆ›å»ºdas_id  masterkey
 		*             
 		*/
 	    ezdev_sdk_kernel_log_info(0, 0, "dev_id is empty\n");
@@ -42,7 +55,7 @@ static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kerne
 		if (strcmp("", (const char*)sdk_kernel->master_key) == 0)
 		{
 			/**
-			* \brief   ×ßÈÏÖ¤ÉÏÏßÁ÷³Ì ĞèÒª´´½¨masterkey
+			* \brief   èµ°è®¤è¯ä¸Šçº¿æµç¨‹ éœ€è¦åˆ›å»ºmasterkey
 			*             
 			*/
 		    ezdev_sdk_kernel_log_info(0, 0, "masterkey is empty\n");
@@ -52,7 +65,7 @@ static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kerne
 		else
 		{
 			/**
-			* \brief   Ë¢ĞÂsesseion key
+			* \brief   åˆ·æ–°sesseion key
 			*             
 			*/
 			sdk_error = lbs_redirect(sdk_kernel);
@@ -75,7 +88,7 @@ static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kerne
 	}
 
 	/**
-	 * Èç¹ûÑéÖ¤³ö´í£¬¿ÉÄÜÊÇÓÉÓÚÕªÒª¼ÆËã´óĞ¡Ğ´Ô­Òò£¨ÀúÊ·Ô­Òò£©£¬ÏÈ³¢ÊÔÒ»ÏÂÕªÒªĞ¡Ğ´µÄÇé¿ö£¬
+	 * å¦‚æœéªŒè¯å‡ºé”™ï¼Œå¯èƒ½æ˜¯ç”±äºæ‘˜è¦è®¡ç®—å¤§å°å†™åŸå› ï¼ˆå†å²åŸå› ï¼‰ï¼Œå…ˆå°è¯•ä¸€ä¸‹æ‘˜è¦å°å†™çš„æƒ…å†µï¼Œ
 	 */
 	if (sdk_error == mkernel_internal_platform_lbs_signcheck_error && nUpper != 0)
 	{
@@ -106,7 +119,7 @@ static mkernel_internal_error cnt_state_das_reged(ezdev_sdk_kernel* sdk_kernel)
 static mkernel_internal_error cnt_state_das_fast_reg(ezdev_sdk_kernel* sdk_kernel)
 {
 	/**
-	 * \brief   sdk wifi¿ìËÙÖØÁ¬¹ı³Ì
+	 * \brief   sdk wifiå¿«é€Ÿé‡è¿è¿‡ç¨‹
 	 */
 
 	
@@ -116,7 +129,7 @@ static mkernel_internal_error cnt_state_das_fast_reg(ezdev_sdk_kernel* sdk_kerne
 static mkernel_internal_error cnt_state_das_fast_reg_v3(ezdev_sdk_kernel* sdk_kernel)
 {
 	/**
-	 * \brief   sdk RF¿ìËÙÖØÁ¬¹ı³Ì
+	 * \brief   sdk RFå¿«é€Ÿé‡è¿è¿‡ç¨‹
 	 */
     
 	return das_light_reg_v3(sdk_kernel);
@@ -132,7 +145,7 @@ static mkernel_internal_error cnt_state_das_work(ezdev_sdk_kernel* sdk_kernel)
 static mkernel_internal_error cnt_state_das_retry(ezdev_sdk_kernel* sdk_kernel)
 {
 	/**
-	 * \brief   sdkÖØÁ¬¹ı³Ì
+	 * \brief   sdké‡è¿è¿‡ç¨‹
 	 */
 	return das_light_reg(sdk_kernel);
 }
@@ -143,7 +156,7 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 
 	if (sdk_entrance_authcode_invalid == sdk_kernel->entr_state)
 	{
-		//Èç¹ûÊÇÒòÎªÉêÇësecretkeyÊ§°Ü£¬ĞèÒª¸ù¾İ·şÎñÆ÷ÅäÖÃµÄÊ±¼ä¼ä¸ôºÍ×ÜÊ±³¤À´½øĞĞÖØÊÔ
+		//å¦‚æœæ˜¯å› ä¸ºç”³è¯·secretkeyå¤±è´¥ï¼Œéœ€è¦æ ¹æ®æœåŠ¡å™¨é…ç½®çš„æ—¶é—´é—´éš”å’Œæ€»æ—¶é•¿æ¥è¿›è¡Œé‡è¯•
 		if (!sdk_kernel->platform_handle.time_isexpired_bydiff(sdk_kernel->cnt_state_timer, sdk_kernel->secretkey_interval*1000) || 
 			sdk_kernel->lbs_redirect_times > sdk_kernel->secretkey_duration)
 		{
@@ -173,12 +186,12 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 		ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_lbs_redirect");
 		broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
 
-		 //Èç¹ûÊÇÁ¬½Ó³ö´í»òÕßÖØĞÂÆ¥ÅäÈÏÖ¤Ğ­ÒéµÄ»°Ôò²»×öË¥±ä
+		 //å¦‚æœæ˜¯è¿æ¥å‡ºé”™æˆ–è€…é‡æ–°åŒ¹é…è®¤è¯åè®®çš„è¯åˆ™ä¸åšè¡°å˜
         if (mkernel_internal_net_connect_error == sdk_error || mkernel_internal_net_gethostbyname_error == sdk_error || mkernel_internal_platform_lbs_auth_type_need_rematch == sdk_error)
 		{
 			sdk_kernel->lbs_redirect_times = 1;
 		}
-		else if (mkernel_internal_platform_lbs_sign_check_fail == sdk_error && !sdk_kernel->secretkey_applied)	///<	Èç¹ûÑéÖ¤³ö´í£¬Ôò×ßÉêÇësecretkeyÁ÷³Ì
+		else if (mkernel_internal_platform_lbs_sign_check_fail == sdk_error && !sdk_kernel->secretkey_applied)	///<	å¦‚æœéªŒè¯å‡ºé”™ï¼Œåˆ™èµ°ç”³è¯·secretkeyæµç¨‹
 		{
 			EZDEV_SDK_UINT16 _interval = 30;
 			EZDEV_SDK_UINT32 _duration = 3600*24;
@@ -195,7 +208,7 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 			{
 				ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_lbs_apply_serectkey");
 				broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-				/** Èç¹ûÑéÖ¤Âë²»ºÏ¹æµÄÉè±¸Î´°ó¶¨Éè±¸£¬ÔòÍ¨ÖªÉÏ²ãÍ¨¹ıappÈ¥ÉêÇësecretkey */
+				/** å¦‚æœéªŒè¯ç ä¸åˆè§„çš„è®¾å¤‡æœªç»‘å®šè®¾å¤‡ï¼Œåˆ™é€šçŸ¥ä¸Šå±‚é€šè¿‡appå»ç”³è¯·secretkey */
 				if (mkernel_internal_platform_secretkey_no_user == sdk_error)
 				{
 					ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_invaild_authcode");
@@ -212,7 +225,7 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 				{
 					sdk_kernel->entr_state = sdk_entrance_authcode_invalid;
 					sdk_kernel->cnt_state = sdk_cnt_unredirect;
-					sdk_kernel->lbs_redirect_times+=_interval;  					///<	°Ñlbs_redirect_timesµ±×öÊ±¼ä¼ÆÊıÆ÷Ê¹ÓÃ
+					sdk_kernel->lbs_redirect_times+=_interval;  					///<	æŠŠlbs_redirect_timeså½“åšæ—¶é—´è®¡æ•°å™¨ä½¿ç”¨
 					sdk_kernel->secretkey_interval = _interval;
 					sdk_kernel->secretkey_duration = _duration;
 				}
@@ -220,7 +233,7 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 		}
 		else
 		{
-			/* ÖØ¶¨ÏòÊ§°Ü ¼ÆÊı */
+			/* é‡å®šå‘å¤±è´¥ è®¡æ•° */
 			if (++sdk_kernel->lbs_redirect_times >= 60)
 				sdk_kernel->lbs_redirect_times = 60;
 		}
@@ -358,7 +371,7 @@ static mkernel_internal_error cnt_das_reg_fast_do(ezdev_sdk_kernel* sdk_kernel)
 	int iRetry_fastReg= 0;
 	sdk_sessionkey_context context = {0};
 
-	for (iRetry_fastReg = 0; iRetry_fastReg < 3; iRetry_fastReg++)//³¢ÊÔ3´Î
+	for (iRetry_fastReg = 0; iRetry_fastReg < 3; iRetry_fastReg++)
 	{
 		sdk_error = cnt_state_das_fast_reg(sdk_kernel);
 		ezdev_sdk_kernel_log_info(sdk_error, 0, "fast reg");
@@ -404,7 +417,7 @@ static mkernel_internal_error cnt_das_reg_v3_fast_do(ezdev_sdk_kernel* sdk_kerne
 	int iRetry_fastReg= 0;
 	sdk_sessionkey_context context = {0};
 
-	for (iRetry_fastReg = 0; iRetry_fastReg < 3; iRetry_fastReg++)//³¢ÊÔ3´Î
+	for (iRetry_fastReg = 0; iRetry_fastReg < 3; iRetry_fastReg++)
 	{
 		sdk_error = cnt_state_das_fast_reg_v3(sdk_kernel);
 		ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "RF fast reconnect:  cnt_state_das_fast_reg_v3 !!!");
@@ -529,7 +542,7 @@ mkernel_internal_error access_server_yield(ezdev_sdk_kernel* sdk_kernel)
 
 mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg* pubmsg)
 {
-	/* ÓÉÓÚ¶ÔÓÚbodyµÄ´¦ÀíºóÆÚĞèÒªÓÃase×ö¼ÓÃÜ£¬Ö±½ÓÔÚÕâÀï×öpadding */
+	/* ç”±äºå¯¹äºbodyçš„å¤„ç†åæœŸéœ€è¦ç”¨aseåšåŠ å¯†ï¼Œç›´æ¥åœ¨è¿™é‡Œåšpadding */
 	EZDEV_SDK_INT32 input_length_padding = 0;
 	ezdev_sdk_kernel_pubmsg_exchange* new_pubmsg_exchange = NULL; 
 	mkernel_internal_error kernel_internal_error = mkernel_internal_succ;
@@ -576,9 +589,9 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
 
 	buf_padding(new_pubmsg_exchange->msg_conntext.msg_body, input_length_padding, pubmsg->msg_body_len);
 
-	new_pubmsg_exchange->max_send_count = 1;	// Ö÷¶¯ÏÂÏßÏûÏ¢Ö»·¢Ò»´Î
+	new_pubmsg_exchange->max_send_count = 1;	// ä¸»åŠ¨ä¸‹çº¿æ¶ˆæ¯åªå‘ä¸€æ¬¡
 
-	/*·Ç×èÈûÊ½ÍùÏûÏ¢¶ÓÁĞÀïpushÄÚÈİ ×îÖÕÓÉSDKbootÄ£¿é´´½¨µÄÖ÷Ïß³ÌÇı¶¯ÏûÏ¢·¢ËÍ*/
+	/*éé˜»å¡å¼å¾€æ¶ˆæ¯é˜Ÿåˆ—é‡Œpushå†…å®¹ æœ€ç»ˆç”±SDKbootæ¨¡å—åˆ›å»ºçš„ä¸»çº¿ç¨‹é©±åŠ¨æ¶ˆæ¯å‘é€*/
 	kernel_internal_error= das_send_pubmsg_async(&g_ezdev_sdk_kernel, new_pubmsg_exchange);
     ezdev_sdk_kernel_log_info(0, 0, "das_send_pubmsg_async offline msg send ,error code:%d",kernel_internal_error);
 	if (kernel_internal_error != mkernel_internal_succ)

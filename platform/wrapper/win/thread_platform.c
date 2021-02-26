@@ -1,14 +1,15 @@
-/**
- * \file		thread_platform.c
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
  *
- * \brief		Ïß³ÌÏà¹Ø²Ù×÷½Ó¿ÚWindowsÊµÏÖ
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		xurongjun
- *
- * \date		2018/6/27
- */
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 #include "thread_platform_wrapper.h"
 #include <process.h>
@@ -16,10 +17,10 @@
 #include "ezdev_sdk_kernel_struct.h"
 
 /** 
- *  \brief		Ïß³Ìº¯Êı
+ *  \brief		çº¿ç¨‹å‡½æ•°
  *  \method		sdk_thread_fun
- *  \param[in] 	arg	Ïß³ÌÉÏÏÂÎÄ
- *  \return 	Ïß³ÌÍË³öÂë,Ä¬ÈÏÎª0
+ *  \param[in] 	arg	çº¿ç¨‹ä¸Šä¸‹æ–‡
+ *  \return 	çº¿ç¨‹é€€å‡ºç ,é»˜è®¤ä¸º0
  */
 unsigned int __stdcall sdk_thread_fun( void * arg)
 {
@@ -33,9 +34,9 @@ unsigned int __stdcall sdk_thread_fun( void * arg)
 }
 
 /** 
- *  \brief		Ïß³ÌËø¶ÔÏó´´½¨
+ *  \brief		çº¿ç¨‹é”å¯¹è±¡åˆ›å»º
  *  \method		sdk_platform_thread_mutex_create
- *  \return 	³É¹¦·µ»ØÏß³ÌËø¶ÔÏó Ê§°Ü·µ»ØNULL
+ *  \return 	æˆåŠŸè¿”å›çº¿ç¨‹é”å¯¹è±¡ å¤±è´¥è¿”å›NULL
  */
 ezdev_sdk_mutex sdk_platform_thread_mutex_create()
 {
@@ -50,9 +51,9 @@ ezdev_sdk_mutex sdk_platform_thread_mutex_create()
 }
 
 /** 
- *  \brief		Ïß³ÌËø¶ÔÏóÏú»Ù
+ *  \brief		çº¿ç¨‹é”å¯¹è±¡é”€æ¯
  *  \method		sdk_platform_thread_mutex_destroy
- *  \param[in] 	arg	Ïß³ÌËø¶ÔÏó
+ *  \param[in] 	arg	çº¿ç¨‹é”å¯¹è±¡
  */
 void sdk_platform_thread_mutex_destroy(ezdev_sdk_mutex ptr_mutex)
 {
@@ -68,10 +69,10 @@ void sdk_platform_thread_mutex_destroy(ezdev_sdk_mutex ptr_mutex)
 }
 
 /** 
- *  \brief		Ïß³ÌÉÏËø
+ *  \brief		çº¿ç¨‹ä¸Šé”
  *  \method		sdk_platform_thread_mutex_lock
- *  \param[in] 	ptr_mutex Ïß³ÌËø¶ÔÏó
- *  \return 	³É¹¦·µ»Ø0 Ê§°Ü·µ»Ø-1
+ *  \param[in] 	ptr_mutex çº¿ç¨‹é”å¯¹è±¡
+ *  \return 	æˆåŠŸè¿”å›0 å¤±è´¥è¿”å›-1
  */
 int sdk_platform_thread_mutex_lock(ezdev_sdk_mutex ptr_mutex)
 {
@@ -85,10 +86,10 @@ int sdk_platform_thread_mutex_lock(ezdev_sdk_mutex ptr_mutex)
 }
 
 /** 
- *  \brief		Ïß³Ì½âËø
+ *  \brief		çº¿ç¨‹è§£é”
  *  \method		sdk_platform_thread_mutex_unlock
- *  \param[in] 	ptr_mutex Ïß³ÌËø¶ÔÏó
- *  \return 	³É¹¦·µ»Ø0 Ê§°Ü·µ»Ø-1
+ *  \param[in] 	ptr_mutex çº¿ç¨‹é”å¯¹è±¡
+ *  \return 	æˆåŠŸè¿”å›0 å¤±è´¥è¿”å›-1
  */
 int sdk_platform_thread_mutex_unlock(ezdev_sdk_mutex ptr_mutex)
 {

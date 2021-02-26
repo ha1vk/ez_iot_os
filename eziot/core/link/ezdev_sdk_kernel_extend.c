@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #include "ezdev_sdk_kernel_extend.h"
 #include "sdk_kernel_def.h"
 #include "ezdev_sdk_kernel_struct.h"
@@ -18,11 +31,11 @@ EXTERN_QUEUE_FUN(pubmsg_exchange_v3)
 EXTERN_QUEUE_BASE_FUN
 
 
-static EZDEV_SDK_UINT16 g_kernel_domains_count = 0;                             ///<	À©Õ¹Êı
-static EZDEV_SDK_UINT16 g_kernel_extend_count = 0;                              ///<	À©Õ¹Êı
-static ezdev_sdk_kernel_domain_info g_kernel_domains[ezdev_sdk_extend_count];   ///<	À©Õ¹ÁĞ±í
-static ezdev_sdk_kernel_domain_info_v3 g_kernel_extend[ezdev_sdk_extend_count]; ///<	À©Õ¹ÁĞ±í V3Ğ­Òé
-static sdk_kernel_event_notice g_kernel_event_notice_cb;                        ///<	SDK»Øµ÷¸øÉÏ²ãµÄÍ¨ÖªÏûÏ¢
+static EZDEV_SDK_UINT16 g_kernel_domains_count = 0;                             ///<	æ‰©å±•æ•°
+static EZDEV_SDK_UINT16 g_kernel_extend_count = 0;                              ///<	æ‰©å±•æ•°
+static ezdev_sdk_kernel_domain_info g_kernel_domains[ezdev_sdk_extend_count];   ///<	æ‰©å±•åˆ—è¡¨
+static ezdev_sdk_kernel_domain_info_v3 g_kernel_extend[ezdev_sdk_extend_count]; ///<	æ‰©å±•åˆ—è¡¨ V3åè®®
+static sdk_kernel_event_notice g_kernel_event_notice_cb;                        ///<	SDKå›è°ƒç»™ä¸Šå±‚çš„é€šçŸ¥æ¶ˆæ¯
 
 void extend_init(sdk_kernel_event_notice kernel_event_notice_cb)
 {
@@ -43,10 +56,10 @@ void extend_fini()
 }
 
 /** 
- *  \brief		¸ù¾İÁìÓòIDÕÒµ½ÁìÓòÉÏÏÂÎÄ
+ *  \brief		æ ¹æ®é¢†åŸŸIDæ‰¾åˆ°é¢†åŸŸä¸Šä¸‹æ–‡
  *  \method		extend_get
- *  \param[in] 	domain_id	ÁìÓòID
- *  \return		³É¹¦·µ»ØÁìÓòÉÏÏÂÎÄÖ¸Õë Ê§°Ü·µ»ØNULL
+ *  \param[in] 	domain_id	é¢†åŸŸID
+ *  \return		æˆåŠŸè¿”å›é¢†åŸŸä¸Šä¸‹æ–‡æŒ‡é’ˆ å¤±è´¥è¿”å›NULL
  */
 ezdev_sdk_kernel_domain_info *extend_get(EZDEV_SDK_UINT32 domain_id)
 {
@@ -62,10 +75,10 @@ ezdev_sdk_kernel_domain_info *extend_get(EZDEV_SDK_UINT32 domain_id)
 }
 
 /** 
- *  \brief		¸ù¾İextend_idÕÒµ½ÁìÓòÉÏÏÂÎÄ
+ *  \brief		æ ¹æ®extend_idæ‰¾åˆ°é¢†åŸŸä¸Šä¸‹æ–‡
  *  \method		extend_get
- *  \param[in] 	domain_id	ÁìÓòID
- *  \return		³É¹¦·µ»ØÁìÓòÉÏÏÂÎÄÖ¸Õë Ê§°Ü·µ»ØNULL
+ *  \param[in] 	domain_id	é¢†åŸŸID
+ *  \return		æˆåŠŸè¿”å›é¢†åŸŸä¸Šä¸‹æ–‡æŒ‡é’ˆ å¤±è´¥è¿”å›NULL
  */
 ezdev_sdk_kernel_domain_info_v3 *extend_get_by_extend_id(const char* module)
 {
@@ -86,18 +99,18 @@ ezdev_sdk_kernel_domain_info_v3 *extend_get_by_extend_id(const char* module)
 }
 
 /** 
- *  \brief		·şÎñÆ÷ÏûÏ¢·Ö·¢
+ *  \brief		æœåŠ¡å™¨æ¶ˆæ¯åˆ†å‘
  *  \method		consume_extend_data
- *	\note		½«À´×Ô·şÎñÆ÷µÄÏûÏ¢¶ÓÁĞÖĞ°´ÏÈ½øÏÈ³öµÄÔ­Ôò»ñÈ¡µÚÒ»¸öÏûÏ¢£¬
- *				¸ù¾İÏûÏ¢µÄÁìÓòIDÕÒµ½×¢²áµÄÁìÓò£¬µ÷ÓÃÁìÓòµÄ»Øµ÷º¯Êı£¬½«ÏûÏ¢·Ö·¢µ½¸ÃÁìÓò
- *  \param[in] 	sdk_kernel				Î¢ÄÚºËÉÏÏÂÎÄ
- *  \return		³É¹¦·µ»Ø0 Ê§°ÜÏê¼û´íÎóÂë
+ *	\note		å°†æ¥è‡ªæœåŠ¡å™¨çš„æ¶ˆæ¯é˜Ÿåˆ—ä¸­æŒ‰å…ˆè¿›å…ˆå‡ºçš„åŸåˆ™è·å–ç¬¬ä¸€ä¸ªæ¶ˆæ¯ï¼Œ
+ *				æ ¹æ®æ¶ˆæ¯çš„é¢†åŸŸIDæ‰¾åˆ°æ³¨å†Œçš„é¢†åŸŸï¼Œè°ƒç”¨é¢†åŸŸçš„å›è°ƒå‡½æ•°ï¼Œå°†æ¶ˆæ¯åˆ†å‘åˆ°è¯¥é¢†åŸŸ
+ *  \param[in] 	sdk_kernel				å¾®å†…æ ¸ä¸Šä¸‹æ–‡
+ *  \return		æˆåŠŸè¿”å›0 å¤±è´¥è¯¦è§é”™è¯¯ç 
  */
 
 static mkernel_internal_error consume_extend_data_v3(ezdev_sdk_kernel *sdk_kernel)
 {
     /**
-	* \brief   ÓÃÀ´Çı¶¯À©Õ¹µÄÏûÏ¢·¢ËÍ
+	* \brief   ç”¨æ¥é©±åŠ¨æ‰©å±•çš„æ¶ˆæ¯å‘é€
 	*/
     const ezdev_sdk_kernel_domain_info_v3 *kernel_extend = NULL;
     ezdev_sdk_kernel_submsg_v3 *ptr_submsg = NULL;
@@ -148,17 +161,17 @@ static mkernel_internal_error consume_extend_data_v3(ezdev_sdk_kernel *sdk_kerne
 }
 
 /** 
- *  \brief		·şÎñÆ÷ÏûÏ¢·Ö·¢ 2.0 Ğ­Òé
+ *  \brief		æœåŠ¡å™¨æ¶ˆæ¯åˆ†å‘ 2.0 åè®®
  *  \method		consume_extend_data
- *	\note		½«À´×Ô·şÎñÆ÷µÄÏûÏ¢¶ÓÁĞÖĞ°´ÏÈ½øÏÈ³öµÄÔ­Ôò»ñÈ¡µÚÒ»¸öÏûÏ¢£¬
- *				¸ù¾İÏûÏ¢µÄÁìÓòIDÕÒµ½×¢²áµÄÁìÓò£¬µ÷ÓÃÁìÓòµÄ»Øµ÷º¯Êı£¬½«ÏûÏ¢·Ö·¢µ½¸ÃÁìÓò
- *  \param[in] 	sdk_kernel				Î¢ÄÚºËÉÏÏÂÎÄ
- *  \return		³É¹¦·µ»Ø0 Ê§°ÜÏê¼û´íÎóÂë
+ *	\note		å°†æ¥è‡ªæœåŠ¡å™¨çš„æ¶ˆæ¯é˜Ÿåˆ—ä¸­æŒ‰å…ˆè¿›å…ˆå‡ºçš„åŸåˆ™è·å–ç¬¬ä¸€ä¸ªæ¶ˆæ¯ï¼Œ
+ *				æ ¹æ®æ¶ˆæ¯çš„é¢†åŸŸIDæ‰¾åˆ°æ³¨å†Œçš„é¢†åŸŸï¼Œè°ƒç”¨é¢†åŸŸçš„å›è°ƒå‡½æ•°ï¼Œå°†æ¶ˆæ¯åˆ†å‘åˆ°è¯¥é¢†åŸŸ
+ *  \param[in] 	sdk_kernel				å¾®å†…æ ¸ä¸Šä¸‹æ–‡
+ *  \return		æˆåŠŸè¿”å›0 å¤±è´¥è¯¦è§é”™è¯¯ç 
  */
 static mkernel_internal_error consume_extend_data(ezdev_sdk_kernel *sdk_kernel)
 {
     /**
-	* \brief   ÓÃÀ´Çı¶¯À©Õ¹µÄÏûÏ¢·¢ËÍ
+	* \brief   ç”¨æ¥é©±åŠ¨æ‰©å±•çš„æ¶ˆæ¯å‘é€
 	*/
     const ezdev_sdk_kernel_domain_info *kernel_domain = NULL;
     ezdev_sdk_kernel_submsg *ptr_submsg = NULL;
@@ -210,11 +223,11 @@ static mkernel_internal_error consume_extend_data(ezdev_sdk_kernel *sdk_kernel)
 }
 
 /** 
- *  \brief		±¾µØÏûÏ¢·Ö·¢
+ *  \brief		æœ¬åœ°æ¶ˆæ¯åˆ†å‘
  *  \method		consume_extend_event
- *	\note		½«À´×Ô±¾µØ¸÷Ïß³ÌµÄÏûÏ¢¶ÓÁĞÖĞ°´ÏÈ½øÏÈ³öµÄÔ­Ôò»ñÈ¡µÚÒ»¸öÏûÏ¢£¬
- *				½«¸ÃÏûÏ¢·Ö·¢ÖÁËùÓĞÁìÓò£¬Èç¹ûÊÇextend_cb_eventÀàÊÂ¼ş£¬»¹½«·Ö·¢µ½ÉÏ²ãÓ¦ÓÃ
- *  \return		³É¹¦·µ»Ø0 Ê§°ÜÏê¼û´íÎóÂë
+ *	\note		å°†æ¥è‡ªæœ¬åœ°å„çº¿ç¨‹çš„æ¶ˆæ¯é˜Ÿåˆ—ä¸­æŒ‰å…ˆè¿›å…ˆå‡ºçš„åŸåˆ™è·å–ç¬¬ä¸€ä¸ªæ¶ˆæ¯ï¼Œ
+ *				å°†è¯¥æ¶ˆæ¯åˆ†å‘è‡³æ‰€æœ‰é¢†åŸŸï¼Œå¦‚æœæ˜¯extend_cb_eventç±»äº‹ä»¶ï¼Œè¿˜å°†åˆ†å‘åˆ°ä¸Šå±‚åº”ç”¨
+ *  \return		æˆåŠŸè¿”å›0 å¤±è´¥è¯¦è§é”™è¯¯ç 
  */
 /*static mkernel_internal_error consume_extend_event_v3()
 {
@@ -265,14 +278,14 @@ static mkernel_internal_error consume_extend_data(ezdev_sdk_kernel *sdk_kernel)
             if (g_kernel_extend[index].kernel_extend.extend_id == 0 || g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_extend_event == NULL)
                 break;
 
-            //ÏûÏ¢»ØÖ´Ö»»Øµ÷¸ø¶ÔÓ¦µÄÁìÓò
+            //æ¶ˆæ¯å›æ‰§åªå›è°ƒç»™å¯¹åº”çš„é¢†åŸŸ
             if (ptr_ack_ctx && g_kernel_extend[index].kernel_extend.extend_id != ptr_ack_ctx->msg_extend_id)
                 continue;
 
             g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_extend_event(&ptr_inner_cb_notic->cb_event, g_kernel_extend[index].kernel_extend.pUser);
         }
 
-        //ÏûÏ¢»ØÖ´²»ĞèÒª»Øµ÷¸øAPP
+        //æ¶ˆæ¯å›æ‰§ä¸éœ€è¦å›è°ƒç»™APP
         if (NULL == ptr_ack_ctx)
             g_kernel_event_notice_cb(&ptr_inner_cb_notic->cb_event);
     }
@@ -284,11 +297,11 @@ static mkernel_internal_error consume_extend_data(ezdev_sdk_kernel *sdk_kernel)
 
 
 /** 
- *  \brief		±¾µØÏûÏ¢·Ö·¢
+ *  \brief		æœ¬åœ°æ¶ˆæ¯åˆ†å‘
  *  \method		consume_extend_event
- *	\note		½«À´×Ô±¾µØ¸÷Ïß³ÌµÄÏûÏ¢¶ÓÁĞÖĞ°´ÏÈ½øÏÈ³öµÄÔ­Ôò»ñÈ¡µÚÒ»¸öÏûÏ¢£¬
- *				½«¸ÃÏûÏ¢·Ö·¢ÖÁËùÓĞÁìÓò£¬Èç¹ûÊÇextend_cb_eventÀàÊÂ¼ş£¬»¹½«·Ö·¢µ½ÉÏ²ãÓ¦ÓÃ
- *  \return		³É¹¦·µ»Ø0 Ê§°ÜÏê¼û´íÎóÂë
+ *	\note		å°†æ¥è‡ªæœ¬åœ°å„çº¿ç¨‹çš„æ¶ˆæ¯é˜Ÿåˆ—ä¸­æŒ‰å…ˆè¿›å…ˆå‡ºçš„åŸåˆ™è·å–ç¬¬ä¸€ä¸ªæ¶ˆæ¯ï¼Œ
+ *				å°†è¯¥æ¶ˆæ¯åˆ†å‘è‡³æ‰€æœ‰é¢†åŸŸï¼Œå¦‚æœæ˜¯extend_cb_eventç±»äº‹ä»¶ï¼Œè¿˜å°†åˆ†å‘åˆ°ä¸Šå±‚åº”ç”¨
+ *  \return		æˆåŠŸè¿”å›0 å¤±è´¥è¯¦è§é”™è¯¯ç 
  */
 static mkernel_internal_error consume_extend_event()
 {
@@ -351,7 +364,7 @@ static mkernel_internal_error consume_extend_event()
         {
             if(g_kernel_domains[index].kernel_extend.domain_id == 0 || g_kernel_domains[index].kernel_extend.ezdev_sdk_kernel_extend_event == NULL)
                 break;
-            //ÏûÏ¢»ØÖ´Ö»»Øµ÷¸ø¶ÔÓ¦µÄÁìÓò
+            //æ¶ˆæ¯å›æ‰§åªå›è°ƒç»™å¯¹åº”çš„é¢†åŸŸ
             if((ptr_ack_ctx && g_kernel_domains[index].kernel_extend.domain_id != ptr_ack_ctx->msg_domain_id)||ptr_ack_ctx_v3)
                 continue;
             g_kernel_domains[index].kernel_extend.ezdev_sdk_kernel_extend_event(&ptr_inner_cb_notic->cb_event, g_kernel_domains[index].kernel_extend.pUser);
@@ -367,7 +380,7 @@ static mkernel_internal_error consume_extend_event()
                 continue;
             g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_event_route(&ptr_inner_cb_notic->cb_event);
         }
-        //ÏûÏ¢»ØÖ´²»ĞèÒª»Øµ÷¸øAPP
+        //æ¶ˆæ¯å›æ‰§ä¸éœ€è¦å›è°ƒç»™APP
         if (NULL == ptr_ack_ctx && NULL == ptr_ack_ctx_v3)
         {
             g_kernel_event_notice_cb(&ptr_inner_cb_notic->cb_event);
@@ -481,7 +494,7 @@ mkernel_internal_error extend_yield(ezdev_sdk_kernel *sdk_kernel)
 
     if (sdk_stop == sdk_kernel->my_state)
     {
-        // Èç¹ûsdkÒÑ¹Ø±Õ£¬ĞèÒª½«±¾µØµÄËùÓĞÏûÏ¢È«²¿ÉÏÅ×
+        // å¦‚æœsdkå·²å…³é—­ï¼Œéœ€è¦å°†æœ¬åœ°çš„æ‰€æœ‰æ¶ˆæ¯å…¨éƒ¨ä¸ŠæŠ›
         while (mkernel_internal_queue_empty != consume_extend_event())
         {
         };
@@ -489,18 +502,18 @@ mkernel_internal_error extend_yield(ezdev_sdk_kernel *sdk_kernel)
     }
     else if (sdk_start == sdk_kernel->my_state)
     {
-        /* ·şÎñÆ÷ÏûÏ¢·Ö·¢ÖÁÉÏ²ãÁìÓò */
+        /* æœåŠ¡å™¨æ¶ˆæ¯åˆ†å‘è‡³ä¸Šå±‚é¢†åŸŸ */
         if (mkernel_internal_queue_empty == (mki_err = consume_extend_data(sdk_kernel)))
             mki_err = mkernel_internal_succ;
 
-        /* ±¾µØÏûÏ¢·Ö·¢ÖÁÉÏ²ãÁìÓòºÍÓ¦ÓÃ */
+        /* æœ¬åœ°æ¶ˆæ¯åˆ†å‘è‡³ä¸Šå±‚é¢†åŸŸå’Œåº”ç”¨ */
         consume_extend_event();
 
-        /* ·şÎñÆ÷ÏûÏ¢·Ö·¢ÖÁÉÏ²ãÁìÓò */
+        /* æœåŠ¡å™¨æ¶ˆæ¯åˆ†å‘è‡³ä¸Šå±‚é¢†åŸŸ */
         if (mkernel_internal_queue_empty == (mki_err = consume_extend_data_v3(sdk_kernel)))
             mki_err = mkernel_internal_succ;
 
-        /* ±¾µØÏûÏ¢·Ö·¢ÖÁÉÏ²ãÁìÓòºÍÓ¦ÓÃ */
+        /* æœ¬åœ°æ¶ˆæ¯åˆ†å‘è‡³ä¸Šå±‚é¢†åŸŸå’Œåº”ç”¨ */
     }
 
     return mki_err;

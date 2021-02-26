@@ -1,71 +1,75 @@
-/**
- *  \file      
- *  \filename  sdk_kernel_def.h  
- *  \filepath  e:\workdir\Ð¡ÏîÄ¿\ezDevSDK_v2.0.0\microkernel\src\sdk_kernel_def.h
- *  \copyright HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *  \brief     Éè±¸SDK ÄÚ²¿ ½á¹¹Ìå¡¢Ã¶¾ÙÒÔ¼°ºê¶¨Òå 
- *  \author    panlong
- *  \date      2017/3/4
- */
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #ifndef H_SDK_KERNEL_DEF_H_
 #define H_SDK_KERNEL_DEF_H_
 
 #include "base_typedef.h"
 #include "ezdev_sdk_kernel_struct.h"
 
-#define ezdev_sdk_recv_topic_len									128		   ///<	Éè±¸SDK Ò»Ð©ÃüÃûµÄ³¤¶È
-#define ezdev_sdk_type_len											16		   ///<	Éè±¸SDK ÀàÐÍ³¤¶È
-#define ezdev_sdk_name_len											64		   ///<	Éè±¸SDK Ò»Ð©ÃüÃûµÄ³¤¶È
-#define ezdev_sdk_sharekey_len										32		   ///<	Éè±¸share key ³¤¶È
-#define ezdev_sdk_devserial_maxlen									72		   ///< Éè±¸ÐòÁÐºÅÖ§³Ö×î´ó³¤¶È
-#define ezdev_sdk_total_len											128		   ///<	ÓÃÓÚÁÙÊ±±äÁ¿µÄ´æ·Å
-#define ezdev_sdk_identificationcode_max_len						256		   ///<	Éè±¸¹Ì¼þÊ¶±ðÂë×î´ó³¤¶È
-#define ezdev_sdk_md5_len											32		   ///<	md5³¤¶È
-#define ezdev_sdk_sha256_len                                        32         ///<	sha256Êý¾Ý³¤¶È
-#define ezdev_sdk_sha256_hex_len                                    64         ///<	sha256Êý¾Ý16½øÖÆ³¤¶È
-#define ezdev_sdk_sha256_offset                                     10         ///<	sha256ÃÜÎÄÆ«ÒÆÖµ
-#define ezdev_sdk_productkey_len									32		   ///<	productkey×î³¤µÄ³¤¶È
-#define ezdev_sdk_json_default_size									1024	   ///<	bscJSON_PrintBuffered µ÷ÓÃÊ±¸øµÄÄ¬ÈÏ´óÐ¡£¬¼õÉÙ¶à´Îmalloc/free¹ý³Ì
-#define ezdev_sdk_domain_id                                         1100       ///< Éè±¸Ö÷¶¯ÏÂÏßÊ±£¬ÄÚ²¿·¢ËÍÏÂÏßÏûÏ¢Ê¹ÓÃµÄÁìÓòid
-#define ezdev_sdk_offline_cmd_id                                    0X00002807 ///< Éè±¸Ö÷¶¯ÏÂÏßÊ±·¢ËÍµÄÖ¸Áîid
-#define ezdev_sdk_cmd_version                                       "v1.0.0"   ///< Ö¸Áî°æ±¾
-#define version_max_len					                            32		   ///<	°æ±¾³¤¶È
-#define QOS_T1                                                      1          ///< ²ÉÓÃQos1
+#define ezdev_sdk_recv_topic_len									128		   ///<	è®¾å¤‡SDK ä¸€äº›å‘½åçš„é•¿åº¦
+#define ezdev_sdk_type_len											16		   ///<	è®¾å¤‡SDK ç±»åž‹é•¿åº¦
+#define ezdev_sdk_name_len											64		   ///<	è®¾å¤‡SDK ä¸€äº›å‘½åçš„é•¿åº¦
+#define ezdev_sdk_sharekey_len										32		   ///<	è®¾å¤‡share key é•¿åº¦
+#define ezdev_sdk_devserial_maxlen									72		   ///< è®¾å¤‡åºåˆ—å·æ”¯æŒæœ€å¤§é•¿åº¦
+#define ezdev_sdk_total_len											128		   ///<	ç”¨äºŽä¸´æ—¶å˜é‡çš„å­˜æ”¾
+#define ezdev_sdk_identificationcode_max_len						256		   ///<	è®¾å¤‡å›ºä»¶è¯†åˆ«ç æœ€å¤§é•¿åº¦
+#define ezdev_sdk_md5_len											32		   ///<	md5é•¿åº¦
+#define ezdev_sdk_sha256_len                                        32         ///<	sha256æ•°æ®é•¿åº¦
+#define ezdev_sdk_sha256_hex_len                                    64         ///<	sha256æ•°æ®16è¿›åˆ¶é•¿åº¦
+#define ezdev_sdk_sha256_offset                                     10         ///<	sha256å¯†æ–‡åç§»å€¼
+#define ezdev_sdk_productkey_len									32		   ///<	productkeyæœ€é•¿çš„é•¿åº¦
+#define ezdev_sdk_json_default_size									1024	   ///<	bscJSON_PrintBuffered è°ƒç”¨æ—¶ç»™çš„é»˜è®¤å¤§å°ï¼Œå‡å°‘å¤šæ¬¡malloc/freeè¿‡ç¨‹
+#define ezdev_sdk_domain_id                                         1100       ///< è®¾å¤‡ä¸»åŠ¨ä¸‹çº¿æ—¶ï¼Œå†…éƒ¨å‘é€ä¸‹çº¿æ¶ˆæ¯ä½¿ç”¨çš„é¢†åŸŸid
+#define ezdev_sdk_offline_cmd_id                                    0X00002807 ///< è®¾å¤‡ä¸»åŠ¨ä¸‹çº¿æ—¶å‘é€çš„æŒ‡ä»¤id
+#define ezdev_sdk_cmd_version                                       "v1.0.0"   ///< æŒ‡ä»¤ç‰ˆæœ¬
+#define version_max_len					                            32		   ///<	ç‰ˆæœ¬é•¿åº¦
+#define QOS_T1                                                      1          ///< é‡‡ç”¨Qos1
 
 #define ezdev_sdk_pbkdf2_hmac_times                                 3          ///<	
 
-#define SendISAPIReq                                                0x00004D01 ///< isapiÐ­Òé£¬¸ù¾ÝÐ­Òé¹ýÂË·¢ËÍ±¨ÎÄ´óÐ¡
+#define SendISAPIReq                                                0x00004D01 ///< isapiåè®®ï¼Œæ ¹æ®åè®®è¿‡æ»¤å‘é€æŠ¥æ–‡å¤§å°
 #define SendISAPIRsp                                                0x00004D02 ///<
 #define SendISAPIEventReq                                           0x00004D03 ///<
 #define SendISAPIEventRsp                                           0x00004D03 ///<
-#define ezdev_sdk_com_msg_max_buf                                   1024*16    ///< ·ÇisapiÏûÏ¢±¨ÎÄ×î´óÔÊÐí·¢ËÍµÄsize
-#define ezdev_sdk_tcp_header_len                                    79         ///< tcpÍ·ºÍ»½ÐÑ°üÍ·³¤¶È
+#define ezdev_sdk_com_msg_max_buf                                   1024*16    ///< éžisapiæ¶ˆæ¯æŠ¥æ–‡æœ€å¤§å…è®¸å‘é€çš„size
+#define ezdev_sdk_tcp_header_len                                    79         ///< tcpå¤´å’Œå”¤é†’åŒ…å¤´é•¿åº¦
 
 
-#define ezdev_sdk_model_type_len											16		   ///<	Éè±¸SDK ÀàÐÍ³¤¶È
+#define ezdev_sdk_model_type_len											16		   ///<	è®¾å¤‡SDK ç±»åž‹é•¿åº¦
 
 #ifdef RAM_LIMIT
-//Ö÷ÒªÊÇ¸ørealtekÊ¹ÓÃ
+//ä¸»è¦æ˜¯ç»™realtekä½¿ç”¨
 #define ezdev_sdk_send_buf_max			1024*2
 #define ezdev_sdk_recv_buf_max			1024*2
 
 #define lbs_send_buf_max			1024*2
 #define lbs_recv_buf_max			1024*2
 
-#define	ezdev_sdk_extend_count  8				///<	Ö§³ÖµÄÀ©Õ¹Ä£¿éÊýÁ¿
+#define	ezdev_sdk_extend_count  8				///<	æ”¯æŒçš„æ‰©å±•æ¨¡å—æ•°é‡
 
 /**
-* \brief   SDK Ò»¸öÁìÓòÖ§³ÖµÄ·ç¿ØÖ¸Áî ×î´óÊý
+* \brief   SDK ä¸€ä¸ªé¢†åŸŸæ”¯æŒçš„é£ŽæŽ§æŒ‡ä»¤ æœ€å¤§æ•°
 */
 #define ezdev_sdk_risk_control_cmd_max		8
 #define	ezdev_sdk_queue_max					32
 #else  //RAM_LIMIT
 /**
-* \brief   DAS MQTT »á»°Ê¹ÓÃµÄ»º´æ
+* \brief   DAS MQTT ä¼šè¯ä½¿ç”¨çš„ç¼“å­˜
 */
 
 
-#if RSETBUFFER          //ISAPI½Ó¿Ú·¢ËÍµÄbuffer´óÐ¡ÉèÖÃÎª256k
+#if RSETBUFFER          //ISAPIæŽ¥å£å‘é€çš„bufferå¤§å°è®¾ç½®ä¸º256k
 
 #define ezdev_sdk_send_buf_max			1024*256
 #define ezdev_sdk_recv_buf_max			1024*256
@@ -80,13 +84,13 @@
 #define lbs_send_buf_max			1024*16
 #define lbs_recv_buf_max			1024*16
 
-#define ezdev_sdk_auth_group_size   64                      //Ö§³ÖµÄÈÏÖ¤Ð­ÒéÀàÐÍ×é×î´óÈÝÁ¿
-#define lbs_var_head_buf_max ezdev_sdk_auth_group_size + 2  //¿É±ä±¨ÎÄÍ·×î´ó³¤¶È£¬2¸ö×Ö½Ú·Ö±ð±íÊ¾µ±Ç°Ð­ÒéÀàÐÍºÍÐ­Òé×éµ±Ç°ÈÝÁ¿
+#define ezdev_sdk_auth_group_size   64                      //æ”¯æŒçš„è®¤è¯åè®®ç±»åž‹ç»„æœ€å¤§å®¹é‡
+#define lbs_var_head_buf_max ezdev_sdk_auth_group_size + 2  //å¯å˜æŠ¥æ–‡å¤´æœ€å¤§é•¿åº¦ï¼Œ2ä¸ªå­—èŠ‚åˆ†åˆ«è¡¨ç¤ºå½“å‰åè®®ç±»åž‹å’Œåè®®ç»„å½“å‰å®¹é‡
 
-#define	ezdev_sdk_extend_count	 32				///<	Ö§³ÖµÄÀ©Õ¹Ä£¿éÊýÁ¿
+#define	ezdev_sdk_extend_count	 32				///<	æ”¯æŒçš„æ‰©å±•æ¨¡å—æ•°é‡
 
 /**
-* \brief   SDK Ò»¸öÁìÓòÖ§³ÖµÄ·ç¿ØÖ¸Áî ×î´óÊý
+* \brief   SDK ä¸€ä¸ªé¢†åŸŸæ”¯æŒçš„é£ŽæŽ§æŒ‡ä»¤ æœ€å¤§æ•°
 */
 #define ezdev_sdk_risk_control_cmd_max		64
 #define	ezdev_sdk_queue_max						64
@@ -94,97 +98,97 @@
 
 #endif //RAM_LIMIT
 
-#define ezdev_sdk_das_default_keepaliveinterval			30		///<	DASÄ¬ÈÏÐÄÌøÊ±¼ä
+#define ezdev_sdk_das_default_keepaliveinterval			30		///<	DASé»˜è®¤å¿ƒè·³æ—¶é—´
 #define ezdev_sdk_sharekey_salt "www.88075998.com"
 
-#define ezdev_sdk_max_publish_count		2		///<	×î¶à·¢²¼µÄ´ÎÊý
-#define ezdev_sdk_msg_type_req			1		///<	dasÐÅÁîÀàÐÍ:ÇëÇó
-#define ezdev_sdk_msg_type_rsp			2		///<	dasÐÅÁîÀàÐÍ:ÏìÓ¦
+#define ezdev_sdk_max_publish_count		2		///<	æœ€å¤šå‘å¸ƒçš„æ¬¡æ•°
+#define ezdev_sdk_msg_type_req			1		///<	dasä¿¡ä»¤ç±»åž‹:è¯·æ±‚
+#define ezdev_sdk_msg_type_rsp			2		///<	dasä¿¡ä»¤ç±»åž‹:å“åº”
 
 typedef enum
 {
-	sdk_no_risk_control=0,		///<	²»·ç¿Ø
-	sdk_risk_control=1,			///<	·ç¿Ø
+	sdk_no_risk_control=0,		///<	ä¸é£ŽæŽ§
+	sdk_risk_control=1,			///<	é£ŽæŽ§
 }sdk_risk_control_flag;
 
 
 // /**
-// * \brief   Éè±¸SDKÀ©Õ¹Ä£¿éID¶¨Òå
+// * \brief   è®¾å¤‡SDKæ‰©å±•æ¨¡å—IDå®šä¹‰
 // */
 // typedef enum
 // {
-// 	ezdev_sdk_extend_begin = 0,				///<	À©Õ¹Ä£¿éÆðÊ¼
-// 	ezdev_sdk_extend_count = 16				///<	Ö§³ÖµÄÀ©Õ¹Ä£¿éÊýÁ¿
+// 	ezdev_sdk_extend_begin = 0,				///<	æ‰©å±•æ¨¡å—èµ·å§‹
+// 	ezdev_sdk_extend_count = 16				///<	æ”¯æŒçš„æ‰©å±•æ¨¡å—æ•°é‡
 // }ezdev_sdk_extend_id;
 
 /**
-* \brief   ±ê¼ÇSDKÈë¿Ú×´Ì¬
+* \brief   æ ‡è®°SDKå…¥å£çŠ¶æ€
 */
 typedef enum
 {
-	sdk_entrance_normal,			///<	SDKÕý³£Èë¿Ú
-	sdk_entrance_switchover,			///<	SDKÈë¿ÚÇÐ»»
+	sdk_entrance_normal,			///<	SDKæ­£å¸¸å…¥å£
+	sdk_entrance_switchover,			///<	SDKå…¥å£åˆ‡æ¢
 	sdk_entrance_authcode_invalid
 }sdk_entrance_state;
 
 
 /**
-* \brief   ±ê¼ÇSDK×´Ì¬
+* \brief   æ ‡è®°SDKçŠ¶æ€
 */
 typedef enum
 {
-	sdk_idle0 = 0,					///<	¸Õ´´½¨Î´³õÊ¼»¯
-	sdk_idle ,						///<	¿ÕÏÐ		³õÊ¼»¯×´Ì¬
-	sdk_start,						///<	sdk´¦ÓÚÆô¶¯
-	sdk_stop,						///<	sdk´¦ÓÚ¹Ø±Õ
-	sdk_idle2,						///<	¿ÕÏÐ		¹Ø±ÕºóµÄ×´Ì¬
+	sdk_idle0 = 0,					///<	åˆšåˆ›å»ºæœªåˆå§‹åŒ–
+	sdk_idle ,						///<	ç©ºé—²		åˆå§‹åŒ–çŠ¶æ€
+	sdk_start,						///<	sdkå¤„äºŽå¯åŠ¨
+	sdk_stop,						///<	sdkå¤„äºŽå…³é—­
+	sdk_idle2,						///<	ç©ºé—²		å…³é—­åŽçš„çŠ¶æ€
 }sdk_state;
 
 /**
-* \brief   ±ê¼ÇSDKÓëcloudÁ¬½Ó×´Ì¬
+* \brief   æ ‡è®°SDKä¸Žcloudè¿žæŽ¥çŠ¶æ€
 */
 typedef enum
 {
-	sdk_cnt_unredirect = 0,				///<	Î´ÖØ¶¨Ïò×´Ì¬		ÐèÒªµ½LBSÈ¥×öÖØ¶¨Ïò
-	sdk_cnt_redirected = 1,				///<	ÖØ¶¨ÏòÍê³É			ÐèÒªµ½DASÉÏ×¢²á
-	sdk_cnt_das_reged = 2,				///<	Íê³É×¢²á			ÐèÒª½ÓÊÕºÍ·¢ËÍÖ¸Áî
-	sdk_cnt_das_break = 4,				///<	ÓëDAS´¦ÓÚÖÐ¶Ï×´Ì¬	ÐèÒªÖØÁ¬
-	sdk_cnt_das_fast_reg = 5,           ///<	Éè±¸¿ìËÙÉÏÏß
-	sdk_cnt_das_fast_reg_v3 = 6,		///<    RF¿ìËÙÖØÁ¬
+	sdk_cnt_unredirect = 0,				///<	æœªé‡å®šå‘çŠ¶æ€		éœ€è¦åˆ°LBSåŽ»åšé‡å®šå‘
+	sdk_cnt_redirected = 1,				///<	é‡å®šå‘å®Œæˆ			éœ€è¦åˆ°DASä¸Šæ³¨å†Œ
+	sdk_cnt_das_reged = 2,				///<	å®Œæˆæ³¨å†Œ			éœ€è¦æŽ¥æ”¶å’Œå‘é€æŒ‡ä»¤
+	sdk_cnt_das_break = 4,				///<	ä¸ŽDASå¤„äºŽä¸­æ–­çŠ¶æ€	éœ€è¦é‡è¿ž
+	sdk_cnt_das_fast_reg = 5,           ///<	è®¾å¤‡å¿«é€Ÿä¸Šçº¿
+	sdk_cnt_das_fast_reg_v3 = 6,		///<    RFå¿«é€Ÿé‡è¿ž
 }sdk_cloud_cnt_state;
 
 typedef enum
 {
-	sdk_dev_auth_sap = 0,				///<	SAPÈÏÖ¤
-	sdk_dev_auth_license = 1			///<	licenseÈÏÖ¤
+	sdk_dev_auth_sap = 0,				///<	SAPè®¤è¯
+	sdk_dev_auth_license = 1			///<	licenseè®¤è¯
 }sdk_dev_auth_mode;
 
 
 typedef enum
 {
-	sdk_v3_unreg = 0,				///<	V3Ð­ÒéÎ´Ê¹ÓÃ
+	sdk_v3_unreg = 0,				///<	V3åè®®æœªä½¿ç”¨
 	sdk_v3_reged ,
 }sdk_v3_reg_status;
 
 typedef enum
 {
-    sdk_dev_auth_protocol_none = 0,     ///<	ÎÞÈÏÖ¤
-    sdk_dev_auth_protocol_ecdh = 1,     ///<	ECDHÈÏÖ¤
-    //sdk_dev_auth_protocol_test = 4,     ///<	²âÊÔÓÃµÄ
+    sdk_dev_auth_protocol_none = 0,     ///<	æ— è®¤è¯
+    sdk_dev_auth_protocol_ecdh = 1,     ///<	ECDHè®¤è¯
+    //sdk_dev_auth_protocol_test = 4,     ///<	æµ‹è¯•ç”¨çš„
     sdk_dev_auth_protocol_end
 }sdk_dev_auth_protocol_type;
 
 /**
-* \brief   ÓëLBS½»»¥Ð­Òé
+* \brief   ä¸ŽLBSäº¤äº’åè®®
 */
 typedef struct
 {
 	unsigned char *head_buf; 
-	EZDEV_SDK_UINT8 head_buf_Len;			///<	¿ÉÉúÆø5¸ö×Ö½Ú´óÐ¡ÒÔÉÏ
+	EZDEV_SDK_UINT8 head_buf_Len;			///<	å¯ç”Ÿæ°”5ä¸ªå­—èŠ‚å¤§å°ä»¥ä¸Š
 	EZDEV_SDK_UINT8 head_buf_off;
 
     unsigned char *var_head_buf;
-    EZDEV_SDK_UINT8 var_head_buf_Len;   //¿É±ä±¨ÎÄÍ·
+    EZDEV_SDK_UINT8 var_head_buf_Len;   //å¯å˜æŠ¥æ–‡å¤´
     EZDEV_SDK_UINT8 var_head_buf_off;
 
 	unsigned char *payload_buf;
@@ -193,18 +197,18 @@ typedef struct
 }lbs_packet;
 
 /**
-* \brief   ÓëLBS½»»¥Í¨ÓÃÐ­ÒéÌå
+* \brief   ä¸ŽLBSäº¤äº’é€šç”¨åè®®ä½“
 */
 typedef struct
 {
-	unsigned char	pro_form_version;			///<	½»»¥Ð­ÒéÐÎÊ½°æ±¾ºÅ
-	unsigned char	pro_type_low_version;		///<	½»»¥Ð­ÒéÀàÐÍ°æ±¾ºÅ(µÍ)
-	unsigned char	pro_type_high_version;		///<	½»»¥Ð­ÒéÀàÐÍ°æ±¾ºÅ(¸ß)
+	unsigned char	pro_form_version;			///<	äº¤äº’åè®®å½¢å¼ç‰ˆæœ¬å·
+	unsigned char	pro_type_low_version;		///<	äº¤äº’åè®®ç±»åž‹ç‰ˆæœ¬å·(ä½Ž)
+	unsigned char	pro_type_high_version;		///<	äº¤äº’åè®®ç±»åž‹ç‰ˆæœ¬å·(é«˜)
 }lbs_common;
 
 typedef struct
 {
-	char server_name[ezdev_sdk_name_len];		///<	lbs ÓòÃû
+	char server_name[ezdev_sdk_name_len];		///<	lbs åŸŸå
 	char server_ip[ezdev_sdk_name_len];			///<	lbs Ip
 	EZDEV_SDK_INT16 server_port;				///<	lbs port
 }ezdev_server_info;
@@ -219,76 +223,76 @@ typedef struct
 }das_info;
 
 /**
- * \brief   Éè±¸»ù±¾ÐÅÏ¢
+ * \brief   è®¾å¤‡åŸºæœ¬ä¿¡æ¯
  */
 typedef struct
 {
-	EZDEV_SDK_UINT16	dev_access_mode;										///		Éè±¸½ÓÈëÄ£Ê½  0-ÆÕÍ¨£¨2.0£©   1-HUB£¨2.0£©
-	sdk_dev_auth_mode dev_auth_mode;											///<    ÈÏÖ¤Ä£Ê½£º0 SAPÈÏÖ¤   1 licenceÈÏÖ¤
-	EZDEV_SDK_UINT16 dev_status;												///<	Éè±¸¹¤×÷×´Ì¬  1£ºÕý³£¹¤×÷Ä£Ê½  5£º´ý»ú(»òË¯Ãß)¹¤×÷Ä£Ê½
-	char dev_subserial[ezdev_sdk_devserial_maxlen];								///<	Éè±¸¶ÌÐòÁÐºÅ(¶ÔÓ¦licenceÈÏÖ¤ÖÐdevice_id)
-	char dev_verification_code[ezdev_sdk_verify_code_maxlen];					///<	Éè±¸ÑéÖ¤Âë(¶ÔÓ¦licenceÈÏÖ¤ÖÐlicence)
-	char dev_serial[ezdev_sdk_devserial_maxlen];								///<	Éè±¸³¤ÐòÁÐºÅ
-	char dev_firmwareversion[ezdev_sdk_name_len];								///<	Éè±¸¹Ì¼þ°æ±¾ºÅ
-	char dev_type[ezdev_sdk_name_len];											///<	Éè±¸ÐÍºÅ
-	char dev_typedisplay[ezdev_sdk_name_len];									///<	Éè±¸ÏÔÊ¾ÐÍºÅ
-	char dev_mac[ezdev_sdk_name_len];											///<	Éè±¸ÍøÉÏÎïÀíµØÖ·
-	char dev_nickname[ezdev_sdk_name_len];										///<	Éè±¸êÇ³Æ
-	char dev_firmwareidentificationcode[ezdev_sdk_identificationcode_max_len];	///<	Éè±¸¹Ì¼þÊ¶±ðÂë
-	EZDEV_SDK_UINT32 dev_oeminfo;												///<	Éè±¸µÄOEMÐÅÏ¢
+	EZDEV_SDK_UINT16	dev_access_mode;										///		è®¾å¤‡æŽ¥å…¥æ¨¡å¼  0-æ™®é€šï¼ˆ2.0ï¼‰   1-HUBï¼ˆ2.0ï¼‰
+	sdk_dev_auth_mode dev_auth_mode;											///<    è®¤è¯æ¨¡å¼ï¼š0 SAPè®¤è¯   1 licenceè®¤è¯
+	EZDEV_SDK_UINT16 dev_status;												///<	è®¾å¤‡å·¥ä½œçŠ¶æ€  1ï¼šæ­£å¸¸å·¥ä½œæ¨¡å¼  5ï¼šå¾…æœº(æˆ–ç¡çœ )å·¥ä½œæ¨¡å¼
+	char dev_subserial[ezdev_sdk_devserial_maxlen];								///<	è®¾å¤‡çŸ­åºåˆ—å·(å¯¹åº”licenceè®¤è¯ä¸­device_id)
+	char dev_verification_code[ezdev_sdk_verify_code_maxlen];					///<	è®¾å¤‡éªŒè¯ç (å¯¹åº”licenceè®¤è¯ä¸­licence)
+	char dev_serial[ezdev_sdk_devserial_maxlen];								///<	è®¾å¤‡é•¿åºåˆ—å·
+	char dev_firmwareversion[ezdev_sdk_name_len];								///<	è®¾å¤‡å›ºä»¶ç‰ˆæœ¬å·
+	char dev_type[ezdev_sdk_name_len];											///<	è®¾å¤‡åž‹å·
+	char dev_typedisplay[ezdev_sdk_name_len];									///<	è®¾å¤‡æ˜¾ç¤ºåž‹å·
+	char dev_mac[ezdev_sdk_name_len];											///<	è®¾å¤‡ç½‘ä¸Šç‰©ç†åœ°å€
+	char dev_nickname[ezdev_sdk_name_len];										///<	è®¾å¤‡æ˜µç§°
+	char dev_firmwareidentificationcode[ezdev_sdk_identificationcode_max_len];	///<	è®¾å¤‡å›ºä»¶è¯†åˆ«ç 
+	EZDEV_SDK_UINT32 dev_oeminfo;												///<	è®¾å¤‡çš„OEMä¿¡æ¯
 }dev_basic_info;
 
 /**
-* \brief   ÁìÓòÐÅÏ¢
+* \brief   é¢†åŸŸä¿¡æ¯
 */
 typedef struct
 {
-	sdk_risk_control_flag		domain_risk;											///<	ÁìÓòÊÇ·ñ±»·ç¿Ø
-	EZDEV_SDK_UINT32			cmd_risk_array[ezdev_sdk_risk_control_cmd_max];			///<	ÁìÓòÄÚ±»·ç¿ØµÄÖ¸Áî
-	ezdev_sdk_kernel_extend		kernel_extend;											///<	SDK×¢²á½øÀ´µÄÁìÓòÀ©Õ¹
+	sdk_risk_control_flag		domain_risk;											///<	é¢†åŸŸæ˜¯å¦è¢«é£ŽæŽ§
+	EZDEV_SDK_UINT32			cmd_risk_array[ezdev_sdk_risk_control_cmd_max];			///<	é¢†åŸŸå†…è¢«é£ŽæŽ§çš„æŒ‡ä»¤
+	ezdev_sdk_kernel_extend		kernel_extend;											///<	SDKæ³¨å†Œè¿›æ¥çš„é¢†åŸŸæ‰©å±•
 }ezdev_sdk_kernel_domain_info;
 
 /**
-* \brief   ÁìÓòÐÅÏ¢
+* \brief   é¢†åŸŸä¿¡æ¯
 */
 typedef struct
 {
-	ezdev_sdk_kernel_extend_v3		kernel_extend;											///<	SDK×¢²á½øÀ´µÄÁìÓòÀ©Õ¹
+	ezdev_sdk_kernel_extend_v3		kernel_extend;											///<	SDKæ³¨å†Œè¿›æ¥çš„é¢†åŸŸæ‰©å±•
 }ezdev_sdk_kernel_domain_info_v3;
 
 
 typedef struct
 {
-	EZDEV_SDK_UINT8		lbs_redirect_times;										///<	¼ÇÂ¼lbsÁ¬ÐøÖØ¶¨ÏòµÄ´ÎÊý
-	EZDEV_SDK_UINT8		das_retry_times;										///<	¼ÇÂ¼dasÁ¬ÐøÖØÁ¬µÄ´ÎÊý
-	EZDEV_SDK_BOOL		secretkey_applied;										///<	ÊÇ·ñÒÑ¾­ÉêÇë¹ýsecretkey
-	EZDEV_SDK_UINT16	secretkey_interval;										///<	ÉêÇësecretkey³ö´íºóÖØÊÔ¼ä¸ô(s)
-	EZDEV_SDK_UINT32	secretkey_duration;										///<	ÉêÇësecretkey³ö´íºóÖØÊÔ×ÜÊ±¼ä(s)
-	sdk_v3_reg_status	v3_reg_status;										    ///<	V3Ð­ÒéÊÇ·ñÊ¹ÓÃ
+	EZDEV_SDK_UINT8		lbs_redirect_times;										///<	è®°å½•lbsè¿žç»­é‡å®šå‘çš„æ¬¡æ•°
+	EZDEV_SDK_UINT8		das_retry_times;										///<	è®°å½•dasè¿žç»­é‡è¿žçš„æ¬¡æ•°
+	EZDEV_SDK_BOOL		secretkey_applied;										///<	æ˜¯å¦å·²ç»ç”³è¯·è¿‡secretkey
+	EZDEV_SDK_UINT16	secretkey_interval;										///<	ç”³è¯·secretkeyå‡ºé”™åŽé‡è¯•é—´éš”(s)
+	EZDEV_SDK_UINT32	secretkey_duration;										///<	ç”³è¯·secretkeyå‡ºé”™åŽé‡è¯•æ€»æ—¶é—´(s)
+	sdk_v3_reg_status	v3_reg_status;										    ///<	V3åè®®æ˜¯å¦ä½¿ç”¨
 
-	sdk_entrance_state	entr_state;												///<	sdkÈë¿Ú×´Ì¬
-	sdk_state			my_state;												///<	sdk×´Ì¬
-	sdk_cloud_cnt_state cnt_state;												///<	Á¬½Ó×´Ì¬											
-	ezdev_sdk_time		cnt_state_timer;										///<	ÖØÁ¬Ïà¹ØµÄ¶¨Ê±Æ÷
+	sdk_entrance_state	entr_state;												///<	sdkå…¥å£çŠ¶æ€
+	sdk_state			my_state;												///<	sdkçŠ¶æ€
+	sdk_cloud_cnt_state cnt_state;												///<	è¿žæŽ¥çŠ¶æ€											
+	ezdev_sdk_time		cnt_state_timer;										///<	é‡è¿žç›¸å…³çš„å®šæ—¶å™¨
 	
 	char dev_subserial[ezdev_sdk_devserial_maxlen];
 	unsigned char master_key[ezdev_sdk_masterkey_len];
 	unsigned char dev_id[ezdev_sdk_devid_len];
 	unsigned char session_key[ezdev_sdk_sessionkey_len];
 
-	EZDEV_SDK_UINT32			das_keepalive_interval;							///<	DASÐÄÌøÊ±¼ä¼ä¸ô
-	dev_basic_info				dev_info;										///<	Éè±¸»ù´¡ÐÅÏ¢
+	EZDEV_SDK_UINT32			das_keepalive_interval;							///<	DASå¿ƒè·³æ—¶é—´é—´éš”
+	dev_basic_info				dev_info;										///<	è®¾å¤‡åŸºç¡€ä¿¡æ¯
 
-	ezdev_server_info			server_info;									///<	lbs·þÎñÐÅÏ¢
-	das_info					redirect_das_info;								///<	lbsÖØ¶¨Ïò¹ýÀ´µÄdasÐÅÏ¢
+	ezdev_server_info			server_info;									///<	lbsæœåŠ¡ä¿¡æ¯
+	das_info					redirect_das_info;								///<	lbsé‡å®šå‘è¿‡æ¥çš„dasä¿¡æ¯
 
-	char subscribe_topic[ezdev_sdk_recv_topic_len];							    ///<	Éè±¸ÏòÆ½Ì¨¶©ÔÄµÄÖ÷Ìâ
+	char subscribe_topic[ezdev_sdk_recv_topic_len];							    ///<	è®¾å¤‡å‘å¹³å°è®¢é˜…çš„ä¸»é¢˜
 
-	char szMainVersion[version_max_len];										///<	SDKÖ÷°æ±¾ºÅ
+	char szMainVersion[version_max_len];										///<	SDKä¸»ç‰ˆæœ¬å·
 
-	EZDEV_SDK_UINT8 reg_mode;													///<	Éè±¸×¢²áÄ£Ê½
-	ezdev_sdk_kernel_platform_handle	platform_handle;						///<	lbs ½»»¥ÖÐÊ¹ÓÃ
-	sdk_risk_control_flag				access_risk;							///<	½ÓÈë·ç¿Ø±êÊ¶
+	EZDEV_SDK_UINT8 reg_mode;													///<	è®¾å¤‡æ³¨å†Œæ¨¡å¼
+	ezdev_sdk_kernel_platform_handle	platform_handle;						///<	lbs äº¤äº’ä¸­ä½¿ç”¨
+	sdk_risk_control_flag				access_risk;							///<	æŽ¥å…¥é£ŽæŽ§æ ‡è¯†
 
     EZDEV_SDK_UINT8     dev_cur_auth_type;
     EZDEV_SDK_UINT8     dev_def_auth_type;
@@ -314,28 +318,28 @@ typedef struct
 	unsigned char share_key[ezdev_sdk_sharekey_len];
 	EZDEV_SDK_UINT16 share_key_len;
 
-	lbs_packet global_out_packet;	///<*	lbs ·¢ËÍ»º³åÇø
-	lbs_packet global_in_packet;	///<*	lbs ½ÓÊÕ»º³åÇø
+	lbs_packet global_out_packet;	///<*	lbs å‘é€ç¼“å†²åŒº
+	lbs_packet global_in_packet;	///<*	lbs æŽ¥æ”¶ç¼“å†²åŒº
 
 	ezdev_sdk_net_work			lbs_net_work;
 }lbs_affair;
 
 /**
- * \brief   Éè±¸·¢²¼ÏûÏ¢µÄÏûÏ¢´æ´¢ÔØÌå
+ * \brief   è®¾å¤‡å‘å¸ƒæ¶ˆæ¯çš„æ¶ˆæ¯å­˜å‚¨è½½ä½“
  */
 typedef struct
 {
-	EZDEV_SDK_UINT16		max_send_count;			///<	×î´ó·¢²¼´ÎÊý£¬sendºó--
-	ezdev_sdk_kernel_pubmsg		msg_conntext;		///<	·¢²¼µÄÏûÏ¢ÄÚÈÝ
+	EZDEV_SDK_UINT16		max_send_count;			///<	æœ€å¤§å‘å¸ƒæ¬¡æ•°ï¼ŒsendåŽ--
+	ezdev_sdk_kernel_pubmsg		msg_conntext;		///<	å‘å¸ƒçš„æ¶ˆæ¯å†…å®¹
 }ezdev_sdk_kernel_pubmsg_exchange;
 
 /**
- * \brief   Éè±¸·¢²¼ÏûÏ¢µÄÏûÏ¢´æ´¢ÔØÌå 3.0Ð­Òé
+ * \brief   è®¾å¤‡å‘å¸ƒæ¶ˆæ¯çš„æ¶ˆæ¯å­˜å‚¨è½½ä½“ 3.0åè®®
  */
 typedef struct
 {
-	EZDEV_SDK_UINT16		max_send_count;			///<	×î´ó·¢²¼´ÎÊý£¬sendºó--
-	ezdev_sdk_kernel_pubmsg_v3	msg_conntext_v3;		///<	·¢²¼µÄÏûÏ¢ÄÚÈÝ
+	EZDEV_SDK_UINT16		max_send_count;			///<	æœ€å¤§å‘å¸ƒæ¬¡æ•°ï¼ŒsendåŽ--
+	ezdev_sdk_kernel_pubmsg_v3	msg_conntext_v3;		///<	å‘å¸ƒçš„æ¶ˆæ¯å†…å®¹
 }ezdev_sdk_kernel_pubmsg_exchange_v3;
 
 typedef enum
@@ -346,7 +350,7 @@ typedef enum
 }extend_cb_type;
 
 /**
-* \brief   kernelÄÚ²¿Ê¹ÓÃµÄÀ©Õ¹Òì²½»Øµ÷ÏûÏ¢
+* \brief   kernelå†…éƒ¨ä½¿ç”¨çš„æ‰©å±•å¼‚æ­¥å›žè°ƒæ¶ˆæ¯
 */
 typedef struct
 {

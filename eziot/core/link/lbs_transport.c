@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #include "lbs_transport.h"
 #include <string.h>
 #include <stdio.h>
@@ -43,10 +56,10 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
     EZDEV_SDK_UINT16 sharekey_salt_len;
 
     unsigned char sharekey_dst[16];
-    unsigned char sharekey_dst_hex[ezdev_sdk_md5_len + 1]; //bscomptls_hexdump »áÓĞ\0²úÉú
+    unsigned char sharekey_dst_hex[ezdev_sdk_md5_len + 1]; //bscomptls_hexdump ä¼šæœ‰\0äº§ç”Ÿ
 
     unsigned char sharekey_sha256_dst[ezdev_sdk_sha256_len];
-    unsigned char sharekey_sha256_dst_hex[ezdev_sdk_sha256_hex_len + 1]; //bscomptls_hexdump »áÓĞ\0²úÉú
+    unsigned char sharekey_sha256_dst_hex[ezdev_sdk_sha256_hex_len + 1]; //bscomptls_hexdump ä¼šæœ‰\0äº§ç”Ÿ
 
 	bscomptls_md_context_t sha1_ctx;
     const bscomptls_md_info_t *info_sha1 = NULL;
@@ -122,7 +135,7 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
 	redirect_affair->random_3 = rand() % 256;
 	redirect_affair->random_4 = rand() % 256;
 
-    //·¢ËÍ°ü£¬¹Ì¶¨±¨ÎÄÍ·£¬2-5¸ö×Ö½Ú
+    //å‘é€åŒ…ï¼Œå›ºå®šæŠ¥æ–‡å¤´ï¼Œ2-5ä¸ªå­—èŠ‚
 	redirect_affair->global_out_packet.head_buf = malloc(16);
 	if(NULL == redirect_affair->global_out_packet.head_buf)
 	{
@@ -133,7 +146,7 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
 	redirect_affair->global_out_packet.head_buf_off = 0;
 	redirect_affair->global_out_packet.head_buf_Len = 16;
 
-    //·¢ËÍ°ü£¬¿É±ä±¨ÎÄÍ·
+    //å‘é€åŒ…ï¼Œå¯å˜æŠ¥æ–‡å¤´
     redirect_affair->global_out_packet.var_head_buf = malloc(lbs_var_head_buf_max);
     if (NULL == redirect_affair->global_out_packet.var_head_buf)
     {
@@ -144,7 +157,7 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
     redirect_affair->global_out_packet.var_head_buf_off = 0;
     redirect_affair->global_out_packet.var_head_buf_Len = lbs_var_head_buf_max;
 
-    //·¢ËÍ°ü£¬Payload
+    //å‘é€åŒ…ï¼ŒPayload
 	redirect_affair->global_out_packet.payload_buf = malloc(lbs_send_buf_max);
 	if(NULL == redirect_affair->global_out_packet.payload_buf)
 	{
@@ -155,7 +168,7 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
 	redirect_affair->global_out_packet.payload_buf_off = 0;
 	redirect_affair->global_out_packet.payload_buf_Len = lbs_send_buf_max;
 
-    //½ÓÊÕ°ü£¬¹Ì¶¨±¨ÎÄÍ·£¬2-5¸ö×Ö½Ú
+    //æ¥æ”¶åŒ…ï¼Œå›ºå®šæŠ¥æ–‡å¤´ï¼Œ2-5ä¸ªå­—èŠ‚
 	redirect_affair->global_in_packet.head_buf = malloc(16);
 	if(NULL == redirect_affair->global_in_packet.head_buf)
 	{
@@ -166,7 +179,7 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
 	redirect_affair->global_in_packet.head_buf_off = 0;
 	redirect_affair->global_in_packet.head_buf_Len = 16;
 
-    //½ÓÊÕ°ü£¬¿É±ä±¨ÎÄÍ·
+    //æ¥æ”¶åŒ…ï¼Œå¯å˜æŠ¥æ–‡å¤´
     redirect_affair->global_in_packet.var_head_buf = malloc(lbs_var_head_buf_max);
     if (NULL == redirect_affair->global_in_packet.var_head_buf)
     {
@@ -177,7 +190,7 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
     redirect_affair->global_in_packet.var_head_buf_off = 0;
     redirect_affair->global_in_packet.var_head_buf_Len = lbs_var_head_buf_max;
 
-    //½ÓÊÕ°ü£¬Payload
+    //æ¥æ”¶åŒ…ï¼ŒPayload
 	redirect_affair->global_in_packet.payload_buf = malloc(lbs_recv_buf_max);
 	if(NULL == redirect_affair->global_in_packet.payload_buf)
 	{
@@ -259,7 +272,7 @@ static void clear_lbs_affair_buf(lbs_affair *redirect_affair)
 static void save_key_value(ezdev_sdk_kernel *sdk_kernel, lbs_affair *affair)
 {
 	/**
-	* \brief   ½«ÊÂÎñÖĞµÄĞÅÏ¢´æ´¢ÆğÀ´
+	* \brief   å°†äº‹åŠ¡ä¸­çš„ä¿¡æ¯å­˜å‚¨èµ·æ¥
 	*/
     ezdev_sdk_kernel_log_info(0, 0, "save_key_value start !!!\n");
 	memcpy(sdk_kernel->dev_id, affair->dev_id, ezdev_sdk_devid_len);
@@ -273,7 +286,7 @@ static void save_key_value(ezdev_sdk_kernel *sdk_kernel, lbs_affair *affair)
 static void save_das_info(ezdev_sdk_kernel *sdk_kernel, das_info *recv_das_info)
 {
 	/**
-	* \brief   ½«DASĞÅÏ¢´æ´¢ÆğÀ´
+	* \brief   å°†DASä¿¡æ¯å­˜å‚¨èµ·æ¥
 	*/
 	memcpy(&sdk_kernel->redirect_das_info, recv_das_info, sizeof(das_info));
 }
@@ -282,14 +295,14 @@ static mkernel_internal_error header_serialize(ezdev_sdk_kernel *sdk_kernel, lbs
 {
 	unsigned char byte_1 = 0;
 	unsigned char byte_2 = 0;
-	EZDEV_SDK_UINT32 total_remain_len = 0;    //authentication_i°üº¬¿É±ä±¨ÎÄÍ·£¬ÆäËûÖ»ÓĞPayload³¤¶È
+	EZDEV_SDK_UINT32 total_remain_len = 0;    //authentication_iåŒ…å«å¯å˜æŠ¥æ–‡å¤´ï¼Œå…¶ä»–åªæœ‰Payloadé•¿åº¦
 	EZDEV_SDK_UINT32 remaining_count = 0;
 
-    //¿É±ä±¨ÎÄÍ·
+    //å¯å˜æŠ¥æ–‡å¤´
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd)
     {
-        //µ±Ç°Éè±¸Ö§³ÖÒ»ÖÖÈÏÖ¤ÀàĞÍECDH
-        //¸ù¾İdev_auth_type_count´óĞ¡£¬Ôö¼Ódev_auth_type_group[1]¡¢dev_auth_type_group[2]......dev_auth_type_group[63]
+        //å½“å‰è®¾å¤‡æ”¯æŒä¸€ç§è®¤è¯ç±»å‹ECDH
+        //æ ¹æ®dev_auth_type_countå¤§å°ï¼Œå¢åŠ dev_auth_type_group[1]ã€dev_auth_type_group[2]......dev_auth_type_group[63]
         *(lbs_pack->var_head_buf + lbs_pack->var_head_buf_off) = sdk_kernel->dev_cur_auth_type;
         lbs_pack->var_head_buf_off += 1;
 
@@ -304,14 +317,14 @@ static mkernel_internal_error header_serialize(ezdev_sdk_kernel *sdk_kernel, lbs
         }
     }
 
-    //¹Ì¶¨±¨ÎÄÍ·£¬2-5¸ö×Ö½Ú
+    //å›ºå®šæŠ¥æ–‡å¤´ï¼Œ2-5ä¸ªå­—èŠ‚
 	if (lbs_pack->head_buf_Len < 5)
 	{
 		return mkernel_internal_mem_lack;
 	}
-    /*¿ØÖÆ±¨ÎÄµÄµÍ2Î»¸´ÓÃ,ÓÃÓÚ·şÎñÇø·ÖĞÂ¾É°æ±¾*/
+    /*æ§åˆ¶æŠ¥æ–‡çš„ä½2ä½å¤ç”¨,ç”¨äºæœåŠ¡åŒºåˆ†æ–°æ—§ç‰ˆæœ¬*/
 	byte_1 = ((cmd & 0x0F) << 4)|0x2;
-    //¿ØÖÆ±¨ÎÄÀàĞÍÎª0x01 µÄÌõ¼şÏÂ£¬ĞèÒªÖ§³Ö¡°Ğ­ÉÌ±ê¼ÇÎ»¡±
+    //æ§åˆ¶æŠ¥æ–‡ç±»å‹ä¸º0x01 çš„æ¡ä»¶ä¸‹ï¼Œéœ€è¦æ”¯æŒâ€œåå•†æ ‡è®°ä½â€
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd)
     {
         byte_1 = byte_1 | 0x8;
@@ -322,7 +335,7 @@ static mkernel_internal_error header_serialize(ezdev_sdk_kernel *sdk_kernel, lbs
 
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd)
     {
-        //¿É±ä±¨ÎÄÍ·+Payload³¤¶È
+        //å¯å˜æŠ¥æ–‡å¤´+Payloadé•¿åº¦
         total_remain_len = remain_len + lbs_pack->var_head_buf_off;
     }
     else
@@ -357,7 +370,7 @@ static mkernel_internal_error header_serialize_old(lbs_packet *lbs_pack, EZDEV_S
 	{
 		return mkernel_internal_mem_lack;
 	}
-    /*¿ØÖÆ±¨ÎÄµÄµÍ2Î»¸´ÓÃ,ÓÃÓÚ·şÎñÇø·ÖĞÂ¾É°æ±¾*/
+    /*æ§åˆ¶æŠ¥æ–‡çš„ä½2ä½å¤ç”¨,ç”¨äºæœåŠ¡åŒºåˆ†æ–°æ—§ç‰ˆæœ¬*/
 	byte_1 = ((cmd & 0x0F) << 4);
 
 	*(lbs_pack->head_buf + lbs_pack->head_buf_off) = byte_1;
@@ -419,7 +432,7 @@ static mkernel_internal_error digital_sign_serialize_sha384(lbs_packet *lbs_pack
 	memcpy(sign_input, sign_src, sign_src_len);
 	sign_input_len = sign_src_len;
    
-    /*ÊäÈë²ÎÊı1±íÊ¾sh384ÕªÒªËã·¨*/
+    /*è¾“å…¥å‚æ•°1è¡¨ç¤ºsh384æ‘˜è¦ç®—æ³•*/
 	bscomptls_sha512(sign_input, sign_input_len, sign_output, 1);
 
 	memset(sign_input, 0, ezdev_sdk_total_len);
@@ -465,7 +478,7 @@ static mkernel_internal_error digital_sign_serialize_and_check_sha384(unsigned c
 	memcpy(sign_input, sign_src, sign_src_len);
 	sign_input_len = sign_src_len;
 
-	/*ÊäÈë²ÎÊı1´ú±í384r1ÕªÒªËã·¨*/
+	/*è¾“å…¥å‚æ•°1ä»£è¡¨384r1æ‘˜è¦ç®—æ³•*/
 	bscomptls_sha512(sign_input, sign_input_len, sign_output, 1);
 
 	memset(sign_input, 0, ezdev_sdk_total_len);
@@ -526,11 +539,11 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
     authi_affair->global_in_packet.head_buf[0] = byte_1;
     authi_affair->global_in_packet.head_buf[1] = byte_2;
 
-    //¿É±ä±¨ÎÄÍ·,Ó©Ê¯ÔÆÆ½Ì¨·µ»ØµÄ³¤¶È¹Ì¶¨Îª1¸ö×Ö½Ú
+    //å¯å˜æŠ¥æ–‡å¤´,è¤çŸ³äº‘å¹³å°è¿”å›çš„é•¿åº¦å›ºå®šä¸º1ä¸ªå­—èŠ‚
     unsigned char flag = (byte_1 & 0x08) >> 3;
     if (0x01 == flag && DEV_PROTOCOL_AUTHENTICATION_II == *rev_cmd)
     {
-        //Ê£Óà±¨ÎÄ°üº¬¿É±ä±¨ÎÄÍ· + Playload
+        //å‰©ä½™æŠ¥æ–‡åŒ…å«å¯å˜æŠ¥æ–‡å¤´ + Playload
         if (*remain_len > authi_affair->global_in_packet.payload_buf_Len + authi_affair->global_in_packet.var_head_buf_Len)
         {
             return mkernel_internal_mem_lack;
@@ -544,7 +557,7 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
         }
         authi_affair->global_in_packet.var_head_buf_off += 1;
 
-        //´ËÊ±Ê£ÓàµÄ±¨ÎÄÖ»ÓĞPlayload£¬Òª¼õÈ¥Êµ¼Ê¿É±ä±¨ÎÄ³¤¶È
+        //æ­¤æ—¶å‰©ä½™çš„æŠ¥æ–‡åªæœ‰Playloadï¼Œè¦å‡å»å®é™…å¯å˜æŠ¥æ–‡é•¿åº¦
         *remain_len -= authi_affair->global_in_packet.var_head_buf_off;
         if (*remain_len > authi_affair->global_in_packet.payload_buf_Len)
         {
@@ -554,14 +567,14 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
     }
     else
     {
-        //Ê£Óà±¨ÎÄÖ»ÓĞPlayload
+        //å‰©ä½™æŠ¥æ–‡åªæœ‰Playload
         if (*remain_len > authi_affair->global_in_packet.payload_buf_Len)
         {
             return mkernel_internal_mem_lack;
         }
     }
 
-	//ĞèÒª½ÓÊÕÍêÈ«£¨Playload£©
+	//éœ€è¦æ¥æ”¶å®Œå…¨ï¼ˆPlayloadï¼‰
 	sdk_error = sdk_kernel->platform_handle.net_work_read(authi_affair->lbs_net_work, authi_affair->global_in_packet.payload_buf, *remain_len, 5 * 1000);
 
 	if (sdk_error != 0)
@@ -585,7 +598,7 @@ static mkernel_internal_error send_lbs_msg(ezdev_sdk_kernel *sdk_kernel, lbs_aff
 
     unsigned char cmd = (authi_affair->global_out_packet.head_buf[0] & 0xf0) >> 4;
     unsigned char flag = (authi_affair->global_out_packet.head_buf[0] & 0x08) >> 3;
-    //¿É±ä±¨ÎÄÍ·
+    //å¯å˜æŠ¥æ–‡å¤´
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd && 0x01 == flag)
     {
         result_ = sdk_kernel->platform_handle.net_work_write(authi_affair->lbs_net_work, authi_affair->global_out_packet.var_head_buf, authi_affair->global_out_packet.var_head_buf_off, 5 * 1000, &real_sendlen);
@@ -640,7 +653,7 @@ static mkernel_internal_error aes_128_encrypt_pubkey(lbs_affair *authi_affair, u
     //EZDEV_SDK_UINT32 buf_len_padding = 0;
     //buf_len_padding = calculate_padding_len(input_buf_len);
 
-    //aes gcm¼ÓÃÜËã·¨ÄÚ²¿×Ô¶¯²¹Æë£¬Ã÷ÎÄ¿ÉÒÔ²»ÊÇ16×Ö½ÚÕûÊı±¶
+    //aes gcmåŠ å¯†ç®—æ³•å†…éƒ¨è‡ªåŠ¨è¡¥é½ï¼Œæ˜æ–‡å¯ä»¥ä¸æ˜¯16å­—èŠ‚æ•´æ•°å€
     out_buf = (unsigned char*)malloc(input_buf_len + 1);
     if (NULL == out_buf)
     {
@@ -649,7 +662,7 @@ static mkernel_internal_error aes_128_encrypt_pubkey(lbs_affair *authi_affair, u
     }
     memset(out_buf, 0, input_buf_len + 1);
     out_buf_len = input_buf_len;
-    /*Ö»Ê¹ÓÃshare_keyµÄÇ°16Î»×÷Îª¼ÓÃÜÃØÔ¿*/
+    /*åªä½¿ç”¨share_keyçš„å‰16ä½ä½œä¸ºåŠ å¯†ç§˜é’¥*/
     memcpy(aes_encrypt_key, authi_affair->share_key, 16);
 
     sdk_error = aes_gcm_128_enc_padding(aes_encrypt_key, input_buf, input_buf_len, out_buf, &out_buf_len, output_tag_buf, tag_buf_len);
@@ -885,7 +898,7 @@ static mkernel_internal_error parse_authentication_ii(ezdev_sdk_kernel *sdk_kern
             ezdev_sdk_kernel_log_error(0, 0, "generate_master_key error\n");
             return sdk_error;
         }
-        /*masterkey ×öÒ»´Îmd5,µÃµ½16Î»µÄmasterkey*/
+        /*masterkey åšä¸€æ¬¡md5,å¾—åˆ°16ä½çš„masterkey*/
         memset(md5_masterkey, 0, 16);
         bscomptls_md5(masterkey, masterkey_len, md5_masterkey);
         break;
@@ -922,7 +935,7 @@ static mkernel_internal_error wait_authentication_ii(ezdev_sdk_kernel *sdk_kerne
 	}
     sdk_error = parse_authentication_ii(sdk_kernel, authi_affair, remain_len, ctx_client);
 
-    //Éè±¸ÓëÆ½Ì¨µÄÈÏÖ¤ÀàĞÍµ±Ç°²»Æ¥Åä£¬¿ÉÖØĞÂÆ¥Åä
+    //è®¾å¤‡ä¸å¹³å°çš„è®¤è¯ç±»å‹å½“å‰ä¸åŒ¹é…ï¼Œå¯é‡æ–°åŒ¹é…
     if (mkernel_internal_platform_lbs_auth_type_need_rematch == sdk_error)
     {
         sdk_kernel->dev_cur_auth_type = authi_affair->global_in_packet.var_head_buf[0];
@@ -1058,7 +1071,7 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
 
     authi_affair->global_in_packet.payload_buf_off += 3;
 
-    //È¡·µ»ØÂë
+    //å–è¿”å›ç 
     memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
     authi_affair->global_in_packet.payload_buf_off++;
 
@@ -1072,16 +1085,16 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     memcpy(devid_tag_buf, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, devid_tag_buf_len);
     authi_affair->global_in_packet.payload_buf_off += devid_tag_buf_len;
 
-    /*È¡en_dev_id³¤¶È*/
+    /*å–en_dev_idé•¿åº¦*/
     en_dev_id_len = *(authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off);
     authi_affair->global_in_packet.payload_buf_off++;
-    //aes 128 gcmËã·¨¼ÓÃÜÊ±£¬·şÎñ¶Ë´«¹ıÈ¥µÄdev_idÃÜÎÄÊÇ32×Ö½Ú£¬Ô­ÎÄÒ²ÊÇ32×Ö½Ú
+    //aes 128 gcmç®—æ³•åŠ å¯†æ—¶ï¼ŒæœåŠ¡ç«¯ä¼ è¿‡å»çš„dev_idå¯†æ–‡æ˜¯32å­—èŠ‚ï¼ŒåŸæ–‡ä¹Ÿæ˜¯32å­—èŠ‚
     if (en_dev_id_len != 32)
     {
         ezdev_sdk_kernel_log_debug(0, 0, "parse_authentication_create_dev_id en_dev_id_len is not 32\n");
         return mkernel_internal_platform_appoint_error;
     }
-    /*½âÃÜ AES-128-gcm dev_id*/
+    /*è§£å¯† AES-128-gcm dev_id*/
     ezdev_sdk_kernel_log_debug(0, 0, "get en_dev_id_len :%d\n", en_dev_id_len);
     sdk_error = aes_gcm_128_dec_padding(authi_affair->master_key, \
                                 authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, en_dev_id_len, \
@@ -1103,16 +1116,16 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     memcpy(sessionkey_tag_buf, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, sessionkey_tag_buf_len);
     authi_affair->global_in_packet.payload_buf_off += sessionkey_tag_buf_len;
 
-    /*È¡en-sessionkey³¤¶È*/
+    /*å–en-sessionkeyé•¿åº¦*/
     en_sessionkey_len = *(authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off);
     authi_affair->global_in_packet.payload_buf_off++;
-    //aes 128 gcmËã·¨¼ÓÃÜÊ±£¬·şÎñ¶Ë´«¹ıÈ¥µÄsessionkeyÃÜÎÄÊÇ16×Ö½Ú£¬Ô­ÎÄÒ²ÊÇ16×Ö½Ú
+    //aes 128 gcmç®—æ³•åŠ å¯†æ—¶ï¼ŒæœåŠ¡ç«¯ä¼ è¿‡å»çš„sessionkeyå¯†æ–‡æ˜¯16å­—èŠ‚ï¼ŒåŸæ–‡ä¹Ÿæ˜¯16å­—èŠ‚
     if (en_sessionkey_len != 16)
     {
         ezdev_sdk_kernel_log_debug(0, 0, "parse_authentication_createdevid_iv en_sessionkey_len is not 32\n");
         return mkernel_internal_platform_appoint_error;
     }
-    /*½âÃÜ AES-128-gcm sessionkey*/
+    /*è§£å¯† AES-128-gcm sessionkey*/
     ezdev_sdk_kernel_log_debug(0, 0, "get en_sessionkey_len :%d\n", en_sessionkey_len);
     sdk_error = aes_gcm_128_dec_padding(authi_affair->master_key, \
                                 authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, en_sessionkey_len, \
@@ -1130,7 +1143,7 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     memcpy(authi_affair->session_key, sessionkey, sessionkey_len);
     authi_affair->global_in_packet.payload_buf_off += en_sessionkey_len;
 
-    //Ğ£ÑéÊı×ÖÇ©Ãû dev_subserial
+    //æ ¡éªŒæ•°å­—ç­¾å dev_subserial
     memset(sign_input, 0, ezdev_sdk_total_len);
     memcpy(sign_input, authi_affair->dev_subserial, strlen(authi_affair->dev_subserial));
     sdk_error = digital_sign_serialize_and_check_sha384(authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, \
@@ -1226,7 +1239,7 @@ static mkernel_internal_error send_refreshsessionkey_i(ezdev_sdk_kernel *sdk_ker
 		return sdk_error;
 	}
 
-	//header,ÕâÀïÓÃÕâ¸öDEV_PROTOCOL_REQUEST_DEVID,±£³ÖºÍÔ­À´¶¨ÒåÒ»Ñù 0x7
+	//header,è¿™é‡Œç”¨è¿™ä¸ªDEV_PROTOCOL_REQUEST_DEVID,ä¿æŒå’ŒåŸæ¥å®šä¹‰ä¸€æ · 0x7
 	sdk_error = header_serialize_old(&authi_affair->global_out_packet, DEV_PROTOCOL_REQUEST_DEVID, authi_affair->global_out_packet.payload_buf_off);
 	if (sdk_error != mkernel_internal_succ)
 	{
@@ -1277,7 +1290,7 @@ static mkernel_internal_error parse_refreshsessionkey_ii(lbs_affair *authi_affai
     EZDEV_SDK_UINT32 ase_dst_len = 0;
     authi_affair->global_in_packet.payload_buf_off += 3;
 
-    //È¡·µ»ØÂë
+    //å–è¿”å›ç 
     memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
     authi_affair->global_in_packet.payload_buf_off++;
 
@@ -1286,7 +1299,7 @@ static mkernel_internal_error parse_refreshsessionkey_ii(lbs_affair *authi_affai
         ezdev_sdk_kernel_log_debug(mkernel_internal_platform_error, result_code, "parse_refreshsessionkey_ii platform return error code:%d\n", result_code);
         return mkernel_internal_platform_error + result_code;
     }
-    //¼ÆËãr1+r2+sessionkey³¤¶È
+    //è®¡ç®—r1+r2+sessionkeyé•¿åº¦
     en_sessionkey_len = remain_len - authi_affair->global_in_packet.payload_buf_off;
     if (en_sessionkey_len != 32)
     {
@@ -1328,11 +1341,11 @@ static mkernel_internal_error wait_refreshsessionkey_ii(ezdev_sdk_kernel *sdk_ke
 		return sdk_error;
 	}
 
-	if (rev_cmd != DEV_PROTOCOL_RESPONSE_DEVID)  //ÕâÀï±£³Ö0x8²»±ä
+	if (rev_cmd != DEV_PROTOCOL_RESPONSE_DEVID)  //è¿™é‡Œä¿æŒ0x8ä¸å˜
 	{
 		return mkernel_internal_net_read_error_request;
 	}
-    /*refresh sessionkeyºÍcreat dev-idµÄÏìÓ¦ÊÇÒ»ÑùµÄ*/
+    /*refresh sessionkeyå’Œcreat dev-idçš„å“åº”æ˜¯ä¸€æ ·çš„*/
 	sdk_error = parse_refreshsessionkey_ii(authi_affair, remain_len);
 	ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "parse_refreshsessionkey_ii end\n");
 
@@ -1404,7 +1417,7 @@ mkernel_internal_error send_refreshsessionkey_iii(ezdev_sdk_kernel *sdk_kernel, 
 		return sdk_error;
 	}
 
-	//header//ÕâÀïÈÔÈ»²ÉÓÃ0x9(DEV_PROTOCOL_APPLY_DEVID_CFM),±£³ÖºÍÔ­À´Ê¹ÓÃµÄ¶¨ÒåÒ»Ñù
+	//header//è¿™é‡Œä»ç„¶é‡‡ç”¨0x9(DEV_PROTOCOL_APPLY_DEVID_CFM),ä¿æŒå’ŒåŸæ¥ä½¿ç”¨çš„å®šä¹‰ä¸€æ ·
 	sdk_error = header_serialize_old(&authi_affair->global_out_packet, DEV_PROTOCOL_APPLY_DEVID_CFM, authi_affair->global_out_packet.payload_buf_off);
 	if (sdk_error != mkernel_internal_succ)
 	{
@@ -1483,7 +1496,7 @@ static mkernel_internal_error crypto_data_req_das_serialize(lbs_affair *auth_aff
 
 		json_len = strlen(json_buf);
 
-		//±£Ö¤ json_len_padding > json_len
+		//ä¿è¯ json_len_padding > json_len
 		json_len_padding = calculate_padding_len(json_len);
 		if (ezdev_sdk_json_default_size > json_len_padding)
 		{
@@ -1578,7 +1591,7 @@ static mkernel_internal_error crypto_data_req_stun_serialize(lbs_affair *auth_af
 
 		json_len = strlen(json_buf);
 
-		//±£Ö¤ json_len_padding > json_len
+		//ä¿è¯ json_len_padding > json_len
 		json_len_padding = calculate_padding_len(json_len);
 		if (ezdev_sdk_json_default_size > json_len_padding)
 		{
@@ -1689,7 +1702,7 @@ static mkernel_internal_error parse_crypto_data_rsp_das(lbs_affair *authi_affair
 
 	authi_affair->global_in_packet.payload_buf_off += 3;
 
-	//È¡·µ»ØÂë
+	//å–è¿”å›ç 
 	memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
 	authi_affair->global_in_packet.payload_buf_off++;
 
@@ -1744,7 +1757,7 @@ static mkernel_internal_error parse_crypto_data_rsp_stun(lbs_affair *authi_affai
 
 	authi_affair->global_in_packet.payload_buf_off += 3;
 
-	//È¡·µ»ØÂë
+	//å–è¿”å›ç 
 	memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
 	authi_affair->global_in_packet.payload_buf_off++;
 
@@ -1834,7 +1847,7 @@ static mkernel_internal_error wait_crypto_data_rsp_stun(ezdev_sdk_kernel *sdk_ke
 
 static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair)
 {
-	//ĞèÒª×öÓòÃû½âÎö
+	//éœ€è¦åšåŸŸåè§£æ
 
 	mkernel_internal_error result_ = mkernel_internal_succ;
 	char szRealIp[ezdev_sdk_ip_max_len] = {0};
@@ -1908,7 +1921,7 @@ mkernel_internal_error lbs_redirect_with_auth(ezdev_sdk_kernel *sdk_kernel, EZDE
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	lbs_affair auth_redirect;
-	//ÉèÖÃĞÅÏ¢
+	//è®¾ç½®ä¿¡æ¯
 	das_info revc_das_info;
 
 	memset(&auth_redirect, 0, sizeof(auth_redirect));
@@ -2010,7 +2023,7 @@ mkernel_internal_error lbs_redirect_createdevid_with_auth(ezdev_sdk_kernel *sdk_
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	lbs_affair auth_redirect;
-	//ÉèÖÃĞÅÏ¢
+	//è®¾ç½®ä¿¡æ¯
 	das_info revc_das_info;
 	memset(&auth_redirect, 0, sizeof(auth_redirect));
 	memset(&revc_das_info, 0, sizeof(revc_das_info));
@@ -2083,7 +2096,7 @@ mkernel_internal_error lbs_redirect_createdevid_with_auth(ezdev_sdk_kernel *sdk_
 		}
 
 		/**
-		* \brief   °ÑÊı¾İ»º´æ´æ´¢ÆğÀ´
+		* \brief   æŠŠæ•°æ®ç¼“å­˜å­˜å‚¨èµ·æ¥
 		*/
 		save_key_value(sdk_kernel, &auth_redirect);
 		save_das_info(sdk_kernel, &revc_das_info);
@@ -2244,21 +2257,21 @@ static mkernel_internal_error send_get_secretkey_rsq(ezdev_sdk_kernel *hsdk_kern
 	char *pE = "010001";
 	char *pN = "CD6E54AA0B45FEA94F03955C838C0827C9017A066A6B7FA7599FE4E1775E8E4EFD304F15630EDAAAE9C7044FC6EE94F02AD2EE44C644F55E10CD428C3D806F55C1D90D76AF395B5FA3DA155F639515EA272715238D2371A8FC0B64A098145BD0CD13D3B90FCC72B605B393C693BAE6C4BA0990BF8873A9A4CC6489960160ACDF";
 
-	unsigned char pSendBuf[512];	 ///< Íù·şÎñÆ÷·¢ËÍµÄ»º³åÇø
-	unsigned char *p = pSendBuf;	 ///< »º³åÇøÖ¸Õë
-	unsigned char buf[128];			 ///< ÁÙÊ±»º³åÇø
-	unsigned int iLength = 0;		 ///< ÁÙÊ±³¤¶È¼ÆËã
-	unsigned int uiPlainPadding = 0; ///< AESĞèÒª²¹Æë³¤¶È
-	unsigned short netLen16 = 0;	 ///< »º´æ×ª³ÉÍøÂç×Ö½ÚĞòºóµÄ³¤¶È
+	unsigned char pSendBuf[512];	 ///< å¾€æœåŠ¡å™¨å‘é€çš„ç¼“å†²åŒº
+	unsigned char *p = pSendBuf;	 ///< ç¼“å†²åŒºæŒ‡é’ˆ
+	unsigned char buf[128];			 ///< ä¸´æ—¶ç¼“å†²åŒº
+	unsigned int iLength = 0;		 ///< ä¸´æ—¶é•¿åº¦è®¡ç®—
+	unsigned int uiPlainPadding = 0; ///< AESéœ€è¦è¡¥é½é•¿åº¦
+	unsigned short netLen16 = 0;	 ///< ç¼“å­˜è½¬æˆç½‘ç»œå­—èŠ‚åºåçš„é•¿åº¦
 	memset(buf, 0, sizeof(buf));
 	memset(pSendBuf, 0, sizeof(pSendBuf));
 
 	do
 	{
-		/** Ê×²¿µÚÒ»¸ö×Ö½Ú±íÊ¾Ô¼¶¨µÄ¼ÓÃÜËã·¨,Ä¿Ç°»¹Ã»ÓĞÏ¸»¯£¬Ä¬ÈÏÎª1£¬AES128+RSA1024 */
+		/** é¦–éƒ¨ç¬¬ä¸€ä¸ªå­—èŠ‚è¡¨ç¤ºçº¦å®šçš„åŠ å¯†ç®—æ³•,ç›®å‰è¿˜æ²¡æœ‰ç»†åŒ–ï¼Œé»˜è®¤ä¸º1ï¼ŒAES128+RSA1024 */
 		*p++ = 0x01;
 
-		/** ÓÃAESËã·¨¶ÔĞòÁĞºÅ½øĞĞ¼ÓÃÜ */
+		/** ç”¨AESç®—æ³•å¯¹åºåˆ—å·è¿›è¡ŒåŠ å¯† */
 		iLength = sizeof(pSendBuf) - (p - pSendBuf);
 		uiPlainPadding = calculate_padding_len(strlen(hlbs_affair->dev_subserial));
 
@@ -2269,16 +2282,16 @@ static mkernel_internal_error send_get_secretkey_rsq(ezdev_sdk_kernel *hsdk_kern
 			break;
 		}
 
-		/** Ìî³äAESÃÜÎÄ³¤¶È */
+		/** å¡«å……AESå¯†æ–‡é•¿åº¦ */
 		netLen16 = htons(iLength);
 		memcpy(p, &netLen16, sizeof(netLen16));
 		p += 2;
 		p += iLength;
 
-		/** Ê¹ÓÃ·şÎñÆ÷¹«Ô¿¶Ô£¨AESÃØÔ¿+ĞòÁĞºÅ£©½øĞĞ¼ÓÃÜ£¬Ä¬ÈÏPKCS1V1.5 Padding */
-		buf[0] = aesKeyLen & 0xFF; ///< ÃÜÔ¿Ç°ÃæÌî³äÒ»¸ö×Ö½Ú³¤¶È
+		/** ä½¿ç”¨æœåŠ¡å™¨å…¬é’¥å¯¹ï¼ˆAESç§˜é’¥+åºåˆ—å·ï¼‰è¿›è¡ŒåŠ å¯†ï¼Œé»˜è®¤PKCS1V1.5 Padding */
+		buf[0] = aesKeyLen & 0xFF; ///< å¯†é’¥å‰é¢å¡«å……ä¸€ä¸ªå­—èŠ‚é•¿åº¦
 		memcpy(buf + 1, aesKey, aesKeyLen);
-		buf[aesKeyLen + 1] = strlen(hlbs_affair->dev_subserial) & 0xFF; ///< ĞòÁĞºÅÇ°ÃæÌî³äÒ»¸ö×Ö½Ú³¤¶È
+		buf[aesKeyLen + 1] = strlen(hlbs_affair->dev_subserial) & 0xFF; ///< åºåˆ—å·å‰é¢å¡«å……ä¸€ä¸ªå­—èŠ‚é•¿åº¦
 		memcpy(buf + aesKeyLen + 2, hlbs_affair->dev_subserial, strlen(hlbs_affair->dev_subserial));
 		iLength = sizeof(pSendBuf) - (p - pSendBuf);
 
@@ -2310,7 +2323,7 @@ static mkernel_internal_error send_get_secretkey_rsq(ezdev_sdk_kernel *hsdk_kern
 		}
 #endif
 
-		/** Ìî³äRSAÃÜÎÄ³¤¶È */
+		/** å¡«å……RSAå¯†æ–‡é•¿åº¦ */
 		netLen16 = htons(iLength);
 		memcpy(p, &netLen16, sizeof(netLen16));
 		p += 2;
@@ -2351,7 +2364,7 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 	EZDEV_SDK_UINT8 result_code = 0;
 	EZDEV_SDK_UINT8 pPlainText[256];
 	EZDEV_SDK_UINT32 iPlainTextLen = sizeof(pPlainText);
-	EZDEV_SDK_UINT16 netLen16 = 0; ///< ÍøÂç×Ö½ÚĞòµÄ³¤¶È
+	EZDEV_SDK_UINT16 netLen16 = 0; ///< ç½‘ç»œå­—èŠ‚åºçš„é•¿åº¦
 	EZDEV_SDK_UINT16 _interval = 0;
 	EZDEV_SDK_UINT32 _duration = 0;
 	EZDEV_SDK_UINT8 *p;
@@ -2371,20 +2384,20 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 			break;
 		}
 
-		/** Í·Èı¸ö×Ö½ÚÊÇĞ­Òé°æ±¾ºÅ£¬²»¹ØĞÄ */
+		/** å¤´ä¸‰ä¸ªå­—èŠ‚æ˜¯åè®®ç‰ˆæœ¬å·ï¼Œä¸å…³å¿ƒ */
 		hlbs_affair->global_in_packet.payload_buf_off = 3;
 
-		/** ÅĞ¶Ï·µ»ØÂë */
+		/** åˆ¤æ–­è¿”å›ç  */
 		result_code = *(hlbs_affair->global_in_packet.payload_buf + hlbs_affair->global_in_packet.payload_buf_off++);
 
-		/** ½âÎöÃÜÎÄ³¤¶È */
+		/** è§£æå¯†æ–‡é•¿åº¦ */
 		memcpy(&netLen16, hlbs_affair->global_in_packet.payload_buf + hlbs_affair->global_in_packet.payload_buf_off, sizeof(short));
 		hlbs_affair->global_in_packet.payload_buf_off += 2;
 
 		if (hlbs_affair->global_in_packet.payload_buf_off + ntohs(netLen16) + 6 > remain_len)
 		{
 			ezdev_sdk_kernel_log_debug(sdk_rv, result_code, "rsp data len out of range, real len = %d\n", remain_len);
-			//Èç¹û°ü³¤¶È½âÎö³ö´í£¬Ä¬ÈÏ30sÒ»´Î£¬ÖÜÆÚ24Ğ¡Ê±
+			//å¦‚æœåŒ…é•¿åº¦è§£æå‡ºé”™ï¼Œé»˜è®¤30sä¸€æ¬¡ï¼Œå‘¨æœŸ24å°æ—¶
 			*interval = 30;
 			*duration = 3600 * 24;
 			sdk_rv = mkernel_internal_rev_invalid_packet;
@@ -2392,7 +2405,7 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 		}
 		else
 		{
-			//¼ÆËãÖØÊÔ¼ä¸ôºÍÖÜÆÚ
+			//è®¡ç®—é‡è¯•é—´éš”å’Œå‘¨æœŸ
 			memcpy(&_interval, hlbs_affair->global_in_packet.payload_buf + hlbs_affair->global_in_packet.payload_buf_off + ntohs(netLen16), sizeof(_interval));
 			memcpy(&_duration, hlbs_affair->global_in_packet.payload_buf + hlbs_affair->global_in_packet.payload_buf_off + ntohs(netLen16) + sizeof(_interval), sizeof(_duration));
 
@@ -2417,7 +2430,7 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 			break;
 		}
 
-		/** Ã÷ÎÄÎª1×Ö½Ú³¤¶È+secretkey + 1×Ö½Ú³¤¶È+ĞòÁĞºÅ*/
+		/** æ˜æ–‡ä¸º1å­—èŠ‚é•¿åº¦+secretkey + 1å­—èŠ‚é•¿åº¦+åºåˆ—å·*/
 		p = pPlainText;
 		if (*p > ezdev_sdk_devserial_maxlen ||
 			*p > iPlainTextLen)
@@ -2430,9 +2443,9 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 		*secretKeyLen = *p;
 		p += *p + 1;
 
-		if (strlen(hlbs_affair->dev_subserial) != *p ||									 ///< ĞòÁĞºÅ³¤¶È²»ÏàµÈ
-			(p - pPlainText + *p) > iPlainTextLen ||									 ///< ¼ÆËãµÄ³¤¶È´óÓÚ±¨ÎÄ³¤¶È
-			memcmp(++p, hlbs_affair->dev_subserial, strlen(hlbs_affair->dev_subserial))) ///< ĞòÁĞºÅ²»ÏàµÈ
+		if (strlen(hlbs_affair->dev_subserial) != *p ||									 ///< åºåˆ—å·é•¿åº¦ä¸ç›¸ç­‰
+			(p - pPlainText + *p) > iPlainTextLen ||									 ///< è®¡ç®—çš„é•¿åº¦å¤§äºæŠ¥æ–‡é•¿åº¦
+			memcmp(++p, hlbs_affair->dev_subserial, strlen(hlbs_affair->dev_subserial))) ///< åºåˆ—å·ä¸ç›¸ç­‰
 		{
 			sdk_rv = mkernel_internal_rev_invalid_packet;
 			break;
@@ -2446,12 +2459,12 @@ mkernel_internal_error cnt_state_lbs_apply_serectkey(ezdev_sdk_kernel *hsdk_kern
 {
 	mkernel_internal_error sdk_rv = mkernel_internal_internal_err;
 
-	/* realtek rtos mbedtlsÎ±Ëæ»úÊıÏà¹Ø²¿·Ö±àÒëÓĞÎÊÌâ*/
+	/* realtek rtos mbedtlsä¼ªéšæœºæ•°ç›¸å…³éƒ¨åˆ†ç¼–è¯‘æœ‰é—®é¢˜*/
 #ifndef _REALTEK_RTOS_
-	EZDEV_SDK_UINT8 aesKey[32] = {0};							   ///< ASEÃÜÔ¿
-	EZDEV_SDK_UINT8 aesKey_hex[32] = {0};						   ///< Ê®Áù½øÖÆµÄAESÃØÔ¿
-	EZDEV_SDK_INT8 aesKeyLen = 16;								   ///< Ä¬ÈÏÊ¹ÓÃAES128
-	EZDEV_SDK_UINT8 secretKey[ezdev_sdk_verify_code_maxlen] = {0}; ///< »ñÈ¡µÄsecretkey
+	EZDEV_SDK_UINT8 aesKey[32] = {0};							   ///< ASEå¯†é’¥
+	EZDEV_SDK_UINT8 aesKey_hex[32] = {0};						   ///< åå…­è¿›åˆ¶çš„AESç§˜é’¥
+	EZDEV_SDK_INT8 aesKeyLen = 16;								   ///< é»˜è®¤ä½¿ç”¨AES128
+	EZDEV_SDK_UINT8 secretKey[ezdev_sdk_verify_code_maxlen] = {0}; ///< è·å–çš„secretkey
 	EZDEV_SDK_INT8 secretKeyLen8 = sizeof(secretKey);
 	EZDEV_SDK_INT32 secretKeyLen32 = sizeof(secretKey);
 	int i = 0;
@@ -2459,11 +2472,11 @@ mkernel_internal_error cnt_state_lbs_apply_serectkey(ezdev_sdk_kernel *hsdk_kern
 	lbs_affair hlbs_affair;
 	memset(&hlbs_affair, 0, sizeof(hlbs_affair));
 
-	/** Éú³ÉËæ»úÊı×÷ÎªAESÃØÔ¿ */
+	/** ç”Ÿæˆéšæœºæ•°ä½œä¸ºAESç§˜é’¥ */
 	if (0 != ezRandomGen(aesKey, aesKeyLen))
 		return sdk_rv;
 
-	/** ·şÎñÆ÷Ö»Ö§³Ö¿É¼û×Ö·ûµÄÃØÔ¿£¬×ªÊ®Áù½øÖÆ */
+	/** æœåŠ¡å™¨åªæ”¯æŒå¯è§å­—ç¬¦çš„ç§˜é’¥ï¼Œè½¬åå…­è¿›åˆ¶ */
 	for (i = 0; i < aesKeyLen / 2; ++i)
 	{
 		sprintf((char *)aesKey_hex + 2 * i, "%02x", aesKey[i]);
@@ -2499,7 +2512,7 @@ mkernel_internal_error cnt_state_lbs_apply_serectkey(ezdev_sdk_kernel *hsdk_kern
 		hsdk_kernel->secretkey_applied = EZDEV_SDK_TRUE;
 		secretKeyLen32 = (EZDEV_SDK_INT32)secretKeyLen8;
 
-		/** »Øµ÷ÉÏ²ã½Ó¿Ú±£´æsecretKey,È»ºóÔÙ»ñÈ¡Ò»´Î,³É¹¦ÔòÈÏÎªÉêÇësecretKeyÁ÷³ÌÍê³É */
+		/** å›è°ƒä¸Šå±‚æ¥å£ä¿å­˜secretKey,ç„¶åå†è·å–ä¸€æ¬¡,æˆåŠŸåˆ™è®¤ä¸ºç”³è¯·secretKeyæµç¨‹å®Œæˆ */
 		if (mkernel_internal_succ != (sdk_rv = hsdk_kernel->platform_handle.curing_data_save(sdk_curingdata_secretkey, secretKey, secretKeyLen32)))
 		{
 			ezdev_sdk_kernel_log_debug(sdk_rv, 0, "Error occur in curing_data_save\n");

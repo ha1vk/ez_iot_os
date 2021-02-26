@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #include "ezdev_sdk_kerne_queuel.h"
 #include "sdk_kernel_def.h"
 #include "ezdev_sdk_kernel_platform.h"
@@ -8,50 +21,50 @@ EZDEV_SDK_KERNEL_PLATFORM_INTERFACE
 EXTERN_QUEUE_BASE_FUN
 EZDEV_SDK_KERNEL_EXTEND_INTERFACE
 
-queque_submsg g_queue_submsg;					///<	½ÓÊÕ·þÎñÆ÷ÏûÏ¢£¬·Ö·¢¸øÁìÓòÄ£¿éºÍÉÏ²ãÓ¦ÓÃ
-queque_pubmsg_exchange g_queue_pubmsg_exchange; ///<	½ÓÊÕÁìÓòÄ£¿éºÍÉÏ²ãÓ¦ÓÃÏûÏ¢£¬Íù·þÎñÆ÷·¢
-queque_inner_cb_notic g_queue_inner_cb_notic;   ///<	½ÓÊÕ±¾µØ¹ã²¥£¬·Ö·¢¸øÁìÓòÄ£¿éºÍÉÏ²ãÓ¦ÓÃ
+queque_submsg g_queue_submsg;					///<	æŽ¥æ”¶æœåŠ¡å™¨æ¶ˆæ¯ï¼Œåˆ†å‘ç»™é¢†åŸŸæ¨¡å—å’Œä¸Šå±‚åº”ç”¨
+queque_pubmsg_exchange g_queue_pubmsg_exchange; ///<	æŽ¥æ”¶é¢†åŸŸæ¨¡å—å’Œä¸Šå±‚åº”ç”¨æ¶ˆæ¯ï¼Œå¾€æœåŠ¡å™¨å‘
+queque_inner_cb_notic g_queue_inner_cb_notic;   ///<	æŽ¥æ”¶æœ¬åœ°å¹¿æ’­ï¼Œåˆ†å‘ç»™é¢†åŸŸæ¨¡å—å’Œä¸Šå±‚åº”ç”¨
 
-queque_submsg_v3 g_queue_submsg_v3;					///<	½ÓÊÕ·þÎñÆ÷ÏûÏ¢V3Ð­Òé, ·Ö·¢¸øÁìÓòÄ£¿éºÍÉÏ²ãÓ¦ÓÃ
-queque_pubmsg_exchange_v3 g_queue_pubmsg_exchange_v3; ///<	½ÓÊÕÉÏ²ãÓ¦ÓÃÏûÏ¢V3Ð­Òé,Íù·þÎñÆ÷·¢
+queque_submsg_v3 g_queue_submsg_v3;					///<	æŽ¥æ”¶æœåŠ¡å™¨æ¶ˆæ¯V3åè®®, åˆ†å‘ç»™é¢†åŸŸæ¨¡å—å’Œä¸Šå±‚åº”ç”¨
+queque_pubmsg_exchange_v3 g_queue_pubmsg_exchange_v3; ///<	æŽ¥æ”¶ä¸Šå±‚åº”ç”¨æ¶ˆæ¯V3åè®®,å¾€æœåŠ¡å™¨å‘
 
-QUEUE_INIT(submsg)			   ///<	Õ¹¿ªºóÎªinit_queue_submsg(EZDEV_SDK_UINT8 max_size)º¯Êý
-QUEUE_INIT(pubmsg_exchange)    ///<	Õ¹¿ªºóÎªinit_queue_pubmsg_exchange(EZDEV_SDK_UINT8 max_size)º¯Êý
-QUEUE_INIT(inner_cb_notic)     ///<	Õ¹¿ªºóÎªinit_queue_inner_cb_notic(EZDEV_SDK_UINT8 max_size)º¯Êý
+QUEUE_INIT(submsg)			   ///<	å±•å¼€åŽä¸ºinit_queue_submsg(EZDEV_SDK_UINT8 max_size)å‡½æ•°
+QUEUE_INIT(pubmsg_exchange)    ///<	å±•å¼€åŽä¸ºinit_queue_pubmsg_exchange(EZDEV_SDK_UINT8 max_size)å‡½æ•°
+QUEUE_INIT(inner_cb_notic)     ///<	å±•å¼€åŽä¸ºinit_queue_inner_cb_notic(EZDEV_SDK_UINT8 max_size)å‡½æ•°
 
-QUEUE_INIT(submsg_v3)	       ///<	Õ¹¿ªºóÎªinit_queue_submsg_v3(EZDEV_SDK_UINT8 max_size)º¯Êý
-QUEUE_INIT(pubmsg_exchange_v3) ///<	Õ¹¿ªºóÎªinit_queue_pubmsg_exchange_v3(EZDEV_SDK_UINT8 max_size)º¯Êý
+QUEUE_INIT(submsg_v3)	       ///<	å±•å¼€åŽä¸ºinit_queue_submsg_v3(EZDEV_SDK_UINT8 max_size)å‡½æ•°
+QUEUE_INIT(pubmsg_exchange_v3) ///<	å±•å¼€åŽä¸ºinit_queue_pubmsg_exchange_v3(EZDEV_SDK_UINT8 max_size)å‡½æ•°
 
-QUEUE_FINI(submsg)			   ///<	Õ¹¿ªºóÎªfini_queue_submsg()º¯Êý
-QUEUE_FINI(pubmsg_exchange)    ///<	Õ¹¿ªºóÎªfini_queue_pubmsg_exchange()º¯Êý
-QUEUE_FINI(inner_cb_notic)     ///<	Õ¹¿ªºóÎªfini_queue_inner_cb_notic()º¯Êý
+QUEUE_FINI(submsg)			   ///<	å±•å¼€åŽä¸ºfini_queue_submsg()å‡½æ•°
+QUEUE_FINI(pubmsg_exchange)    ///<	å±•å¼€åŽä¸ºfini_queue_pubmsg_exchange()å‡½æ•°
+QUEUE_FINI(inner_cb_notic)     ///<	å±•å¼€åŽä¸ºfini_queue_inner_cb_notic()å‡½æ•°
 
-QUEUE_FINI(submsg_v3)			   ///<	Õ¹¿ªºóÎªfini_queue_submsg_v3()º¯Êý
-QUEUE_FINI(pubmsg_exchange_v3)    ///<	Õ¹¿ªºóÎªfini_queue_pubmsg_exchange_v3()º¯Êý
+QUEUE_FINI(submsg_v3)			   ///<	å±•å¼€åŽä¸ºfini_queue_submsg_v3()å‡½æ•°
+QUEUE_FINI(pubmsg_exchange_v3)    ///<	å±•å¼€åŽä¸ºfini_queue_pubmsg_exchange_v3()å‡½æ•°
 
-QUEUE_POP(submsg)		       ///<	Õ¹¿ªºóÎªpop_queue_submsg(ezdev_sdk_kernel_submsg**)º¯Êý
-QUEUE_POP(pubmsg_exchange)     ///<	Õ¹¿ªºóÎªpop_queue_pubmsg_exchange(ezdev_sdk_kernel_pubmsg_exchange**)º¯Êý
-QUEUE_POP(inner_cb_notic)      ///<	Õ¹¿ªºóÎªpop_queue_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic**)º¯Êý
-QUEUE_GET(pubmsg_exchange)     ///<	Õ¹¿ªºóÎªget_queue_pubmsg_exchange(ezdev_sdk_kernel_pubmsg_exchange**)º¯Êý
+QUEUE_POP(submsg)		       ///<	å±•å¼€åŽä¸ºpop_queue_submsg(ezdev_sdk_kernel_submsg**)å‡½æ•°
+QUEUE_POP(pubmsg_exchange)     ///<	å±•å¼€åŽä¸ºpop_queue_pubmsg_exchange(ezdev_sdk_kernel_pubmsg_exchange**)å‡½æ•°
+QUEUE_POP(inner_cb_notic)      ///<	å±•å¼€åŽä¸ºpop_queue_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic**)å‡½æ•°
+QUEUE_GET(pubmsg_exchange)     ///<	å±•å¼€åŽä¸ºget_queue_pubmsg_exchange(ezdev_sdk_kernel_pubmsg_exchange**)å‡½æ•°
 
-QUEUE_POP(submsg_v3)		       ///<	Õ¹¿ªºóÎªpop_queue_submsg_v3(ezdev_sdk_kernel_submsg_v3**)º¯Êý
-QUEUE_POP(pubmsg_exchange_v3)     ///<	Õ¹¿ªºóÎªpop_queue_pubmsg_exchange_v3(ezdev_sdk_kernel_pubmsg_exchange_v3**)º¯Êý
-QUEUE_GET(pubmsg_exchange_v3)     ///<	Õ¹¿ªºóÎªget_queue_pubmsg_exchange_v3(ezdev_sdk_kernel_pubmsg_exchange_v3**)º¯Êý
+QUEUE_POP(submsg_v3)		       ///<	å±•å¼€åŽä¸ºpop_queue_submsg_v3(ezdev_sdk_kernel_submsg_v3**)å‡½æ•°
+QUEUE_POP(pubmsg_exchange_v3)     ///<	å±•å¼€åŽä¸ºpop_queue_pubmsg_exchange_v3(ezdev_sdk_kernel_pubmsg_exchange_v3**)å‡½æ•°
+QUEUE_GET(pubmsg_exchange_v3)     ///<	å±•å¼€åŽä¸ºget_queue_pubmsg_exchange_v3(ezdev_sdk_kernel_pubmsg_exchange_v3**)å‡½æ•°
 
-QUEUE_PUSH(submsg)			   ///<	Õ¹¿ªºóÎªpush_queue_submsg(ezdev_sdk_kernel_submsg**)º¯Êý
-QUEUE_PUSH(pubmsg_exchange)    ///<	Õ¹¿ªºóÎªpush_queue_pubmsg_exchange(ezdev_sdk_kernel_pubmsg_exchange**)º¯Êý
-QUEUE_PUSH(inner_cb_notic)     ///<	Õ¹¿ªºóÎªpush_queue_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic**)º¯Êý
+QUEUE_PUSH(submsg)			   ///<	å±•å¼€åŽä¸ºpush_queue_submsg(ezdev_sdk_kernel_submsg**)å‡½æ•°
+QUEUE_PUSH(pubmsg_exchange)    ///<	å±•å¼€åŽä¸ºpush_queue_pubmsg_exchange(ezdev_sdk_kernel_pubmsg_exchange**)å‡½æ•°
+QUEUE_PUSH(inner_cb_notic)     ///<	å±•å¼€åŽä¸ºpush_queue_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic**)å‡½æ•°
 
-QUEUE_PUSH(submsg_v3)			   ///<	Õ¹¿ªºóÎªpush_queue_submsg_v3(ezdev_sdk_kernel_submsg_v3**)º¯Êý
-QUEUE_PUSH(pubmsg_exchange_v3)    ///<	Õ¹¿ªºóÎªpush_queue_pubmsg_exchange_v3(ezdev_sdk_kernel_pubmsg_exchangeV3**)º¯Êý
+QUEUE_PUSH(submsg_v3)			   ///<	å±•å¼€åŽä¸ºpush_queue_submsg_v3(ezdev_sdk_kernel_submsg_v3**)å‡½æ•°
+QUEUE_PUSH(pubmsg_exchange_v3)    ///<	å±•å¼€åŽä¸ºpush_queue_pubmsg_exchange_v3(ezdev_sdk_kernel_pubmsg_exchangeV3**)å‡½æ•°
 
 
-QUEUE_PUSH_HEAD(submsg)			 ///<	Õ¹¿ªºóÎªpush_queue_head_submsg(ezdev_sdk_kernel_submsg**)º¯Êý
-QUEUE_PUSH_HEAD(pubmsg_exchange) ///<	Õ¹¿ªºóÎªpush_queue_head_pubmsg_exchange(ezdev_sdk_kernel_pubmsg_exchange**)º¯Êý
-QUEUE_PUSH_HEAD(inner_cb_notic)  ///<	Õ¹¿ªºóÎªpush_queue_head_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic**)º¯Êý
+QUEUE_PUSH_HEAD(submsg)			 ///<	å±•å¼€åŽä¸ºpush_queue_head_submsg(ezdev_sdk_kernel_submsg**)å‡½æ•°
+QUEUE_PUSH_HEAD(pubmsg_exchange) ///<	å±•å¼€åŽä¸ºpush_queue_head_pubmsg_exchange(ezdev_sdk_kernel_pubmsg_exchange**)å‡½æ•°
+QUEUE_PUSH_HEAD(inner_cb_notic)  ///<	å±•å¼€åŽä¸ºpush_queue_head_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic**)å‡½æ•°
 
-QUEUE_PUSH_HEAD(submsg_v3)			 ///<	Õ¹¿ªºóÎªpush_queue_head_submsg_v3(ezdev_sdk_kernel_submsg_v3**)º¯Êý
-QUEUE_PUSH_HEAD(pubmsg_exchange_v3) ///<	Õ¹¿ªºóÎªpush_queue_head_pubmsg_exchange_v3(ezdev_sdk_kernel_pubmsg_exchange_v3**)º¯Êý
+QUEUE_PUSH_HEAD(submsg_v3)			 ///<	å±•å¼€åŽä¸ºpush_queue_head_submsg_v3(ezdev_sdk_kernel_submsg_v3**)å‡½æ•°
+QUEUE_PUSH_HEAD(pubmsg_exchange_v3) ///<	å±•å¼€åŽä¸ºpush_queue_head_pubmsg_exchange_v3(ezdev_sdk_kernel_pubmsg_exchange_v3**)å‡½æ•°
 
 mkernel_internal_error init_queue(EZDEV_SDK_UINT16 sub_max_size, EZDEV_SDK_UINT16 pub_max_size, EZDEV_SDK_UINT16 inner_max_size)
 {
@@ -70,9 +83,6 @@ void fini_queue()
 	clear_queue_submsg();
 	clear_queue_submsg_v3();
 	clear_queue_pubmsg_exchange_v3();
-	/**
-	 * \brief   ÓÉÓÚÄÚ²¿»¹ÓÐÄÚ´æÐèÒªÊÍ·Å
-	 */
 	do
 	{
 		ptr_inner_cb_notic = NULL;

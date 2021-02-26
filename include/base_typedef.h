@@ -1,14 +1,15 @@
-/**
- * \file		base_typedef.h
+/*******************************************************************************
+ * Copyright 漏 2017-2021 Ezviz Inc.
  *
- * \brief		设备SDK 跨平台基础类型定义
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		panlong
- *
- * \date		2017/3/2
- */
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 #ifndef H_BASE_TYPEDEF_H_  
 #define H_BASE_TYPEDEF_H_

@@ -1,12 +1,16 @@
-/**
-*  \file      
-*  \filename  ezdev_sdk_kernel_extend.h  
-*  \filepath  E:\workdir\小项目\ezDevSDK_v2.0.0\microkernel\src\ezdev_sdk_kernel_extend.h
-*  \copyright HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
-*  \brief     设备SDK微内核，支持模块扩展的头文件
-*  \author    panlong
-*  \date      2017/3/2
-*/
+/*******************************************************************************
+ * Copyright 漏 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #ifndef H_EZDEV_SDK_KERNEL_EXTEND_H_
 #define H_EZDEV_SDK_KERNEL_EXTEND_H_
 

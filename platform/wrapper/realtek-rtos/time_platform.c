@@ -1,8 +1,20 @@
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 #include "time_platform_wrapper.h"
 #include "base_typedef.h"
 #include <platform/platform_stdlib.h>
 
-//realtek(free rtos) ÊµÏÖ
+
 ezdev_sdk_time Platform_TimerCreater()
 {
 	freertos_time* freertostime = NULL;
@@ -11,9 +23,6 @@ ezdev_sdk_time Platform_TimerCreater()
 	{
 		return NULL;
 	}
-
-//	freertostime->xTicksToWait = 0;
-//	memset(&freertostime->xTimeOut, '\0', sizeof(freertostime->xTimeOut));
 	freertostime->end_time = sys_now();
 	return freertostime;
 }
@@ -25,27 +34,7 @@ char Platform_TimeIsExpired_Bydiff(ezdev_sdk_time sdktime, EZDEV_SDK_UINT32 time
 	{
 		return (char)1;
 	}
-
-
-	/*
-	if (xTaskCheckForTimeOut(&freertostime->xTimeOut, &freertostime->xTicksToWait) == pdTRUE)
-	{
-		os_printf("Platform_TimeIsExpired_Bydiff 222222222222222:%x, time_ms:%d \n", freertostime, time_ms);
-		vTaskSetTimeOutState(&freertostime->xTimeOut);
-		freertostime->xTicksToWait = time_ms / portTICK_RATE_MS;
-		
-		os_printf("Platform_TimeIsExpired_Bydiff 444444444444444:%x, time_ms:%d \n", freertostime, time_ms);
-		return (char)1;
-	}
-	else
-	{
-		os_printf("Platform_TimeIsExpired_Bydiff 333333333333333:%x, time_ms:%d \n", freertostime, time_ms);
-		return (char)0;
-	}
-	*/
 	uint32_t cur_time = sys_now();
-	
-	
 	if(cur_time - freertostime->end_time >= (time_ms))
 	{
 		return (char)1;
@@ -64,25 +53,12 @@ char Platform_TimerIsExpired(ezdev_sdk_time sdktime)
 		return (char)1;
 	}
 	uint32_t cur_time = sys_now();
-//	os_printf("Platform_TimerIsExpired cur_time:%d end_time:%d \n", cur_time, freertostime->end_time);
 	if (cur_time >= freertostime->end_time)
 	{
 		return (char)1;
 	}
-	else
-	{
-		return (char)0;
-	}
-	/*
-	if (xTaskCheckForTimeOut(&freertostime->xTimeOut, &freertostime->xTicksToWait) == pdTRUE)
-	{
-		return (char)1;
-	}
-	else
-	{
-		return (char)0;
-	}
-	*/
+	
+	return (char)0;
 }
 
 
@@ -94,10 +70,7 @@ void Platform_TimerCountdownMS(ezdev_sdk_time sdktime, unsigned int timeout)
 		return;
 	}
 	uint32_t cur_time = sys_now();
-//	os_printf("Platform_TimerCountdownMS cur_time:%d timeout:%d \n", cur_time, timeout);
 	freertostime->end_time = cur_time + timeout;
-	//freertostime->xTicksToWait = timeout/portTICK_RATE_MS;
-	//vTaskSetTimeOutState(&freertostime->xTimeOut);
 }
 
 
@@ -114,8 +87,6 @@ EZDEV_SDK_UINT32 Platform_TimerLeftMS(ezdev_sdk_time sdktime)
 	{
 		return 0;
 	}
-//	xTaskCheckForTimeOut(&freertostime->xTimeOut, &freertostime->xTicksToWait); /* updates xTicksToWait to the number left */
-//	return (freertostime->xTicksToWait < 0) ? 0 : (freertostime->xTicksToWait * portTICK_RATE_MS);
 	uint32_t cur_time = sys_now();
 	
 	if (freertostime->end_time - cur_time < 0)

@@ -1,14 +1,16 @@
-/**
- * \file		utils.h
+/*******************************************************************************
+ * Copyright Â© 2017-2021 Ezviz Inc.
  *
- * \brief		Ò»Ğ©Í¨ÓÃµÄ¹¦ÄÜĞÔº¯ÊıµÄÊµÏÖ
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		xurongjun
- *
- * \date		2018/7/10
- */
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
+
 #ifndef _EZDEVSDK_UTILS_H
 #define _EZDEVSDK_UTILS_H
 
@@ -18,49 +20,49 @@ extern "C"
 #endif
 
 /** 
- *  \brief		Ëæ»úÊıÉú³É
+ *  \brief		éšæœºæ•°ç”Ÿæˆ
  *  \method		ezRandomGen
- *  \param[out] buf				½ÓÊÕ»º³åÇø
- *  \param[in] 	len				»º³åÇø³¤¶È,Í¬Ê±Ò²ÊÇÉú³ÉËæ»úÊı³¤¶È
- *  \return		³É¹¦·µ0,Ê§°Ü·µ·Ç0
+ *  \param[out] buf				æ¥æ”¶ç¼“å†²åŒº
+ *  \param[in] 	len				ç¼“å†²åŒºé•¿åº¦,åŒæ—¶ä¹Ÿæ˜¯ç”Ÿæˆéšæœºæ•°é•¿åº¦
+ *  \return		æˆåŠŸè¿”0,å¤±è´¥è¿”é0
  */
 int ezRandomGen(unsigned char *buf, unsigned int len);
 
 /** 
- *  \brief			RSA¹«Ô¿¼ÓÃÜ£¬Ä¬ÈÏPKCS#1 v1.5Ìî³ä·½Ê½
+ *  \brief			RSAå…¬é’¥åŠ å¯†ï¼Œé»˜è®¤PKCS#1 v1.5å¡«å……æ–¹å¼
  *  \method			ezRsaEncrypt
- *  \param[in]		pIn				Ã÷ÎÄ
- *  \param[in] 		iInLen			Ã÷ÎÄ³¤¶È
- *  \param[out] 	pOut			ÃÜÎÄ
- *  \param[in/out] 	iOutLen			ÃÜÎÄ³¤¶È
- *  \param[in] 		pN				NÖµ£¬16½øÖÆ×Ö·û´®,"00112233FF"
- *  \param[in] 		pE				EÖµ£¬16½øÖÆ×Ö·û´®
- *  \return							³É¹¦·µ0,Ê§°Ü·µ1
+ *  \param[in]		pIn				æ˜æ–‡
+ *  \param[in] 		iInLen			æ˜æ–‡é•¿åº¦
+ *  \param[out] 	pOut			å¯†æ–‡
+ *  \param[in/out] 	iOutLen			å¯†æ–‡é•¿åº¦
+ *  \param[in] 		pN				Nå€¼ï¼Œ16è¿›åˆ¶å­—ç¬¦ä¸²,"00112233FF"
+ *  \param[in] 		pE				Eå€¼ï¼Œ16è¿›åˆ¶å­—ç¬¦ä¸²
+ *  \return							æˆåŠŸè¿”0,å¤±è´¥è¿”1
  */
 int ezRsaEncrypt(const unsigned char *pIn, int iInLen, unsigned char *pOut, int *iOutLen, const char *pN, const char *pE);
 
 /** 
- *  \brief			RSAË½Ô¿½âÃÜ£¬Ä¬ÈÏPKCS#1 v1.5Ìî³ä·½Ê½
+ *  \brief			RSAç§é’¥è§£å¯†ï¼Œé»˜è®¤PKCS#1 v1.5å¡«å……æ–¹å¼
  *  \method			ezRsaDecrypt
- *  \param[in]		pIn				ÃÜÎÄ
- *  \param[in] 		iInLen			ÃÜÎÄ³¤¶È
- *  \param[out] 	pOut			Ã÷ÎÄ
- *  \param[in/out] 	iOutLen			Ã÷ÎÄ³¤¶È
- *  \param[in] 		pN				NÖµ£¬16½øÖÆ×Ö·û´®,"00112233FF"
- *  \param[in] 		pD				DÖµ£¬16½øÖÆ×Ö·û´®
- *  \return							³É¹¦·µ0,Ê§°Ü·µ1
+ *  \param[in]		pIn				å¯†æ–‡
+ *  \param[in] 		iInLen			å¯†æ–‡é•¿åº¦
+ *  \param[out] 	pOut			æ˜æ–‡
+ *  \param[in/out] 	iOutLen			æ˜æ–‡é•¿åº¦
+ *  \param[in] 		pN				Nå€¼ï¼Œ16è¿›åˆ¶å­—ç¬¦ä¸²,"00112233FF"
+ *  \param[in] 		pD				Då€¼ï¼Œ16è¿›åˆ¶å­—ç¬¦ä¸²
+ *  \return							æˆåŠŸè¿”0,å¤±è´¥è¿”1
  */
 int ezRsaDecrypt(const unsigned char *pIn, int iInLen, unsigned char *pOut, int *iOutLen, const char *pP, const char *pQ, 
 				 const char *pN, const char *pD, const char *pE);
 
 /** 
- *  \brief			ÄÚ²¿´íÎóÂë×ªÍâ²¿´íÎóÂë
+ *  \brief			å†…éƒ¨é”™è¯¯ç è½¬å¤–éƒ¨é”™è¯¯ç 
  *  \method			mkiE2ezE
  */
 unsigned int mkiE2ezE(unsigned int mkernel_err);
 
 /** 
- *  \brief			»ñÈ¡µ±Ç°Ä£¿é±àÒëÈÕÆÚ
+ *  \brief			è·å–å½“å‰æ¨¡å—ç¼–è¯‘æ—¥æœŸ
  *  \method			get_module_build_date
  */
 int get_module_build_date(char* pbuf);
