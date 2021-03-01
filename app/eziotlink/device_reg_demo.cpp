@@ -1,14 +1,15 @@
-﻿/**
-* Copyright (c) HangZhou Ezviz Co.,Ltd. All Right Reserved.
-* 
-* @file device_reg_demo.c
-* @brief 设备注册上线示例
-* 
-* @author  shenhongyin
-* @date  2021-02-24
-* @version   v1.0
-*
-*************************************************/
+﻿/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <process.h>

@@ -1,14 +1,15 @@
-/**
- * \file		ezDevSDK_boot.h
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
  *
- * \brief		SDKBoot模块，向上层应用提供初始化、反初始化、启动、停止微内核等功能接口，承接时间、线程、网络等和平台关联性大的功能实现
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
- * \copyright	HangZhou Hikvision System Technology Co.,Ltd. All Right Reserved.
- *
- * \author		panlong
- *
- * \date		2017/3/10
- */
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 
 #ifndef H_EZDEVSDK_BOOT_H_ 
 #define H_EZDEVSDK_BOOT_H_
