@@ -18,5 +18,5 @@
 	extern ezdev_sdk_kernel_error lbs_redirect_with_auth(ezdev_sdk_kernel* sdk_kernel, EZDEV_SDK_UINT8 nUpper); \
 	extern ezdev_sdk_kernel_error lbs_redirect_createdevid_with_auth(ezdev_sdk_kernel* sdk_kernel, EZDEV_SDK_UINT8 nUpper); \
 	extern ezdev_sdk_kernel_error lbs_getstun(ezdev_sdk_kernel* sdk_kernel, stun_info* ptr_stun);\
-	extern ezdev_sdk_kernel_error cnt_state_lbs_apply_serectkey(ezdev_sdk_kernel* sdk_kernel, EZDEV_SDK_UINT16 *interval, EZDEV_SDK_UINT32 *duration); \
+	extern ezdev_sdk_kernel_error cnt_state_lbs_apply_serectkey(ezdev_sdk_kernel* sdk_kernel, EZDEV_SDK_UINT16 *interval, EZDEV_SDK_UINT32 *duration);
 #endif //H_LBS_TRANSPORT_H_
