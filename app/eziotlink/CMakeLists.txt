@@ -1,4 +1,4 @@
-#cmake版本要求
+﻿#cmake版本要求
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(CMAKE_TOOLCHAIN_FILE "ToolChain.cmake")
@@ -26,7 +26,6 @@ AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/  boot)
 AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../../platform/wrapper/linux warpper)
 AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../../platform/wrapper comm_def)
 
-#########################################################添加依赖库######################################################
 SET(lib_rt -lpthread -lm -lrt)
 
 #头文件搜索路径

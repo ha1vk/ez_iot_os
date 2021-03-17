@@ -10,7 +10,7 @@
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
-#include "ezDevSDK_boot.h"
+#include "ez_sdk_api.h"
 #include "ezdev_sdk_kernel.h"
 #include "platform_define.h"
 #include "thread_interface.h"
@@ -23,7 +23,7 @@ thread_handle g_main_thread = {0};
 thread_handle g_user_thread = {0};
 
 
-ezDevSDK_all_config g_all_config = {{0}, {0}};
+ez_init_info_t g_all_config = {{0}, {0}};
 
 EZDEVSDK_CONFIG_INTERFACE
 NET_PLATFORM_INTERFACE
@@ -42,6 +42,7 @@ MUTEX_PLATFORM_INTERFACE
 
 static EZDEV_SDK_INT8 g_init = 0;
 static EZDEV_SDK_INT8 g_running = 0;
+
 void sdk_kernel_logprint(sdk_log_level level, EZDEV_SDK_INT32 sdk_error, EZDEV_SDK_INT32 othercode, const char *buf);
 
 unsigned int sdk_main_thread(void *user_data)
@@ -58,7 +59,7 @@ unsigned int sdk_main_thread(void *user_data)
         sdk_thread_sleep(10);
     } while (g_running && sdk_error != ezdev_sdk_kernel_invald_call);
 
-    sdk_kernel_logprint(sdk_log_info, 0, 0, "sdk_main_thread exist");
+    sdk_kernel_logprint(sdk_log_info, 0, 0, "sdk_main_thread exist\n");
     return 0;
 }
 
@@ -69,10 +70,12 @@ unsigned int sdk_user_thread(void *user_data)
     do
     {
         sdk_error = ezdev_sdk_kernel_yield_user();
+
         sdk_thread_sleep(10);
+
     } while (g_running && sdk_error != ezdev_sdk_kernel_invald_call);
 
-    sdk_kernel_logprint(sdk_log_info, 0, 0, "sdk_user_thread exist");
+    sdk_kernel_logprint(sdk_log_info, 0, 0, "sdk_user_thread exist\n");
     return 0;
 }
 
@@ -90,7 +93,6 @@ int win_socket_init()
         return -1;
     }
 
-    
     if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
     {
         WSACleanup();
@@ -116,19 +118,19 @@ void sdk_kernel_logprint(sdk_log_level level, EZDEV_SDK_INT32 sdk_error, EZDEV_S
     switch (level)
     {
     case sdk_log_error:
-        g_all_config.notice.log_notice(ezDevSDK_log_error, sdk_error, othercode, buf);
+        g_all_config.notice.log_notice(log_error, sdk_error, othercode, buf);
         break;
     case sdk_log_warn:
-        g_all_config.notice.log_notice(ezDevSDK_log_warn, sdk_error, othercode, buf);
+        g_all_config.notice.log_notice(log_warn, sdk_error, othercode, buf);
         break;
     case sdk_log_info:
-        g_all_config.notice.log_notice(ezDevSDK_log_info, sdk_error, othercode, buf);
+        g_all_config.notice.log_notice(log_info, sdk_error, othercode, buf);
         break;
     case sdk_log_debug:
-        g_all_config.notice.log_notice(ezDevSDK_log_debug, sdk_error, othercode, buf);
+        g_all_config.notice.log_notice(log_debug, sdk_error, othercode, buf);
         break;
     case sdk_log_trace:
-        g_all_config.notice.log_notice(ezDevSDK_log_trace, sdk_error, othercode, buf);
+        g_all_config.notice.log_notice(log_trace, sdk_error, othercode, buf);
         break;
     default:
         break;
@@ -137,15 +139,15 @@ void sdk_kernel_logprint(sdk_log_level level, EZDEV_SDK_INT32 sdk_error, EZDEV_S
 
 void value_load(sdk_keyvalue_type valuetype, unsigned char *keyvalue, EZDEV_SDK_INT32 keyvalue_maxsize)
 {
-    if (g_all_config.config.bUser && g_all_config.config.keyValueLoadFun != NULL)
+    if (g_all_config.config.bUser && g_all_config.config.value_load != NULL)
     {
         if (valuetype == sdk_keyvalue_devid)
         {
-            g_all_config.config.keyValueLoadFun(ezDevSDK_keyvalue_devid, keyvalue, keyvalue_maxsize);
+            g_all_config.config.value_load(dev_id, keyvalue, keyvalue_maxsize);
         }
         else if (valuetype == sdk_keyvalue_masterkey)
         {
-            g_all_config.config.keyValueLoadFun(ezDevSDK_keyvalue_masterkey, keyvalue, keyvalue_maxsize);
+            g_all_config.config.value_load(masterkey, keyvalue, keyvalue_maxsize);
         }
     }
     else
@@ -165,15 +167,15 @@ EZDEV_SDK_INT32 value_save(sdk_keyvalue_type valuetype, unsigned char *keyvalue,
 {
     EZDEV_SDK_INT32 iRv = ezdev_sdk_kernel_succ;
 
-    if (g_all_config.config.bUser && g_all_config.config.keyValueSaveFun != NULL)
+    if (g_all_config.config.bUser && g_all_config.config.value_save != NULL)
     {
         if (valuetype == sdk_keyvalue_devid)
         {
-            iRv = g_all_config.config.keyValueSaveFun(ezDevSDK_keyvalue_devid, keyvalue, keyvalue_size);
+            iRv = g_all_config.config.value_save(key_devid, keyvalue, keyvalue_size);
         }
         else if (valuetype == sdk_keyvalue_masterkey)
         {
-            iRv = g_all_config.config.keyValueSaveFun(ezDevSDK_keyvalue_masterkey, keyvalue, keyvalue_size);
+            iRv = g_all_config.config.value_save(key_masterkey, keyvalue, keyvalue_size);
         }
     }
     else
@@ -197,7 +199,7 @@ EZDEV_SDK_INT32 curing_data_load(sdk_curingdata_type datatype, unsigned char *ke
 
     if (sdk_curingdata_secretkey == datatype)
     {
-        iRv = g_all_config.config.curingDataLoadFun(ezDevSDK_curingdata_secretkey, keyvalue, (EZDEV_SDK_UINT32 *)keyvalue_maxsize);
+        iRv = g_all_config.config.data_load(data_secretkey, keyvalue, (EZDEV_SDK_UINT32 *)keyvalue_maxsize);
     }
 
     return iRv;
@@ -209,13 +211,13 @@ EZDEV_SDK_INT32 curing_data_save(sdk_curingdata_type datatype, unsigned char *ke
 
     if (sdk_curingdata_secretkey == datatype)
     {
-        iRv = g_all_config.config.curingDataSaveFun(ezDevSDK_curingdata_secretkey, keyvalue, (EZDEV_SDK_UINT32)keyvalue_size);
+        iRv = g_all_config.config.data_save(data_secretkey, keyvalue, (EZDEV_SDK_UINT32)keyvalue_size);
     }
 
     return iRv;
 }
 
-void event_notice_from_sdk_kernel(ezdev_sdk_kernel_event *ptr_event)
+static void event_notice_to_device(ezdev_sdk_kernel_event *ptr_event)
 {
     if (g_all_config.notice.event_notice == NULL || ptr_event == NULL)
     {
@@ -224,42 +226,48 @@ void event_notice_from_sdk_kernel(ezdev_sdk_kernel_event *ptr_event)
     switch (ptr_event->event_type)
     {
     case sdk_kernel_event_online:
-        g_all_config.notice.event_notice(ezDevSDK_App_Event_Online, ptr_event->event_context);
+        g_all_config.notice.event_notice(device_online, ptr_event->event_context);
         break;
     case sdk_kernel_event_break:
-        g_all_config.notice.event_notice(ezDevSDK_App_Event_Break, ptr_event->event_context);
+        g_all_config.notice.event_notice(device_offline, ptr_event->event_context);
         break;
     case sdk_kernel_event_switchover:
-        g_all_config.notice.event_notice(ezDevSDK_App_Event_Switchover, ptr_event->event_context);
+        g_all_config.notice.event_notice(device_switch, ptr_event->event_context);
         break;
     case sdk_kernel_event_invaild_authcode:
-        g_all_config.notice.event_notice(ezDevSDK_App_Event_Invaild_authcode, ptr_event->event_context);
+        g_all_config.notice.event_notice(invaild_authcode, ptr_event->event_context);
         break;
     case sdk_kernel_event_fast_reg_online:
-        g_all_config.notice.event_notice(ezDevSDK_App_Event_fast_reg_online, ptr_event->event_context);
+        g_all_config.notice.event_notice(fast_reg_online, ptr_event->event_context);
         break;
     case sdk_kernel_event_reconnect_success:
-        g_all_config.notice.event_notice(ezDevSDK_App_Event_Reconnect_success, ptr_event->event_context);
+        g_all_config.notice.event_notice(reconnect_success, ptr_event->event_context);
         break;
     case sdk_kernel_event_heartbeat_interval_changed:
-        g_all_config.notice.event_notice(ezDevSDK_App_Event_heartbeat_interval_changed, ptr_event->event_context);
+        g_all_config.notice.event_notice(heartbeat_interval_changed, ptr_event->event_context);
         break;
     case sdk_kernel_event_runtime_err:
-        g_all_config.notice.event_notice(ezDevSDK_App_Event_Runtime_err, ptr_event->event_context);
+        g_all_config.notice.event_notice(runtime_cb, ptr_event->event_context);
     default:
         break;
     }
 }
 
-int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_all_config *all_config, EZDEV_SDK_UINT32 reg_mode)
+EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_info_t* pinit, EZDEV_SDK_UINT32 reg_mode)
 {
     char devinfo_string[4 * 1024] = {0};
     int result_code = ezdev_sdk_kernel_succ;
-    ezdev_sdk_kernel_platform_handle kernel_platform_handle;
-    memset(&kernel_platform_handle, 0, sizeof(kernel_platform_handle));
+
+    sdk_config_t  config;
+    ezdev_sdk_kernel_platform_handle platform_handle;
+
+    memset(&platform_handle, 0, sizeof(platform_handle));
+    memset(&config, 0, sizeof(sdk_config_t));
+
 #ifdef _WIN32
     win_socket_init();
 #endif // WIN32
+
     do
     {
         if (0 != g_init)
@@ -268,33 +276,36 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
             break;
         }
 
-        if (all_config == NULL || all_config->notice.event_notice == NULL || all_config->notice.log_notice == NULL ||
-            all_config->config.curingDataLoadFun == NULL || all_config->config.curingDataSaveFun == NULL)
+        if (NULL== pserver_info|| NULL== pserver_info->host||NULL== pinit||pinit->notice.event_notice == NULL || pinit->notice.log_notice == NULL ||
+            pinit->config.data_load == NULL || pinit->config.data_save == NULL)
         {
             result_code = ezdev_sdk_kernel_params_invalid;
             break;
         }
-        if (0 == all_config->config.bUser)
+
+        if (0 == pinit->config.bUser)
         {
-            if (!strlen(all_config->config.dev_id) || !strlen(all_config->config.dev_masterkey))
+            if (0 == strlen(pinit->config.dev_id) || 0 == strlen(pinit->config.dev_masterkey))
             {
-                sdk_kernel_logprint(sdk_log_error, 0, 0, "dev_id or masterkey is null \n");
                 result_code = ezdev_sdk_kernel_params_invalid;
                 break;
             }
         }
         else
         {
-            if (all_config->config.keyValueLoadFun == NULL || all_config->config.keyValueSaveFun == NULL)
+            if (pinit->config.value_load == NULL || pinit->config.value_save == NULL)
             {
                 sdk_kernel_logprint(sdk_log_error, 0, 0, "keyValueFun is null \n");
                 result_code = ezdev_sdk_kernel_params_invalid;
                 break;
             }
         }
-
+        config.server->host = pserver_info->host;
+        config.server->port = pserver_info->port;
+       
         memset(&g_all_config, 0, sizeof(g_all_config));
-        memcpy(&g_all_config, all_config, sizeof(ezDevSDK_all_config));
+
+        memcpy(&g_all_config, pinit, sizeof(ez_init_info_t));
 
         result_code = get_devinfo_fromconfig(g_all_config.config.devinfo_path, devinfo_string, 4 * 1024);
         if (result_code != 0)
@@ -303,32 +314,35 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
             result_code = ezdev_sdk_kernel_value_load;
             break;
         }
-        kernel_platform_handle.net_work_create = net_create;
-        kernel_platform_handle.net_work_connect = net_connect;
-        kernel_platform_handle.net_work_read = net_read;
-        kernel_platform_handle.net_work_write = net_write;
-        kernel_platform_handle.net_work_disconnect = net_disconnect;
-        kernel_platform_handle.net_work_destroy = net_destroy;
-        kernel_platform_handle.net_work_getsocket = net_getsocket;
-        kernel_platform_handle.time_creator = Platform_TimerCreater;
-        kernel_platform_handle.time_isexpired_bydiff = Platform_TimeIsExpired_Bydiff;
-        kernel_platform_handle.time_isexpired = Platform_TimerIsExpired;
-        kernel_platform_handle.time_countdownms = Platform_TimerCountdownMS;
-        kernel_platform_handle.time_countdown = Platform_TimerCountdown;
-        kernel_platform_handle.time_leftms = Platform_TimerLeftMS;
-        kernel_platform_handle.time_destroy = Platform_TimeDestroy;
-        kernel_platform_handle.sdk_kernel_log = sdk_kernel_logprint;
-        kernel_platform_handle.key_value_load = value_load;
-        kernel_platform_handle.key_value_save = value_save;
-        kernel_platform_handle.curing_data_load = curing_data_load;
-        kernel_platform_handle.curing_data_save = curing_data_save;
-        kernel_platform_handle.thread_mutex_create = sdk_platform_thread_mutex_create;
-        kernel_platform_handle.thread_mutex_destroy = sdk_platform_thread_mutex_destroy;
-        kernel_platform_handle.thread_mutex_lock = sdk_platform_thread_mutex_lock;
-        kernel_platform_handle.thread_mutex_unlock = sdk_platform_thread_mutex_unlock;
-        kernel_platform_handle.time_sleep = sdk_thread_sleep;
+        platform_handle.net_work_create       = net_create;
+        platform_handle.net_work_connect      = net_connect;
+        platform_handle.net_work_read         = net_read;
+        platform_handle.net_work_write        = net_write;
+        platform_handle.net_work_disconnect   = net_disconnect;
+        platform_handle.net_work_destroy      = net_destroy;
+        platform_handle.net_work_getsocket    = net_getsocket;
+        platform_handle.time_creator          = Platform_TimerCreater;
+        platform_handle.time_isexpired_bydiff = Platform_TimeIsExpired_Bydiff;
+        platform_handle.time_isexpired        = Platform_TimerIsExpired;
+        platform_handle.time_countdownms      = Platform_TimerCountdownMS;
+        platform_handle.time_countdown        = Platform_TimerCountdown;
+        platform_handle.time_leftms           = Platform_TimerLeftMS;
+        platform_handle.time_destroy          = Platform_TimeDestroy;
+        platform_handle.sdk_kernel_log        = sdk_kernel_logprint;
+        platform_handle.key_value_load        = value_load;
+        platform_handle.key_value_save        = value_save;
+        platform_handle.curing_data_load      = curing_data_load;
+        platform_handle.curing_data_save      = curing_data_save;
+        platform_handle.thread_mutex_create   = sdk_platform_thread_mutex_create;
+        platform_handle.thread_mutex_destroy  = sdk_platform_thread_mutex_destroy;
+        platform_handle.thread_mutex_lock     = sdk_platform_thread_mutex_lock;
+        platform_handle.thread_mutex_unlock   = sdk_platform_thread_mutex_unlock;
+        platform_handle.time_sleep            = sdk_thread_sleep;
 
-        result_code = ezdev_sdk_kernel_init(server_name, server_port, &kernel_platform_handle, event_notice_from_sdk_kernel, devinfo_string, (kernel_das_info *)all_config->config.reg_das_info, reg_mode);
+        config.dev_info = devinfo_string;
+        config.buf_size = 
+        result_code = ezdev_sdk_kernel_init(pserver_info->host, pserver_info->port, &platform_handle, event_notice_to_device, \
+                                           devinfo_string, (kernel_das_info *)pinit->config.pdas_info, reg_mode);
         if (result_code != ezdev_sdk_kernel_succ)
         {
             sdk_kernel_logprint(sdk_log_error, 0, 0,"ezdev_sdk_kernel_init err\n");
@@ -340,18 +354,21 @@ int ezDevSDK_Init(const char *server_name, unsigned int server_port, ezDevSDK_al
     return result_code;
 }
 
-int ezDevSDK_Fini()
+int ez_sdk_deinit()
 {
     if (1 != g_init)
     {
         return ezdev_sdk_kernel_invald_call;
     }
+
     ezdev_sdk_kernel_fini();
+
     g_init = 0;
+
     return ezdev_sdk_kernel_succ;
 }
 
-int ezDevSDK_Start()
+int ez_sdk_start()
 {
     int result = 0;
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
@@ -361,7 +378,6 @@ int ezDevSDK_Start()
     {
         return kernel_error;
     }
-
     do
     {
         g_running = 1;
@@ -384,8 +400,10 @@ int ezDevSDK_Start()
     if (result != 0)
     {
         sdk_kernel_logprint(sdk_log_debug, 0, 0, "sdk_thread_create err \n");
+
         g_running = 0;
         ezdev_sdk_kernel_stop();
+
         sdk_thread_destroy(&g_main_thread);
         sdk_thread_destroy(&g_user_thread);
 
@@ -395,7 +413,7 @@ int ezDevSDK_Start()
     return result;
 }
 
-int ezDevSDK_Stop()
+int ez_sdk_stop()
 {
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
     
@@ -405,12 +423,16 @@ int ezDevSDK_Stop()
         sdk_thread_destroy(&g_main_thread);
         sdk_thread_destroy(&g_user_thread);
     }
-    sdk_kernel_logprint(sdk_log_debug, 0, 0,"ezDevSDK_Stop\n");
+
     kernel_error = ezdev_sdk_kernel_stop();
+
     if (kernel_error != ezdev_sdk_kernel_succ)
     {
+        sdk_kernel_logprint(sdk_log_debug, kernel_error, 0,"ez_sdk_stop \n");
         return kernel_error;
     }
+
+    sdk_kernel_logprint(sdk_log_debug, 0, 0,"ez_sdk_stop return\n");
 
     return 0;
 }
