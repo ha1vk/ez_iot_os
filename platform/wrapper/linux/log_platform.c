@@ -1,10 +1,12 @@
-#include "log_platform_wrapper.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
 #include <sys/syscall.h>
 #include <unistd.h>
+
+#include "log_platform_wrapper.h"
 
 void time_print(int sdk_error, int othercode, const char * buf)
 {

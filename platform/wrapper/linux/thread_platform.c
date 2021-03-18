@@ -1,7 +1,8 @@
-#include "thread_platform_wrapper.h"
+
 #include <unistd.h>
 #include <sys/prctl.h>
 
+#include "thread_platform_wrapper.h"
 #include "ezdev_sdk_kernel_struct.h"
 
 static void *sdk_thread_fun(void *aArg)

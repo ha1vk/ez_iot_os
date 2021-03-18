@@ -14,6 +14,8 @@
 #ifndef H_PLATFORM_DEFINE_H_
 #define H_PLATFORM_DEFINE_H_
 
+typedef void *ezdev_sdk_mutex;
+
 #define LOG_PLATFORM_INTERFACE                                                  \
 	extern void log_print_error(int sdk_error, int othercode, const char *buf); \
 	extern void log_print_warn(int sdk_error, int othercode, const char *buf);  \

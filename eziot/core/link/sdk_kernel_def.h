@@ -111,16 +111,6 @@ typedef enum
 	sdk_risk_control=1,			///<	风控
 }sdk_risk_control_flag;
 
-
-// /**
-// * \brief   设备SDK扩展模块ID定义
-// */
-// typedef enum
-// {
-// 	ezdev_sdk_extend_begin = 0,				///<	扩展模块起始
-// 	ezdev_sdk_extend_count = 16				///<	支持的扩展模块数量
-// }ezdev_sdk_extend_id;
-
 /**
 * \brief   标记SDK入口状态
 */
@@ -174,7 +164,6 @@ typedef enum
 {
     sdk_dev_auth_protocol_none = 0,     ///<	无认证
     sdk_dev_auth_protocol_ecdh = 1,     ///<	ECDH认证
-    //sdk_dev_auth_protocol_test = 4,     ///<	测试用的
     sdk_dev_auth_protocol_end
 }sdk_dev_auth_protocol_type;
 
@@ -184,11 +173,11 @@ typedef enum
 typedef struct
 {
 	unsigned char *head_buf; 
-	EZDEV_SDK_UINT8 head_buf_Len;			///<	可生气5个字节大小以上
+	EZDEV_SDK_UINT8 head_buf_Len;		
 	EZDEV_SDK_UINT8 head_buf_off;
 
     unsigned char *var_head_buf;
-    EZDEV_SDK_UINT8 var_head_buf_Len;   //可变报文头
+    EZDEV_SDK_UINT8 var_head_buf_Len;        //可变报文头
     EZDEV_SDK_UINT8 var_head_buf_off;
 
 	unsigned char *payload_buf;

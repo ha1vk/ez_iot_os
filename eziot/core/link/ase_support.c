@@ -167,59 +167,6 @@ mkernel_internal_error aes_cbc_128_enc_padding(const unsigned char aes_key[16], 
 	return sdk_error;
 }
 
-
-// static int timer_entropy_poll(void *data, uint8_t *output, size_t len, size_t *olen)
-// {
-//     unsigned long timer = bscomptls_timing_hardclock();
-//     ((void)data);
-//     *olen = 0;
-// 
-//     if (len < sizeof(unsigned long))
-//         return(0);
-// 
-//     memcpy(output, &timer, sizeof(unsigned long));
-//     *olen = sizeof(unsigned long);
-// 
-//     return(0);
-// }
-
-
-// static int GenRandom(const uint8_t *custom, uint8_t * out, size_t out_len)
-// {
-//     mkernel_internal_error sdk_error = mkernel_internal_succ;
-//     int ret = 0;
-//     bscomptls_entropy_context entropy;
-//     bscomptls_ctr_drbg_context ctr_drbg;
-// 
-//     do 
-//     {
-//         bscomptls_entropy_init(&entropy);
-//         bscomptls_ctr_drbg_init(&ctr_drbg);
-// 
-//         bscomptls_entropy_add_source(&entropy, timer_entropy_poll, NULL, BSCOMPTLS_ENTROPY_MAX_GATHER, BSCOMPTLS_ENTROPY_SOURCE_STRONG);
-// 
-//         sdk_error = bscomptls_ctr_drbg_seed(&ctr_drbg, bscomptls_entropy_func, &entropy, custom, strlen(custom));
-//         if (sdk_error != 0)
-//         {
-//             sdk_error = mkernel_internal_casll_mbedtls_setdeckey_error;
-//             break;
-//         }
-// 
-//         sdk_error = bscomptls_ctr_drbg_random(&ctr_drbg, out, out_len);
-//         if (sdk_error != 0)
-//         {
-//             sdk_error = mkernel_internal_casll_mbedtls_setdeckey_error;
-//             break;
-//         }
-//     } while (0);
-// 
-//     bscomptls_ctr_drbg_free(&ctr_drbg);
-//     bscomptls_entropy_free(&entropy);
-// 
-//     return sdk_error;
-// }
-
-
 //明文input_buf不需要用户填充补齐，gcm算法内部自动处理，生成的密文output_buf也是不包含填充内容的，即全部是密文内容
 mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], \
                                                 unsigned char *input_buf, EZDEV_SDK_UINT32 input_length, \
@@ -233,14 +180,6 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
     unsigned int key_len = 16 * 8;
     bscomptls_cipher_id_t cipher = BSCOMPTLS_CIPHER_ID_AES;
     unsigned char iv[iv_len];
-
-//    //调试代码，需要时候放开
-//     unsigned char gcm_key_hex[16 * 2 + 1] = { 0 };
-//     unsigned char iv_hex[iv_len * 2 + 1] = { 0 };
-//     unsigned char input_buf_hex[512];
-//     unsigned char output_buf_hex[512];
-//     unsigned char tag_buf_hex[32 + 1] = { 0 };
-
     do
     {
         bscomptls_gcm_init(&gcm_ctx);
@@ -257,23 +196,12 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
             break;
         }
 
-        //GenRandom("mbedtls_IV", iv, iv_len);
-
-//         //调试代码，需要时候放开
-//         bscomptls_hexdump(gcm_key, 16, 1, gcm_key_hex);
-//         bscomptls_hexdump(iv, iv_len, 1, iv_hex);
-//         bscomptls_hexdump(input_buf, input_length, 1, input_buf_hex);
-
         gcm_result = bscomptls_gcm_crypt_and_tag(&gcm_ctx, BSCOMPTLS_GCM_ENCRYPT, input_length/*input_length_padding*/, iv, iv_len, NULL/*addition*/, 0/*add_len*/, input_buf, output_buf, tag_buf_len, output_tag_buf);
         if (gcm_result != 0)
         {
             sdk_error = mkernel_internal_casll_mbedtls_crypt_error;
             break;
         }
-
-//         //调试代码，需要时候放开
-//         bscomptls_hexdump(output_tag_buf, tag_buf_len, 1, tag_buf_hex);
-//         bscomptls_hexdump(output_buf, input_length, 1, output_buf_hex);
 
     } while (0);
 

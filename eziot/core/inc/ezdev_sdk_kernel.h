@@ -75,11 +75,9 @@ extern "C"
  *  \return 	ezdev_sdk_kernel_succ、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_json_invalid、ezdev_sdk_kernel_json_format、 \n
  *				ezdev_sdk_kernel_value_load、ezdev_sdk_kernel_invald_call
  */
-EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char* server_name, EZDEV_SDK_INT16 server_port,
-																  const ezdev_sdk_kernel_platform_handle* kernel_platform_handle,
-																  sdk_kernel_event_notice kernel_event_notice_cb,
-																  const char* dev_config_info,
-																  kernel_das_info* reg_das_info,
+EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig,
+                                                                  const ezdev_sdk_kernel_platform_handle* phandle,
+																  const sdk_kernel_event_notice event_notice_cb,
 																  EZDEV_SDK_INT8 reg_mode);
 
 /**

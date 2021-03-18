@@ -11,7 +11,6 @@ int32_t ez_sdk_log_start(void)
         {
             break;
         }
-        
         elog_set_fmt(ELOG_LVL_ASSERT, ELOG_FMT_ALL);
         elog_set_fmt(ELOG_LVL_ERROR, ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_LINE);
         elog_set_fmt(ELOG_LVL_WARN, ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_LINE);
@@ -21,7 +20,7 @@ int32_t ez_sdk_log_start(void)
 #ifdef ELOG_COLOR_ENABLE
         elog_set_text_color_enabled(true);
 #endif
-        rv = elog_start();
+        elog_start();
 
     }while(0);
 

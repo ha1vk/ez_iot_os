@@ -63,47 +63,41 @@ static void *_calloc_func(size_t nmemb, size_t size)
 {
     size_t mem_size;
     void *ptr = NULL;
-
     mem_size = nmemb * size;
     ptr = malloc(mem_size);
-
     if (ptr)
+    {
         memset(ptr, 0, mem_size);
-
+    }
     return ptr;
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_INT16 server_port,
-                                             const ezdev_sdk_kernel_platform_handle *kernel_platform_handle,
-                                             sdk_kernel_event_notice kernel_event_notice_cb,
-                                             const char *dev_config_info,
-                                             kernel_das_info *reg_das_info,
-                                             EZDEV_SDK_INT8 reg_mode)
-
+ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const ezdev_sdk_kernel_platform_handle* handle,
+											 const sdk_kernel_event_notice event_notice_cb, const EZDEV_SDK_INT8 reg_mode)
 {
     ezdev_sdk_kernel_error sdk_error = ezdev_sdk_kernel_succ;
     unsigned char szDev_vcode[ezdev_sdk_verify_code_maxlen] = {0};
     EZDEV_SDK_INT32 iDev_vcode = ezdev_sdk_verify_code_maxlen;
-    ezdev_sdk_kernel_log_debug(0, 0, "ezdev_sdk_kernel_init :my_state: %d\n", g_ezdev_sdk_kernel.my_state);
+
     if (sdk_idle0 != g_ezdev_sdk_kernel.my_state && sdk_idle2 != g_ezdev_sdk_kernel.my_state)
     {
         return ezdev_sdk_kernel_invald_call;
     }
-
     do
     {
         bscomptls_platform_set_calloc_free(_calloc_func, free);
-        if (strlen(server_name) >= ezdev_sdk_name_len ||NULL == kernel_platform_handle || NULL == kernel_event_notice_cb)
+
+        if(NULL == pconfig||NULL == pconfig->pdev_info||NULL == pconfig->server.host||
+           strlen(pconfig->server.host)>ezdev_sdk_name_len||NULL == handle||NULL == event_notice_cb)
         {
-            sdk_error = ezdev_sdk_kernel_params_invalid;
-            break;
+            return ezdev_sdk_kernel_params_invalid;
         }
 
-        if (kernel_platform_handle->key_value_load == NULL || kernel_platform_handle->net_work_connect == NULL || kernel_platform_handle->net_work_read == NULL || kernel_platform_handle->net_work_write == NULL ||
-            kernel_platform_handle->net_work_disconnect == NULL || kernel_platform_handle->net_work_destroy == NULL || kernel_platform_handle->time_creator == NULL || kernel_platform_handle->time_isexpired_bydiff == NULL ||
-            kernel_platform_handle->time_isexpired == NULL || kernel_platform_handle->time_countdownms == NULL || kernel_platform_handle->time_countdown == NULL || kernel_platform_handle->time_leftms == NULL ||
-            kernel_platform_handle->time_destroy == NULL || kernel_platform_handle->key_value_load == NULL || kernel_platform_handle->key_value_save == NULL || kernel_platform_handle->sdk_kernel_log == NULL ||
-            kernel_platform_handle->curing_data_load == NULL || kernel_platform_handle->curing_data_save == NULL)
+        if (handle->key_value_load == NULL || handle->net_work_connect == NULL || handle->net_work_read == NULL || handle->net_work_write == NULL ||
+            handle->net_work_disconnect == NULL || handle->net_work_destroy == NULL || handle->time_creator == NULL || handle->time_isexpired_bydiff == NULL ||
+            handle->time_isexpired == NULL || handle->time_countdownms == NULL || handle->time_countdown == NULL || handle->time_leftms == NULL ||
+            handle->time_destroy == NULL || handle->key_value_load == NULL || handle->key_value_save == NULL || handle->sdk_kernel_log == NULL ||
+            handle->curing_data_load == NULL || handle->curing_data_save == NULL)
         {
             sdk_error = ezdev_sdk_kernel_params_invalid;
             break;
@@ -123,14 +117,14 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
         g_ezdev_sdk_kernel.das_keepalive_interval = ezdev_sdk_das_default_keepaliveinterval;
 
         /* 设置服务器信息 */
-        strncpy(g_ezdev_sdk_kernel.server_info.server_name, server_name, ezdev_sdk_name_len - 1);
-        g_ezdev_sdk_kernel.server_info.server_port = server_port;
+        strncpy(g_ezdev_sdk_kernel.server_info.server_name, pconfig->server.host, ezdev_sdk_name_len - 1);
+        g_ezdev_sdk_kernel.server_info.server_port = pconfig->server.port;
 
         /* 设置回调函数 */
-        memcpy(&g_ezdev_sdk_kernel.platform_handle, kernel_platform_handle, sizeof(ezdev_sdk_kernel_platform_handle));
+        memcpy(&g_ezdev_sdk_kernel.platform_handle, handle, sizeof(ezdev_sdk_kernel_platform_handle));
 
         /* 解析json数据，并设置设备信息 */
-        sdk_error = mkiE2ezE(json_parse_devinfo(dev_config_info, &g_ezdev_sdk_kernel.dev_info));
+        sdk_error = mkiE2ezE(json_parse_devinfo(pconfig->pdev_info, &g_ezdev_sdk_kernel.dev_info));
         if (sdk_error != ezdev_sdk_kernel_succ)
         {
             break;
@@ -138,8 +132,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
         /**
 		 *	通过回调获取验证码
 		 */
-        if (ezdev_sdk_kernel_succ == (sdk_error = kernel_platform_handle->curing_data_load(sdk_curingdata_secretkey, szDev_vcode, &iDev_vcode)) &&
-            iDev_vcode <= ezdev_sdk_verify_code_maxlen)
+        if (ezdev_sdk_kernel_succ == (sdk_error = handle->curing_data_load(sdk_curingdata_secretkey, szDev_vcode, &iDev_vcode)) &&iDev_vcode <= ezdev_sdk_verify_code_maxlen)
         {
             strncpy(g_ezdev_sdk_kernel.dev_info.dev_verification_code, (char *)szDev_vcode, iDev_vcode);
         }
@@ -148,18 +141,22 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
             sdk_error = ezdev_sdk_kernel_value_load;
             break;
         }
-
         /* 初始化链接状态 */
         g_ezdev_sdk_kernel.lbs_redirect_times = 0;
         g_ezdev_sdk_kernel.das_retry_times = 0;
         g_ezdev_sdk_kernel.secretkey_applied = EZDEV_SDK_FALSE;
         g_ezdev_sdk_kernel.secretkey_interval = 0;
         g_ezdev_sdk_kernel.secretkey_duration = 0;
+
         g_ezdev_sdk_kernel.entr_state = sdk_entrance_normal;
         g_ezdev_sdk_kernel.my_state = sdk_idle0;
         g_ezdev_sdk_kernel.cnt_state = sdk_cnt_unredirect;
         g_ezdev_sdk_kernel.cnt_state_timer = g_ezdev_sdk_kernel.platform_handle.time_creator();
-
+        if(NULL == g_ezdev_sdk_kernel.cnt_state_timer)
+        {
+            sdk_error = ezdev_sdk_kernel_memory;
+            break;
+        }
         /* 初始化风控信息 */
         g_ezdev_sdk_kernel.access_risk = sdk_no_risk_control;
 
@@ -175,42 +172,54 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const char *server_name, EZDEV_SDK_
             g_ezdev_sdk_kernel.reg_mode = reg_mode;
         }
 
-        if (reg_das_info && reg_das_info->bLightreg) ///<	快速注册
+        if (pconfig->pdas_info && 0!= pconfig->pdas_info->bLightreg)   ///< 快速注册
         {
-            g_ezdev_sdk_kernel.redirect_das_info.das_port = reg_das_info->das_port;
-            g_ezdev_sdk_kernel.redirect_das_info.das_udp_port = reg_das_info->das_udp_port;
-            strncpy(g_ezdev_sdk_kernel.redirect_das_info.das_address, reg_das_info->das_address, ezdev_sdk_ip_max_len - 1);
-            strncpy(g_ezdev_sdk_kernel.redirect_das_info.das_domain, reg_das_info->das_domain, ezdev_sdk_ip_max_len - 1);
-            strncpy(g_ezdev_sdk_kernel.redirect_das_info.das_serverid, reg_das_info->das_serverid, ezdev_sdk_name_len - 1);
-            memcpy(g_ezdev_sdk_kernel.session_key, reg_das_info->session_key, ezdev_sdk_sessionkey_len);
-            if (1 == reg_das_info->bLightreg)
+            g_ezdev_sdk_kernel.redirect_das_info.das_port = pconfig->pdas_info->das_port;
+            g_ezdev_sdk_kernel.redirect_das_info.das_udp_port = pconfig->pdas_info->das_udp_port;
+            strncpy(g_ezdev_sdk_kernel.redirect_das_info.das_address, pconfig->pdas_info->das_address, ezdev_sdk_ip_max_len - 1);
+            strncpy(g_ezdev_sdk_kernel.redirect_das_info.das_domain, pconfig->pdas_info->das_domain, ezdev_sdk_ip_max_len - 1);
+            strncpy(g_ezdev_sdk_kernel.redirect_das_info.das_serverid, pconfig->pdas_info->das_serverid, ezdev_sdk_name_len - 1);
+            memcpy(g_ezdev_sdk_kernel.session_key, pconfig->pdas_info->session_key, ezdev_sdk_sessionkey_len);
+
+            if (1 == pconfig->pdas_info->bLightreg)
             {
                 g_ezdev_sdk_kernel.cnt_state = sdk_cnt_das_fast_reg;
             }
-            else if (2 == reg_das_info->bLightreg)
+            else if (2 == pconfig->pdas_info->bLightreg)
             {
                 g_ezdev_sdk_kernel.cnt_state = sdk_cnt_das_fast_reg_v3;
             }
         }
-
         /* 初始化领域和公共领域 */
         common_module_init();
-        extend_init(kernel_event_notice_cb);
+
+        extend_init(event_notice_cb);
 
         /* 初始化MQTT和消息队列 */
         das_object_init(&g_ezdev_sdk_kernel);
+
         g_mutex_lock = g_ezdev_sdk_kernel.platform_handle.thread_mutex_create();
         if(NULL == g_mutex_lock)
         {
             sdk_error = ezdev_sdk_kernel_memory;
             break;
         }
+
         g_das_transport_seq = 0;
+
     } while (0);
 
     if (sdk_error == ezdev_sdk_kernel_succ)
     {
         g_ezdev_sdk_kernel.my_state = sdk_idle;
+    }
+    else
+    {
+        if(NULL!=g_ezdev_sdk_kernel.cnt_state_timer)
+        {
+            g_ezdev_sdk_kernel.platform_handle.time_destroy(g_ezdev_sdk_kernel.cnt_state_timer);
+            g_ezdev_sdk_kernel.cnt_state_timer = NULL;
+        }
     }
 
     return sdk_error;
@@ -225,16 +234,21 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_fini()
     }
 
     das_object_fini(&g_ezdev_sdk_kernel);
+
     extend_fini();
+
     common_module_fini();
 
     g_ezdev_sdk_kernel.platform_handle.time_destroy(g_ezdev_sdk_kernel.cnt_state_timer);
+
     if(g_mutex_lock)
     {
         g_ezdev_sdk_kernel.platform_handle.thread_mutex_destroy(g_mutex_lock);
         g_mutex_lock = 0;
     }
+
     memset(&g_ezdev_sdk_kernel, 0, sizeof(g_ezdev_sdk_kernel));
+
     return ezdev_sdk_kernel_succ;
 }
 
@@ -322,6 +336,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_stop()
     }
 
     g_ezdev_sdk_kernel.my_state = sdk_stop;
+    
     clear_queue_pubmsg_exchange();
     send_offline_msg_to_platform(genaral_seq());
 

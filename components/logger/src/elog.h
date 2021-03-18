@@ -29,10 +29,11 @@
 #ifndef __ELOG_H__
 #define __ELOG_H__
 
-#include <elog_cfg.h>
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "elog_cfg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -165,7 +166,7 @@ typedef enum {
 
 /* elog.c */
 ElogErrCode elog_init(void);
-ElogErrCode elog_start(void);
+void elog_start(void);
 ElogErrCode elog_stop(void); 
 void elog_set_output_enabled(bool enabled);
 bool elog_get_output_enabled(void);

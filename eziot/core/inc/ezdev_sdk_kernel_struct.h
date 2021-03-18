@@ -62,7 +62,7 @@ typedef enum
 {
     sdk_keyvalue_devid,     ///< 设备唯一标识  首次设备上线后会分配 一定要写入flash
     sdk_keyvalue_masterkey, ///< 设备masterkey 首次设备上线后会分配 尽量写入flash
-    sdk_keyvalue_coapinfo,  ///<    coap信息,
+    sdk_keyvalue_coapinfo,  ///< coap信息,
     sdk_keyvalue_count      ///< 枚举上限 用来判定越界
 } sdk_keyvalue_type;
 
@@ -153,7 +153,6 @@ typedef struct
     char sub_serial[ezdev_sdk_max_serial_len];       ///< 子设备序列号
     char ext_msg[ezdev_sdk_ext_msg_len];             ///< 扩展字段,"model"模块中的 "domainid/identifier"内容
 } ezdev_sdk_kernel_submsg_v3;
-
 
 /**
  * \brief 事件类型
@@ -257,14 +256,14 @@ typedef struct
  */
 typedef struct
 {
-    EZDEV_SDK_INT8 bLightreg;							 ///< 指定是否快速上线,0(否),1是wifi快速重连，2是RF快速重连
-    EZDEV_SDK_UINT16 das_port;                           ///< das端口
-    EZDEV_SDK_UINT16 das_udp_port;                       ///< das udp端口
-    int das_socket;                                      ///< 上次下线保修的socket,可以不指定
-    char das_address[ezdev_sdk_ip_max_len];              ///< das IP地址
-    char das_domain[ezdev_sdk_ip_max_len];               ///< das 域名
-    char das_serverid[ezdev_sdk_name_len];               ///< das serverid
-    unsigned char session_key[ezdev_sdk_sessionkey_len]; ///< das session key
+    EZDEV_SDK_INT8   bLightreg;							   ///< 指定是否快速上线,0(否),1是wifi快速重连，2是RF快速重连
+    EZDEV_SDK_UINT16 das_port;                             ///< das端口
+    EZDEV_SDK_UINT16 das_udp_port;                         ///< das udp端口
+    int              das_socket;                           ///< 上次下线保活的socket,可以不指定
+    char             das_address[ezdev_sdk_ip_max_len];    ///< das IP地址
+    char             das_domain[ezdev_sdk_ip_max_len];     ///< das 域名
+    char             das_serverid[ezdev_sdk_name_len];     ///< das serverid
+    unsigned char    session_key[ezdev_sdk_sessionkey_len];///< das session key
 } kernel_das_info;
 
 /**
@@ -282,7 +281,6 @@ typedef struct
     char extend_module_version[version_max_len];                                                          ///< 模块版本号
 } ezdev_sdk_kernel_extend;
 
-
 /**
  * \brief 扩展模块注册信息(V3协议)
  */
@@ -299,7 +297,7 @@ typedef struct
 typedef struct
 {
 	EZDEV_SDK_UINT16 domain_id; ///<	extendID 对应到业务领域
-	EZDEV_SDK_INT8(*ezdev_sdk_kernel_common_module_data_handle)(ezdev_sdk_kernel_submsg *ptr_submsg, EZDEV_SDK_PTR pUser); ///<	回调是单线程出来的
+	EZDEV_SDK_INT8(*ezdev_sdk_kernel_common_module_data_handle)(ezdev_sdk_kernel_submsg *ptr_submsg, EZDEV_SDK_PTR pUser); 
 	EZDEV_SDK_PTR pUser;
 } ezdev_sdk_kernel_common_module;
 
@@ -336,7 +334,6 @@ typedef struct
 	void (*thread_mutex_destroy)(ezdev_sdk_mutex ptr_mutex);
 	int (*thread_mutex_lock)(ezdev_sdk_mutex ptr_mutex);
 	int (*thread_mutex_unlock)(ezdev_sdk_mutex ptr_mutex);
-
 } ezdev_sdk_kernel_platform_handle;
 
 /**
@@ -374,6 +371,20 @@ typedef struct
     unsigned char dev_id[ezdev_sdk_devid_len + 1];
     unsigned char dev_verification_code[ezdev_sdk_verify_code_maxlen + 1];
 } showkey_info;
+
+typedef struct
+{
+    char*        host;
+    unsigned int port;
+} server_info_t;
+
+typedef struct
+{
+    char*             pdev_info;
+    server_info_t     server;
+    kernel_das_info*  pdas_info;   
+    EZDEV_SDK_UINT32  buf_size;        
+} sdk_config_t;
 
 typedef void (*sdk_kernel_event_notice)(ezdev_sdk_kernel_event *ptr_event);
 #endif //H_EZDEV_SDK_KERNEL_STRUCT_H_

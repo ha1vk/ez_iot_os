@@ -31,12 +31,12 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>
-#include <hal_thread.h>
+
 
 #ifdef ELOG_FILE_ENABLE
 #include <elog_file.h>
 #endif
-static void *mutex_handler = NULL;
+static pthread_mutex_t output_lock;
 
 /**
  * EasyLogger port initialize
@@ -46,31 +46,19 @@ static void *mutex_handler = NULL;
 ElogErrCode elog_port_init(void) {
     ElogErrCode result = ELOG_NO_ERR;
 
-    mutex_handler = hal_thread_mutex_create();
-    if(NULL == mutex_handler)
-    {
-        result = ELOG_MALLOC_ERR;
-    }
+    pthread_mutex_init(&output_lock, NULL);
 
 #ifdef ELOG_FILE_ENABLE
-    result = elog_file_init();
+    elog_file_init();
 #endif
 
     return result;
 }
 
-ElogErrCode elog_port_deinit(void) 
+ElogErrCode elog_port_deinit(void)
 {
     ElogErrCode result = ELOG_NO_ERR;
 
-    if(NULL!=mutex_handler)
-    {
-        hal_thread_mutex_destroy(mutex_handler);
-        mutex_handler = NULL;
-    }
-#ifdef ELOG_FILE_ENABLE
-    elog_file_deinit();
-#endif
     return result;
 }
 
@@ -93,14 +81,14 @@ void elog_port_output(const char *log, size_t size) {
  * output lock
  */
 void elog_port_output_lock(void) {
-    hal_thread_mutex_lock(mutex_handler);
+    pthread_mutex_lock(&output_lock);
 }
 
 /**
  * output unlock
  */
 void elog_port_output_unlock(void) {
-    hal_thread_mutex_unlock(mutex_handler);
+    pthread_mutex_unlock(&output_lock);
 }
 
 
@@ -133,8 +121,7 @@ const char *elog_port_get_time(void) {
 const char *elog_port_get_p_info(void) {
     static char cur_process_info[10] = { 0 };
 
-    // snprintf(cur_process_info, 10, "pid:%04d", getpid());
-    snprintf(cur_process_info, 10, "pid:%04d", 12);
+    snprintf(cur_process_info, 10, "pid:%04d", getpid());
 
     return cur_process_info;
 }

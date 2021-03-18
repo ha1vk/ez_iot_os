@@ -120,7 +120,7 @@ mkernel_internal_error linuxsocket_poll(int socket_fd, POLL_TYPE type, int timeo
 	nfds = poll(&poll_fd, 1, timeout);
 	if (nfds < 0) 
 	{
-//		DERROR("poll error, errno %d\n", errno);
+//		ez_log_e(TAG_OTA,"poll error, errno %d\n", errno);
 		if (errno == EINTR) 
 		{
 			return mkernel_internal_succ;

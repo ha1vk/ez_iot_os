@@ -3,7 +3,7 @@
 
 #include <time.h>
 /**
-* \brief   linux й╣ож
+* \brief   linux 
 */
 typedef struct 
 {

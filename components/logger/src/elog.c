@@ -188,16 +188,16 @@ ElogErrCode elog_init(void) {
 /**
  * EasyLogger start after initialize.
  */
-ElogErrCode elog_start(void) {
+void elog_start(void) {
     /* enable output */
-    extern ElogErrCode elog_port_init(void);
-    extern ElogErrCode elog_async_init(void);
-    ElogErrCode result = ELOG_NO_ERR;
-    /* port initialize */
-    result = elog_port_init();
-    if (result != ELOG_NO_ERR) {
-        return result;
-    }
+     /* enable output */
+    elog_set_output_enabled(true);
+
+#if defined(ELOG_ASYNC_OUTPUT_ENABLE)
+    elog_async_enabled(true);
+#elif defined(ELOG_BUF_OUTPUT_ENABLE)
+    elog_buf_enabled(true);
+#endif
     /* show version */
     // log_i("EasyLogger V%s is initialize success.", ELOG_SW_VERSION);
 }
@@ -480,9 +480,8 @@ void elog_output(uint8_t level, const char *tag, const char *file, const char *f
         log_len += elog_strcpy(log_len, log_buf + log_len, "] ");
     }
     /* package file directory and name, function name and line number info */
-    if (get_fmt_enabled(level, ELOG_FMT_DIR | ELOG_FMT_FUNC | ELOG_FMT_LINE)) {
+    /*if (get_fmt_enabled(level, ELOG_FMT_DIR | ELOG_FMT_FUNC | ELOG_FMT_LINE)) {
         log_len += elog_strcpy(log_len, log_buf + log_len, "(");
-        /* package time info */
         if (get_fmt_enabled(level, ELOG_FMT_DIR)) {
             log_len += elog_strcpy(log_len, log_buf + log_len, file);
             if (get_fmt_enabled(level, ELOG_FMT_FUNC)) {
@@ -491,20 +490,20 @@ void elog_output(uint8_t level, const char *tag, const char *file, const char *f
                 log_len += elog_strcpy(log_len, log_buf + log_len, ":");
             }
         }
-        /* package process info */
+        
         if (get_fmt_enabled(level, ELOG_FMT_FUNC)) {
             log_len += elog_strcpy(log_len, log_buf + log_len, func);
             if (get_fmt_enabled(level, ELOG_FMT_LINE)) {
                 log_len += elog_strcpy(log_len, log_buf + log_len, ":");
             }
         }
-        /* package thread info */
+       
         if (get_fmt_enabled(level, ELOG_FMT_LINE)) {
             snprintf(line_num, ELOG_LINE_NUM_MAX_LEN, "%ld", line);
             log_len += elog_strcpy(log_len, log_buf + log_len, line_num);
         }
         log_len += elog_strcpy(log_len, log_buf + log_len, ")");
-    }
+    }*/
     /* package other log data to buffer. '\0' must be added in the end by vsnprintf. */
     fmt_result = vsnprintf(log_buf + log_len, ELOG_LINE_BUF_SIZE - log_len, format, args);
 

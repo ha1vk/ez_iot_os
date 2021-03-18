@@ -53,10 +53,10 @@ void log_print(const char *fmt, ...)
 {
 	va_list ap;
 	char logbuf[256];
-	memset(logbuf, 0, 256);
+	memset(logbuf, 0, sizeof(logbuf));
 
 	va_start(ap, fmt);
-	vsnprintf(logbuf, 256, fmt,ap);
+	vsnprintf(logbuf, sizeof(logbuf), fmt,ap);
 	va_end(ap);
 
 	printf("log_print: %s \n", logbuf);

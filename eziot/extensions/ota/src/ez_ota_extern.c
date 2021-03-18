@@ -170,7 +170,7 @@ static int ez_ota_upgrade_to_device(ota_res_t* pres, unsigned int seq, void* buf
         if(response)
         {
             len = strlen(response);
-            ez_err ota_err = ez_ota_send_msg_to_platform((unsigned char*)response, len, pres, "operate_reply", "upgrade", EZ_OTA_RSP, &seq, 0); 
+            ez_err_e ota_err = ez_ota_send_msg_to_platform((unsigned char*)response, len, pres, "operate_reply", "upgrade", EZ_OTA_RSP, &seq, 0); 
             ez_log_d(TAG_OTA,"reply upgrade rsp to das,result:%d,seq:%d rsp:%s\n", ota_err, seq, response);
         }
         else
@@ -236,7 +236,7 @@ static void ez_ota_data_route_cb(ezdev_sdk_kernel_submsg_v3* ptr_submsg)
         result_code = ez_ota_upgrade_to_device(&res, ptr_submsg->msg_seq, ptr_submsg->buf);
     }
 
-	DINFO("ota notify :result_code %d,msg_type:%s,seq:%d\n", result_code, ptr_submsg->msg_type, ptr_submsg->msg_seq);
+	ez_log_i(TAG_OTA,"ota notify :result_code %d,msg_type:%s,seq:%d\n", result_code, ptr_submsg->msg_type, ptr_submsg->msg_seq);
 }
 
 static void ez_ota_event_route_cb(ezdev_sdk_kernel_event* ptr_event)

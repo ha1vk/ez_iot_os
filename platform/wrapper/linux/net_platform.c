@@ -9,10 +9,10 @@
 #include <netdb.h>
 #include <netinet/tcp.h>
 #include<net/if.h>
-//#include <signal.h>
-#include "net_platform_wrapper.h"
+
 #include "ezdev_sdk_kernel_struct.h"
 #include "mkernel_internal_error.h"
+#include "net_platform_wrapper.h"
 
 /**
  * \brief   linux 实现

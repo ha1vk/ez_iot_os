@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 /**
- * \brief   linux й╣ож
+ * \brief   linux
  */
 
 typedef struct 

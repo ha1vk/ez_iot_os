@@ -56,11 +56,11 @@ MESSAGE(STATUS "c compile option: ${CMAKE_C_FLAGS}")
 MESSAGE(STATUS "c++ compile option: ${CMAKE_CXX_FLAGS}")
 
 ADD_LIBRARY(ez_iot_STATIC STATIC ${link} ${src_mbedtls} ${src_json} ${src_xml} ${mqtt} )
-SET_TARGET_PROPERTIES(ez_iot_STATIC PROPERTIES OUTPUT_NAME ez_iot)
+SET_TARGET_PROPERTIES(ez_iot_STATIC PROPERTIES OUTPUT_NAME ez_iot_core)
 
 IF (${DYNAMIC})
 	ADD_LIBRARY(ez_iot_SHARED SHARED ${link} ${src_mbedtls} ${src_json} ${src_xml} ${mqtt})
-	SET_TARGET_PROPERTIES(ez_iot_SHARED PROPERTIES OUTPUT_NAME ez_iot)
+	SET_TARGET_PROPERTIES(ez_iot_SHARED PROPERTIES OUTPUT_NAME ez_iot_core)
 ENDIF (${DYNAMIC})
 
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../lib/linux)

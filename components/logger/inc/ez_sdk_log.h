@@ -9,7 +9,7 @@
 #define EZ_ELOG_LVL_WARN    2  ///< 打印业务过程中必要的关键信息，尽量简短（WARN<=会记入文件）
 #define EZ_ELOG_LVL_INFO    3  ///< 较详细的信息（不允许刷屏）
 #define EZ_ELOG_LVL_DEBUG   4  ///< 更为详细的信息，每行带有行号（不允许刷屏）
-#define EZ_ELOG_LVL_VERBOSE 5  ///< 不限制打印，每行带有行号，默认不开启。（不允许刷屏）
+#define EZ_ELOG_LVL_VERBOSE 5  ///< 不限制打印，每行带有行号，默认不开启（不允许刷屏）*/
 
 #define TAG_SDK      "T_SDK"
 #define TAG_SHADOW   "T_SHADOW"
@@ -22,6 +22,8 @@
 #define TAG_REX_UART "T_REX_UART"
 #define TAG_HUB      "T_HUB"
 #define TAG_TSL      "T_TSL"
+
+
 
 #ifdef __cplusplus
 extern "C"

@@ -1,6 +1,7 @@
-#include "time_platform_wrapper.h"
+
 #include <time.h>
 #include "ezdev_sdk_kernel_struct.h"
+#include "time_platform_wrapper.h"
 
 #define TIMESPEC_THOUSAND	1000
 #define TIMESPEC_MILLION	1000000
@@ -50,16 +51,6 @@ char Platform_TimeIsExpired_Bydiff(ezdev_sdk_time sdktime, EZDEV_SDK_UINT32 time
 
 	clock_gettime(CLOCK_MONOTONIC, &now);
 	Platform_Timespec_Sub(&now, &linuxtime->time_record, &res);
-
-
-// 	char now_time[16];
-// 	time_t t = time(0);
-// 	strftime(now_time, 16, "%m-%d %H:%M:%S", localtime(&t));
-// 
-//  	printf("[%s][0][0]pre time:%d:%d  now time:%d:%d\n restime:%d:%d diff:%d \n",
-//  		now_time, linuxtime->time_record.tv_sec, linuxtime->time_record.tv_usec,
-//  		now.tv_sec, now.tv_usec, res.tv_sec, res.tv_usec, time_ms);
-
 	if (res.tv_sec < 0)
 	{
 		return (char)0;

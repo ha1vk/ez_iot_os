@@ -21,10 +21,9 @@
 #include <WinSock2.h>
 #include <Windows.h>
 #include <ws2tcpip.h>
-
 #include "base_typedef.h"
 #include "ezdev_sdk_kernel_struct.h"
-#include <../src/mkernel_internal_error.h>
+#include "mkernel_internal_error.h"
 
 /** 
  *  \brief		判断是否是合法的IP地址

@@ -27,9 +27,9 @@
  */
 
 #include "elog_file.h"
-#include "hal_thread.h"
+#include "pthread.h"
 
-static void *mutex_handler = NULL;
+static pthread_mutex_t file_w_mutex;
 
 /**
  * EasyLogger flile log pulgin port initialize
@@ -39,13 +39,8 @@ static void *mutex_handler = NULL;
 ElogErrCode elog_file_port_init(void)
 {
     ElogErrCode result = ELOG_NO_ERR;
-
     /* add your code here */
-    mutex_handler = hal_thread_mutex_create();
-    if(NULL == mutex_handler)
-    {
-        result = ELOG_MALLOC_ERR; 
-    }
+    pthread_mutex_init(&file_w_mutex, NULL);
 
     return result;
 }
@@ -55,9 +50,8 @@ ElogErrCode elog_file_port_init(void)
  */
 void elog_file_port_lock(void)
 {
-
     /* add your code here */
-    hal_thread_mutex_lock(mutex_handler);
+    pthread_mutex_lock(&file_w_mutex);
 }
 
 /**
@@ -66,7 +60,7 @@ void elog_file_port_lock(void)
 void elog_file_port_unlock(void)
 {
     /* add your code here */
-    hal_thread_mutex_unlock(mutex_handler);
+    pthread_mutex_unlock(&file_w_mutex);
 }
 
 /**
@@ -75,9 +69,5 @@ void elog_file_port_unlock(void)
 void elog_file_port_deinit(void)
 {
     /* add your code here */
-   if(NULL!=mutex_handler)
-   {
-        hal_thread_mutex_destroy(mutex_handler);
-        mutex_handler = NULL;
-    }
+    
 }
