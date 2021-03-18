@@ -1,0 +1,55 @@
+#cmake版本要求
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+SET(CMAKE_TOOLCHAIN_FILE "ToolChain.cmake")
+
+#项目名称
+PROJECT(DEV_SDK)
+SET(USE_STATIC_LIB_LINKAGE ON)
+
+#添加编译选项
+ADD_DEFINITIONS("-Wall")
+ADD_DEFINITIONS("-DSDK_HARDWARE_PLATFORM=\"${HARDWARE_PLATFORM}\"")
+ADD_DEFINITIONS("-DNETBSD -D_LARGEFILE_SOURCE -D_LARGE_FILES -DFTP_COMBINE_CWDS")
+
+SET(CMAKE_C_FLAGS "-O2 -g -Wall")
+SET(CMAKE_CXX_FLAGS "-O2 -g -Wall -fno-rtti -fno-exceptions")
+
+if(DEFINED PRECOMPILE_MACRO)
+	ADD_DEFINITIONS("${PRECOMPILE_MACRO}")
+endif()
+
+IF (${RTOS})
+	ADD_DEFINITIONS("-DSYS_RTOS")
+	INCLUDE(${PROJECT_SOURCE_DIR}/../../../../private_CMakeLists.txt)
+ENDIF (${RTOS})
+
+IF (${P2PV3})
+	ADD_DEFINITIONS("-DP2PV3_SUPPORT")
+ENDIF (${P2PV3})
+
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/  ez_sdk_src)
+AUX_SOURCE_DIRECTORY( ${PROJECT_SOURCE_DIR}/../../../platform/wrapper/linux  warpper_src) 
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../../../platform/wrapper warpper_def)
+	
+#头文件搜索路径
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/
+                    ${PROJECT_SOURCE_DIR}/../inc
+					${PROJECT_SOURCE_DIR}/../../../components/logger/inc
+                    ${PROJECT_SOURCE_DIR}/../../../include
+					${PROJECT_SOURCE_DIR}/../../../platform/wrapper/linux
+					${PROJECT_SOURCE_DIR}/../../../platform/wrapper
+					${PROJECT_SOURCE_DIR}/../../../eziot/core/inc
+					${PROJECT_SOURCE_DIR}/../../../eziot/core/link)
+
+#同时生成静态库和动态库，target的名字要唯一，但是生成的库名可以重定义
+ADD_LIBRARY(ez_iot_link_static STATIC ${ez_sdk_src} ${warpper_src} ${warpper_def})
+SET_TARGET_PROPERTIES(ez_iot_link_static PROPERTIES OUTPUT_NAME ez_iot_link)
+
+IF (${DYNAMIC})
+ADD_LIBRARY(ez_iot_link_shared SHARED  ${ez_sdk_src} ${warpper_src} ${warpper_def})
+SET_TARGET_PROPERTIES(ez_iot_link_shared PROPERTIES OUTPUT_NAME ez_iot_link)
+ENDIF (${DYNAMIC})
+
+#设置生成的库文件存放路径为lib
+SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../lib/linux)
