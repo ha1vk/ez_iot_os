@@ -28,21 +28,21 @@ extern "C"
 
     typedef enum
     {
-        ota_code_none = 0,                     ///< 没有错误
-        ota_code_file_size = 0x00500032,       ///< 下文件大小和查询的信息不匹配
-        ota_code_file_size_range = 0x00500033, ///< 下文件大小超过分区大小
-        ota_code_dns = 0x00500034,             ///< 下载地址域名解析失败
-        ota_code_download = 0x00500035,        ///< 下载出错（超过最大重试次数）
-        ota_code_digest = 0x00500036,          ///< 底层接口调用失败
-        ota_code_sign = 0x00500037,            ///< 签名校验失败
-        ota_code_damage = 0x00500038,          ///< 升级包损坏
-        ota_code_mem = 0x00500039,             ///< 内存不足
-        ota_code_burn = 0x0050003a,            ///< 烧录固件出错
-        ota_code_genneral = 0x0050003b,        ///< 未知错误
-        ota_code_cancel = 0x0050003c,          ///< 主动停止
-        ota_code_recovery = 0x0050003d,        ///< 升级失败，通过备份系统或最小系统恢复
-        ota_code_uart_err = 0x0050003e,        ///< 外挂设备升级失败
-        ota_code_max = 0x0050004f
+        ota_code_none             = 0,             ///< 没有错误
+        ota_code_file_size        = 0x00500032,    ///< 下文件大小和查询的信息不匹配
+        ota_code_file_size_range  = 0x00500033,    ///< 下文件大小超过分区大小
+        ota_code_dns              = 0x00500034,    ///< 下载地址域名解析失败
+        ota_code_download         = 0x00500035,    ///< 下载出错（超过最大重试次数）
+        ota_code_digest           = 0x00500036,    ///< 底层接口调用失败
+        ota_code_sign             = 0x00500037,    ///< 签名校验失败
+        ota_code_damage           = 0x00500038,    ///< 升级包损坏
+        ota_code_mem              = 0x00500039,    ///< 内存不足
+        ota_code_burn             = 0x0050003a,    ///< 烧录固件出错
+        ota_code_genneral         = 0x0050003b,    ///< 未知错误
+        ota_code_cancel           = 0x0050003c,    ///< 主动停止
+        ota_code_recovery         = 0x0050003d,    ///< 升级失败,通过备份系统或最小系统恢复
+        ota_code_uart_err         = 0x0050003e,    ///< 外挂设备升级失败
+        ota_code_max              = 0x0050004f
     } ota_errcode_e;
 
 
@@ -53,7 +53,7 @@ extern "C"
      */
     typedef enum
     {
-        start_upgrade,      ///< 通知设备执行升级,收到该消息后,设备开始执行升级动作 data: ota_upgrade_info_t*,
+        start_upgrade,   ///< 通知设备执行升级(回调升级包下载所需要的url等信息),收到该消息后,设备开始执行升级动作 data: ota_upgrade_info_t*,
     } ota_event_e;
 
     /**
@@ -62,21 +62,18 @@ extern "C"
      */
     typedef enum
     {
-        ota_state_starting = 1,           ///< 开始升级
-        ota_state_downloading = 2,        ///< 正在下载
-        ota_state_download_completed = 3, ///< 下载完成
-        ota_state_burning = 4,            ///< 正在烧录
-        ota_state_burning_completed = 5,  ///< 烧录完成
-        ota_state_rebooting = 6,          ///< 正在重启
+        ota_state_starting           = 1,     ///< 开始升级
+        ota_state_downloading        = 2,     ///< 正在下载
+        ota_state_download_completed = 3,     ///< 下载完成
+        ota_state_burning            = 4,     ///< 正在烧录
+        ota_state_burning_completed  = 5,     ///< 烧录完成
+        ota_state_rebooting          = 6,     ///< 正在重启
     } ota_status_e;
 
-    typedef enum
-    {
-        ota_progress_min = 1,
-
-        ota_progress_max = 100
-    } ota_progress_e;
-
+    /**
+     * @brief 设备差分包的信息
+     *       
+     */
     typedef struct
     {
         int8_t url[270];       ///< 包下载路径,不带http/https前缀。设备根据自己的能力选择下载通道。
@@ -85,9 +82,13 @@ extern "C"
         int size;              ///< 软件包大小，单位Byte
     } ota_file_diff_t;
 
+    /**
+     * @brief 服务返回的设备升级包的信息
+     *       
+     */
     typedef struct
     {
-        int8_t mod_name[256];    ///< 模块名称,萤石设备module=设备型号,其他设备module=设备类型索引+设备平台索引+语言+客户码+中性/标配+内部模块名。
+        int8_t mod_name[256];   ///< 模块名称,萤石设备module=设备型号,其他设备module=设备类型索引+设备平台索引+语言+客户码+中性/标配+内部模块名。
         int8_t url[270];        ///< 包下载路径,不带http/https前缀。设备根据自己的能力选择下载通道。
         int8_t fw_ver[64];      ///< 升级包版本号
         int8_t digest[32 + 1];  ///< 升级包的摘要值,包含'\0'
@@ -95,7 +96,7 @@ extern "C"
         ota_file_diff_t *pdiffs;///< 该版本对应的的差分包
     } ota_file_info_t;
 
-     /**
+    /**
     * \brief   设备升级模块信息
     */
     typedef struct
@@ -109,7 +110,7 @@ extern "C"
     */
     typedef struct
     {
-        int8_t num;                   ///< 升级模块数量，最多支持16组
+        int8_t num;                ///< 升级模块数量，最多支持16组
         ota_module_t *plist;       ///< 升级模块信息列表
     } ota_modules_t;
 
