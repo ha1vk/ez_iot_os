@@ -43,9 +43,10 @@ ez_err_e ez_progress_report(const ota_res_t *pres, const int8_t* pmodule, const 
     char err_code[16] = {0};
     int32_t  msg_len  = 0;
     uint32_t msg_seq  = 0;
+
     bscJSON* pJsRoot  = bscJSON_CreateObject();
     ez_log_d(TAG_OTA, "ez_progress_report, status:%d code:%d, process:%d\n",status, errcode, progress);
-    sprintf(err_code,"0x%#08x", errcode);
+    sprintf(err_code,"0x%08x", errcode);
     do
     {
         if(NULL== pJsRoot)
@@ -95,6 +96,7 @@ ez_err_e ez_progress_report(const ota_res_t *pres, const int8_t* pmodule, const 
     if(sz_progress)
     {
         free(sz_progress);
+        sz_progress = NULL;
     }
     if(pJsRoot)
     {
@@ -131,9 +133,9 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
         if(0!=retry_flg)
         {
             status = webclient_get_position(h_client, url, (int)*offset);
-            if(status!=200)
+            if(status!=200 && 206!=status)
             {
-                ez_log_e(TAG_OTA,"webclient_get_position faield,status:%d, offset:%d\n", *offset);
+                ez_log_e(TAG_OTA,"webclient_get_position faield,status:%d, offset:%d\n",status, *offset);
                 break;
             }
         }
@@ -149,7 +151,7 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
         content_len = webclient_content_length_get(h_client);
         if(content_len!=*total_len-*offset)
         {
-            ez_log_d(TAG_OTA,"content_len not match,content_len:%d,real:%d\n",content_len, *total_len-*offset );
+            ez_log_d(TAG_OTA,"content_len not match,content_len:%d,real:%d\n",content_len, *total_len-*offset);
             break;
         }
         ez_log_d(TAG_OTA,"content_len :%d\n",content_len);
@@ -170,13 +172,14 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
                 break;
             }
             need_readlen -= readlen;
-            *offset += readlen;
             ret = file_cb(*total_len, *offset, recvbuffer, readlen, user_data);
             if(0 != ret)
             {
                 ret = 0;
                 break;
             }
+
+            *offset += readlen;
         }
     }while(0);
    
@@ -184,6 +187,7 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
     if(recvbuffer)
     {
         free(recvbuffer);
+        recvbuffer = NULL;
     }
     if(h_client)
     {
