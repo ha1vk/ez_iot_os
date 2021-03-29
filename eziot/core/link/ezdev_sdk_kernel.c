@@ -338,6 +338,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_stop()
     g_ezdev_sdk_kernel.my_state = sdk_stop;
     
     clear_queue_pubmsg_exchange();
+    
     send_offline_msg_to_platform(genaral_seq());
 
     while (sdk_cnt_das_reged == g_ezdev_sdk_kernel.cnt_state)

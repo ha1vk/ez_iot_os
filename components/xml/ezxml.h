@@ -27,8 +27,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdarg.h>
-//#include <fcntl.h>
+//#include <stdarg.h>
+
+//#include "ind_if.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +59,8 @@ struct ezxml {
 // and decoding ampersand sequences. If you don't want this, copy the data and
 // pass in the copy. Returns NULL on failure.
 ezxml_t ezxml_parse_str(char *s, size_t len);
-#if 0 
+
+#if 0
 // A wrapper for ezxml_parse_str() that accepts a file descriptor. First
 // attempts to mem map the file. Failing that, reads the file into memory.
 // Returns NULL on failure.
@@ -66,12 +68,14 @@ ezxml_t ezxml_parse_fd(int fd);
 
 // a wrapper for ezxml_parse_fd() that accepts a file name
 ezxml_t ezxml_parse_file(const char *file);
-   
+#endif
+    
 // Wrapper for ezxml_parse_str() that accepts a file stream. Reads the entire
 // stream into memory and then parses it. For xml files, use ezxml_parse_file()
 // or ezxml_parse_fd()
 ezxml_t ezxml_parse_fp(FILE *fp);
-#endif
+
+
 // returns the first child tag (one level deeper) with the given name or NULL
 // if not found
 ezxml_t ezxml_child(ezxml_t xml, const char *name);

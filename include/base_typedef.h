@@ -56,11 +56,11 @@ typedef uint64_t			EZDEV_SDK_UINT64;
 typedef signed char         EZDEV_SDK_INT8;
 typedef signed short        EZDEV_SDK_INT16;
 typedef signed int          EZDEV_SDK_INT32;
-typedef signed long long             EZDEV_SDK_INT64;
+typedef signed long long    EZDEV_SDK_INT64;
 typedef unsigned char       EZDEV_SDK_UINT8;
 typedef unsigned short      EZDEV_SDK_UINT16;
 typedef unsigned int        EZDEV_SDK_UINT32;
-typedef unsigned long long    EZDEV_SDK_UINT64;
+typedef unsigned long long  EZDEV_SDK_UINT64;
 
 #else
  /* C89 but not Amendment 1*/
@@ -71,7 +71,7 @@ typedef signed long long    EZDEV_SDK_INT64;
 typedef unsigned char       EZDEV_SDK_UINT8;
 typedef unsigned short      EZDEV_SDK_UINT16;
 typedef unsigned int        EZDEV_SDK_UINT32;
-typedef unsigned long long    EZDEV_SDK_UINT64;
+typedef unsigned long long  EZDEV_SDK_UINT64;
 
 #endif
 
@@ -80,11 +80,11 @@ typedef unsigned long long    EZDEV_SDK_UINT64;
 typedef signed char         EZDEV_SDK_INT8;
 typedef signed short        EZDEV_SDK_INT16;
 typedef signed int          EZDEV_SDK_INT32;
-typedef signed long long             EZDEV_SDK_INT64;
+typedef signed long long    EZDEV_SDK_INT64;
 typedef unsigned char       EZDEV_SDK_UINT8;
 typedef unsigned short      EZDEV_SDK_UINT16;
 typedef unsigned int        EZDEV_SDK_UINT32;
-typedef unsigned long long    EZDEV_SDK_UINT64;
+typedef unsigned long long  EZDEV_SDK_UINT64;
 #endif //_WIN32
 
 

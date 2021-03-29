@@ -13,17 +13,10 @@
 
 #define TAG_SDK      "T_SDK"
 #define TAG_SHADOW   "T_SHADOW"
-#define TAG_AP       "T_AP"
+#define TAG_MOD      "T_MODEL"
 #define TAG_OTA      "T_OTA"
 #define TAG_APP      "T_APP"
-#define TAG_TIME     "T_TIME"
-#define TAG_ATCMD    "T_ATCMD"
-#define TAG_BLE      "T_BLE"
-#define TAG_REX_UART "T_REX_UART"
-#define TAG_HUB      "T_HUB"
-#define TAG_TSL      "T_TSL"
-
-
+#define TAG_BASE     "T_BASE"
 
 #ifdef __cplusplus
 extern "C"
