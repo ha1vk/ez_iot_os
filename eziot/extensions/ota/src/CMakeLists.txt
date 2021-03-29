@@ -38,7 +38,7 @@ AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../../../../components/http/webclient
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/
                     ${PROJECT_SOURCE_DIR}/../inc
                     ${PROJECT_SOURCE_DIR}/../../../../components/http/webclient
-					${PROJECT_SOURCE_DIR}/../../../../platform/hal/hal_thread/linux 
+					${PROJECT_SOURCE_DIR}/../../../../platform/hal/inc
 					${PROJECT_SOURCE_DIR}/../../../../components/json
 					${PROJECT_SOURCE_DIR}/../../../../components/logger/inc
                     ${PROJECT_SOURCE_DIR}/../../../../include

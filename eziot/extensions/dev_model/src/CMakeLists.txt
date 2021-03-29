@@ -37,7 +37,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/
 					${PROJECT_SOURCE_DIR}/../../../../components/json
 					${PROJECT_SOURCE_DIR}/../../../../components/utility/double_link_list
 					${PROJECT_SOURCE_DIR}/../../../../components/logger/inc
-					${PROJECT_SOURCE_DIR}/../../../../platform/hal/hal_thread/linux
+					${PROJECT_SOURCE_DIR}/../../../../platform/hal/inc
                     ${PROJECT_SOURCE_DIR}/../../../../include
 					${PROJECT_SOURCE_DIR}/../../../core/inc)
 
