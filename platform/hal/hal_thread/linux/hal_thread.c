@@ -1,9 +1,10 @@
-#include <hal_thread.h>
+
 #include <unistd.h>
 #include <sys/prctl.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hal_thread.h"
 
 typedef struct
 {
@@ -61,15 +62,12 @@ int hal_thread_destroy(void *handle)
     }
 
     thread_handle *thandle = (thread_handle *)handle;
-
     if (thandle->thread_hd != 0)
     {
         void *pres = NULL;
         pthread_join(thandle->thread_hd, &pres);
     }
-
     free(thandle);
-
     return 0;
 }
 
@@ -80,9 +78,7 @@ int hal_thread_detach(void *handle)
     {
         return -1;
     }
-
     thread_handle *thandle = (thread_handle *)handle;
-
     if (thandle->thread_hd != 0)
     {   
         pthread_detach(thandle->thread_hd);
@@ -101,7 +97,6 @@ void *hal_thread_mutex_create()
     {
         return NULL;
     }
-
     pthread_mutex_init(&ptr_mutex_platform->lock, NULL);
 
     return (void *)ptr_mutex_platform;
