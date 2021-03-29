@@ -3,7 +3,7 @@
 
 PRJ_PWD=$(dirname "$PWD")
 LOC_PWD=${PRJ_PWD}
-SUBDIRS='app/eziotlink/src eziot/core/link components/logger/src eziot/extensions/ota/src'
+SUBDIRS='app/eziotlink/src eziot/core/link components/logger/src eziot/extensions/dev_model/src eziot/extensions/ota/src eziot/extensions/dev_bind/src'
 VERSION='V1.1.0'
 TOOL_STRIP=""
 DYNAMIC_SWITCH=int0
@@ -198,7 +198,7 @@ function modify_cmake_file()
     touch ToolChain.cmake
 
 	#不需要编译动态库第二参数传入""
-	generate_config './ToolChain.cmake' '' "$@"
+	generate_config './ToolChain.cmake' 'DYNAMIC' "$@"
 }
 
 function build_sdk()
