@@ -4,12 +4,12 @@
 #include <stdint.h>
 
 /* output log's level */
-#define EZ_ELOG_LVL_ASSERT  0  ///< 致命错误，导致整个程序无法继续运行
-#define EZ_ELOG_LVL_ERROR   1  ///< 某个业务出错，不影响其他业务
-#define EZ_ELOG_LVL_WARN    2  ///< 打印业务过程中必要的关键信息，尽量简短（WARN<=会记入文件）
-#define EZ_ELOG_LVL_INFO    3  ///< 较详细的信息（不允许刷屏）
-#define EZ_ELOG_LVL_DEBUG   4  ///< 更为详细的信息，每行带有行号（不允许刷屏）
-#define EZ_ELOG_LVL_VERBOSE 5  ///< 不限制打印，每行带有行号，默认不开启（不允许刷屏）*/
+#define LVL_ASSERT  0  ///< 致命错误,导致整个程序无法继续运行
+#define LVL_ERROR   1  ///< 某个业务出错,不影响其他业务
+#define LVL_WARN    2  ///< 打印业务过程中必要的关键信息
+#define LVL_INFO    3  ///< 较详细的信息
+#define LVL_DEBUG   4  ///< 更为详细的信息
+#define LVL_VERBOSE 5  ///< 不限制打印,默认不开启
 
 #define TAG_SDK      "T_SDK"
 #define TAG_SHADOW   "T_SHADOW"
@@ -55,12 +55,12 @@ extern "C"
     extern void elog_output(uint8_t level, const char *tag, const char *file, const char *func,
                             const long line, const char *format, ...);
 
-#define ez_log_a(tag, ...) elog_output(EZ_ELOG_LVL_ASSERT, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_e(tag, ...) elog_output(EZ_ELOG_LVL_ERROR, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_w(tag, ...) elog_output(EZ_ELOG_LVL_WARN, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_i(tag, ...) elog_output(EZ_ELOG_LVL_INFO, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_d(tag, ...) elog_output(EZ_ELOG_LVL_DEBUG, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_v(tag, ...) elog_output(EZ_ELOG_LVL_VERBOSE, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define ez_log_a(tag, ...) elog_output(LVL_ASSERT, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define ez_log_e(tag, ...) elog_output(LVL_ERROR, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define ez_log_w(tag, ...) elog_output(LVL_WARN, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define ez_log_i(tag, ...) elog_output(LVL_INFO, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define ez_log_d(tag, ...) elog_output(LVL_DEBUG, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define ez_log_v(tag, ...) elog_output(LVL_VERBOSE, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 #ifdef __cplusplus
 }

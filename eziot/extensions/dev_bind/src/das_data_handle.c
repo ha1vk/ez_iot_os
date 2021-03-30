@@ -27,10 +27,6 @@ static const char *get_verify_code(void);
 
 static int msg2dev_set_userid(const char *userid);
 
-static int g_query_user_get_list = 0;
-
-//static int msg2dev_query_userid_rsp(const char *userid, const char *username);
-
 static ez_base_cb_t g_base_cb = {0};
 
 void base_set_cb(ez_base_cb_t cb)
@@ -58,21 +54,38 @@ static void set_result(ezxml_t rsp, int code)
 
 static int check_result(ezxml_t rsp)
 {
-    ezxml_t response;
+    char* response = NULL;
     ezxml_t result;
     char strres[32]={0};
     int ret = -1;
-    response = ezxml_child(rsp, "Response");
-    if(NULL!=response)
+    do
     {
-        result = ezxml_child(response, "Result");
-        if(NULL!=result)
+        response = ezxml_name(rsp);
+        if(NULL!=response)
         {
-            strncpy(strres, ezxml_txt(result), sizeof(strres)-1);
-            ret = strtol(strres, NULL, 10);
-            ez_log_v(TAG_BASE,"check_result:%s, ret:%d\n", strres, ret);
+            if( 0 != strcmp(response,"Response"))
+            {
+                ez_log_e(TAG_BASE,"result not response:%s\n",response);
+                break;
+            }
+            result = ezxml_child(rsp, "Result");
+            if(NULL!=result)
+            {
+                strncpy(strres, ezxml_txt(result), sizeof(strres)-1);
+                ret = strtol(strres, NULL, 10);
+                ez_log_d(TAG_BASE,"check_result:%s,%02x\n", strres, ret);
+            }
+            else
+            {
+                ez_log_e(TAG_BASE,"check Result err\n");
+            }
         }
-    }
+        else
+        {
+            ez_log_e(TAG_BASE,"check response err\n");
+            break;
+        }
+    }while(0);
     
     return ret;
 }
@@ -99,12 +112,13 @@ int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, cons
 
     strncpy(pubmsg.command_ver, cmd_version, version_max_len - 1);
 
-    ez_log_e(TAG_BASE,"cmd_id:%#02x\n",cmd_id);
-    ez_log_e(TAG_BASE,"type:%d ,seq:%d\n",msg_response, msg_seq);
+    ez_log_i(TAG_BASE,"cmd_id:%#02x\n",cmd_id);
+    ez_log_v(TAG_BASE,"type:%d ,seq:%d\n",msg_response, *msg_seq);
 
     ezdev_sdk_kernel_error sdk_error = ezdev_sdk_kernel_send(&pubmsg);
     if (sdk_error != ezdev_sdk_kernel_succ)
     {
+        ez_log_e(TAG_BASE,"ezdev_sdk_kernel_send failed:%08x\n", sdk_error);
         return -1;
     }
     if(0 == msg_response)
@@ -116,32 +130,36 @@ int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, cons
     return 0;
 }
 
-
-
 int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const char *cmd_version, unsigned int msg_req, req_rsp_handle _handle)
 {
     ezxml_t req =NULL;
     ezxml_t rsp =NULL;
     char * strrsp = NULL;
+    char * strreq = NULL;
     int ret = 0;
     unsigned int rsp_len = 0;
     do
     {
-        rsp = ezxml_new("Response");
+         rsp = ezxml_new("Response");
         if(NULL == rsp)
         {
+            ez_log_e(TAG_BASE,"new xml failed\n");
             break;
         }
         req = ezxml_parse_str((char*) buf, buf_len);
         if (NULL == req)
         { 
+            ez_log_e(TAG_BASE,"input xml parse failed \n");
             set_result(rsp, CIVIL_RESULT_GENERAL_PARSE_FAILED);
             break;
         }
         else
         {
-            if(NULL== ezxml_child(req,"Request"))
+            strreq = ezxml_name(req);
+            if(NULL==strreq||0!=strcmp(strreq, "Request"))
             {
+                ez_log_e(TAG_BASE,"das req format err\n");
+                set_result(rsp, CIVIL_RESULT_GENERAL_PARSE_FAILED);
                 break;
             }
         }
@@ -151,12 +169,15 @@ int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const c
             strrsp = ezxml_toxml(rsp);
             if(NULL == strrsp)
             {
+                ez_log_e(TAG_BASE,"xml to str failed\n");
+                set_result(rsp, CIVIL_RESULT_GENERAL_UNKNOW_ERROR);
                 break;
             }
             rsp_len = strlen(strrsp);
-
             ret = ez_send_msg2plat((unsigned char*)rsp, rsp_len, rsp_cmd, cmd_version, EZ_BASE_RSP, &msg_req);
+            
         }
+        ez_log_v(TAG_BASE,"ez_send_msg2plat,len:%d,ret:%d\n", rsp_len,ret);
 
     } while (0);
 
@@ -230,7 +251,7 @@ int pu2plt_query_userid_rsp(void *buf, int buf_len)
 {
     int ret = -1;
     char userid[64]={0};
-    char name[64]={0};
+    //char name[64]={0};
     ezxml_t rsp;
     ezxml_t User;
     do
@@ -258,12 +279,17 @@ int pu2plt_query_userid_rsp(void *buf, int buf_len)
             {
                 strncpy(userid, ezxml_attr(User,"Id"), sizeof(userid) -1);
             }
-            if(NULL!=ezxml_attr(User,"Name"))
+            /*if(NULL!=ezxml_attr(User,"Name"))
             {
                 strncpy(name, ezxml_attr(User,"Name"), sizeof(name) -1);
-            }
+            }*/
+        }
+        else
+        {
+            ez_log_e(TAG_BASE,"parse User err\n");
         }
         ret = msg2dev_set_userid(userid);
+        ez_log_v(TAG_BASE,"set_userid ret:%d\n", ret);
     } while (0);
 
     if(NULL!=rsp)
@@ -279,24 +305,22 @@ int plt2pu_set_userid(ezxml_t req, ezxml_t rsp)
     int ret = CIVIL_RESULT_GENERAL_NO_ERROR;
     ezxml_t  x_userid;
     char user_id[64]={0};
-
+   
     x_userid = ezxml_child(req, "UserId");
     if (NULL!= x_userid)
     {
         strncpy(user_id, ezxml_txt(x_userid), sizeof(user_id)-1);
         ret = msg2dev_set_userid((const char*)user_id);
+        ez_log_v(TAG_BASE,"das set userid %s\n", user_id);
     }
     else
     {
+        ez_log_e(TAG_BASE,"plt2pu_set_userid err ,no UserId\n");
         ret = CIVIL_RESULT_GENERAL_PARSE_FAILED;
     }
-
     set_result(rsp, ret);
-
     return ret;
 }
-
-
 
 int pu2plt_query_userid_req()
 {
@@ -326,7 +350,7 @@ int pu2plt_query_userid_req()
             break;
         }
         len = strlen(strreq);
-
+        ez_log_v(TAG_BASE,"query_userid_req:%s\n", strreq);
         ret = ez_send_msg2plat((unsigned char*)strreq, len,kPu2CenPltGetUserListReq, ez_base_cmd_version, EZ_BASE_REQ, &msg_seq);
 
     }while(0);
@@ -358,6 +382,7 @@ static const char *get_verify_code(void)
 
     if (dev_verify_code == NULL)
     {
+        ez_log_e(TAG_BASE,"dev_verify_code is null\n");
         return NULL;
     }
 
@@ -387,37 +412,6 @@ static int msg2dev_set_userid(const char *userid)
 
     return ret;
 }
-
-/*static int msg2dev_set_userid()
-{
-    ez_msg2dev_t msg;
-    memset(&msg, 0, sizeof(ez_msg2dev_t));
-
-    msg.type = EZ_UNBINDING;
-    msg.len = 0;
-    msg.data = NULL;
-
-    return g_base_cb.recv_msg(&msg);
-}
-
-static int msg2dev_query_userid_rsp(const char *userid, const char *username)
-{
-    ez_msg2dev_t msg;
-    ez_userid_rsp_t data;
-
-    memset(&msg , 0, sizeof(ez_msg2dev_t));
-    memset(&data , 0, sizeof(ez_userid_rsp_t));
-
-    msg.type = EZ_USERID_RSP;
-    msg.len = sizeof(ez_set_userid_t);
-    msg.data = &data;
-
-    strncpy(data.user_id, userid, sizeof(data.user_id) - 1);
-    strncpy(data.user_name, username, sizeof(data.user_name) - 1);
-
-    return g_base_cb.recv_msg(&msg);
-}*/
-
 void extend_start_cb(EZDEV_SDK_PTR pUser)
 {
     ez_log_d(TAG_BASE,"base extend_start_cb\n");
@@ -443,7 +437,7 @@ void extend_data_route_cb(ezdev_sdk_kernel_submsg *ptr_submsg, EZDEV_SDK_PTR pUs
     cmd_id = ptr_submsg->msg_command_id;
     msg_seq = ptr_submsg->msg_seq;
 
-    ez_log_e(TAG_BASE,"cmd:%#02x, seq:%d ,buf_len:%d\n",cmd_id, msg_seq, ptr_submsg->buf_len);
+    ez_log_i(TAG_BASE,"cmd:%#02x, seq:%d ,buf_len:%d\n",cmd_id, msg_seq, ptr_submsg->buf_len);
     ez_log_v(TAG_BASE,"recv buf:%s\n",ptr_submsg->buf);
 
     switch (cmd_id)
@@ -454,11 +448,6 @@ void extend_data_route_cb(ezdev_sdk_kernel_submsg *ptr_submsg, EZDEV_SDK_PTR pUs
         break;
     case kPu2CenPltGetUserListRsp:
         result_code = pu2plt_query_userid_rsp(ptr_submsg->buf, ptr_submsg->buf_len);
-        if (result_code == 0)
-        {
-            g_query_user_get_list = 1;
-            ez_log_e(TAG_BASE,"GetUserListRsp,set g_query_user_get_list to 1!!\n");
-        }
         break;
     case kCenPlt2PuSetUserIdReq:
         result_code = das_req_rsp_handle(cmd_id, ptr_submsg->buf, ptr_submsg->buf_len,kCenPlt2PuSetUserIdReq, 
@@ -485,7 +474,7 @@ void extend_data_route_cb(ezdev_sdk_kernel_submsg *ptr_submsg, EZDEV_SDK_PTR pUs
         break;
     }
 
-    ez_log_e(TAG_BASE,"result_code:%d\n",result_code);
+    ez_log_i(TAG_BASE,"result_code:%d\n",result_code);
 }
 
 void extend_event_cb(ezdev_sdk_kernel_event *ptr_event, EZDEV_SDK_PTR pUser)
@@ -495,7 +484,7 @@ void extend_event_cb(ezdev_sdk_kernel_event *ptr_event, EZDEV_SDK_PTR pUser)
         ez_log_e(TAG_BASE,"event router,input NULL\n");
         return ;
     }
-    ez_log_e(TAG_BASE,"event router,type:%d\n",ptr_event->event_type);
+    ez_log_i(TAG_BASE,"event router,type:%d\n",ptr_event->event_type);
     switch (ptr_event->event_type)
     {
     case sdk_kernel_event_online:
@@ -507,7 +496,6 @@ void extend_event_cb(ezdev_sdk_kernel_event *ptr_event, EZDEV_SDK_PTR pUser)
                 strncpy(skey, (char*)sessionkey_context->session_key, ezdev_sdk_sessionkey_len);
                 ez_log_d(TAG_BASE,"session: %s\n", skey);
             }
-            g_query_user_get_list = 0;
         }
         break;
     case sdk_kernel_event_break:
@@ -530,11 +518,11 @@ void extend_event_cb(ezdev_sdk_kernel_event *ptr_event, EZDEV_SDK_PTR pUser)
             sdk_runtime_err_context *err_ctx = (sdk_runtime_err_context *)ptr_event->event_context;
             if(NULL!=err_ctx)
             {
-                ez_log_d(TAG_BASE,"run_time_err info: code:%#02x,\n", err_ctx->err_code);
+                ez_log_v(TAG_BASE,"run_time_cb info: code:%#02x,\n", err_ctx->err_code);
                 sdk_send_msg_ack_context* ack_info =(sdk_send_msg_ack_context*)err_ctx->err_ctx;
                 if(ack_info)
                 {
-                    ez_log_d(TAG_BASE,"run_time_err ack info: domain:%d,cmd_id:%#02x, seq:%d\n", ack_info->msg_domain_id,ack_info->msg_command_id,ack_info->msg_seq);
+                    ez_log_v(TAG_BASE,"run_time_cb ack info: domain:%d,cmd_id:%#02x, seq:%d\n", ack_info->msg_domain_id,ack_info->msg_command_id,ack_info->msg_seq);
                 }
             }
         }
@@ -556,6 +544,7 @@ int base_set_operation_code(const char *pcode, const int len)
             ret = -1;
             break;
         }
+        ez_log_v(TAG_BASE,"operation:%s,len:%d\n", pcode, len);
         memset(g_user_operation_code, 0, sizeof(g_user_operation_code));
         strncpy(g_user_operation_code, pcode, sizeof(g_user_operation_code) - 1);
     } while (0);

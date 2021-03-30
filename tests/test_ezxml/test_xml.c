@@ -26,6 +26,11 @@ int main()
       printf("ezxml_parse_fp error\n");
       break;
     }
+    char* sname = ezxml_name(req);
+    if(sname)
+    {
+      printf("xml name:%s\n",sname);
+    }
     ezxml_t code = ezxml_child(req,"Code");
     if(code)
     {    

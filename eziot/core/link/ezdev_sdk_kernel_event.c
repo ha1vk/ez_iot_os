@@ -217,7 +217,7 @@ mkernel_internal_error das_keepalive_interval_changed_event_cb(int interval)
 	prt_inner_cb_notic->cb_event.event_context = (void *)context;
     
 	kernel_error = push_event_to_queue(prt_inner_cb_notic);
-	ezdev_sdk_kernel_log_error(kernel_error, kernel_error, "das_keepalive_interval_changed, event_notice callback!");
+	ezdev_sdk_kernel_log_info(kernel_error, kernel_error, "das_keepalive_interval_changed, event_notice callback!");
 
 	return kernel_error;
 }

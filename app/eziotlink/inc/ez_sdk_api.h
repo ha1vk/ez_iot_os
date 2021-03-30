@@ -172,7 +172,6 @@ typedef struct
 	char                dev_id[128];					///< dev_id文件路径
 	char                dev_masterkey[128];				///< masterkey文件路径
 	ez_das_info_t*      pdas_info;					    ///< 低功耗设备快速上线,需要提供das信息,如果不需要默认为NULL
-	EZDEV_SDK_UINT32    buf_size;                       ///< 自定义发送和接收消息的buf的大小
 }ez_config_t;
 
 /**

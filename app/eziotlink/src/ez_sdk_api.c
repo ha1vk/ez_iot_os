@@ -59,7 +59,7 @@ unsigned int sdk_main_thread(void *user_data)
         sdk_thread_sleep(10);
     } while (g_running && sdk_error != ezdev_sdk_kernel_invald_call);
 
-    sdk_kernel_logprint(sdk_log_info, 0, 0, "sdk_main_thread exist\n");
+    ez_log_i(TAG_SDK,"sdk_main_thread exit\n");
     return 0;
 }
 
@@ -75,7 +75,7 @@ unsigned int sdk_user_thread(void *user_data)
 
     } while (g_running && sdk_error != ezdev_sdk_kernel_invald_call);
 
-    sdk_kernel_logprint(sdk_log_info, 0, 0, "sdk_user_thread exist\n");
+    ez_log_i(TAG_SDK,"sdk_user_thread exit\n");
     return 0;
 }
 
@@ -309,8 +309,7 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
             break;
         }
 
-        ez_log_d(TAG_SDK,"devinfo_string:%s\n", devinfo_string);
-
+        ez_log_v(TAG_SDK,"devinfo_string:%s\n", devinfo_string);
         sdk_cb_fun.net_work_create       = net_create;
         sdk_cb_fun.net_work_connect      = net_connect;
         sdk_cb_fun.net_work_read         = net_read;
@@ -362,8 +361,6 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
             strncpy(config.pdas_info->das_serverid, pinit->config.pdas_info->das_serverid, ezdev_sdk_name_len -1);
             memcpy(config.pdas_info->session_key, pinit->config.pdas_info->session_key, ezdev_sdk_sessionkey_len);
         }
-
-        config.buf_size = pinit->config.buf_size;
         result_code = ezdev_sdk_kernel_init(&config, &sdk_cb_fun, event_notice_to_device, reg_mode);
         if (result_code != ezdev_sdk_kernel_succ)
         {
@@ -384,7 +381,7 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
     return result_code;
 }
 
-int ez_sdk_start()
+EZDEV_SDK_INT32 ez_sdk_start()
 {
     int result = 0;
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
@@ -429,7 +426,7 @@ int ez_sdk_start()
     return result;
 }
 
-int ez_sdk_stop()
+EZDEV_SDK_INT32 ez_sdk_stop()
 {
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
     
@@ -447,13 +444,11 @@ int ez_sdk_stop()
         ez_log_e(TAG_SDK,"ezdev_sdk_kernel_stop err :%#08x\n", kernel_error);
         return kernel_error;
     }
-
-    ez_log_e(TAG_SDK,"ez_sdk_stop return\n");
-
+    
     return 0;
 }
 
-int ez_sdk_deinit()
+EZDEV_SDK_INT32 ez_sdk_deinit()
 {
     if (1 != g_init)
     {

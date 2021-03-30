@@ -350,10 +350,11 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_stop()
             break;
 
         g_ezdev_sdk_kernel.platform_handle.time_sleep(100);
-        if (wait4times++ < 3)
+        if (wait4times++ > 3)
             break;
     }
     ezdev_sdk_kernel_log_debug(0, 0, "stop_yield my_state:%d \n", g_ezdev_sdk_kernel.my_state);
+    
     stop_yield(&g_ezdev_sdk_kernel);
 
     return ezdev_sdk_kernel_succ;

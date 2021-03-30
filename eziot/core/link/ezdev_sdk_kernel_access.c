@@ -268,7 +268,7 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel* sdk_kernel)
 			memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
 			memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
 			memcpy(context.lbs_domain, sdk_kernel->server_info.server_name, ezdev_sdk_ip_max_len);
-			ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_switchover");
+			ezdev_sdk_kernel_log_info(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_switchover");
 			broadcast_user_event(sdk_kernel_event_switchover, (void*)&context, sizeof(context));
 			sdk_kernel->entr_state = sdk_entrance_normal;
 		}
@@ -283,7 +283,7 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel* sdk_kernel)
 			memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
 			memcpy(context.das_domain, sdk_kernel->redirect_das_info.das_domain, ezdev_sdk_ip_max_len);
 			memcpy(context.das_serverid, sdk_kernel->redirect_das_info.das_serverid, ezdev_sdk_ip_max_len);
-			ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_online");
+			ezdev_sdk_kernel_log_info(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_online");
 			broadcast_user_event(sdk_kernel_event_online, (void*)&context, sizeof(context));
 		}
 	}

@@ -1407,7 +1407,7 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
 		MQTTNetDisconnect(&g_DasNetWork);
 		MQTTNetFini(&g_DasNetWork);
 	}
-	ezdev_sdk_kernel_log_error(sdk_error, sdk_error, "mqtt connect server, server ip:%s, port:%d\n", sdk_kernel->redirect_das_info.das_address, sdk_kernel->redirect_das_info.das_port);
+	ezdev_sdk_kernel_log_info(sdk_error, 0, "mqtt connect server, server ip:%s, port:%d\n", sdk_kernel->redirect_das_info.das_address, sdk_kernel->redirect_das_info.das_port);
 	return sdk_error;
 }
 

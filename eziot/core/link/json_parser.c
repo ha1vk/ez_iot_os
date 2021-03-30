@@ -11,70 +11,68 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
 #include "json_parser.h"
-#include "sdk_kernel_def.h"
 #include "bscJSON.h"
 #include "mkernel_internal_error.h"
+#include "sdk_kernel_def.h"
 
-mkernel_internal_error json_parse_sap_devinfo( bscJSON* json_root, dev_basic_info* dev_info)
+mkernel_internal_error json_parse_sap_devinfo(bscJSON *json_root, dev_basic_info *dev_info)
 {
-	bscJSON* json_dev_status	 = NULL;
-	bscJSON* json_dev_subserial = NULL;
-	bscJSON* json_dev_verification_code = NULL;
-	bscJSON* json_dev_serial			 = NULL;			
-	bscJSON* json_dev_firmwareversion		 = NULL;		
-	bscJSON* json_dev_type				 = NULL;	
-	bscJSON* json_dev_typedisplay	 = NULL;				
-	bscJSON* json_dev_mac		 = NULL;					
-	bscJSON* json_dev_nickname		 = NULL;				
-	bscJSON* json_dev_firmwareidentificationcode	 = NULL;
-	bscJSON* json_dev_oeminfo	= NULL;
+	bscJSON *json_dev_status = NULL;
+	bscJSON *json_dev_subserial = NULL;
+	bscJSON *json_dev_verification_code = NULL;
+	bscJSON *json_dev_serial = NULL;
+	bscJSON *json_dev_firmwareversion = NULL;
+	bscJSON *json_dev_type = NULL;
+	bscJSON *json_dev_typedisplay = NULL;
+	bscJSON *json_dev_mac = NULL;
+	bscJSON *json_dev_nickname = NULL;
+	bscJSON *json_dev_firmwareidentificationcode = NULL;
+	bscJSON *json_dev_oeminfo = NULL;
 
-	json_dev_status						= bscJSON_GetObjectItem(json_root, "dev_status");
-	json_dev_subserial						= bscJSON_GetObjectItem(json_root, "dev_subserial");
-	json_dev_verification_code					= bscJSON_GetObjectItem(json_root, "dev_verification_code");
-	json_dev_serial						= bscJSON_GetObjectItem(json_root, "dev_serial");
-	json_dev_firmwareversion				= bscJSON_GetObjectItem(json_root, "dev_firmwareversion");
-	json_dev_type						= bscJSON_GetObjectItem(json_root, "dev_type");
-	json_dev_typedisplay					= bscJSON_GetObjectItem(json_root, "dev_typedisplay");
-	json_dev_mac							= bscJSON_GetObjectItem(json_root, "dev_mac");
-	json_dev_nickname					= bscJSON_GetObjectItem(json_root, "dev_nickname");
-	json_dev_firmwareidentificationcode	= bscJSON_GetObjectItem(json_root, "dev_firmwareidentificationcode");
-	json_dev_oeminfo					= bscJSON_GetObjectItem(json_root, "dev_oeminfo");
+	json_dev_status = bscJSON_GetObjectItem(json_root, "dev_status");
+	json_dev_subserial = bscJSON_GetObjectItem(json_root, "dev_subserial");
+	json_dev_verification_code = bscJSON_GetObjectItem(json_root, "dev_verification_code");
+	json_dev_serial = bscJSON_GetObjectItem(json_root, "dev_serial");
+	json_dev_firmwareversion = bscJSON_GetObjectItem(json_root, "dev_firmwareversion");
+	json_dev_type = bscJSON_GetObjectItem(json_root, "dev_type");
+	json_dev_typedisplay = bscJSON_GetObjectItem(json_root, "dev_typedisplay");
+	json_dev_mac = bscJSON_GetObjectItem(json_root, "dev_mac");
+	json_dev_nickname = bscJSON_GetObjectItem(json_root, "dev_nickname");
+	json_dev_firmwareidentificationcode = bscJSON_GetObjectItem(json_root, "dev_firmwareidentificationcode");
+	json_dev_oeminfo = bscJSON_GetObjectItem(json_root, "dev_oeminfo");
 
-	if (json_dev_status == NULL || json_dev_subserial == NULL || json_dev_serial == NULL || json_dev_verification_code == NULL || json_dev_firmwareversion == NULL || json_dev_type == NULL || \
+	if (json_dev_status == NULL || json_dev_subserial == NULL || json_dev_serial == NULL || json_dev_verification_code == NULL || json_dev_firmwareversion == NULL || json_dev_type == NULL ||
 		json_dev_typedisplay == NULL || json_dev_mac == NULL || json_dev_nickname == NULL || json_dev_firmwareidentificationcode == NULL || json_dev_oeminfo == NULL)
 	{
 		ezdev_sdk_kernel_log_error(mkernel_internal_get_error_json, 0, "json_parse_sap_devinfo loss some  field");
 		return mkernel_internal_get_error_json;
 	}
 
-	if (json_dev_status->type != bscJSON_Number || \
-		json_dev_subserial->type != bscJSON_String || json_dev_subserial->valuestring == NULL || \
-		json_dev_serial->type != bscJSON_String || json_dev_serial->valuestring == NULL || \
-		json_dev_verification_code->type != bscJSON_String || json_dev_verification_code->valuestring == NULL || \
-		json_dev_firmwareversion->type != bscJSON_String || json_dev_firmwareversion->valuestring == NULL || \
-		json_dev_type->type != bscJSON_String || json_dev_type->valuestring == NULL || \
-		json_dev_typedisplay->type != bscJSON_String || json_dev_typedisplay->valuestring == NULL || \
-		json_dev_mac->type != bscJSON_String || json_dev_mac->valuestring == NULL || \
-		json_dev_nickname->type != bscJSON_String || json_dev_nickname->valuestring == NULL || \
-		json_dev_firmwareidentificationcode->type != bscJSON_String || json_dev_firmwareidentificationcode->valuestring == NULL || \
-		json_dev_oeminfo->type != bscJSON_Number
-		)
+	if (json_dev_status->type != bscJSON_Number ||
+		json_dev_subserial->type != bscJSON_String || json_dev_subserial->valuestring == NULL ||
+		json_dev_serial->type != bscJSON_String || json_dev_serial->valuestring == NULL ||
+		json_dev_verification_code->type != bscJSON_String || json_dev_verification_code->valuestring == NULL ||
+		json_dev_firmwareversion->type != bscJSON_String || json_dev_firmwareversion->valuestring == NULL ||
+		json_dev_type->type != bscJSON_String || json_dev_type->valuestring == NULL ||
+		json_dev_typedisplay->type != bscJSON_String || json_dev_typedisplay->valuestring == NULL ||
+		json_dev_mac->type != bscJSON_String || json_dev_mac->valuestring == NULL ||
+		json_dev_nickname->type != bscJSON_String || json_dev_nickname->valuestring == NULL ||
+		json_dev_firmwareidentificationcode->type != bscJSON_String || json_dev_firmwareidentificationcode->valuestring == NULL ||
+		json_dev_oeminfo->type != bscJSON_Number)
 	{
 		ezdev_sdk_kernel_log_error(mkernel_internal_get_error_json, 0, "json_parse_sap_devinfo value type is error");
 		return mkernel_internal_get_error_json;
 	}
 
-	if( strlen(json_dev_subserial->valuestring) >= ezdev_sdk_devserial_maxlen || \
-		strlen(json_dev_serial->valuestring) >= ezdev_sdk_devserial_maxlen || \
-		strlen(json_dev_verification_code->valuestring) >= ezdev_sdk_verify_code_maxlen || \
-		strlen(json_dev_firmwareversion->valuestring) >= ezdev_sdk_name_len || \
-		strlen(json_dev_type->valuestring) >= ezdev_sdk_name_len || \
-		strlen(json_dev_typedisplay->valuestring) >= ezdev_sdk_name_len || \
-		strlen(json_dev_mac->valuestring) >= ezdev_sdk_name_len || \
-		strlen(json_dev_nickname->valuestring) >= ezdev_sdk_name_len || \
-		strlen(json_dev_firmwareidentificationcode->valuestring) >= ezdev_sdk_identificationcode_max_len\
-		)
+	if (strlen(json_dev_subserial->valuestring) >= ezdev_sdk_devserial_maxlen ||
+		strlen(json_dev_serial->valuestring) >= ezdev_sdk_devserial_maxlen ||
+		strlen(json_dev_verification_code->valuestring) >= ezdev_sdk_verify_code_maxlen ||
+		strlen(json_dev_firmwareversion->valuestring) >= ezdev_sdk_name_len ||
+		strlen(json_dev_type->valuestring) >= ezdev_sdk_name_len ||
+		strlen(json_dev_typedisplay->valuestring) >= ezdev_sdk_name_len ||
+		strlen(json_dev_mac->valuestring) >= ezdev_sdk_name_len ||
+		strlen(json_dev_nickname->valuestring) >= ezdev_sdk_name_len ||
+		strlen(json_dev_firmwareidentificationcode->valuestring) >= ezdev_sdk_identificationcode_max_len)
 	{
 		ezdev_sdk_kernel_log_error(mkernel_internal_get_error_json, 0, "json_parse_sap_devinfo value is too long");
 		return mkernel_internal_get_error_json;
@@ -82,7 +80,7 @@ mkernel_internal_error json_parse_sap_devinfo( bscJSON* json_root, dev_basic_inf
 
 	dev_info->dev_status = json_dev_status->valueint;
 	dev_info->dev_oeminfo = (EZDEV_SDK_UINT32)json_dev_oeminfo->valuedouble;
-	
+
 	strncpy(dev_info->dev_subserial, json_dev_subserial->valuestring, strlen(json_dev_subserial->valuestring));
 	strncpy(dev_info->dev_verification_code, json_dev_verification_code->valuestring, strlen(json_dev_verification_code->valuestring));
 	strncpy(dev_info->dev_serial, json_dev_serial->valuestring, strlen(json_dev_serial->valuestring));
@@ -96,43 +94,43 @@ mkernel_internal_error json_parse_sap_devinfo( bscJSON* json_root, dev_basic_inf
 	return mkernel_internal_succ;
 }
 
-mkernel_internal_error json_parse_license_devinfo( bscJSON* json_root, dev_basic_info* dev_info)
+mkernel_internal_error json_parse_license_devinfo(bscJSON *json_root, dev_basic_info *dev_info)
 {
-	bscJSON* json_dev_productKey	 = NULL;
-	bscJSON* json_dev_deviceName = NULL;
-	bscJSON* json_dev_deviceLicense = NULL;			
-	bscJSON* json_dev_firmwareversion		 = NULL;						
-	bscJSON* json_dev_mac		 = NULL;					
-	bscJSON* json_dev_nickname		 = NULL;				
+	bscJSON *json_dev_productKey = NULL;
+	bscJSON *json_dev_deviceName = NULL;
+	bscJSON *json_dev_deviceLicense = NULL;
+	bscJSON *json_dev_firmwareversion = NULL;
+	bscJSON *json_dev_mac = NULL;
+	bscJSON *json_dev_nickname = NULL;
 
-	json_dev_productKey						= bscJSON_GetObjectItem(json_root, "dev_productKey");
-	json_dev_deviceName						= bscJSON_GetObjectItem(json_root, "dev_deviceName");
-	json_dev_deviceLicense					= bscJSON_GetObjectItem(json_root, "dev_deviceLicense");
-	json_dev_firmwareversion				= bscJSON_GetObjectItem(json_root, "dev_firmwareversion");
-	json_dev_mac							= bscJSON_GetObjectItem(json_root, "dev_mac");
-	json_dev_nickname						= bscJSON_GetObjectItem(json_root, "dev_nickname");
+	json_dev_productKey = bscJSON_GetObjectItem(json_root, "dev_productKey");
+	json_dev_deviceName = bscJSON_GetObjectItem(json_root, "dev_deviceName");
+	json_dev_deviceLicense = bscJSON_GetObjectItem(json_root, "dev_deviceLicense");
+	json_dev_firmwareversion = bscJSON_GetObjectItem(json_root, "dev_firmwareversion");
+	json_dev_mac = bscJSON_GetObjectItem(json_root, "dev_mac");
+	json_dev_nickname = bscJSON_GetObjectItem(json_root, "dev_nickname");
 
-	if (json_dev_productKey == NULL || json_dev_deviceName == NULL || json_dev_deviceLicense == NULL || json_dev_firmwareversion == NULL || json_dev_mac == NULL || \
-		json_dev_nickname == NULL )
+	if (json_dev_productKey == NULL || json_dev_deviceName == NULL || json_dev_deviceLicense == NULL || json_dev_firmwareversion == NULL || json_dev_mac == NULL ||
+		json_dev_nickname == NULL)
 	{
 		ezdev_sdk_kernel_log_error(mkernel_internal_get_error_json, 0, "json_parse_license_devinfo loss some  field");
 		return mkernel_internal_get_error_json;
 	}
 
-	if (json_dev_productKey->type != bscJSON_String || \
-		json_dev_deviceName->type != bscJSON_String || json_dev_deviceLicense->valuestring == NULL || \
-		json_dev_firmwareversion->type != bscJSON_String || json_dev_mac->valuestring == NULL || \
-		json_dev_nickname->type != bscJSON_String )
+	if (json_dev_productKey->type != bscJSON_String ||
+		json_dev_deviceName->type != bscJSON_String || json_dev_deviceLicense->valuestring == NULL ||
+		json_dev_firmwareversion->type != bscJSON_String || json_dev_mac->valuestring == NULL ||
+		json_dev_nickname->type != bscJSON_String)
 	{
 		ezdev_sdk_kernel_log_error(mkernel_internal_get_error_json, 0, "json_parse_license_devinfo value type is error");
 		return mkernel_internal_get_error_json;
 	}
-	
-	if( strlen(json_dev_productKey->valuestring) >= ezdev_sdk_productkey_len || \
-		strlen(json_dev_deviceName->valuestring) >= ezdev_sdk_productkey_len || \
-		strlen(json_dev_deviceLicense->valuestring) >= ezdev_sdk_verify_code_maxlen || \
-		strlen(json_dev_firmwareversion->valuestring) >= ezdev_sdk_name_len || \
-		strlen(json_dev_mac->valuestring) >= ezdev_sdk_name_len || \
+
+	if (strlen(json_dev_productKey->valuestring) >= ezdev_sdk_productkey_len ||
+		strlen(json_dev_deviceName->valuestring) >= ezdev_sdk_productkey_len ||
+		strlen(json_dev_deviceLicense->valuestring) >= ezdev_sdk_verify_code_maxlen ||
+		strlen(json_dev_firmwareversion->valuestring) >= ezdev_sdk_name_len ||
+		strlen(json_dev_mac->valuestring) >= ezdev_sdk_name_len ||
 		strlen(json_dev_nickname->valuestring) >= ezdev_sdk_name_len)
 	{
 		ezdev_sdk_kernel_log_error(mkernel_internal_get_error_json, 0, "json_parse_sap_devinfo value is too long");
@@ -145,24 +143,24 @@ mkernel_internal_error json_parse_license_devinfo( bscJSON* json_root, dev_basic
 	strncpy(dev_info->dev_verification_code, json_dev_deviceLicense->valuestring, strlen(json_dev_deviceLicense->valuestring));
 	strncpy(dev_info->dev_serial, dev_info->dev_subserial, strlen(dev_info->dev_subserial));
 	strncpy(dev_info->dev_firmwareversion, json_dev_firmwareversion->valuestring, strlen(json_dev_firmwareversion->valuestring));
-	
+
 	strncpy(dev_info->dev_type, json_dev_productKey->valuestring, strlen(json_dev_productKey->valuestring));
 	strncpy(dev_info->dev_typedisplay, dev_info->dev_type, strlen(dev_info->dev_type));
-	
+
 	strncpy(dev_info->dev_mac, json_dev_mac->valuestring, strlen(json_dev_mac->valuestring));
 	strncpy(dev_info->dev_nickname, json_dev_nickname->valuestring, strlen(json_dev_nickname->valuestring));
 
 	return mkernel_internal_succ;
 }
 
-mkernel_internal_error json_parse_devinfo( const char* dev_config_info, dev_basic_info* dev_info)
+mkernel_internal_error json_parse_devinfo(const char *dev_config_info, dev_basic_info *dev_info)
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
-	bscJSON* json_root	 = NULL;
-	bscJSON* json_dev_auth_mode	 = NULL;
-	bscJSON* json_dev_access_mode	 = NULL;
+	bscJSON *json_root = NULL;
+	bscJSON *json_dev_auth_mode = NULL;
+	bscJSON *json_dev_access_mode = NULL;
 
-	do 
+	do
 	{
 		json_root = bscJSON_Parse(dev_config_info);
 		if (json_root == NULL)
@@ -170,7 +168,7 @@ mkernel_internal_error json_parse_devinfo( const char* dev_config_info, dev_basi
 			sdk_error = mkernel_internal_json_parse_error;
 			break;
 		}
-		
+
 		json_dev_auth_mode = bscJSON_GetObjectItem(json_root, "dev_auth_mode");
 		if (json_dev_auth_mode == NULL || json_dev_auth_mode->type != bscJSON_Number)
 		{
@@ -178,7 +176,7 @@ mkernel_internal_error json_parse_devinfo( const char* dev_config_info, dev_basi
 		}
 		else
 		{
-			if (json_dev_auth_mode->valueint == sdk_dev_auth_license)	
+			if (json_dev_auth_mode->valueint == sdk_dev_auth_license)
 				dev_info->dev_auth_mode = sdk_dev_auth_license;
 			else
 				dev_info->dev_auth_mode = sdk_dev_auth_sap;
@@ -194,7 +192,7 @@ mkernel_internal_error json_parse_devinfo( const char* dev_config_info, dev_basi
 			dev_info->dev_access_mode = json_dev_access_mode->valueint;
 		}
 
-		if(dev_info->dev_auth_mode == sdk_dev_auth_license)
+		if (dev_info->dev_auth_mode == sdk_dev_auth_license)
 		{
 			sdk_error = json_parse_license_devinfo(json_root, dev_info);
 		}
@@ -203,7 +201,7 @@ mkernel_internal_error json_parse_devinfo( const char* dev_config_info, dev_basi
 			sdk_error = json_parse_sap_devinfo(json_root, dev_info);
 		}
 	} while (0);
-	
+
 	if (json_root != NULL)
 	{
 		bscJSON_Delete(json_root);
@@ -212,10 +210,10 @@ mkernel_internal_error json_parse_devinfo( const char* dev_config_info, dev_basi
 	return sdk_error;
 }
 
-extern mkernel_internal_error json_parse_das_server_info( const char* jsonstring, das_info* das_server_info)
+extern mkernel_internal_error json_parse_das_server_info(const char *jsonstring, das_info *das_server_info)
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
-	bscJSON * json_item = NULL;
+	bscJSON *json_item = NULL;
 	bscJSON *address_json_item = NULL;
 	bscJSON *port_json_item = NULL;
 	bscJSON *udpport_json_item = NULL;
@@ -224,7 +222,7 @@ extern mkernel_internal_error json_parse_das_server_info( const char* jsonstring
 	bscJSON *dasinfo_json_item = NULL;
 	bscJSON *das_json_item = NULL;
 
-	do 
+	do
 	{
 		json_item = bscJSON_Parse((const char *)jsonstring);
 		if (json_item == NULL)
@@ -268,9 +266,9 @@ extern mkernel_internal_error json_parse_das_server_info( const char* jsonstring
 			break;
 		}
 
-		if (port_json_item->type != bscJSON_Number || udpport_json_item->type != bscJSON_Number ||\
-			serverid_json_item->type != bscJSON_String || serverid_json_item->valuestring == NULL || \
-			domain_json_item->type != bscJSON_String || domain_json_item->valuestring == NULL || \
+		if (port_json_item->type != bscJSON_Number || udpport_json_item->type != bscJSON_Number ||
+			serverid_json_item->type != bscJSON_String || serverid_json_item->valuestring == NULL ||
+			domain_json_item->type != bscJSON_String || domain_json_item->valuestring == NULL ||
 			address_json_item->type != bscJSON_String || address_json_item->valuestring == NULL)
 		{
 			sdk_error = mkernel_internal_get_error_json;
@@ -303,7 +301,7 @@ extern mkernel_internal_error json_parse_das_server_info( const char* jsonstring
 
 		das_server_info->das_port = port_json_item->valueint;
 		das_server_info->das_udp_port = udpport_json_item->valueint;
-		ezdev_sdk_kernel_log_debug(0, 0, "das_server_info:address:%s,port:%d \n",das_server_info->das_address, das_server_info->das_port);
+		ezdev_sdk_kernel_log_debug(0, 0, "das_server_info:address:%s,port:%d \n", das_server_info->das_address, das_server_info->das_port);
 	} while (0);
 
 	if (NULL != json_item)
@@ -315,16 +313,16 @@ extern mkernel_internal_error json_parse_das_server_info( const char* jsonstring
 	return sdk_error;
 }
 
-mkernel_internal_error json_parse_stun_server_info( const char* jsonstring, stun_info* stun_server_info)
+mkernel_internal_error json_parse_stun_server_info(const char *jsonstring, stun_info *stun_server_info)
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
-	bscJSON * json_item = NULL;
+	bscJSON *json_item = NULL;
 	bscJSON *stun_json_item = NULL;
 	bscJSON *interval_json_item = NULL;
 	bscJSON *stuninfo_json_item = NULL;
 	int array_count = 0;
-	bscJSON * stun1_json_item = NULL;
-	bscJSON * stun2_json_item = NULL;
+	bscJSON *stun1_json_item = NULL;
+	bscJSON *stun2_json_item = NULL;
 	bscJSON *stun1_address_json_item = NULL;
 	bscJSON *stun1_port_json_item = NULL;
 	bscJSON *stun1_domain_json_item = NULL;
@@ -333,7 +331,7 @@ mkernel_internal_error json_parse_stun_server_info( const char* jsonstring, stun
 	bscJSON *stun2_port_json_item = NULL;
 	bscJSON *stun2_domain_json_item = NULL;
 
-	do 
+	do
 	{
 		json_item = bscJSON_Parse((const char *)jsonstring);
 		if (json_item == NULL)
@@ -366,7 +364,7 @@ mkernel_internal_error json_parse_stun_server_info( const char* jsonstring, stun
 			sdk_error = mkernel_internal_get_error_json;
 			break;
 		}
-		if (interval_json_item->type != bscJSON_Number )
+		if (interval_json_item->type != bscJSON_Number)
 		{
 			sdk_error = mkernel_internal_get_error_json;
 			break;
@@ -409,11 +407,11 @@ mkernel_internal_error json_parse_stun_server_info( const char* jsonstring, stun
 			break;
 		}
 
-		if (stun1_port_json_item->type != bscJSON_Number || \
-			stun1_address_json_item->type != bscJSON_String || NULL == stun1_address_json_item->valuestring || \
-			stun1_domain_json_item->type != bscJSON_String || NULL == stun1_domain_json_item->valuestring || \
-			stun2_port_json_item->type != bscJSON_Number || \
-			stun2_address_json_item->type != bscJSON_String || NULL == stun2_address_json_item->valuestring || \
+		if (stun1_port_json_item->type != bscJSON_Number ||
+			stun1_address_json_item->type != bscJSON_String || NULL == stun1_address_json_item->valuestring ||
+			stun1_domain_json_item->type != bscJSON_String || NULL == stun1_domain_json_item->valuestring ||
+			stun2_port_json_item->type != bscJSON_Number ||
+			stun2_address_json_item->type != bscJSON_String || NULL == stun2_address_json_item->valuestring ||
 			stun2_domain_json_item->type != bscJSON_String || NULL == stun2_domain_json_item->valuestring)
 		{
 			sdk_error = mkernel_internal_get_error_json;
