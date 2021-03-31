@@ -1,7 +1,6 @@
 #include "ez_ota.h"
 #include "ez_ota_extern.h"
 #include "ez_ota_user.h"
-#include "ez_sdk_errno.h"
 #include "ez_sdk_log.h"
 #include "ez_sdk_ota.h"
 #include <string.h>

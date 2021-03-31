@@ -19,13 +19,32 @@
 #endif
 
 #include <stdint.h>
-#include "ez_sdk_errno.h"
+
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+    typedef enum ez_err
+    {
+        ez_errno_succ               = 0 , ///< Tsl interface error code base
+        ez_errno_ota_not_init           , ///< The ota module is not initialized
+        ez_errno_ota_not_ready          , ///< The sdk core module is not started
+        ez_errno_ota_param_invalid      , ///< The input parameters is illegal, it may be that some parameters can not be null or out of range
+        ez_errno_ota_internal           , ///< Unknown error
+        ez_errno_ota_memory             , ///< Out of memory
+        ez_errno_ota_register_failed    , ///< register_failed 
+        ez_errno_ota_json_creat_err     , ///< json_creat_err
+        ez_errno_ota_json_format_err    , ///< json_format_err 
+        ez_errno_ota_msg_send_err       , ///< msg_send_err
+        ez_errno_ota_download_already   , ///< download already 
+    } ez_err_e;
+
+     /**
+     * \brief   ota status errcode
+     * \note    
+     */
     typedef enum
     {
         ota_code_none             = 0,             ///< 没有错误

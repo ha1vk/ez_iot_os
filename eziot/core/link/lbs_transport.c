@@ -794,7 +794,7 @@ static mkernel_internal_error aes_128_decrypt_peer_pubkey(lbs_affair *authi_affa
     }
 
     recv_plat_key_len = remain_len - authi_affair->global_in_packet.payload_buf_off;
-    ezdev_sdk_kernel_log_error(0, 0, "recv_plat_key_len: is :%d \n", recv_plat_key_len);
+    ezdev_sdk_kernel_log_debug(0, 0, "recv_plat_key_len: is :%d \n", recv_plat_key_len);
 
     memcpy(aes_encrypt_key, authi_affair->share_key, 16);
 

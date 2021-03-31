@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include "ez_sdk_errno.h"
+
 #include "ez_sdk_ota.h"
 
 #ifdef __cplusplus

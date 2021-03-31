@@ -39,7 +39,7 @@ ez_err_e ez_ota_send_msg_to_platform(unsigned char *msg, int msg_len, const ota_
 	strncpy(pubmsg.method, method, sizeof(pubmsg.method) - 1);
 	strncpy(pubmsg.msg_type, msg_type, sizeof(pubmsg.msg_type) - 1);
 
-	ez_log_e(TAG_OTA, "ota_send: type:%s, seq:%d \n", msg_type, *msg_seq);
+	ez_log_i(TAG_OTA, "ota_send: type:%s, seq:%d \n", msg_type, *msg_seq);
 	ez_log_d(TAG_OTA, "msg: %s\n", msg);
 	sdk_error = ezdev_sdk_kernel_send_v3(&pubmsg);
 	if (sdk_error != ezdev_sdk_kernel_succ)

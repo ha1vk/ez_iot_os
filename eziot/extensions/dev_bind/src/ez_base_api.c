@@ -2,6 +2,7 @@
 #include "ez_base_def.h"
 #include "ezdev_sdk_kernel.h"
 #include "ezdev_sdk_kernel_struct.h"
+#include "ezdev_sdk_kernel_inner.h"
 #include "ez_sdk_log.h"
 #include "das_data_handle.h"
 
@@ -41,6 +42,8 @@ EZ_BASE_API ez_base_err ez_base_init(const ez_base_init_t *pinit)
         }
 
         base_set_cb(pinit->cb);
+
+        ezdev_sdk_kernel_set_sdk_main_version((char*)EZ_SDK_VERSION);
 
         g_inited = 1;
 

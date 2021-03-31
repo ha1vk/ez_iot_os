@@ -1,7 +1,7 @@
 #ifndef H_EZ_OTA_EXTERN_H_
 #define H_EZ_OTA_EXTERN_H_
 
-#include "ez_sdk_errno.h"
+
 #include "ez_sdk_ota.h"
 #include "ez_ota_def.h"
 

@@ -7,4 +7,6 @@
 #define ez_base_module_version      "V2.0.0"
 #define ez_base_cmd_version	        "v1.0.0"	
 
+#define EZ_SDK_VERSION            "V1.1.0"
+
 #endif

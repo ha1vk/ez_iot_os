@@ -25,7 +25,8 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/
 					${PROJECT_SOURCE_DIR}/../../../../components/xml
 					${PROJECT_SOURCE_DIR}/../../../../components/logger/inc
                     ${PROJECT_SOURCE_DIR}/../../../../include
-					${PROJECT_SOURCE_DIR}/../../../core/inc)
+					${PROJECT_SOURCE_DIR}/../../../core/inc
+					${PROJECT_SOURCE_DIR}/../../../core/link)
 #同时生成静态库和动态库，target的名字要唯一，但是生成的库名可以重定义
 ADD_LIBRARY(ez_iot_base_static STATIC ${dev_bind})
 SET_TARGET_PROPERTIES(ez_iot_base_static PROPERTIES OUTPUT_NAME ez_iot_base)

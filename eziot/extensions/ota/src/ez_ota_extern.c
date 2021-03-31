@@ -241,7 +241,7 @@ static void ez_ota_data_route_cb(ezdev_sdk_kernel_submsg_v3* ptr_submsg)
 
 static void ez_ota_event_route_cb(ezdev_sdk_kernel_event* ptr_event)
 {
-	ez_log_e(TAG_OTA,"ota event router , type: %d\n", ptr_event->event_type);
+	ez_log_i(TAG_OTA,"ota event router,type: %d\n", ptr_event->event_type);
     switch(ptr_event->event_type)
     {
         case sdk_kernel_event_online:
