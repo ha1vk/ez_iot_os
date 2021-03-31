@@ -34,24 +34,6 @@ void base_set_cb(ez_base_cb_t cb)
     g_base_cb = cb;
 }
 
-static void set_result(ezxml_t rsp, int code)
-{
-    ezxml_t result ;
-    char buf[32] = {0};
-    sprintf(buf, "%d", code);
-
-    result = ezxml_child(rsp, "Result");
-    if(NULL== result)
-    {
-        ezxml_t res = ezxml_add_child(rsp, "Result", 1);
-        ezxml_set_txt(res, buf);
-    }
-    else
-    {
-        ezxml_set_txt(result, buf);
-    }
-}
-
 static int check_result(ezxml_t rsp)
 {
     char* response = NULL;
@@ -132,54 +114,57 @@ int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, cons
 
 int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const char *cmd_version, unsigned int msg_req, req_rsp_handle _handle)
 {
-    ezxml_t req =NULL;
-    ezxml_t rsp =NULL;
+    ezxml_t req;
+    ezxml_t rsp;
+    ezxml_t result;
     char * strrsp = NULL;
     char * strreq = NULL;
     int ret = 0;
     unsigned int rsp_len = 0;
+    char err[32] = {0};
+    rsp = ezxml_new("Response");
+    if(NULL == rsp)
+    {
+        ez_log_e(TAG_BASE,"new xml failed\n");
+        return -1;
+    }
     do
     {
-         rsp = ezxml_new("Response");
-        if(NULL == rsp)
-        {
-            ez_log_e(TAG_BASE,"new xml failed\n");
-            break;
-        }
         req = ezxml_parse_str((char*) buf, buf_len);
         if (NULL == req)
         { 
             ez_log_e(TAG_BASE,"input xml parse failed \n");
-            set_result(rsp, CIVIL_RESULT_GENERAL_PARSE_FAILED);
+            ret = CIVIL_RESULT_GENERAL_PARSE_FAILED;
             break;
         }
         else
         {
             strreq = ezxml_name(req);
-            if(NULL==strreq||0!=strcmp(strreq, "Request"))
+            if(NULL==strreq||0!=strcmp(strreq,"Request"))
             {
                 ez_log_e(TAG_BASE,"das req format err\n");
-                set_result(rsp, CIVIL_RESULT_GENERAL_PARSE_FAILED);
+                ret = CIVIL_RESULT_GENERAL_PARSE_FAILED;
                 break;
             }
         }
-        ret = _handle(req, rsp);
-        if(0== ret)
-        {
-            strrsp = ezxml_toxml(rsp);
-            if(NULL == strrsp)
-            {
-                ez_log_e(TAG_BASE,"xml to str failed\n");
-                set_result(rsp, CIVIL_RESULT_GENERAL_UNKNOW_ERROR);
-                break;
-            }
-            rsp_len = strlen(strrsp);
-            ret = ez_send_msg2plat((unsigned char*)rsp, rsp_len, rsp_cmd, cmd_version, EZ_BASE_RSP, &msg_req);
-            
-        }
-        ez_log_v(TAG_BASE,"ez_send_msg2plat,len:%d,ret:%d\n", rsp_len,ret);
-
+        ret = _handle(req);
     } while (0);
+
+    sprintf(err, "%d", ret);
+    result = ezxml_add_child(rsp, "Result", 1);
+    ezxml_set_txt(result, err);
+    strrsp = ezxml_toxml(rsp);
+    if(NULL == strrsp)
+    {
+        ez_log_e(TAG_BASE,"xml to str failed\n");
+    }
+    else
+    {
+        ez_log_v(TAG_BASE,"rsp:%s\n", strrsp);
+        rsp_len = strlen(strrsp);
+    }
+    ret = ez_send_msg2plat((unsigned char*)strrsp, rsp_len, rsp_cmd, cmd_version, EZ_BASE_RSP, &msg_req);
+    ez_log_v(TAG_BASE,"ez_send_msg2plat,len:%d,ret:%d\n", rsp_len,ret);
 
     if(NULL!= req)
     {
@@ -197,9 +182,9 @@ int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const c
     return ret;
 }
 
-int verify_challengecode_req(ezxml_t req, ezxml_t rsp)
+int verify_challengecode_req(ezxml_t req)
 {
-    int ret = -1;
+    int ret = CIVIL_RESULT_GENERAL_NO_ERROR;
     unsigned char md[16]={0};
     unsigned char mcode[33]={0};
     unsigned int  mdlen = sizeof(md);
@@ -214,7 +199,7 @@ int verify_challengecode_req(ezxml_t req, ezxml_t rsp)
         if (NULL == Code)
         {
             ez_log_e(TAG_BASE,"VerifyChallengeCode, not find code\n");
-            set_result(rsp, CIVIL_RESULT_GENERAL_COMMAND_NOT_SUITABLE);
+            ret= CIVIL_RESULT_GENERAL_COMMAND_NOT_SUITABLE;
             break;
         }
         
@@ -225,23 +210,18 @@ int verify_challengecode_req(ezxml_t req, ezxml_t rsp)
         if(0!= strcmp(strcode, (char *)mcode))
         {
             ez_log_e(TAG_BASE,"VerifyChallengeCode, code compare err\n");
-            set_result(rsp, CIVIL_RESULT_PU_CHALLENGE_CODE_VERIFY_FAILED);
+            ret=CIVIL_RESULT_PU_CHALLENGE_CODE_VERIFY_FAILED;
             break;
         }
         UserID = ezxml_child(req, "UserID");
         if (NULL == UserID)
         {
             ez_log_e(TAG_BASE,"VerifyChallengeCode, not find UserID\n");
-            set_result(rsp, CIVIL_RESULT_GENERAL_COMMAND_NOT_SUITABLE);
+            ret=CIVIL_RESULT_GENERAL_COMMAND_NOT_SUITABLE;
             break;
         }
-
         strncpy(struser_id, ezxml_txt(UserID), sizeof(struser_id)-1);
-
         ret = msg2dev_set_userid(struser_id);
-
-        set_result(rsp, ret);
-
     } while (0);
 
     return ret;
@@ -300,12 +280,11 @@ int pu2plt_query_userid_rsp(void *buf, int buf_len)
     return ret;
 }
 
-int plt2pu_set_userid(ezxml_t req, ezxml_t rsp)
+int plt2pu_set_userid(ezxml_t req)
 {
     int ret = CIVIL_RESULT_GENERAL_NO_ERROR;
     ezxml_t  x_userid;
     char user_id[64]={0};
-   
     x_userid = ezxml_child(req, "UserId");
     if (NULL!= x_userid)
     {
@@ -318,7 +297,6 @@ int plt2pu_set_userid(ezxml_t req, ezxml_t rsp)
         ez_log_e(TAG_BASE,"plt2pu_set_userid err ,no UserId\n");
         ret = CIVIL_RESULT_GENERAL_PARSE_FAILED;
     }
-    set_result(rsp, ret);
     return ret;
 }
 
@@ -450,7 +428,7 @@ void extend_data_route_cb(ezdev_sdk_kernel_submsg *ptr_submsg, EZDEV_SDK_PTR pUs
         result_code = pu2plt_query_userid_rsp(ptr_submsg->buf, ptr_submsg->buf_len);
         break;
     case kCenPlt2PuSetUserIdReq:
-        result_code = das_req_rsp_handle(cmd_id, ptr_submsg->buf, ptr_submsg->buf_len,kCenPlt2PuSetUserIdReq, 
+        result_code = das_req_rsp_handle(cmd_id, ptr_submsg->buf, ptr_submsg->buf_len, kCenPlt2PuSetUserIdRsp, 
                                          ez_base_cmd_version, msg_seq, plt2pu_set_userid);
         break;
     default:

@@ -6,7 +6,7 @@
 #include "ezdev_sdk_kernel_struct.h"
 #include "ez_base_api.h"
 
-typedef int (*req_rsp_handle)(ezxml_t req, ezxml_t rsp);
+typedef int (*req_rsp_handle)(ezxml_t req);
 
 #ifdef __cplusplus
 extern "C"
@@ -25,9 +25,9 @@ extern "C"
 
     int base_set_operation_code(const char *pcode, const int len);
 
-    int verify_challengecode_req(ezxml_t req, ezxml_t rsp);
+    int verify_challengecode_req(ezxml_t req);
 
-    int plt2pu_set_userid(ezxml_t req, ezxml_t rsp);
+    int plt2pu_set_userid(ezxml_t req);
 
     int pu2plt_query_userid_req();
 
