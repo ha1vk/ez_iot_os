@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright ? 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+* Contributors:
+ *    shenhongyin - initial API and implementation and/or initial documentation
+ *******************************************************************************/
 #include "base_typedef.h"
 #include "stdio.h"
 #include <float.h>
@@ -256,7 +270,7 @@ static void ez_attribute_data_route(ez_basic_info *basic_info, char *msg_type, v
     ez_err_info err_info;
     memset(&err_info, 0, sizeof(ez_err_info));
     memset(&tlv, 0, sizeof(ez_model_msg));
-    
+
     if (NULL == basic_info || NULL == buf || NULL == domain_info)
     {
         ez_log_e(TAG_MOD, "recv attribute msg, buf is null\n");
