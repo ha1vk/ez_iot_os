@@ -98,10 +98,10 @@ function buildall() {
 	done
 	
 	# 导出SDK的所有文件
-	export_ezDevSDK
+	export_ez_iot_sdk
 }
 
-function export_ezDevSDK()
+function export_ez_iot_sdk()
 {
 	# 删除旧目录，创建新目录
 	rm -rf ${LOC_PWD}/export/$EXPORT_PRE$ToolChain
