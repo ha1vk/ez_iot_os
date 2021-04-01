@@ -548,13 +548,13 @@ static void das_message_receive_v3(MessageData *msg_data)
 	EZDEV_SDK_INT32 division_num = 0;
 	unsigned char *output_buf = NULL;
 	EZDEV_SDK_UINT32 output_buf_len = 0;
-
 	EZDEV_SDK_UINT16 common_len = 0;
 	unsigned char common_len_buf[2];
-	memset(common_len_buf, 0, 2);
 	char find_str[32] = {0};
 	char msg_topic[512];
 	char dev_serial[ezdev_sdk_devserial_maxlen];
+
+    memset(common_len_buf, 0, 2);
 	memset(msg_topic, 0, 512);
 	memset(dev_serial, 0, ezdev_sdk_devserial_maxlen);
 	do
@@ -606,9 +606,7 @@ static void das_message_receive_v3(MessageData *msg_data)
 			   break;
 		   }
         }
-		/**
-		 * \brief   将整个报文解密
-		 */
+		//将整个报文解密
 		output_buf = (unsigned char *)malloc(msg_data->message->payloadlen);
 		if (NULL == output_buf)
 		{
@@ -702,6 +700,7 @@ void das_message_receive_ex(MessageData* msg_data)
     char msg_topic[128];
     unsigned char common_len_buf[2];
     char dev_serial[ezdev_sdk_devserial_maxlen];
+    ezdev_sdk_kernel_domain_info* kernel_domain = NULL;
 
     memset(msg_topic, 0, 128);
     memset(common_len_buf, 0, 2);
@@ -788,7 +787,7 @@ void das_message_receive_ex(MessageData* msg_data)
         {
             common_module_bus_handle(ptr_submsg);
         }
-    	ezdev_sdk_kernel_domain_info* kernel_domain = extend_get(ptr_submsg->msg_domain_id);
+    	kernel_domain = extend_get(ptr_submsg->msg_domain_id);
 
         if (kernel_domain)
         {

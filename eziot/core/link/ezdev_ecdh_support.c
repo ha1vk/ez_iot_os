@@ -174,4 +174,3 @@ mkernel_internal_error ezdev_generate_masterkey(bscomptls_ecdh_context* ctx_clie
     
     return sdk_error;
 }
-

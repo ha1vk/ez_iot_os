@@ -71,7 +71,7 @@
 
 /* Implementation that should never be optimized out by the compiler */
 static void bscomptls_zeroize( void *v, size_t n ) {
-    volatile unsigned char *p = v; while( n-- ) *p++ = 0;
+    volatile unsigned char *p = (unsigned char *)v; while( n-- ) *p++ = 0;
 }
 
 void bscomptls_ripemd160_init( bscomptls_ripemd160_context *ctx )

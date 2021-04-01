@@ -115,10 +115,11 @@ int ezRsaDecrypt(const unsigned char *pIn, int iInLen, unsigned char *pOut, int 
 	bscomptls_rsa_context rsa;
 	bscomptls_ctr_drbg_context ctr_drbg;
 	bscomptls_entropy_context entropy;
+    unsigned int olen = *iOutLen;
 	bscomptls_rsa_init( &rsa, BSCOMPTLS_RSA_PKCS_V15, 0 );
 	bscomptls_ctr_drbg_init( &ctr_drbg );
 	bscomptls_entropy_init( &entropy );
-	size_t olen = *iOutLen;
+	
 
 	do 
 	{

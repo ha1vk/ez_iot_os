@@ -493,7 +493,6 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
 
 ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubmsg)
 {
-    /* 由于对于body的处理后期需要用ase做加密，直接在这里做padding */
     EZDEV_SDK_INT32 input_length_padding = 0;
     ezdev_sdk_kernel_pubmsg_exchange_v3 *new_pubmsg_exchange = NULL;
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;

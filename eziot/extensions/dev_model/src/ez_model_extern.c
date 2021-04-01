@@ -54,9 +54,9 @@ ez_model_default_cb g_ez_model_data_router = {NULL,};
 int ez_get_list_size()
 {
     int list_size = 0;
-    hal_thread_mutex_lock(&g_model_domain_lock_h);
+    hal_thread_mutex_lock(g_model_domain_lock_h);
     list_size = list_get_size(&g_model_domains);
-    hal_thread_mutex_unlock(&g_model_domain_lock_h);
+    hal_thread_mutex_unlock(g_model_domain_lock_h);
 
     return list_size;
 }
@@ -67,9 +67,9 @@ int ez_set_data_route_cb(ez_model_default_cb *ez_data_router)
     {
         return EZ_CODE_INVALID_PARAM;
     }
-    hal_thread_mutex_lock(&g_model_cb_lock_h);
+    hal_thread_mutex_lock(g_model_cb_lock_h);
     g_ez_model_data_router = *ez_data_router;
-    hal_thread_mutex_unlock(&g_model_cb_lock_h);
+    hal_thread_mutex_unlock(g_model_cb_lock_h);
 
     return EZ_CODE_SUCESS;
 }
@@ -77,19 +77,18 @@ int ez_set_data_route_cb(ez_model_default_cb *ez_data_router)
 static ez_domain_node_t *ez_model_find_domain_info(list_t *list, const char *domain)
 {
     ez_domain_node_t *pnode = NULL;
-
     if (NULL == list || 0 == list_get_size(list) || NULL == domain)
     {
         ez_log_e(TAG_MOD, "ez_model_find_domain,list size  is 0 or domain is null\n");
         return NULL;
     }
-
     LIST_FOR_EACH(list, ez_domain_node_t, pnode)
     {
         if (0 == strcmp(pnode->domain_info->domain, domain))
         {
             return pnode;
         }
+         ez_log_i(TAG_MOD, "node find domain\n");
     }
     return NULL;
 }
@@ -138,9 +137,9 @@ int ez_reg_domain(const ez_domain_reg *domain_reg)
     {
         return EZ_CODE_INVALID_PARAM;
     }
-    hal_thread_mutex_lock(&g_model_domain_lock_h);
+    hal_thread_mutex_lock(g_model_domain_lock_h);
     ret = ez_model_add_domain_info(&g_model_domains, domain_reg);
-    hal_thread_mutex_unlock(&g_model_domain_lock_h);
+    hal_thread_mutex_unlock(g_model_domain_lock_h);
     if (EZ_CODE_SUCESS == ret)
     {
         ez_log_v(TAG_MOD, "Domain reg success  size:%d\n", list_get_size(&g_model_domains));
@@ -152,7 +151,7 @@ int ez_dereg_domain(const char *domain)
 {
     ez_domain_node_t *pnode = NULL;
 
-    hal_thread_mutex_lock(&g_model_domain_lock_h);
+    hal_thread_mutex_lock(g_model_domain_lock_h);
     pnode = ez_model_find_domain_info(&g_model_domains, domain);
     if (pnode)
     {
@@ -165,7 +164,7 @@ int ez_dereg_domain(const char *domain)
         free(pnode);
         pnode = NULL;
     }
-    hal_thread_mutex_unlock(&g_model_domain_lock_h);
+    hal_thread_mutex_unlock(g_model_domain_lock_h);
 
     ez_log_v(TAG_MOD, "Domain dereg success  size:%d\n", list_get_size(&g_model_domains));
     return EZ_CODE_SUCESS;
@@ -185,11 +184,12 @@ ez_domain_reg *ez_get_reg_domain(const char *domain)
         ez_log_e(TAG_MOD, "ez_get_reg_domain input err\n");
         return NULL;
     }
-    hal_thread_mutex_lock(&g_model_domain_lock_h);
+    hal_thread_mutex_lock(g_model_domain_lock_h);
     pnode_domain = ez_model_find_domain_info(&g_model_domains, domain);
-    hal_thread_mutex_unlock(&g_model_domain_lock_h);
+    hal_thread_mutex_unlock(g_model_domain_lock_h);
     if (NULL == pnode_domain)
     {
+        ez_log_e(TAG_MOD, "ez_model no find_domain_info n");
         return NULL;
     }
     return pnode_domain->domain_info;
@@ -256,13 +256,13 @@ static void ez_attribute_data_route(ez_basic_info *basic_info, char *msg_type, v
     ez_err_info err_info;
     memset(&err_info, 0, sizeof(ez_err_info));
     memset(&tlv, 0, sizeof(ez_model_msg));
-
+    
     if (NULL == basic_info || NULL == buf || NULL == domain_info)
     {
         ez_log_e(TAG_MOD, "recv attribute msg, buf is null\n");
         return;
     }
-    ez_log_v(TAG_MOD, "recv attribute msg:domain_id:%s,identifier:%s \n", basic_info->domain, basic_info->identifier);
+    ez_log_i(TAG_MOD, "recv attribute msg:domain_id:%s,identifier:%s \n", basic_info->domain, basic_info->identifier);
     do
     {
         pjsRoot = bscJSON_Parse((const char *)buf);
@@ -454,14 +454,15 @@ void ez_model_data_route(ezdev_sdk_kernel_submsg_v3 *ptr_submsg)
         if (NULL == domain_info)
         {
             ez_log_w(TAG_MOD, "domain not register:%s \n", basic_info.domain);
-            hal_thread_mutex_lock(&g_model_cb_lock_h);
+            hal_thread_mutex_lock(g_model_cb_lock_h);
             if (g_ez_model_data_router.ez_model_default_cb)
             {
                 g_ez_model_data_router.ez_model_default_cb(&basic_info, ptr_submsg->msg_type, ptr_submsg->buf, ptr_submsg->buf_len, ptr_submsg->msg_seq);
             }
-            hal_thread_mutex_unlock(&g_model_cb_lock_h);
+            hal_thread_mutex_unlock(g_model_cb_lock_h);
             break;
         }
+        ez_log_i(TAG_MOD, "data router:identifier:%s\n", basic_info.identifier);
         switch (basic_info.type)
         {
         case ez_event:
@@ -550,6 +551,7 @@ int ez_model_extern_init()
             break;
         }
         g_model_cb_lock_h = hal_thread_mutex_create();
+        if(NULL == g_model_cb_lock_h)
         {
             ez_log_e(TAG_MOD, "cb_lock create faild\n");
             ret = EZ_CODE_MODEL_MALLOC_ERR;

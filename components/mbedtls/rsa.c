@@ -1105,11 +1105,11 @@ int bscomptls_rsa_rsassa_pkcs1_v15_sign( bscomptls_rsa_context *ctx,
      * In order to prevent Lenstra's attack, make the signature in a
      * temporary buffer and check it before returning it.
      */
-    sig_try = bscomptls_calloc( 1, ctx->len );
+    sig_try = (unsigned char *)bscomptls_calloc( 1, ctx->len );
     if( sig_try == NULL )
         return( BSCOMPTLS_ERR_MPI_ALLOC_FAILED );
 
-    verif   = bscomptls_calloc( 1, ctx->len );
+    verif   = (unsigned char *)bscomptls_calloc( 1, ctx->len );
     if( verif == NULL )
     {
         bscomptls_free( sig_try );

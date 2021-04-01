@@ -21,7 +21,7 @@ static int ez_model_init()
 		}
 		g_inited = 1;
 
-		ez_log_e(TAG_MOD, "ez_model_init success:%d\n", g_inited);
+		ez_log_i(TAG_MOD, "ez_model_init success:%d\n", g_inited);
 	} while (0);
 
 	return ret;
