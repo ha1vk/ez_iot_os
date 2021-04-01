@@ -12,7 +12,7 @@
 * Contributors:
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
-#include "error.h"
+#include "ez_error.h"
 #include "md5.h"
 #include "ezxml.h"
 #include "ez_sdk_log.h"
