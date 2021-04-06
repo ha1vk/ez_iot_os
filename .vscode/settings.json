@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "functional": "c",
+        "platform_define.h": "c",
+        "*.tcc": "cpp",
+        "ezdev_sdk_kernel_struct.h": "c",
+        "double_link_list.h": "c",
+        "array": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "md5.h": "c",
+        "ez_base_def.h": "c",
+        "system_error": "c",
+        "das_data_handle.h": "c",
+        "string": "c",
+        "ez_base_api.h": "c",
+        "random": "c",
+        "ez_sdk_errno.h": "c",
+        "ez_sdk_ota.h": "c"
+    }
+}
