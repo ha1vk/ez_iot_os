@@ -16,14 +16,13 @@
  * \brief		网络相关接口的Windows实现
  *
  */
-
-#include "net_platform_wrapper.h"
 #include <WinSock2.h>
-#include <Windows.h>
 #include <ws2tcpip.h>
+#include <Windows.h>
 #include "base_typedef.h"
 #include "ezdev_sdk_kernel_struct.h"
 #include "mkernel_internal_error.h"
+#include "net_platform_wrapper.h"
 
 /** 
  *  \brief		判断是否是合法的IP地址

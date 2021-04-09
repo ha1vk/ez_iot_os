@@ -11,10 +11,11 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
 
-#include "thread_platform_wrapper.h"
+
 #include <process.h>
 #include <windows.h>
 #include "ezdev_sdk_kernel_struct.h"
+#include "thread_platform_wrapper.h"
 
 /** 
  *  \brief		线程函数
@@ -129,6 +130,7 @@ int sdk_thread_destroy(thread_handle* handle)
 		CloseHandle(handle->thread_hd);
 		handle->thread_hd = NULL;
 	}
+    return 0;
 }
 
 void sdk_thread_sleep(unsigned int time_ms)

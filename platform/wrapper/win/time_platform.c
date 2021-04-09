@@ -11,9 +11,10 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
 
-#include "time_platform_wrapper.h"
+
 #include <time.h>
 #include "ezdev_sdk_kernel_struct.h"
+#include "time_platform_wrapper.h"
 
 /** 
  *  \brief		创建时间对象
@@ -97,22 +98,15 @@ char Platform_TimerIsExpired(ezdev_sdk_time sdktime)
  */
 void Platform_TimerCountdownMS(ezdev_sdk_time sdktime, unsigned int timeout)
 {
-	// 	struct timeval now;
-	// 	struct timeval interval = {timeout / 1000, (timeout % 1000) * 1000};
-	// 	gettimeofday(&now, NULL);
-	// 	timeradd(&now, &interval, &timer->end_time);
-
 	time_t now_t = 0;
 	win_time* wintime = (win_time*)sdktime;
 	if (wintime == NULL)
 	{
-		return (char)1;
+		return;
 	}
 
 	now_t = time(NULL);
-
 	wintime->time_record = time(NULL);
-
 	wintime->time_record += (timeout/1000 + 1);
 }
 
@@ -124,16 +118,11 @@ void Platform_TimerCountdownMS(ezdev_sdk_time sdktime, unsigned int timeout)
  */
 void Platform_TimerCountdown(ezdev_sdk_time sdktime, unsigned int timeout)
 {
-	// 	struct timeval now;
-	// 	struct timeval interval = {timeout, 0};
-	// 	gettimeofday(&now, NULL);
-	// 	timeradd(&now, &interval, &timer->end_time);
-
 	time_t now_t = 0;
 	win_time* wintime = (win_time*)sdktime;
 	if (wintime == NULL)
 	{
-		return (char)1;
+		return;
 	}
 
 	now_t = time(NULL);
@@ -150,12 +139,6 @@ void Platform_TimerCountdown(ezdev_sdk_time sdktime, unsigned int timeout)
  */
 EZDEV_SDK_UINT32 Platform_TimerLeftMS(ezdev_sdk_time sdktime)
 {
-	// 	struct timeval now, res;
-	// 	gettimeofday(&now, NULL);
-	// 	timersub(&timer->end_time, &now, &res);
-	// 	//printf("left %d ms\n", (res.tv_sec < 0) ? 0 : res.tv_sec * 1000 + res.tv_usec / 1000);
-	// 	return (res.tv_sec < 0) ? 0 : res.tv_sec * 1000 + res.tv_usec / 1000;
-
 	time_t now_t = 0;
 	win_time* wintime = (win_time*)sdktime;
 	if (wintime == NULL)
@@ -185,9 +168,8 @@ void Platform_TimeDestroy(ezdev_sdk_time sdktime)
 	win_time* wintime = (win_time*)sdktime;
 	if (wintime == NULL)
 	{
-		return (char)1;
+		return;
 	}
-	
 	free(wintime);
 	wintime = NULL;
 }

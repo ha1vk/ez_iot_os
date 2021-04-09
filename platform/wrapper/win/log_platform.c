@@ -10,9 +10,10 @@
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
-#include "log_platform_wrapper.h"
 #include <stdarg.h>
 #include <time.h>
+#include <stdio.h>
+#include "log_platform_wrapper.h"
 
 void time_print(int sdk_error, int othercode, const char * buf)
 {
@@ -20,7 +21,7 @@ void time_print(int sdk_error, int othercode, const char * buf)
 	time_t t = time(0);
 	strftime(now_time, 16, "%m-%d %H:%M:%S", localtime(&t));
 
-	printf("[%s][%d][%d]sdk_error:%d, othercode:%d, info:%s \n", now_time, getpid(), 0, sdk_error, othercode, buf);
+	printf("[%s]sdk_error:%d, othercode:%d, info:%s \n", now_time, sdk_error, othercode, buf);
 }
 
 void log_print_error(int sdk_error, int othercode, const char * buf)
