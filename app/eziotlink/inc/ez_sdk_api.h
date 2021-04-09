@@ -23,11 +23,10 @@
 #else
 #define EZ_SDK_API __declspec(dllimport)
 #endif
-
-#define EZ_IOT_CALLBACK __stdcall
+#define EZ_SDK_CALLBACK __stdcall
 #else
 #define EZ_SDK_API 
-#define EZ_IOT_CALLBACK 
+#define EZ_SDK_CALLBACK 
 #endif
 
 
@@ -194,7 +193,7 @@ typedef struct
 
 typedef struct
 {
-	char*          host;						         ///< 平台域名
+	char           host[64];						     ///< 平台域名
 	unsigned int   port;						         ///< 端口
 }ez_server_info_t;
 

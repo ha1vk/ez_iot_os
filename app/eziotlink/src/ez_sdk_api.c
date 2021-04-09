@@ -10,20 +10,20 @@
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
-#include "ez_sdk_api.h"
-#include "ezdev_sdk_kernel.h"
+
+#include "ez_sdk_log.h"
 #include "platform_define.h"
 #include "thread_interface.h"
 #include "base_typedef.h"
 #include "net_platform_wrapper.h"
+#include "ezdev_sdk_kernel.h"
 #include "ezdev_sdk_kernel_struct.h"
-#include "ez_sdk_log.h"
-
-thread_handle g_main_thread = {0};
-thread_handle g_user_thread = {0};
+#include "ez_sdk_api.h"
 
 
-ez_init_info_t g_all_config = {{0}, {0}};
+thread_handle  g_main_thread = {0};
+thread_handle  g_user_thread = {0};
+ez_init_info_t g_init_config = {{0}, {0}};
 
 EZDEVSDK_CONFIG_INTERFACE
 NET_PLATFORM_INTERFACE
@@ -34,13 +34,13 @@ MUTEX_PLATFORM_INTERFACE
 #define BOOT_MAIN_THREAD_NAME "ez_kernel_main"
 #define BOOT_USER_THREAD_NAME "ez_kernel_user"
 
-#define BOOT_MAX_COMMON_KEY_SIZE 128
+#define BOOT_MAX_COMMON_KEY_SIZE           128
 #define BOOT_MAX_SETSWITCHENABLE_TYPE_SIZE 128
-#define BOOT_MAX_QUERYSTATUS_TYPE_SIZE 128
-#define BOOT_MAX_SETDEVPLAN_TYPE_SIZE 128
-#define BOOT_MAX_DEFAULT_TYPE_SIZE 128
+#define BOOT_MAX_QUERYSTATUS_TYPE_SIZE     128
+#define BOOT_MAX_SETDEVPLAN_TYPE_SIZE      128
+#define BOOT_MAX_DEFAULT_TYPE_SIZE         128
 
-static EZDEV_SDK_INT8 g_init = 0;
+static EZDEV_SDK_INT8 g_init    = 0;
 static EZDEV_SDK_INT8 g_running = 0;
 
 void sdk_kernel_logprint(sdk_log_level level, EZDEV_SDK_INT32 sdk_error, EZDEV_SDK_INT32 othercode, const char *buf);
@@ -111,26 +111,26 @@ int win_socket_fini()
 
 void sdk_kernel_logprint(sdk_log_level level, EZDEV_SDK_INT32 sdk_error, EZDEV_SDK_INT32 othercode, const char *buf)
 {
-    if (g_all_config.notice.log_notice == NULL)
+    if (g_init_config.notice.log_notice == NULL)
     {
         return;
     }
     switch (level)
     {
     case sdk_log_error:
-        g_all_config.notice.log_notice(log_error, sdk_error, othercode, buf);
+        g_init_config.notice.log_notice(log_error, sdk_error, othercode, buf);
         break;
     case sdk_log_warn:
-        g_all_config.notice.log_notice(log_warn, sdk_error, othercode, buf);
+        g_init_config.notice.log_notice(log_warn, sdk_error, othercode, buf);
         break;
     case sdk_log_info:
-        g_all_config.notice.log_notice(log_info, sdk_error, othercode, buf);
+        g_init_config.notice.log_notice(log_info, sdk_error, othercode, buf);
         break;
     case sdk_log_debug:
-        g_all_config.notice.log_notice(log_debug, sdk_error, othercode, buf);
+        g_init_config.notice.log_notice(log_debug, sdk_error, othercode, buf);
         break;
     case sdk_log_trace:
-        g_all_config.notice.log_notice(log_trace, sdk_error, othercode, buf);
+        g_init_config.notice.log_notice(log_trace, sdk_error, othercode, buf);
         break;
     default:
         break;
@@ -139,26 +139,26 @@ void sdk_kernel_logprint(sdk_log_level level, EZDEV_SDK_INT32 sdk_error, EZDEV_S
 
 void value_load(sdk_keyvalue_type valuetype, unsigned char *keyvalue, EZDEV_SDK_INT32 keyvalue_maxsize)
 {
-    if (g_all_config.config.bUser && g_all_config.config.value_load != NULL)
+    if (g_init_config.config.bUser && g_init_config.config.value_load != NULL)
     {
         if (valuetype == sdk_keyvalue_devid)
         {
-            g_all_config.config.value_load(key_devid, keyvalue, keyvalue_maxsize);
+            g_init_config.config.value_load(key_devid, keyvalue, keyvalue_maxsize);
         }
         else if (valuetype == sdk_keyvalue_masterkey)
         {
-            g_all_config.config.value_load(key_masterkey, keyvalue, keyvalue_maxsize);
+            g_init_config.config.value_load(key_masterkey, keyvalue, keyvalue_maxsize);
         }
     }
     else
     {
         if (valuetype == sdk_keyvalue_devid)
         {
-            get_file_value(g_all_config.config.dev_id, keyvalue, keyvalue_maxsize);
+            get_file_value(g_init_config.config.dev_id, keyvalue, keyvalue_maxsize);
         }
         else if (valuetype == sdk_keyvalue_masterkey)
         {
-            get_file_value(g_all_config.config.dev_masterkey, keyvalue, keyvalue_maxsize);
+            get_file_value(g_init_config.config.dev_masterkey, keyvalue, keyvalue_maxsize);
         }
     }
 }
@@ -167,26 +167,26 @@ EZDEV_SDK_INT32 value_save(sdk_keyvalue_type valuetype, unsigned char *keyvalue,
 {
     EZDEV_SDK_INT32 iRv = ezdev_sdk_kernel_succ;
 
-    if (g_all_config.config.bUser && g_all_config.config.value_save != NULL)
+    if (g_init_config.config.bUser && g_init_config.config.value_save != NULL)
     {
         if (valuetype == sdk_keyvalue_devid)
         {
-            iRv = g_all_config.config.value_save(key_devid, keyvalue, keyvalue_size);
+            iRv = g_init_config.config.value_save(key_devid, keyvalue, keyvalue_size);
         }
         else if (valuetype == sdk_keyvalue_masterkey)
         {
-            iRv = g_all_config.config.value_save(key_masterkey, keyvalue, keyvalue_size);
+            iRv = g_init_config.config.value_save(key_masterkey, keyvalue, keyvalue_size);
         }
     }
     else
     {
         if (valuetype == sdk_keyvalue_devid)
         {
-            iRv = set_file_value(g_all_config.config.dev_id, keyvalue, keyvalue_size);
+            iRv = set_file_value(g_init_config.config.dev_id, keyvalue, keyvalue_size);
         }
         else if (valuetype == sdk_keyvalue_masterkey)
         {
-            iRv = set_file_value(g_all_config.config.dev_masterkey, keyvalue, keyvalue_size);
+            iRv = set_file_value(g_init_config.config.dev_masterkey, keyvalue, keyvalue_size);
         }
     }
 
@@ -199,7 +199,7 @@ EZDEV_SDK_INT32 curing_data_load(sdk_curingdata_type datatype, unsigned char *ke
 
     if (sdk_curingdata_secretkey == datatype)
     {
-        iRv = g_all_config.config.data_load(data_secretkey, keyvalue, (EZDEV_SDK_UINT32 *)keyvalue_maxsize);
+        iRv = g_init_config.config.data_load(data_secretkey, keyvalue, (EZDEV_SDK_UINT32 *)keyvalue_maxsize);
     }
 
     return iRv;
@@ -211,7 +211,7 @@ EZDEV_SDK_INT32 curing_data_save(sdk_curingdata_type datatype, unsigned char *ke
 
     if (sdk_curingdata_secretkey == datatype)
     {
-        iRv = g_all_config.config.data_save(data_secretkey, keyvalue, (EZDEV_SDK_UINT32)keyvalue_size);
+        iRv = g_init_config.config.data_save(data_secretkey, keyvalue, (EZDEV_SDK_UINT32)keyvalue_size);
     }
 
     return iRv;
@@ -219,35 +219,35 @@ EZDEV_SDK_INT32 curing_data_save(sdk_curingdata_type datatype, unsigned char *ke
 
 static void event_notice_to_device(ezdev_sdk_kernel_event *ptr_event)
 {
-    if (g_all_config.notice.event_notice == NULL || ptr_event == NULL)
+    if (g_init_config.notice.event_notice == NULL || ptr_event == NULL)
     {
         return;
     }
     switch (ptr_event->event_type)
     {
     case sdk_kernel_event_online:
-        g_all_config.notice.event_notice(device_online, ptr_event->event_context);
+        g_init_config.notice.event_notice(device_online, ptr_event->event_context);
         break;
     case sdk_kernel_event_break:
-        g_all_config.notice.event_notice(device_offline, ptr_event->event_context);
+        g_init_config.notice.event_notice(device_offline, ptr_event->event_context);
         break;
     case sdk_kernel_event_switchover:
-        g_all_config.notice.event_notice(device_switch, ptr_event->event_context);
+        g_init_config.notice.event_notice(device_switch, ptr_event->event_context);
         break;
     case sdk_kernel_event_invaild_authcode:
-        g_all_config.notice.event_notice(invaild_authcode, ptr_event->event_context);
+        g_init_config.notice.event_notice(invaild_authcode, ptr_event->event_context);
         break;
     case sdk_kernel_event_fast_reg_online:
-        g_all_config.notice.event_notice(fast_reg_online, ptr_event->event_context);
+        g_init_config.notice.event_notice(fast_reg_online, ptr_event->event_context);
         break;
     case sdk_kernel_event_reconnect_success:
-        g_all_config.notice.event_notice(reconnect_success, ptr_event->event_context);
+        g_init_config.notice.event_notice(reconnect_success, ptr_event->event_context);
         break;
     case sdk_kernel_event_heartbeat_interval_changed:
-        g_all_config.notice.event_notice(heartbeat_interval_changed, ptr_event->event_context);
+        g_init_config.notice.event_notice(heartbeat_interval_changed, ptr_event->event_context);
         break;
     case sdk_kernel_event_runtime_err:
-        g_all_config.notice.event_notice(runtime_cb, ptr_event->event_context);
+        g_init_config.notice.event_notice(runtime_cb, ptr_event->event_context);
     default:
         break;
     }
@@ -272,7 +272,7 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
             result_code = ezdev_sdk_kernel_invald_call;
             break;
         }
-        if (NULL== pserver_info|| NULL== pserver_info->host||NULL== pinit||pinit->notice.event_notice == NULL || pinit->notice.log_notice == NULL ||
+        if (NULL== pserver_info|| 0 == strlen(pserver_info->host)||NULL== pinit||pinit->notice.event_notice == NULL || pinit->notice.log_notice == NULL ||
             pinit->config.data_load == NULL || NULL == pinit->config.data_save)
         {
             ez_log_e(TAG_SDK,"input params null\n");
@@ -298,18 +298,19 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
                 break;
             }
         }
-        memset(&g_all_config, 0, sizeof(g_all_config));
-        memcpy(&g_all_config, pinit, sizeof(ez_init_info_t));
+        memset(&g_init_config, 0, sizeof(g_init_config));
+        memcpy(&g_init_config, pinit, sizeof(ez_init_info_t));
 
-        result_code = get_devinfo_fromconfig(g_all_config.config.devinfo_path, devinfo_string, sizeof(devinfo_string));
+        result_code = get_devinfo_fromconfig(g_init_config.config.devinfo_path, devinfo_string, sizeof(devinfo_string));
         if (result_code != 0)
         {
-            ez_log_e(TAG_SDK,"get_devinfo_fromconfig err,path:%s\n", g_all_config.config.devinfo_path);
+            ez_log_e(TAG_SDK,"get_devinfo_fromconfig err,path:%s\n", g_init_config.config.devinfo_path);
             result_code = ezdev_sdk_kernel_value_load;
             break;
         }
 
         ez_log_v(TAG_SDK,"devinfo_string:%s\n", devinfo_string);
+
         sdk_cb_fun.net_work_create       = net_create;
         sdk_cb_fun.net_work_connect      = net_connect;
         sdk_cb_fun.net_work_read         = net_read;
@@ -335,7 +336,8 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
         sdk_cb_fun.thread_mutex_unlock   = sdk_platform_thread_mutex_unlock;
         sdk_cb_fun.time_sleep            = sdk_thread_sleep;
 
-        config.server.host  = pserver_info->host;
+
+        strncpy(config.server.host, pserver_info->host, sizeof(config.server.host) - 1);
         config.server.port  = pserver_info->port;
         config.pdev_info    = devinfo_string;
 
@@ -352,10 +354,11 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
                 break;
             }
             memset(config.pdas_info, 0, sizeof(kernel_das_info));
-            config.pdas_info->bLightreg = pinit->config.pdas_info->bLightreg;
-            config.pdas_info->das_port  = pinit->config.pdas_info->das_port;
+            config.pdas_info->bLightreg    = pinit->config.pdas_info->bLightreg;
+            config.pdas_info->das_port     = pinit->config.pdas_info->das_port;
             config.pdas_info->das_udp_port = pinit->config.pdas_info->das_udp_port;
-            config.pdas_info->das_socket = pinit->config.pdas_info->das_socket;
+            config.pdas_info->das_socket   = pinit->config.pdas_info->das_socket;
+
             strncpy(config.pdas_info->das_address, pinit->config.pdas_info->das_address, ezdev_sdk_ip_max_len -1);
             strncpy(config.pdas_info->das_domain, pinit->config.pdas_info->das_domain, ezdev_sdk_ip_max_len -1);
             strncpy(config.pdas_info->das_serverid, pinit->config.pdas_info->das_serverid, ezdev_sdk_name_len -1);
