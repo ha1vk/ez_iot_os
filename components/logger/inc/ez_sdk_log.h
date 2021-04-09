@@ -15,10 +15,21 @@
 #ifndef _EZ_SDK_LOG_H_
 #define _EZ_SDK_LOG_H_
 
+#if defined (_WIN32) || defined(_WIN64)
+#ifdef EZ_SDK_API_EXPORTS
+#define EZ_SDK_API	__declspec(dllexport)
+#else
+#define EZ_SDK_API __declspec(dllimport)
+#endif
+#define EZ_SDK_CALLBACK __stdcall
+#else
+#define EZ_SDK_API 
+#define EZ_SDK_CALLBACK 
+#endif
+
 #include <stdint.h>
 
 /* output log's level */
-#define LVL_ASSERT  0  ///< 致命错误,导致整个程序无法继续运行
 #define LVL_ERROR   1  ///< 某个业务出错,不影响其他业务
 #define LVL_WARN    2  ///< 打印业务过程中必要的关键信息
 #define LVL_INFO    3  ///< 较详细的信息
@@ -40,21 +51,27 @@ extern "C"
      * 
      *start run log
      */
-    int32_t ez_sdk_log_start(void);
+    EZ_SDK_API int32_t ez_sdk_log_start(void);
     /**
      * stop  run log 
      */
-    void ez_sdk_log_stop(void);
+    EZ_SDK_API void ez_sdk_log_stop(void);
 
     /**
      * set log  level
      */
-    void ez_sdk_set_log_level(uint8_t level);
+    EZ_SDK_API void ez_sdk_set_log_level(uint8_t level);
 
     /**
      * filter log  by tag
      */
-    void ez_sdk_log_filter_tag(const char *tag);
+    EZ_SDK_API void ez_sdk_log_filter_tag(const char *tag);
+
+    /**
+    * set log text color status
+    */
+
+    EZ_SDK_API void ez_sdk_set_text_color_enabled(uint8_t enabled);
 
     /**
      * dump the hex format data to log
@@ -64,17 +81,17 @@ extern "C"
      * @param buf hex buffer
      * @param size buffer size
      */
-    void ez_sdk_log_hexdump(const char *tag, uint8_t width, uint8_t *buf, uint16_t size);
-
-    extern void elog_output(uint8_t level, const char *tag, const char *file, const char *func,
-                            const long line, const char *format, ...);
-
-#define ez_log_a(tag, ...) elog_output(LVL_ASSERT, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_e(tag, ...) elog_output(LVL_ERROR, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_w(tag, ...) elog_output(LVL_WARN, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_i(tag, ...) elog_output(LVL_INFO, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_d(tag, ...) elog_output(LVL_DEBUG, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
-#define ez_log_v(tag, ...) elog_output(LVL_VERBOSE, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+    EZ_SDK_API void ez_sdk_log_hexdump(const char *tag, uint8_t width, uint8_t *buf, uint16_t size);
+    /**
+     * print log
+     */
+    EZ_SDK_API void elog_output(uint8_t level, const char *tag, const char *file, const char *func,const long line, const char *format, ...);
+ 
+    #define ez_log_e(tag, ...) elog_output(LVL_ERROR, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+    #define ez_log_w(tag, ...) elog_output(LVL_WARN, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+    #define ez_log_i(tag, ...) elog_output(LVL_INFO, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+    #define ez_log_d(tag, ...) elog_output(LVL_DEBUG, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+    #define ez_log_v(tag, ...) elog_output(LVL_VERBOSE, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 #ifdef __cplusplus
 }

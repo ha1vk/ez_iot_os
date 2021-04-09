@@ -26,12 +26,22 @@
  * Created on: 2015-04-28
  */
 
-#define LOG_TAG      "elog"
 
-#include <elog.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include "elog.h"
+#include "ez_sdk_log.h"
+
+#if defined (_WIN32) || defined(_WIN64)
+
+#ifdef _MSC_VER
+#define snprintf  _snprintf 
+#endif
+
+#endif
+
+#define LOG_TAG      "elog"
 
 #if !defined(ELOG_OUTPUT_LVL)
     #error "Please configure static output log level (in elog_cfg.h)"
@@ -405,20 +415,19 @@ void elog_raw(const char *format, ...) {
  * @param ... args
  *
  */
-void elog_output(uint8_t level, const char *tag, const char *file, const char *func,
-        const long line, const char *format, ...) {
+void elog_output(uint8_t level, const char *tag, const char *file, const char *func,const long line, const char *format, ...) 
+{
     extern const char *elog_port_get_time(void);
     extern const char *elog_port_get_p_info(void);
     extern const char *elog_port_get_t_info(void);
 
     size_t tag_len = strlen(tag), log_len = 0, newline_len = strlen(ELOG_NEWLINE_SIGN);
     //char line_num[ELOG_LINE_NUM_MAX_LEN + 1] = { 0 };
-    char tag_sapce[ELOG_FILTER_TAG_MAX_LEN / 2 + 1] = { 0 };
+    char tag_sapce[ELOG_FILTER_TAG_MAX_LEN/2 + 1] = {0};
     va_list args;
     int fmt_result;
-
+    memset(log_buf, 0, sizeof(log_buf));
     ELOG_ASSERT(level <= ELOG_LVL_VERBOSE);
-
     /* check output enabled */
     if (!elog.output_enabled) {
         return;
@@ -479,34 +488,9 @@ void elog_output(uint8_t level, const char *tag, const char *file, const char *f
         }
         log_len += elog_strcpy(log_len, log_buf + log_len, "] ");
     }
-    /* package file directory and name, function name and line number info */
-    /*if (get_fmt_enabled(level, ELOG_FMT_DIR | ELOG_FMT_FUNC | ELOG_FMT_LINE)) {
-        log_len += elog_strcpy(log_len, log_buf + log_len, "(");
-        if (get_fmt_enabled(level, ELOG_FMT_DIR)) {
-            log_len += elog_strcpy(log_len, log_buf + log_len, file);
-            if (get_fmt_enabled(level, ELOG_FMT_FUNC)) {
-                log_len += elog_strcpy(log_len, log_buf + log_len, " ");
-            } else if (get_fmt_enabled(level, ELOG_FMT_LINE)) {
-                log_len += elog_strcpy(log_len, log_buf + log_len, ":");
-            }
-        }
-        
-        if (get_fmt_enabled(level, ELOG_FMT_FUNC)) {
-            log_len += elog_strcpy(log_len, log_buf + log_len, func);
-            if (get_fmt_enabled(level, ELOG_FMT_LINE)) {
-                log_len += elog_strcpy(log_len, log_buf + log_len, ":");
-            }
-        }
-       
-        if (get_fmt_enabled(level, ELOG_FMT_LINE)) {
-            snprintf(line_num, ELOG_LINE_NUM_MAX_LEN, "%ld", line);
-            log_len += elog_strcpy(log_len, log_buf + log_len, line_num);
-        }
-        log_len += elog_strcpy(log_len, log_buf + log_len, ")");
-    }*/
+
     /* package other log data to buffer. '\0' must be added in the end by vsnprintf. */
     fmt_result = vsnprintf(log_buf + log_len, ELOG_LINE_BUF_SIZE - log_len, format, args);
-
     va_end(args);
     /* calculate log length */
     if ((log_len + fmt_result <= ELOG_LINE_BUF_SIZE) && (fmt_result > -1)) {
@@ -573,7 +557,7 @@ void elog_output(uint8_t level, const char *tag, const char *file, const char *f
  *
  * @return enable or disable
  */
-static bool get_fmt_enabled(uint8_t level, size_t set) {
+ bool get_fmt_enabled(uint8_t level, size_t set) {
     ELOG_ASSERT(level <= ELOG_LVL_VERBOSE);
 
     if (elog.enabled_fmt_set[level] & set) {
@@ -768,3 +752,89 @@ void elog_hexdump(const char *name, uint8_t width, uint8_t *buf, uint16_t size)
     /* unlock output */
     elog_output_unlock();
 }
+
+int32_t ez_sdk_log_start(void)
+{
+    int32_t rv = elog_init();
+    do
+    {
+        if (ELOG_NO_ERR != rv)
+        {
+            break;
+        }
+        elog_set_fmt(ELOG_LVL_ASSERT, ELOG_FMT_ALL);
+        elog_set_fmt(ELOG_LVL_ERROR, ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_LINE);
+        elog_set_fmt(ELOG_LVL_WARN, ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_LINE);
+        elog_set_fmt(ELOG_LVL_INFO, ELOG_FMT_LVL | ELOG_FMT_TAG | ELOG_FMT_TIME | ELOG_FMT_LINE);
+        elog_set_fmt(ELOG_LVL_DEBUG, ELOG_FMT_ALL & ~ELOG_FMT_FUNC & ~ELOG_FMT_P_INFO & ~ELOG_FMT_DIR);
+        elog_set_fmt(ELOG_LVL_VERBOSE, ELOG_FMT_ALL & ~ELOG_FMT_FUNC & ~ELOG_FMT_P_INFO & ~ELOG_FMT_DIR);
+#ifdef ELOG_COLOR_ENABLE
+        elog_set_text_color_enabled(false);
+#endif
+        elog_start();
+
+    }while(0);
+
+    return rv;
+}
+
+void ez_sdk_log_stop(void)
+{
+    /* enable output */
+    elog_stop();
+}
+
+void ez_sdk_set_log_level(uint8_t level)
+{
+    elog_set_filter_lvl(level);
+}
+
+uint8_t ez_sdk_log_filter_lvl_get(void)
+{
+    return elog_get_filter_lvl();
+}
+
+void ez_sdk_log_filter_tag(const char *tag)
+{
+    if(NULL == tag)
+    {
+        return;
+    }
+
+    elog_set_filter_tag(tag);
+}
+
+void ez_sdk_set_text_color_enabled(uint8_t enabled)
+{
+    if (0 == enabled)
+    {
+        elog_set_text_color_enabled(false);
+    }
+    else
+    {
+        elog_set_text_color_enabled(true);
+    }
+}
+
+void ez_sdk_log_filter_kw(const char *keyword)
+{
+    if(NULL == keyword)
+    {
+        return;
+    }
+    elog_set_filter_kw(keyword);
+}
+
+void ez_sdk_log_hexdump(const char *tag, uint8_t width, uint8_t *buf, uint16_t size)
+{
+    if(NULL ==tag||NULL == buf)
+    {
+        return;
+    }
+    elog_hexdump(tag, width, buf, size);
+}
+
+
+
+
+
