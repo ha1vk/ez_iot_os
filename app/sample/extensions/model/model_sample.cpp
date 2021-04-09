@@ -56,14 +56,6 @@ static int parse_attr_value(ez_model_msg* msg, char* status, int len)
             strncpy(status,(char*)msg->value, len -1);
             ez_log_d(TAG_APP, "status value:%s \n", status);
         } 
-        //bscJSON* pJsMsg = bscJSON_Parse((char*)msg->value);
-       // CHECK_NULL((NULL==pJsMsg));
-        //ez_log_d(TAG_APP, "json type:%d\n", pJsMsg->type);
-        //if(bscJSON_String == pJsMsg->type)
-       // {
-       //     strncpy(status, pJsMsg->valuestring, len -1);
-        //}
-        //JSON_SAFE_FREE(pJsMsg);
        
     } while (0);
 
@@ -138,26 +130,20 @@ int ez_model_service_das_req(ez_basic_info* basic_info, char* msg_type, ez_model
     char* szdata = NULL;
     bscJSON* root  = NULL;
     bscJSON* data  = NULL;
-
     ez_err_info status;
     ez_model_msg    msg;
     ez_msg_attr msg_attr;
-
     if(NULL == basic_info||NULL == recv_buf||NULL  == msg_type)
     {
         ez_log_i(TAG_APP,"ez_model_service_das_req input invalid \n");
         return -1;
     }
-  
     memset(&status, 0, sizeof(ez_err_info));
     memset(&msg, 0, sizeof(ez_model_msg));
     memset(&msg_attr, 0, sizeof(ez_msg_attr));
-
     strncpy(status.err_code, "0x0", EZ_ERR_CODE_LEN-1);
     status.status = 200;
     strncpy(status.err_msg, "success", EZ_ERR_MSG_LEN - 1);
-
-    msg.type= model_data_type_object;
     msg_attr.msg_qos = 0;
     msg_attr.msg_seq = msg_seq;
 
@@ -165,23 +151,21 @@ int ez_model_service_das_req(ez_basic_info* basic_info, char* msg_type, ez_model
     {
         root = bscJSON_CreateObject();
         CHECK_NULL(!root);
-
         data = bscJSON_CreateObject();
         CHECK_NULL(!data);
-
         bscJSON_AddNumberToObject(data,"value", value);
         bscJSON_AddObjectToObject(root, "data", data);
         szdata = bscJSON_PrintUnformatted(root);
         CHECK_NULL(!szdata);
-
+        msg.type= model_data_type_object;
         msg.value = szdata;
         msg.length = strlen(szdata);
-
         if(0 == strcmp(msg_type, "operate"))
         {
             strncpy(msg_attr.msg_type, "operate_reply", EZ_MSG_TYPE_LEN-1);
             ret = ez_model_reply_to_das(basic_info, &msg, &status, &msg_attr);
         }
+
     } while (0);
     
    SAFE_FREE(szdata);

@@ -280,7 +280,6 @@ EZDEV_SDK_INT32 curing_data_save_cb(ez_data_type_e datatype, unsigned char* data
 	return ezRv;
 }
 
-
 int main(void)
 {
     int log_level = 4;
@@ -292,6 +291,7 @@ int main(void)
     ez_init_info_t init_info;
 	ez_server_info_t  server;
 	EZDEV_SDK_INT32 sdk_err = ezdev_sdk_kernel_succ;
+
     do
     {
         signal(SIGPIPE,SIG_IGN);
@@ -308,15 +308,11 @@ int main(void)
         /*set log level*/
         ez_sdk_set_log_level(log_level);
         host_len = lbs_domain.length();
-        server.host = (char*)malloc(sizeof(char)*host_len + 1);
-        if(NULL == server.host)
-        {
-            ez_log_e(TAG_APP, "malloc host err\n");
-            break;;
-        }
+        memset(&server, 0, sizeof(server));
+
         server.port = lbs_port;
         memset(server.host, 0, sizeof(char)*host_len + 1);
-	    strncpy(server.host, lbs_domain.c_str(), sizeof(char)*host_len);
+	    strncpy(server.host, lbs_domain.c_str(), sizeof(server.host)-1);
 
         memset(&init_info, 0, sizeof(init_info));
         sprintf(init_info.config.devinfo_path, "%s%s", CONFIG_LOCAL_DIR, "dev_info");
@@ -363,7 +359,7 @@ int main(void)
 				sdk_err = ez_sdk_init(&server, &init_info, 1);
 				if (ezdev_sdk_kernel_succ != sdk_err)
 				{
-					ez_log_a(TAG_APP,"ez_sdk_init failed, code: %d\n", sdk_err);
+					ez_log_e(TAG_APP,"ez_sdk_init failed, code: %d\n", sdk_err);
 					break;
 				}
 				else
@@ -411,8 +407,6 @@ int main(void)
 			}
 	#endif
 
-
-
 			if (!strcmp(message, "stop\n"))
 			{
 				ez_sdk_stop();
@@ -431,11 +425,6 @@ int main(void)
 
     }while(0);
 
-    if(NULL!=server.host)
-	{
-		free(server.host);
-		server.host = NULL;
-	}
 
     return 0;
 }
