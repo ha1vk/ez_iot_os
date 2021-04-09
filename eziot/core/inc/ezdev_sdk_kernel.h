@@ -216,22 +216,6 @@ EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_server_info(ser
  */
 EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_show_key_info(showkey_info* ptr_showkey_info);
 
-/** 
- *  \brief			
- *  \method			ezDevSDK_parse_wifi_publish_msg
- *  \param[out]		
- *  \return			ezdev_sdk_kernel_error、ezdev_sdk_kernel_params_invalid 、ezdev_sdk_kernel_net_transmit
- */
-EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezDevSDK_parse_wifi_publish_msg(void * buf, int buf_len, unsigned int id);
-
-/** 
- *  \brief			
- *  \method			ezDevSDK_parse_wifi_publish_msg_id, 
- *  \param[out]		
- *  \return			-1 or cmd_id
- */ 
-EZDEV_SDK_KERNEL_API int ezDevSDK_parse_wifi_publish_msg_id(void * buf, int buf_len, unsigned int id);
-
 #ifdef __cplusplus
 }
 #endif

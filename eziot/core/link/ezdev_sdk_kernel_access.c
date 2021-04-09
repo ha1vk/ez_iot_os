@@ -95,16 +95,6 @@ static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kerne
 		sdk_error = cnt_state_lbs_redirect(sdk_kernel, 0);
 		ezdev_sdk_kernel_log_info(sdk_error, 0, "lbs return :%d, and nUpper != 0", sdk_error);
 	}
-	
-	// test
-// 	sdk_error = ezdev_sdk_kernel_succ;
-// 	memcpy(sdk_kernel->master_key, "1234567890123456", ezdev_sdk_masterkey_len);
-// 	memcpy(sdk_kernel->dev_id, "12345678901234561234567890123456", ezdev_sdk_devid_len);
-// 	memcpy(sdk_kernel->session_key, "1234567890123456", ezdev_sdk_sessionkey_len);
-// 
-// 	memcpy(sdk_kernel->redirect_das_info.das_address,"10.82.3.19", 10);
-// 	sdk_kernel->redirect_das_info.das_port = 8883;
-
 	return sdk_error;
 }
 
@@ -654,10 +644,10 @@ mkernel_internal_error send_offline_msg_to_platform(EZDEV_SDK_UINT32 seq)
     {
         ezdev_sdk_kernel_log_info(sdk_error, sdk_error, "sdk_kernel_inner_send offline msg failed,error code:%d",sdk_error);
     }
-    
-	free(msg_body_offline);	
-	msg_body_offline = NULL;
-	ezxml_free(req);
 
-	return sdk_error;
+    free(msg_body_offline);	
+    msg_body_offline = NULL;
+    ezxml_free(req);
+
+    return sdk_error;
 }

@@ -374,7 +374,7 @@ typedef struct
 
 typedef struct
 {
-    char*        host;
+    char         host[ezdev_sdk_ip_max_len];
     unsigned int port;
 } server_info_t;
 

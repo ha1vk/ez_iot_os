@@ -1708,23 +1708,3 @@ int ezdev_sdk_kernel_get_das_socket(ezdev_sdk_kernel *sdk_kernel)
 {
 	return sdk_kernel->platform_handle.net_work_getsocket(g_DasNetWork.my_socket);
 }
-
-
-/*void das_checkCoapInfoFile(ezdev_sdk_kernel* sdk_kernel)
-{
-    unsigned char loadCfgValue[COAP_SAVE_CFG_FILE_MAX_LEN];
-    memset(&loadCfgValue, 0, sizeof(loadCfgValue));
-
-    sdk_kernel->platform_handle.key_value_load(sdk_keyvalue_coapinfo, loadCfgValue, COAP_SAVE_CFG_FILE_MAX_LEN);
-    ezdev_sdk_kernel_log_error(0, 0,"[check]%s\n", loadCfgValue);
-    if((strlen(loadCfgValue) == 0) || (coapLoad_cfgInfo(&sdk_kernel->coapInfo) != OK))
-	{
-        ezdev_sdk_kernel_log_error(0, 0, "[das_checkCoapInfoFile] reset coapInfo file.\n");
-        sdk_kernel->coapInfo.protocol = EZDEV_SDK_PROTOCOL_COAP;
-        sdk_kernel->coapInfo.isCheckUdpPortAging = true;
-        sdk_kernel->coapInfo.keepAliveInterval = 0;
-        sdk_kernel->coapInfo.lastAliveTime = 0;
-        coapSave_cfgInfo(&sdk_kernel->coapInfo);
-    }
-    return;
-}*/

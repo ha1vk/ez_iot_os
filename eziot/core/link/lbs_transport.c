@@ -10,7 +10,8 @@
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
-#include "lbs_transport.h"
+
+
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -18,7 +19,7 @@
 #if !defined(_REALTEK_RTOS_) && !defined(_WIN32)
 #include <arpa/inet.h>
 #endif
-
+#include "lbs_transport.h"
 #include "mkernel_internal_error.h"
 #include "ezdev_sdk_kernel_struct.h"
 #include "sdk_kernel_def.h"
@@ -31,11 +32,14 @@
 #include "mbedtls/md5.h"
 #include "mbedtls/ecdh.h"
 #include "mbedtls/pkcs5.h"
-
 #include "ase_support.h"
 #include "json_parser.h"
 #include "mbedtls/sha512.h"
 #include "utils.h"
+
+#if defined (_WIN32) || defined(_WIN64)
+#pragma comment(lib,"ws2_32.lib")
+#endif
 
 ASE_SUPPORT_INTERFACE
 JSON_PARSER_INTERFACE
@@ -55,12 +59,12 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
     EZDEV_SDK_UINT16 sharekey_salt_len;
 
     unsigned char sharekey_dst[16];
-    unsigned char sharekey_dst_hex[ezdev_sdk_md5_len + 1]; //bscomptls_hexdump 会有\0产生
+    unsigned char sharekey_dst_hex[ezdev_sdk_md5_len + 1]; 
 
     unsigned char sharekey_sha256_dst[ezdev_sdk_sha256_len];
-    unsigned char sharekey_sha256_dst_hex[ezdev_sdk_sha256_hex_len + 1]; //bscomptls_hexdump 会有\0产生
+    unsigned char sharekey_sha256_dst_hex[ezdev_sdk_sha256_hex_len + 1];
 
-	bscomptls_md_context_t sha1_ctx;
+    bscomptls_md_context_t sha1_ctx;
     const bscomptls_md_info_t *info_sha1 = NULL;
 
 	memset(sharekey_src, 0, ezdev_sdk_total_len);
@@ -77,7 +81,6 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
 	sharekey_src_len += strlen(sdk_kernel->dev_info.dev_subserial);
 
     bscomptls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
-    //bscomptls_sha256(sharekey_src, sharekey_src_len, sharekey_dst, 0);
 	if (nUpper != 0)
 	{
         bscomptls_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
@@ -105,7 +108,6 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
     bscomptls_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
 
     bscomptls_md_init(&sha1_ctx);
-
     info_sha1 = bscomptls_md_info_from_type(BSCOMPTLS_MD_SHA256);
     if (info_sha1 == NULL)
     {
@@ -118,7 +120,7 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
     }
 
     bscomptls_pkcs5_pbkdf2_hmac(&sha1_ctx, sharekey_dst_hex, ezdev_sdk_md5_len, \
-                                    ezdev_sdk_sharekey_salt, sharekey_salt_len, ezdev_sdk_pbkdf2_hmac_times, ezdev_sdk_sha256_len, sharekey_sha256_dst);
+                                    (const unsigned char*)ezdev_sdk_sharekey_salt, sharekey_salt_len, ezdev_sdk_pbkdf2_hmac_times, ezdev_sdk_sha256_len, sharekey_sha256_dst);
     bscomptls_hexdump(sharekey_sha256_dst, ezdev_sdk_sha256_len, 1, sharekey_sha256_dst_hex);
 
     bscomptls_md_free(&sha1_ctx);
@@ -149,7 +151,7 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
     redirect_affair->global_out_packet.var_head_buf = malloc(lbs_var_head_buf_max);
     if (NULL == redirect_affair->global_out_packet.var_head_buf)
     {
-        ezdev_sdk_kernel_log_error(0, 0, "malloc out_packet head_buf err\n");
+        ezdev_sdk_kernel_log_error(0, 0, "malloc out_packet head_buf err");
         return mkernel_internal_mem_lack;
     }
     memset(redirect_affair->global_out_packet.var_head_buf, 0, lbs_var_head_buf_max);
@@ -292,11 +294,11 @@ static void save_das_info(ezdev_sdk_kernel *sdk_kernel, das_info *recv_das_info)
 
 static mkernel_internal_error header_serialize(ezdev_sdk_kernel *sdk_kernel, lbs_packet *lbs_pack, EZDEV_SDK_UINT32 cmd, EZDEV_SDK_UINT32 remain_len)
 {
+    int i = 0;
 	unsigned char byte_1 = 0;
 	unsigned char byte_2 = 0;
 	EZDEV_SDK_UINT32 total_remain_len = 0;    //authentication_i包含可变报文头，其他只有Payload长度
 	EZDEV_SDK_UINT32 remaining_count = 0;
-    int i = 0;
 
     //可变报文头
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd)
@@ -560,7 +562,7 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
         *remain_len -= authi_affair->global_in_packet.var_head_buf_off;
         if (*remain_len > authi_affair->global_in_packet.payload_buf_Len)
         {
-            ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response payload_buf size %d not enough for %d\n", authi_affair->global_in_packet.payload_buf_Len, *remain_len);
+            ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response payload_buf size %d not enough for %d", authi_affair->global_in_packet.payload_buf_Len, remain_len);
             return mkernel_internal_mem_lack;
         }
     }
@@ -645,7 +647,8 @@ static mkernel_internal_error aes_128_encrypt_pubkey(lbs_affair *authi_affair, u
     unsigned char *out_buf = NULL;
     EZDEV_SDK_UINT32 out_buf_len = 0;
     unsigned char aes_encrypt_key[16] = { 0 };
-
+    unsigned char temp[512] = { 0 };
+    EZDEV_SDK_UINT32 templen = 0;
     if (authi_affair == NULL || input_buf == NULL || input_buf_len == 0)
     {
         return mkernel_internal_input_param_invalid;
@@ -673,12 +676,9 @@ static mkernel_internal_error aes_128_encrypt_pubkey(lbs_affair *authi_affair, u
 		free(out_buf);
         return sdk_error;
     }
-
-    unsigned char temp[512] = { 0 };
-    unsigned char temp_hex[512] = { 0 };
-    EZDEV_SDK_UINT32 templen = 0;
+   
     sdk_error = aes_gcm_128_dec_padding(aes_encrypt_key, out_buf, out_buf_len, temp, &templen, output_tag_buf, tag_buf_len);
-    bscomptls_hexdump(temp, templen, 1, temp_hex);
+    //bscomptls_hexdump(temp, templen, 1, temp_hex);
 
     memcpy(output_buf, out_buf, out_buf_len);
     *output_buf_len = out_buf_len;
@@ -787,6 +787,8 @@ static mkernel_internal_error aes_128_decrypt_peer_pubkey(lbs_affair *authi_affa
     EZDEV_SDK_UINT8 recv_plat_key_len = 0;
     unsigned char aes_encrypt_key[16];
     EZDEV_SDK_UINT32 peer_pubkey_len = 0;
+    //EZDEV_SDK_UINT32 buf_len = 0;
+
     if (authi_affair == NULL || remain_len == 0 || out_buf == NULL || out_len == NULL || intput_tag_buf == NULL || tag_buf_len == 0)
     {
         return mkernel_internal_input_param_invalid;
@@ -1998,12 +2000,12 @@ mkernel_internal_error lbs_redirect_createdevid_with_auth(ezdev_sdk_kernel *sdk_
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	lbs_affair auth_redirect;
-	//设置信息
+    void* ctx_client = NULL;
 	das_info revc_das_info;
 	memset(&auth_redirect, 0, sizeof(auth_redirect));
 	memset(&revc_das_info, 0, sizeof(revc_das_info));
 
-    void* ctx_client = NULL;
+    
     switch (sdk_kernel->dev_cur_auth_type)
     {
     case sdk_dev_auth_protocol_ecdh:

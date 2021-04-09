@@ -87,8 +87,8 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
     {
         bscomptls_platform_set_calloc_free(_calloc_func, free);
 
-        if(NULL == pconfig||NULL == pconfig->pdev_info||NULL == pconfig->server.host||
-           strlen(pconfig->server.host)>ezdev_sdk_name_len||NULL == handle||NULL == event_notice_cb)
+        if(NULL == pconfig||NULL == pconfig->pdev_info||strlen(pconfig->server.host)>ezdev_sdk_name_len
+           ||NULL == handle||NULL == event_notice_cb)
         {
             return ezdev_sdk_kernel_params_invalid;
         }
@@ -758,87 +758,3 @@ EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_show_key_info(showk
 
     return ezdev_sdk_kernel_succ;
 }
-
-
-EZDEV_SDK_KERNEL_API int ezDevSDK_parse_wifi_publish_msg_id(void * buf, int buf_len, unsigned int id)
-{
-   
-    MQTTString topicName = MQTTString_initializer;
-
-    MQTTMessage msg;
-    memset(&msg , 0, sizeof(MQTTMessage));
-
-    int intQoS;
-    char msg_topic[128]= {0};
-    int division_num = 0;
-    char dev_serial[ezdev_sdk_devserial_maxlen] = {0};
-    int domain_id = 0;
-    int cmd_id = 0;
-
-    
-    if(NULL == buf || buf_len  < ezdev_sdk_tcp_header_len)
-    {
-        ezdev_sdk_kernel_log_error(0, 0, "parse_wifi_publish_msg_id input error\n");
-        return -1;
-    }
-    
-    ezdev_sdk_kernel_log_debug(0, 0, "parse_publish_msg_id，buf_len:%d\n", buf_len);
-    if (MQTTDeserialize_publish(&msg.dup, &intQoS, &msg.retained, &msg.id, &topicName,(unsigned char**)&msg.payload, (int*)&msg.payloadlen, 
-                               (unsigned char *)((unsigned char *)buf + ezdev_sdk_tcp_header_len), buf_len - ezdev_sdk_tcp_header_len) != 1)
-    {
-        ezdev_sdk_kernel_log_error(0, 0, "parse_wifi_publish_msg_id: MQTTDeserialize_publish error\n");
-        return -1;
-    }
-
-    MessageData md;
-    memset(&md, 0, sizeof(MessageData));
-
-    md.topicName = &topicName;
-    md.message = &msg;
-    msg.qos = (enum QoS)intQoS;
-
-    strncpy(msg_topic, topicName.lenstring.data, topicName.lenstring.len);
-
-    division_num = sscanf(msg_topic, "/%16[^/]/%d/%d", dev_serial, &domain_id, &cmd_id);
-    if(3 != division_num)
-    {
-        ezdev_sdk_kernel_log_error(0, 0,"parse_wifi_publish_msg_id failed, division_num:%d\n", division_num);
-    }
-     ezdev_sdk_kernel_log_debug(0, 0, "parse_publish_msg_id: %d \n", cmd_id);
-
-    return cmd_id;
-}
-
-
-EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezDevSDK_parse_wifi_publish_msg(void * buf, int buf_len, unsigned int id)
-{
-   
-    MQTTString topicName  = MQTTString_initializer;
-    MQTTMessage msg;
-    memset(&msg , 0, sizeof(MQTTMessage));
-
-    if(NULL == buf || buf_len  <ezdev_sdk_tcp_header_len)
-    {
-        return ezdev_sdk_kernel_params_invalid;
-    }
-    
-    int intQoS;
-    if (MQTTDeserialize_publish(&msg.dup, &intQoS, &msg.retained, &msg.id, &topicName,
-                               (unsigned char**)&msg.payload, (int*)&msg.payloadlen, (unsigned char *)((unsigned char *)buf + ezdev_sdk_tcp_header_len), buf_len - ezdev_sdk_tcp_header_len) != 1)
-    {
-        ezdev_sdk_kernel_log_error(mkernel_internal_call_mqtt_pub_error, 0,"MQTTDeserialize_publish error\n");
-        return ezdev_sdk_kernel_net_transmit;
-    }
-
-    MessageData md;
-    memset(&md , 0, sizeof(MessageData));
-
-    md.topicName = &topicName;
-    md.message = &msg;
-    msg.qos = (enum QoS)intQoS;
-
-    das_message_receive_ex(&md);
-
-    return ezdev_sdk_kernel_succ;
-}
-

@@ -1,3 +1,4 @@
+﻿
 /*******************************************************************************
  * Copyright © 2017-2021 Ezviz Inc.
  *
@@ -10,13 +11,11 @@
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include "mkernel_internal_error.h"
 #include "sdk_kernel_def.h"
+#include <string.h>
+#include <stdio.h>
+
 #include "mbedtls/ecdh.h"
 #include "mbedtls/config.h"
 #include "mbedtls/bignum.h"
@@ -39,10 +38,7 @@ static int rnd_std_rand( void *rng_state, unsigned char *output, size_t len )
         rng_state  = NULL;
 
     for( i = 0; i < len; ++i )
-    {
-        srand( (unsigned)time( NULL)); 
         output[i] = rand();
-    }
 #else
     if( rng_state != NULL )
         rng_state = NULL;
@@ -52,7 +48,6 @@ static int rnd_std_rand( void *rng_state, unsigned char *output, size_t len )
 
     return( 0 );
 }
-
 static int rnd_pseudo_rand( void *rng_state, unsigned char *output, size_t len )
 {
     rnd_pseudo_info *info = (rnd_pseudo_info *) rng_state;
@@ -139,7 +134,7 @@ mkernel_internal_error ezdev_generate_masterkey(bscomptls_ecdh_context* ctx_clie
     int ret = 0;
     mkernel_internal_error sdk_error = mkernel_internal_succ;
     rnd_pseudo_info rnd_info;
-    size_t master_key_len = 0;
+    unsigned int master_key_len = 0;
     unsigned char input_key[ezdev_sdk_ecdh_key_len+1]={0};
     ezdev_sdk_kernel_log_debug(0, 0, "generate_master_key enter! \n");
     
@@ -160,7 +155,7 @@ mkernel_internal_error ezdev_generate_masterkey(bscomptls_ecdh_context* ctx_clie
             sdk_error = mkernel_internal_bscomptls_ecdh_read_public_err;
             break;
         }
-        ret = bscomptls_ecdh_calc_secret( ctx_client, &master_key_len, masterkey, 1000, &rnd_pseudo_rand, &rnd_info );
+        ret = bscomptls_ecdh_calc_secret(ctx_client, &master_key_len, masterkey, 1000, &rnd_pseudo_rand, &rnd_info );
         if(ret!=0)
         {
             ezdev_sdk_kernel_log_warn(0, 0, "bscomptls_ecdh_calc_secret error,ret:%d\n", ret);
