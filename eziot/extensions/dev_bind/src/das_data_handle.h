@@ -37,7 +37,7 @@ extern "C"
 
     void base_set_cb(ez_base_cb_t cb);
 
-    int base_set_operation_code(const char *pcode, const int len);
+    ez_base_err base_set_operation_code(const char *pcode, const int len);
 
     int verify_challengecode_req(ezxml_t req);
 
@@ -47,9 +47,12 @@ extern "C"
 
     int pu2plt_query_userid_rsp(void *buf, int buf_len);
 
+    ez_base_err base_report_bind_token(const ez_bind_token_t *ptoken);
+
     int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const char *cmd_version, unsigned int msg_req, req_rsp_handle _handle);
 
-    int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, const char *cmd_version, unsigned char msg_response, unsigned int* msg_seq);
+    int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, const char *cmd_version, 
+                         unsigned char msg_response, unsigned int* msg_seq,unsigned int qos);
 
 #ifdef __cplusplus
 }

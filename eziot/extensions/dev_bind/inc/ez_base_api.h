@@ -41,12 +41,15 @@ extern "C"
 	*/
 	typedef enum
 	{
-		EZ_SUCCESS = 0  , 
-		EZ_FAILED       ,		   
-		EZ_NOT_INITED   ,
-		EZ_INITED       ,	   
-		EZ_INVALID_PARAM, 
-		EZ_REG_ERR      ,  
+		EZ_SUCCESS = 0     , 
+		EZ_FAILED          ,		   
+		EZ_NOT_INITED      ,
+		EZ_INITED          ,	   
+		EZ_INVALID_PARAM   , 
+		EZ_REG_ERR         ,  
+		EZ_JSON_CREATE_ERR ,  
+		EZ_JSON_PRINT_ERR  , 
+		EZ_JSON_SEND_ERR   , 
 	} ez_base_err;
 
 	/**
@@ -89,6 +92,25 @@ extern "C"
 	}ez_trans_cmd_t;
 
 	/**
+	* \brief sdk set msg to device
+	*/
+	typedef enum
+	{
+		TOUCH_BIND,             ///<  TOUCH_BIND_TOKEN (for eth)
+		BIND_USER,              ///<  BIND_USER_TOKEN(for ap)
+	} ez_bind_type_e;
+
+	/**
+	 * \brief report token to bind device(only choose one type)
+	*/
+	typedef struct 
+	{
+		ez_bind_type_e type;      ///< bind token type
+		unsigned int   int_token; ///< token with int type (use for eth, vlue:server_token +1), type:TOUCH_BIND
+		char*          str_oken;  ///< token with char type (use for ap) type:BIND_USER
+	}ez_bind_token_t;
+
+	/**
 	 * \brief msg attribute
 	*/
 	typedef struct 
@@ -120,6 +142,13 @@ extern "C"
     * return 0-success !0-failed   /ref ez_base_err
     */
 	EZ_BASE_API ez_base_err ez_base_init(const ez_base_init_t *pinit);
+
+	  /** 
+    * @brief ez_base_report_bind_token, report bind token 
+    * @param ptoken  bind token info 
+    * return 0-success !0-failed   /ref ez_base_err
+    */
+	EZ_BASE_API ez_base_err ez_base_report_bind_token(const ez_bind_token_t *ptoken);
     /** 
     * @brief ez_base_send_msg, for sending user msg to das
     * @param buf      user msg buf

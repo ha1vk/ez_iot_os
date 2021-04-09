@@ -92,7 +92,7 @@ extern "C"
 
 /** 
  *  \brief	设置默认回调函数,用于未注册的领域消息的接收
- *  \method		ez_model_set_default_call_back
+ *  \method		ez_model_reg_default_cb
  *  \param[in]  ez_data_router消息回调
  *  \return  0成功 非0 失败
  */

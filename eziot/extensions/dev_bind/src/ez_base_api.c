@@ -54,7 +54,6 @@ EZ_BASE_API ez_base_err ez_base_init(const ez_base_init_t *pinit)
             err = EZ_REG_ERR;
             break;
         }
-
         base_set_cb(pinit->cb);
 
         ezdev_sdk_kernel_set_sdk_main_version((char*)EZ_SDK_VERSION);
@@ -99,7 +98,7 @@ EZ_BASE_API ez_base_err ez_base_send_msg(const unsigned char* buf, const unsigne
             err = EZ_INVALID_PARAM;
             break;
         }
-        ret = ez_send_msg2plat((unsigned char*)buf, len, cmd_id, ez_base_cmd_version, msg_attr->msg_type, &msg_attr->msg_seq);
+        ret = ez_send_msg2plat((unsigned char*)buf, len, cmd_id, ez_base_cmd_version, msg_attr->msg_type, &msg_attr->msg_seq, msg_attr->msg_qos);
         if(0!=ret)
         {
             err = EZ_FAILED; 
@@ -109,18 +108,16 @@ EZ_BASE_API ez_base_err ez_base_send_msg(const unsigned char* buf, const unsigne
 
     return err;
 }
+EZ_BASE_API ez_base_err ez_base_report_bind_token(const ez_bind_token_t *ptoken)
+{
+    
+    return base_report_bind_token(ptoken);
+
+}
 
 EZ_BASE_API ez_base_err ez_base_set_operation_code(const char *pcode, const int len)
 {
-    int ret = 0;
-    ez_base_err err  = EZ_SUCCESS;
-
-    ret  = base_set_operation_code(pcode, len);
-    if(0!=ret)
-    {
-       err = EZ_INVALID_PARAM; 
-    }
-    return err;
+    return base_set_operation_code(pcode, len);
 }
 
 EZ_BASE_API ez_base_err ez_base_query_userid()

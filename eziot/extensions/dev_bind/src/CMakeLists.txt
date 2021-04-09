@@ -22,6 +22,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/
                     ${PROJECT_SOURCE_DIR}/../inc
 					${PROJECT_SOURCE_DIR}/das_protocol_def
 					${PROJECT_SOURCE_DIR}/../../../../components/mbedtls
+					${PROJECT_SOURCE_DIR}/../../../../components/json
 					${PROJECT_SOURCE_DIR}/../../../../components/xml
 					${PROJECT_SOURCE_DIR}/../../../../components/logger/inc
                     ${PROJECT_SOURCE_DIR}/../../../../include

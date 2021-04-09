@@ -15,6 +15,7 @@
 #include "ez_error.h"
 #include "md5.h"
 #include "ezxml.h"
+#include "bscJSON.h"
 #include "ez_sdk_log.h"
 #include "das_data_handle.h"
 #include "ezdev_sdk_kernel_struct.h"
@@ -33,6 +34,8 @@
 #define    kCenPlt2PuVerifyChallengeCodeRsp 0X00002844
 #define    kPu2CenPltGetUserListReq         0X00003445
 #define    kPu2CenPltGetUserListRsp         0X00003446
+#define    kPu2CenPltBindUserReq            0X00003802
+#define    kPu2CenPltBindUserTouchTokenReq  0X00003808
 
 
 static char g_user_operation_code[OPERATION_CODE_LEN] = {0};
@@ -87,7 +90,8 @@ static int check_result(ezxml_t rsp)
 }
 
 
-int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, const char *cmd_version, unsigned char msg_response, unsigned int* msg_seq)
+int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, const char *cmd_version,
+                     unsigned char msg_response, unsigned int* msg_seq, unsigned int qos)
 {
     ezdev_sdk_kernel_pubmsg pubmsg;
     memset(&pubmsg, 0, sizeof(ezdev_sdk_kernel_pubmsg));
@@ -96,7 +100,16 @@ int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, cons
     {
         return -1;
     }
-    
+
+    if(0 == qos)
+    {
+       pubmsg.msg_qos =  QOS_T0;
+    }
+    else
+    {
+        pubmsg.msg_qos = QOS_T1;
+    }
+
     pubmsg.msg_response = msg_response;
     pubmsg.msg_seq = *msg_seq;
 
@@ -177,7 +190,7 @@ int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const c
         ez_log_v(TAG_BASE,"rsp:%s\n", strrsp);
         rsp_len = strlen(strrsp);
     }
-    ret = ez_send_msg2plat((unsigned char*)strrsp, rsp_len, rsp_cmd, cmd_version, EZ_BASE_RSP, &msg_req);
+    ret = ez_send_msg2plat((unsigned char*)strrsp, rsp_len, rsp_cmd, cmd_version, EZ_BASE_RSP, &msg_req, 0);
     ez_log_v(TAG_BASE,"ez_send_msg2plat,len:%d,ret:%d\n", rsp_len,ret);
 
     if(NULL!= req)
@@ -248,6 +261,7 @@ int pu2plt_query_userid_rsp(void *buf, int buf_len)
     //char name[64]={0};
     ezxml_t rsp;
     ezxml_t User;
+    const char* strattr;
     do
     {
         rsp = ezxml_parse_str((char*)buf, buf_len);
@@ -256,8 +270,7 @@ int pu2plt_query_userid_rsp(void *buf, int buf_len)
             ez_log_e(TAG_BASE,"userid_rsp: parse err\n");
             break;
         }
-        ret = check_result(rsp);
-        if (0 != ret)
+        if (0 != (ret = check_result(rsp)))
         {
             if(0x101c02 == ret)
             {
@@ -266,12 +279,12 @@ int pu2plt_query_userid_rsp(void *buf, int buf_len)
             }
             break;
         }
-        User = ezxml_child(rsp, "User");
-        if(NULL!=User)
+        if(NULL!=(User = ezxml_child(rsp, "User")))
         {
-            if(NULL!=ezxml_attr(User,"Id"))
+            strattr = ezxml_attr(User,"Id");
+            if(NULL!= strattr)
             {
-                strncpy(userid, ezxml_attr(User,"Id"), sizeof(userid) -1);
+                strncpy(userid, strattr, sizeof(userid) -1);
             }
             /*if(NULL!=ezxml_attr(User,"Name"))
             {
@@ -280,7 +293,7 @@ int pu2plt_query_userid_rsp(void *buf, int buf_len)
         }
         else
         {
-            ez_log_e(TAG_BASE,"parse User err\n");
+            ez_log_e(TAG_BASE,"parse User tag err\n");
         }
         ret = msg2dev_set_userid(userid);
         ez_log_v(TAG_BASE,"set_userid ret:%d\n", ret);
@@ -343,7 +356,7 @@ int pu2plt_query_userid_req()
         }
         len = strlen(strreq);
         ez_log_v(TAG_BASE,"query_userid_req:%s\n", strreq);
-        ret = ez_send_msg2plat((unsigned char*)strreq, len,kPu2CenPltGetUserListReq, ez_base_cmd_version, EZ_BASE_REQ, &msg_seq);
+        ret = ez_send_msg2plat((unsigned char*)strreq, len,kPu2CenPltGetUserListReq, ez_base_cmd_version, EZ_BASE_REQ, &msg_seq, 0);
 
     }while(0);
     
@@ -419,6 +432,8 @@ void extend_data_route_cb(ezdev_sdk_kernel_submsg *ptr_submsg, EZDEV_SDK_PTR pUs
     int cmd_id = 0;
     int result_code = 0;
     EZDEV_SDK_UINT32 msg_seq = 0;
+    ez_msg2dev_t msg;
+    ez_trans_cmd_t data;
 
     if (ptr_submsg == NULL||NULL == ptr_submsg->buf)
     {
@@ -447,8 +462,6 @@ void extend_data_route_cb(ezdev_sdk_kernel_submsg *ptr_submsg, EZDEV_SDK_PTR pUs
         break;
     default:
         {
-            ez_msg2dev_t msg;
-            ez_trans_cmd_t data;
             memset(&msg ,  0, sizeof(ez_msg2dev_t));
             memset(&data , 0, sizeof(ez_trans_cmd_t));
 
@@ -512,7 +525,7 @@ void extend_event_cb(ezdev_sdk_kernel_event *ptr_event, EZDEV_SDK_PTR pUser)
             {
                 ez_log_v(TAG_BASE,"run_time_cb info: code:%#02x,\n", err_ctx->err_code);
                 sdk_send_msg_ack_context* ack_info =(sdk_send_msg_ack_context*)err_ctx->err_ctx;
-                if(ack_info)
+                if(NULL!=ack_info)
                 {
                     ez_log_v(TAG_BASE,"run_time_cb ack info: domain:%d,cmd_id:%#02x, seq:%d\n", ack_info->msg_domain_id,ack_info->msg_command_id,ack_info->msg_seq);
                 }
@@ -525,15 +538,15 @@ void extend_event_cb(ezdev_sdk_kernel_event *ptr_event, EZDEV_SDK_PTR pUser)
 
 }
 
-
-int base_set_operation_code(const char *pcode, const int len)
+ez_base_err base_set_operation_code(const char *pcode, const int len)
 {
-    int ret = 0;
+
+    ez_base_err err = EZ_SUCCESS;
     do
     {
         if (NULL == pcode || len > (OPERATION_CODE_LEN - 1))
         {
-            ret = -1;
+            err = EZ_INVALID_PARAM;
             break;
         }
         ez_log_v(TAG_BASE,"operation:%s,len:%d\n", pcode, len);
@@ -541,5 +554,128 @@ int base_set_operation_code(const char *pcode, const int len)
         strncpy(g_user_operation_code, pcode, sizeof(g_user_operation_code) - 1);
     } while (0);
     
-    return ret;
+    return err;
+}
+
+static ez_base_err report_bind_user_token(const char* ptoken)
+{
+    ez_base_err err  = EZ_SUCCESS;
+    bscJSON*    root = NULL;
+    char*       strjson = NULL;
+    unsigned int len = 0;
+    unsigned int seq = 0;
+    int ret = 0;
+    do
+    {
+        if(NULL == ptoken)
+        {
+            err = EZ_INVALID_PARAM;
+            break;
+        }
+        root = bscJSON_CreateObject();
+        if(NULL == root)
+        {
+            err = EZ_JSON_CREATE_ERR;
+            break;
+        }
+        bscJSON_AddStringToObject(root, "token", ptoken);
+        strjson = bscJSON_Print(root);
+        if(NULL== strjson)
+        {
+            err = EZ_JSON_PRINT_ERR;
+            break;
+        }
+        len = strlen(strjson);
+        ret = ez_send_msg2plat((unsigned char*)strjson, len, kPu2CenPltBindUserReq, ez_base_cmd_version, 0, &seq, 0);
+        if(0!=ret)
+        {
+            err = EZ_JSON_SEND_ERR;
+        }
+
+    }while(0);
+
+    if(NULL!=root)
+    {
+        bscJSON_Delete(root);
+    }
+    if(NULL!=strjson)
+    {
+        free(strjson);
+        strjson = NULL;
+    }
+    
+    return err;
+}
+
+static ez_base_err report_touch_bind_token(const int token)
+{
+    ez_base_err err  = EZ_SUCCESS;
+    bscJSON*    root = NULL;
+    char*       strjson = NULL;
+    unsigned int len = 0;
+    unsigned int seq = 0;
+    int ret = 0;
+    do
+    {
+        root = bscJSON_CreateObject();
+        if(NULL == root)
+        {
+            err = EZ_JSON_CREATE_ERR;
+            break;
+        }
+        bscJSON_AddNumberToObject(root, "token", token);
+        strjson = bscJSON_Print(root);
+        if(NULL== strjson)
+        {
+            err = EZ_JSON_PRINT_ERR;
+            break;
+        }
+        len = strlen(strjson);
+        ret = ez_send_msg2plat((unsigned char*)strjson, len, kPu2CenPltBindUserTouchTokenReq, ez_base_cmd_version, 0, &seq, 0);
+        if(0!=ret)
+        {
+            err = EZ_JSON_SEND_ERR;
+        }
+
+    }while(0);
+
+    if(NULL!=root)
+    {
+        bscJSON_Delete(root);
+    }
+    if(NULL!=strjson)
+    {
+        free(strjson);
+        strjson = NULL;
+    }
+    
+    return err;
+}
+
+ez_base_err base_report_bind_token(const ez_bind_token_t *ptoken)
+{
+    ez_base_err err  = EZ_SUCCESS;
+    do 
+    {
+        if(NULL ==ptoken)
+        {
+            err = EZ_INVALID_PARAM;
+            break;
+        }
+        ez_log_v(TAG_BASE,"bind tk type:%d\n", ptoken->type);
+        switch(ptoken->type)
+        {
+            case TOUCH_BIND:
+                err =  report_bind_user_token(ptoken->str_oken);
+                break;
+            case BIND_USER:
+                err =  report_touch_bind_token(ptoken->int_token);
+                break;
+            default:
+                break;
+        } 
+        
+    }while(0);
+
+    return err;
 }
