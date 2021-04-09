@@ -18,6 +18,8 @@
         "ez_base_api.h": "c",
         "random": "c",
         "ez_sdk_errno.h": "c",
-        "ez_sdk_ota.h": "c"
+        "ez_sdk_ota.h": "c",
+        "ezdev_sdk_kernel_common.h": "c",
+        "pthread.h": "c"
     }
 }
