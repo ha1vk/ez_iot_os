@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="头文件\inc">
+      <UniqueIdentifier>{1b2af5be-4767-4988-8d97-79a440e4ac1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\wrapper">
+      <UniqueIdentifier>{3f23709e-5048-49d1-9310-ac264e2719b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\src">
+      <UniqueIdentifier>{8cb1ca97-0540-4c74-bd5d-ae80a586e1cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\wrapper">
+      <UniqueIdentifier>{e43ebf84-0bad-4709-a4c0-c5af4d630d9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\posix">
+      <UniqueIdentifier>{4ef8eb03-14e9-49cd-b0d7-fbe1b32c615d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\posix">
+      <UniqueIdentifier>{7b9ec2f5-2295-4034-b470-e5e22d39a5da}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\platform\posix\win\pthread.h">
+      <Filter>头文件\posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\components\logger\inc\ez_sdk_log.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\components\logger\wrappers\win\elog_cfg.h">
+      <Filter>头文件\wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\components\logger\wrappers\win\elog_file.h">
+      <Filter>头文件\wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\components\logger\wrappers\win\elog_file_cfg.h">
+      <Filter>头文件\wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\platform\posix\win\pthread.c">
+      <Filter>源文件\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\logger\src\elog.c">
+      <Filter>源文件\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\logger\src\elog_async.c">
+      <Filter>源文件\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\logger\src\elog_buf.c">
+      <Filter>源文件\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\logger\src\elog_utils.c">
+      <Filter>源文件\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\logger\wrappers\win\elog_file.c">
+      <Filter>源文件\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\logger\wrappers\win\elog_file_port.c">
+      <Filter>源文件\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\logger\wrappers\win\elog_port.c">
+      <Filter>源文件\wrapper</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ez_iot_log.rc" />
+  </ItemGroup>
+</Project>

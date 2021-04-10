@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\eziot\core\inc\ezdev_sdk_kernel.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\eziot\core\inc\ezdev_sdk_kernel_error.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\eziot\core\inc\ezdev_sdk_kernel_struct.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{03f39f28-0006-4230-8468-903b07763aaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{93480b3d-ed9b-4ede-8dc6-b8ffe98cfaea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\link">
+      <UniqueIdentifier>{26a6c506-fb96-4b2e-bada-7081070238ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\mqtt">
+      <UniqueIdentifier>{4e75ccbf-6b62-4706-b6df-fe0d80dddac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\mbedtls">
+      <UniqueIdentifier>{3d48f697-f5ae-49ac-bf94-1aac0867200b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\cjosn">
+      <UniqueIdentifier>{26243242-5582-437a-b8bb-6113f921217b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\xml">
+      <UniqueIdentifier>{0989ad35-e746-4c72-b81a-21ffab44ba90}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\eziot\core\link\utils.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\sdk_kernel_def.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\lbs_transport.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\json_parser.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_xml_parser.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_risk_control.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_platform.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_inner.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_extend.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_ex.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_event.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_common.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel_access.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kernel.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_sdk_kerne_queuel.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ezdev_ecdh_support.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\das_transport.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\ase_support.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\core\link\access_domain_bus.c">
+      <Filter>src\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTClient.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTConnectClient.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTConnectServer.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTDeserializePublish.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTFormat.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTNet.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTPacket.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTSerializePublish.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTSubscribeClient.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTSubscribeServer.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTUnsubscribeClient.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mqtt\MQTTUnsubscribeServer.c">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\aes.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\aesni.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\arc4.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\asn1parse.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\bignum.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\blowfish.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\camellia.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\ccm.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\cipher.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\cipher_wrap.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\ctr_drbg.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\des.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\ecdh.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\ecp.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\ecp_curves.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\entropy.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\entropy_poll.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\error.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\gcm.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\havege.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\md.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\md_wrap.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\md2.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\md4.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\md5.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\oid.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\padlock.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\pkcs5.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\platform.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\ripemd160.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\rsa.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\sha1.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\sha256.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\sha512.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\timing.c">
+      <Filter>src\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\json\bscJSON.c">
+      <Filter>src\cjosn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\xml\ezxml.c">
+      <Filter>src\xml</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+</Project>

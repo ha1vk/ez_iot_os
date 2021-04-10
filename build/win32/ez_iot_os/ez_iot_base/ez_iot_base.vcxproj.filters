@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\inc">
+      <UniqueIdentifier>{c1108878-5f1b-4f54-8cf7-d709b965ef3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\tool">
+      <UniqueIdentifier>{52a8ac61-71b9-41c4-b395-606f4fbc32ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\src">
+      <UniqueIdentifier>{593d6465-6d15-444b-b1d4-9b75e44dd9b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\xml">
+      <UniqueIdentifier>{23e8fd78-441d-4c06-9f4d-d76f1a017e31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\md5">
+      <UniqueIdentifier>{58518c27-71d9-47f1-8afa-022541d36fd9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\eziot\extensions\dev_bind\src\das_data_handle.c">
+      <Filter>源文件\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\eziot\extensions\dev_bind\src\ez_base_api.c">
+      <Filter>源文件\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\xml\ezxml.c">
+      <Filter>源文件\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\components\mbedtls\md5.c">
+      <Filter>源文件\md5</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\components\xml\ezxml.h">
+      <Filter>头文件\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\eziot\extensions\dev_bind\inc\ez_base_api.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
