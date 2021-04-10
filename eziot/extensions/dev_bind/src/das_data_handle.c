@@ -666,10 +666,10 @@ ez_base_err base_report_bind_token(const ez_bind_token_t *ptoken)
         switch(ptoken->type)
         {
             case TOUCH_BIND:
-                err =  report_bind_user_token(ptoken->str_oken);
+                err =  report_touch_bind_token(ptoken->int_token);
                 break;
             case BIND_USER:
-                err =  report_touch_bind_token(ptoken->int_token);
+                err =  report_bind_user_token(ptoken->str_oken);
                 break;
             default:
                 break;

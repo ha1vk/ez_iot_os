@@ -110,16 +110,13 @@ EZ_BASE_API ez_base_err ez_base_send_msg(const unsigned char* buf, const unsigne
 }
 EZ_BASE_API ez_base_err ez_base_report_bind_token(const ez_bind_token_t *ptoken)
 {
-    
     return base_report_bind_token(ptoken);
-
 }
 
 EZ_BASE_API ez_base_err ez_base_set_operation_code(const char *pcode, const int len)
 {
     return base_set_operation_code(pcode, len);
 }
-
 EZ_BASE_API ez_base_err ez_base_query_userid()
 {
     int ret = 0;
