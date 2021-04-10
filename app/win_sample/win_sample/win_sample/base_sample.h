@@ -28,6 +28,8 @@ extern "C"
 
 	int base_sample_set_operation_code();
 
+    int base_report_token(int type);
+
 #ifdef __cplusplus
 }
 #endif
