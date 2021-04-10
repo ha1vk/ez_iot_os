@@ -117,7 +117,7 @@ typedef enum
 typedef enum
 {
 	sdk_entrance_normal,			///<	SDK正常入口
-	sdk_entrance_switchover,			///<	SDK入口切换
+	sdk_entrance_switchover,	    ///<	SDK入口切换
 	sdk_entrance_authcode_invalid
 }sdk_entrance_state;
 

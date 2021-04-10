@@ -1,24 +1,19 @@
 /*******************************************************************************
- * Copyright © 2017-2021 Ezviz Inc.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- *
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *   http://www.eclipse.org/org/documents/edl-v10.php.
- *******************************************************************************/
-
+* Copyright © 2017-2021 Ezviz Inc.
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* and Eclipse Distribution License v1.0 which accompany this distribution.
+*
+* The Eclipse Public License is available at
+*    http://www.eclipse.org/legal/epl-v10.html
+* and the Eclipse Distribution License is available at
+*   http://www.eclipse.org/org/documents/edl-v10.php.
+*******************************************************************************/
 
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
-
-#if !defined(_REALTEK_RTOS_) && !defined(_WIN32)
-#include <arpa/inet.h>
-#endif
 #include "lbs_transport.h"
 #include "mkernel_internal_error.h"
 #include "ezdev_sdk_kernel_struct.h"
@@ -32,14 +27,15 @@
 #include "mbedtls/md5.h"
 #include "mbedtls/ecdh.h"
 #include "mbedtls/pkcs5.h"
+#include "mbedtls/sha512.h"
 #include "ase_support.h"
 #include "json_parser.h"
-#include "mbedtls/sha512.h"
 #include "utils.h"
 
-#if defined (_WIN32) || defined(_WIN64)
-#pragma comment(lib,"ws2_32.lib")
+#if !defined(_REALTEK_RTOS_) && !defined(_WIN32)
+#include <arpa/inet.h>
 #endif
+
 
 ASE_SUPPORT_INTERFACE
 JSON_PARSER_INTERFACE
@@ -59,7 +55,7 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
     EZDEV_SDK_UINT16 sharekey_salt_len;
 
     unsigned char sharekey_dst[16];
-    unsigned char sharekey_dst_hex[ezdev_sdk_md5_len + 1]; 
+    unsigned char sharekey_dst_hex[ezdev_sdk_md5_len + 1];
 
     unsigned char sharekey_sha256_dst[ezdev_sdk_sha256_len];
     unsigned char sharekey_sha256_dst_hex[ezdev_sdk_sha256_hex_len + 1];
@@ -81,6 +77,7 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
 	sharekey_src_len += strlen(sdk_kernel->dev_info.dev_subserial);
 
     bscomptls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
+
 	if (nUpper != 0)
 	{
         bscomptls_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
@@ -136,18 +133,16 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
 	redirect_affair->random_3 = rand() % 256;
 	redirect_affair->random_4 = rand() % 256;
 
-    //发送包，固定报文头，2-5个字节
 	redirect_affair->global_out_packet.head_buf = malloc(16);
 	if(NULL == redirect_affair->global_out_packet.head_buf)
 	{
-		ezdev_sdk_kernel_log_error(0, 0, "malloc out_packet head_buf err\n");
+		ezdev_sdk_kernel_log_error(0, 0, "malloc out_packet head_buf err");
 		return mkernel_internal_mem_lack;
 	}
 	memset(redirect_affair->global_out_packet.head_buf, 0, 16);
 	redirect_affair->global_out_packet.head_buf_off = 0;
 	redirect_affair->global_out_packet.head_buf_Len = 16;
 
-    //发送包，可变报文头
     redirect_affair->global_out_packet.var_head_buf = malloc(lbs_var_head_buf_max);
     if (NULL == redirect_affair->global_out_packet.var_head_buf)
     {
@@ -157,30 +152,24 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
     memset(redirect_affair->global_out_packet.var_head_buf, 0, lbs_var_head_buf_max);
     redirect_affair->global_out_packet.var_head_buf_off = 0;
     redirect_affair->global_out_packet.var_head_buf_Len = lbs_var_head_buf_max;
-
-    //发送包，Payload
 	redirect_affair->global_out_packet.payload_buf = malloc(lbs_send_buf_max);
 	if(NULL == redirect_affair->global_out_packet.payload_buf)
 	{
-		ezdev_sdk_kernel_log_error(0, 0, "malloc out_packet payload_buf err\n");
+		ezdev_sdk_kernel_log_error(0, 0, "malloc out_packet payload_buf err");
 		return mkernel_internal_mem_lack;
 	}
 	memset(redirect_affair->global_out_packet.payload_buf, 0, lbs_send_buf_max);
 	redirect_affair->global_out_packet.payload_buf_off = 0;
 	redirect_affair->global_out_packet.payload_buf_Len = lbs_send_buf_max;
-
-    //接收包，固定报文头，2-5个字节
 	redirect_affair->global_in_packet.head_buf = malloc(16);
 	if(NULL == redirect_affair->global_in_packet.head_buf)
 	{
-		ezdev_sdk_kernel_log_error(0, 0, "malloc in_packet head_buf err \n");
+		ezdev_sdk_kernel_log_error(0, 0, "malloc in_packet head_buf err ");
 		return mkernel_internal_mem_lack;
 	}
 	memset(redirect_affair->global_in_packet.head_buf, 0, 16);
 	redirect_affair->global_in_packet.head_buf_off = 0;
 	redirect_affair->global_in_packet.head_buf_Len = 16;
-
-    //接收包，可变报文头
     redirect_affair->global_in_packet.var_head_buf = malloc(lbs_var_head_buf_max);
     if (NULL == redirect_affair->global_in_packet.var_head_buf)
     {
@@ -190,12 +179,10 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
     memset(redirect_affair->global_in_packet.var_head_buf, 0, lbs_var_head_buf_max);
     redirect_affair->global_in_packet.var_head_buf_off = 0;
     redirect_affair->global_in_packet.var_head_buf_Len = lbs_var_head_buf_max;
-
-    //接收包，Payload
 	redirect_affair->global_in_packet.payload_buf = malloc(lbs_recv_buf_max);
 	if(NULL == redirect_affair->global_in_packet.payload_buf)
 	{
-		ezdev_sdk_kernel_log_error(0, 0, "malloc in_packet payload_buf err\n");
+		ezdev_sdk_kernel_log_error(0, 0, "malloc in_packet payload_buf err ");
 		return mkernel_internal_mem_lack;
 	}
 	memset(redirect_affair->global_in_packet.payload_buf, 0, lbs_recv_buf_max);
@@ -272,10 +259,7 @@ static void clear_lbs_affair_buf(lbs_affair *redirect_affair)
 
 static void save_key_value(ezdev_sdk_kernel *sdk_kernel, lbs_affair *affair)
 {
-	/**
-	* \brief   将事务中的信息存储起来
-	*/
-    ezdev_sdk_kernel_log_info(0, 0, "save_key_value start !!!\n");
+    ezdev_sdk_kernel_log_info(0, 0, "save_key_value start !!!");
 	memcpy(sdk_kernel->dev_id, affair->dev_id, ezdev_sdk_devid_len);
 	memcpy(sdk_kernel->master_key, affair->master_key, ezdev_sdk_masterkey_len);
 	memcpy(sdk_kernel->session_key, affair->session_key, ezdev_sdk_sessionkey_len);
@@ -286,9 +270,6 @@ static void save_key_value(ezdev_sdk_kernel *sdk_kernel, lbs_affair *affair)
 
 static void save_das_info(ezdev_sdk_kernel *sdk_kernel, das_info *recv_das_info)
 {
-	/**
-	* \brief   将DAS信息存储起来
-	*/
 	memcpy(&sdk_kernel->redirect_das_info, recv_das_info, sizeof(das_info));
 }
 
@@ -297,14 +278,10 @@ static mkernel_internal_error header_serialize(ezdev_sdk_kernel *sdk_kernel, lbs
     int i = 0;
 	unsigned char byte_1 = 0;
 	unsigned char byte_2 = 0;
-	EZDEV_SDK_UINT32 total_remain_len = 0;    //authentication_i包含可变报文头，其他只有Payload长度
+	EZDEV_SDK_UINT32 total_remain_len = 0;  
 	EZDEV_SDK_UINT32 remaining_count = 0;
-
-    //可变报文头
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd)
     {
-        //当前设备支持一种认证类型ECDH
-        //根据dev_auth_type_count大小，增加dev_auth_type_group[1]、dev_auth_type_group[2]......dev_auth_type_group[63]
         *(lbs_pack->var_head_buf + lbs_pack->var_head_buf_off) = sdk_kernel->dev_cur_auth_type;
         lbs_pack->var_head_buf_off += 1;
 
@@ -316,15 +293,11 @@ static mkernel_internal_error header_serialize(ezdev_sdk_kernel *sdk_kernel, lbs
             lbs_pack->var_head_buf_off += 1;
         }
     }
-
-    //固定报文头，2-5个字节
 	if (lbs_pack->head_buf_Len < 5)
 	{
 		return mkernel_internal_mem_lack;
 	}
-    /*控制报文的低2位复用,用于服务区分新旧版本*/
 	byte_1 = ((cmd & 0x0F) << 4)|0x2;
-    //控制报文类型为0x01 的条件下，需要支持“协商标记位”
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd)
     {
         byte_1 = byte_1 | 0x8;
@@ -335,7 +308,6 @@ static mkernel_internal_error header_serialize(ezdev_sdk_kernel *sdk_kernel, lbs
 
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd)
     {
-        //可变报文头+Payload长度
         total_remain_len = remain_len + lbs_pack->var_head_buf_off;
     }
     else
@@ -370,7 +342,6 @@ static mkernel_internal_error header_serialize_old(lbs_packet *lbs_pack, EZDEV_S
 	{
 		return mkernel_internal_mem_lack;
 	}
-    /*控制报文的低2位复用,用于服务区分新旧版本*/
 	byte_1 = ((cmd & 0x0F) << 4);
 
 	*(lbs_pack->head_buf + lbs_pack->head_buf_off) = byte_1;
@@ -431,8 +402,6 @@ static mkernel_internal_error digital_sign_serialize_sha384(lbs_packet *lbs_pack
 	memset(sign_output, 0, 64);
 	memcpy(sign_input, sign_src, sign_src_len);
 	sign_input_len = sign_src_len;
-   
-    /*输入参数1表示sh384摘要算法*/
 	bscomptls_sha512(sign_input, sign_input_len, sign_output, 1);
 
 	memset(sign_input, 0, ezdev_sdk_total_len);
@@ -477,8 +446,6 @@ static mkernel_internal_error digital_sign_serialize_and_check_sha384(unsigned c
 
 	memcpy(sign_input, sign_src, sign_src_len);
 	sign_input_len = sign_src_len;
-
-	/*输入参数1代表384r1摘要算法*/
 	bscomptls_sha512(sign_input, sign_input_len, sign_output, 1);
 
 	memset(sign_input, 0, ezdev_sdk_total_len);
@@ -512,7 +479,7 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
 	mkernel_internal_error sdk_error = sdk_kernel->platform_handle.net_work_read(authi_affair->lbs_net_work, &byte_1, 1, 5 * 1000);
 	if (sdk_error != mkernel_internal_succ)
 	{
-		ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response revc byte_1 error\n");
+		ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response revc byte_1 error");
 		return sdk_error;
 	}
 
@@ -526,7 +493,7 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
 		sdk_error = sdk_kernel->platform_handle.net_work_read(authi_affair->lbs_net_work, &byte_2, 1, 5 * 1000);
 		if (sdk_error != mkernel_internal_succ)
 		{
-			ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response revc byte_2 error\n");
+			ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response revc byte_2 error");
 			return sdk_error;
 		}
 
@@ -539,12 +506,9 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
 
     authi_affair->global_in_packet.head_buf[0] = byte_1;
     authi_affair->global_in_packet.head_buf[1] = byte_2;
-
-    //可变报文头,萤石云平台返回的长度固定为1个字节
     flag = (byte_1 & 0x08) >> 3;
     if (0x01 == flag && DEV_PROTOCOL_AUTHENTICATION_II == *rev_cmd)
     {
-        //剩余报文包含可变报文头 + Playload
         if (*remain_len > authi_affair->global_in_packet.payload_buf_Len + authi_affair->global_in_packet.var_head_buf_Len)
         {
             return mkernel_internal_mem_lack;
@@ -553,12 +517,10 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
         sdk_error = sdk_kernel->platform_handle.net_work_read(authi_affair->lbs_net_work, authi_affair->global_in_packet.var_head_buf, 1, 5 * 1000);
         if (sdk_error != 0)
         {
-            ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response revc var head error\n");
+            ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response revc var head error");
             return sdk_error;
         }
         authi_affair->global_in_packet.var_head_buf_off += 1;
-
-        //此时剩余的报文只有Playload，要减去实际可变报文长度
         *remain_len -= authi_affair->global_in_packet.var_head_buf_off;
         if (*remain_len > authi_affair->global_in_packet.payload_buf_Len)
         {
@@ -568,14 +530,11 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
     }
     else
     {
-        //剩余报文只有Playload
         if (*remain_len > authi_affair->global_in_packet.payload_buf_Len)
         {
             return mkernel_internal_mem_lack;
         }
     }
-
-	//需要接收完全（Playload）
 	sdk_error = sdk_kernel->platform_handle.net_work_read(authi_affair->lbs_net_work, authi_affair->global_in_packet.payload_buf, *remain_len, 5 * 1000);
 
 	if (sdk_error != 0)
@@ -583,7 +542,7 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
 		ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "wait_assign_response revc data error");
 		return sdk_error;
 	}
-	ezdev_sdk_kernel_log_trace(sdk_error, sdk_error, "wait_assign_response succ, cmd:%d, len:%d\n", *rev_cmd, *remain_len);
+	ezdev_sdk_kernel_log_trace(sdk_error, sdk_error, "wait_assign_response succ, cmd:%d, len:%d", *rev_cmd, *remain_len);
 	return mkernel_internal_succ;
 }
 
@@ -598,10 +557,8 @@ static mkernel_internal_error send_lbs_msg(ezdev_sdk_kernel *sdk_kernel, lbs_aff
 	{
 		return result_;
 	}
-
     cmd = (authi_affair->global_out_packet.head_buf[0] & 0xf0) >> 4;
     flag = (authi_affair->global_out_packet.head_buf[0] & 0x08) >> 3;
-    //可变报文头
     if (DEV_PROTOCOL_AUTHENTICATION_I == cmd && 0x01 == flag)
     {
         result_ = sdk_kernel->platform_handle.net_work_write(authi_affair->lbs_net_work, authi_affair->global_out_packet.var_head_buf, authi_affair->global_out_packet.var_head_buf_off, 5 * 1000, &real_sendlen);
@@ -619,10 +576,6 @@ static mkernel_internal_error send_lbs_msg(ezdev_sdk_kernel *sdk_kernel, lbs_aff
 
 	return mkernel_internal_succ;
 }
-
-/********************************************************************/
-/************************Authentication_I****************************/
-/********************************************************************/
 static mkernel_internal_error authentication_i_serialize(lbs_affair *authi_affair)
 {
 	EZDEV_SDK_UINT8 dev_serial_len = strlen(authi_affair->dev_subserial);
@@ -653,11 +606,6 @@ static mkernel_internal_error aes_128_encrypt_pubkey(lbs_affair *authi_affair, u
     {
         return mkernel_internal_input_param_invalid;
     }
-
-    //EZDEV_SDK_UINT32 buf_len_padding = 0;
-    //buf_len_padding = calculate_padding_len(input_buf_len);
-
-    //aes gcm加密算法内部自动补齐，明文可以不是16字节整数倍
     out_buf = (unsigned char*)malloc(input_buf_len + 1);
     if (NULL == out_buf)
     {
@@ -666,7 +614,6 @@ static mkernel_internal_error aes_128_encrypt_pubkey(lbs_affair *authi_affair, u
     }
     memset(out_buf, 0, input_buf_len + 1);
     out_buf_len = input_buf_len;
-    /*只使用share_key的前16位作为加密秘钥*/
     memcpy(aes_encrypt_key, authi_affair->share_key, 16);
 
     sdk_error = aes_gcm_128_enc_padding(aes_encrypt_key, input_buf, input_buf_len, out_buf, &out_buf_len, output_tag_buf, tag_buf_len);
@@ -676,10 +623,8 @@ static mkernel_internal_error aes_128_encrypt_pubkey(lbs_affair *authi_affair, u
 		free(out_buf);
         return sdk_error;
     }
-   
-    sdk_error = aes_gcm_128_dec_padding(aes_encrypt_key, out_buf, out_buf_len, temp, &templen, output_tag_buf, tag_buf_len);
-    //bscomptls_hexdump(temp, templen, 1, temp_hex);
 
+    sdk_error = aes_gcm_128_dec_padding(aes_encrypt_key, out_buf, out_buf_len, temp, &templen, output_tag_buf, tag_buf_len);
     memcpy(output_buf, out_buf, out_buf_len);
     *output_buf_len = out_buf_len;
     if (out_buf)
@@ -787,7 +732,6 @@ static mkernel_internal_error aes_128_decrypt_peer_pubkey(lbs_affair *authi_affa
     EZDEV_SDK_UINT8 recv_plat_key_len = 0;
     unsigned char aes_encrypt_key[16];
     EZDEV_SDK_UINT32 peer_pubkey_len = 0;
-    //EZDEV_SDK_UINT32 buf_len = 0;
 
     if (authi_affair == NULL || remain_len == 0 || out_buf == NULL || out_len == NULL || intput_tag_buf == NULL || tag_buf_len == 0)
     {
@@ -795,7 +739,7 @@ static mkernel_internal_error aes_128_decrypt_peer_pubkey(lbs_affair *authi_affa
     }
 
     recv_plat_key_len = remain_len - authi_affair->global_in_packet.payload_buf_off;
-    ezdev_sdk_kernel_log_debug(0, 0, "recv_plat_key_len: is :%d \n", recv_plat_key_len);
+    ezdev_sdk_kernel_log_error(0, 0, "recv_plat_key_len: is :%d \n", recv_plat_key_len);
 
     memcpy(aes_encrypt_key, authi_affair->share_key, 16);
 
@@ -812,6 +756,12 @@ static mkernel_internal_error aes_128_decrypt_peer_pubkey(lbs_affair *authi_affa
     return sdk_error;
 }
 
+
+/*****************************************************************/
+
+/********************************************************************/
+/****************************Authentication_II********************************/
+/********************************************************************/
 static mkernel_internal_error parse_authentication_ii(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair, EZDEV_SDK_UINT32 remain_len, void* ctx_client)
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
@@ -827,11 +777,11 @@ static mkernel_internal_error parse_authentication_ii(ezdev_sdk_kernel *sdk_kern
 	int nIndex = 0;
     unsigned char in_packet_flag = 0;
     unsigned char out_packet_flag = 0;
+
     unsigned char in_packet_auth_type = 0;
     unsigned char out_packet_auth_type = 0;
     EZDEV_SDK_UINT8 var_head_buf_off = 0;
     EZDEV_SDK_UINT8 dev_support_auth_type = 0;
-
 	authi_affair->global_in_packet.payload_buf_off += 3;
 
 	ezdev_sdk_kernel_log_debug(0, 0, "parse_authentication_ii remain_len:%d", remain_len);
@@ -849,7 +799,7 @@ static mkernel_internal_error parse_authentication_ii(ezdev_sdk_kernel *sdk_kern
         out_packet_auth_type = authi_affair->global_out_packet.var_head_buf[0];
         if (in_packet_auth_type != out_packet_auth_type)
         {
-             var_head_buf_off = 1;
+            var_head_buf_off = 1;
             do 
             {
                 var_head_buf_off++;
@@ -931,8 +881,6 @@ static mkernel_internal_error wait_authentication_ii(ezdev_sdk_kernel *sdk_kerne
 		return mkernel_internal_net_read_error_request;
 	}
     sdk_error = parse_authentication_ii(sdk_kernel, authi_affair, remain_len, ctx_client);
-
-    //设备与平台的认证类型当前不匹配，可重新匹配
     if (mkernel_internal_platform_lbs_auth_type_need_rematch == sdk_error)
     {
         sdk_kernel->dev_cur_auth_type = authi_affair->global_in_packet.var_head_buf[0];
@@ -969,7 +917,6 @@ static mkernel_internal_error send_sessionkey_req_serialize(lbs_affair *authi_af
 
 static mkernel_internal_error send_update_sessionkey_req(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair)
 {
-	//payload
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 
 	sdk_error = common_serialize(&authi_affair->global_out_packet, DEV_PROTOCOL_LBS_FORM_VERSION, DEV_PROTOCOL_LBS_LOW_TYPE_VERSION, DEV_PROTOCOL_LBS_HIGH_TYPE_VERSION);
@@ -984,8 +931,6 @@ static mkernel_internal_error send_update_sessionkey_req(ezdev_sdk_kernel *sdk_k
 	{
 		return sdk_error;
 	}
-
-	//header
     sdk_error = header_serialize(sdk_kernel, &authi_affair->global_out_packet, DEV_PROTOCOL_REFRESHSESSIONKEY_REQ, authi_affair->global_out_packet.payload_buf_off);
 	if (sdk_error != mkernel_internal_succ)
 	{
@@ -1020,7 +965,6 @@ static mkernel_internal_error wait_update_sessionkey_rsp(ezdev_sdk_kernel *sdk_k
 
 static mkernel_internal_error send_authentication_creat_dev_id(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair)
 {
-	//payload
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 
 	sdk_error = common_serialize(&authi_affair->global_out_packet, DEV_PROTOCOL_LBS_FORM_VERSION, DEV_PROTOCOL_LBS_LOW_TYPE_VERSION, DEV_PROTOCOL_LBS_HIGH_TYPE_VERSION);
@@ -1034,8 +978,6 @@ static mkernel_internal_error send_authentication_creat_dev_id(ezdev_sdk_kernel 
 	{
 		return sdk_error;
 	}
-
-	//header
     sdk_error = header_serialize(sdk_kernel, &authi_affair->global_out_packet, DEV_PROTOCOL_REQUEST_DEVID, authi_affair->global_out_packet.payload_buf_off);
 	if (sdk_error != mkernel_internal_succ)
 	{
@@ -1066,8 +1008,6 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     EZDEV_SDK_UINT32 sessionkey_tag_buf_len = tag_len;
 
     authi_affair->global_in_packet.payload_buf_off += 3;
-
-    //取返回码
     memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
     authi_affair->global_in_packet.payload_buf_off++;
 
@@ -1076,21 +1016,15 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
         ezdev_sdk_kernel_log_debug(mkernel_internal_platform_error, result_code, "parse_authentication_iv_create_devid platform return err code:%d\n", result_code);
         return mkernel_internal_platform_error + result_code;
     }
-
-    //devid tag
     memcpy(devid_tag_buf, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, devid_tag_buf_len);
     authi_affair->global_in_packet.payload_buf_off += devid_tag_buf_len;
-
-    //取en_dev_id长度
     en_dev_id_len = *(authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off);
     authi_affair->global_in_packet.payload_buf_off++;
-    //aes 128 gcm算法加密时，服务端传过去的dev_id密文是32字节，原文也是32字节
     if (en_dev_id_len != 32)
     {
         ezdev_sdk_kernel_log_debug(0, 0, "parse_authentication_create_dev_id en_dev_id_len is not 32\n");
         return mkernel_internal_platform_appoint_error;
     }
-    //解密 AES-128-gcm dev_id
     ezdev_sdk_kernel_log_debug(0, 0, "get en_dev_id_len :%d\n", en_dev_id_len);
     sdk_error = aes_gcm_128_dec_padding(authi_affair->master_key, \
                                 authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, en_dev_id_len, \
@@ -1107,21 +1041,15 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     }
     memcpy(authi_affair->dev_id, dev_id, dev_id_len);
     authi_affair->global_in_packet.payload_buf_off += en_dev_id_len;
-
-    //sessionkey tag
     memcpy(sessionkey_tag_buf, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, sessionkey_tag_buf_len);
     authi_affair->global_in_packet.payload_buf_off += sessionkey_tag_buf_len;
-
-    //取en-sessionkey长度
     en_sessionkey_len = *(authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off);
     authi_affair->global_in_packet.payload_buf_off++;
-    //aes 128 gcm算法加密时，服务端传过去的sessionkey密文是16字节，原文也是16字节
     if (en_sessionkey_len != 16)
     {
         ezdev_sdk_kernel_log_debug(0, 0, "parse_authentication_createdevid_iv en_sessionkey_len is not 32\n");
         return mkernel_internal_platform_appoint_error;
     }
-    //解密 AES-128-gcm sessionkey
     ezdev_sdk_kernel_log_debug(0, 0, "get en_sessionkey_len :%d\n", en_sessionkey_len);
     sdk_error = aes_gcm_128_dec_padding(authi_affair->master_key, \
                                 authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, en_sessionkey_len, \
@@ -1138,8 +1066,6 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     }
     memcpy(authi_affair->session_key, sessionkey, sessionkey_len);
     authi_affair->global_in_packet.payload_buf_off += en_sessionkey_len;
-
-    //校验数字签名 dev_subserial
     memset(sign_input, 0, ezdev_sdk_total_len);
     memcpy(sign_input, authi_affair->dev_subserial, strlen(authi_affair->dev_subserial));
     sdk_error = digital_sign_serialize_and_check_sha384(authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, \
@@ -1179,7 +1105,6 @@ static mkernel_internal_error refreshsessionkey_i_serialize(lbs_affair *auth_aff
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	EZDEV_SDK_UINT8 dev_serial_len = 0;
-	//	unsigned char ase_key[16];
 	unsigned char en_src[16];
 	unsigned char en_dst[16];
 	EZDEV_SDK_UINT32 en_dst_len = 0;
@@ -1215,7 +1140,6 @@ static mkernel_internal_error refreshsessionkey_i_serialize(lbs_affair *auth_aff
 
 static mkernel_internal_error send_refreshsessionkey_i(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair)
 {
-	//payload
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 
 	sdk_error = common_serialize(&authi_affair->global_out_packet, DEV_PROTOCOL_LBS_FORM_VERSION, DEV_PROTOCOL_LBS_LOW_TYPE_VERSION, DEV_PROTOCOL_LBS_HIGH_TYPE_VERSION);
@@ -1230,7 +1154,6 @@ static mkernel_internal_error send_refreshsessionkey_i(ezdev_sdk_kernel *sdk_ker
 		return sdk_error;
 	}
 
-	//header,这里用这个DEV_PROTOCOL_REQUEST_DEVID,保持和原来定义一样 0x7
 	sdk_error = header_serialize_old(&authi_affair->global_out_packet, DEV_PROTOCOL_REQUEST_DEVID, authi_affair->global_out_packet.payload_buf_off);
 	if (sdk_error != mkernel_internal_succ)
 	{
@@ -1244,7 +1167,6 @@ static mkernel_internal_error send_refreshsessionkey_i(ezdev_sdk_kernel *sdk_ker
 
 static mkernel_internal_error send_stun_refreshsessionkey_i(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair)
 {
-	//payload
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 
 	sdk_error = common_serialize(&authi_affair->global_out_packet, DEV_PROTOCOL_LBS_FORM_VERSION, DEV_PROTOCOL_LBS_LOW_TYPE_VERSION, DEV_PROTOCOL_LBS_HIGH_TYPE_VERSION);
@@ -1258,8 +1180,6 @@ static mkernel_internal_error send_stun_refreshsessionkey_i(ezdev_sdk_kernel *sd
 	{
 		return sdk_error;
 	}
-
-	//header
 	sdk_error = header_serialize_old(&authi_affair->global_out_packet, DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_I, authi_affair->global_out_packet.payload_buf_off);
 	if (sdk_error != mkernel_internal_succ)
 	{
@@ -1267,7 +1187,7 @@ static mkernel_internal_error send_stun_refreshsessionkey_i(ezdev_sdk_kernel *sd
 	}
 
 	sdk_error = send_lbs_msg(sdk_kernel, authi_affair);
-	ezdev_sdk_kernel_log_debug(sdk_error, 0, "send_stun_refreshsessionkey_i complete\n");
+	ezdev_sdk_kernel_log_debug(sdk_error, 0, "send_stun_refreshsessionkey_i complete");
 	return mkernel_internal_succ;
 }
 
@@ -1280,28 +1200,25 @@ static mkernel_internal_error parse_refreshsessionkey_ii(lbs_affair *authi_affai
     unsigned char ase_dst[32];
     EZDEV_SDK_UINT32 ase_dst_len = 0;
     authi_affair->global_in_packet.payload_buf_off += 3;
-
-    //取返回码
     memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
     authi_affair->global_in_packet.payload_buf_off++;
 
     if (result_code != 0)
     {
-        ezdev_sdk_kernel_log_debug(mkernel_internal_platform_error, result_code, "parse_refreshsessionkey_ii platform return error code:%d\n", result_code);
+        ezdev_sdk_kernel_log_debug(mkernel_internal_platform_error, result_code, "parse_refreshsessionkey_ii platform return error code:%d", result_code);
         return mkernel_internal_platform_error + result_code;
     }
-    //计算r1+r2+sessionkey长度
     en_sessionkey_len = remain_len - authi_affair->global_in_packet.payload_buf_off;
     if (en_sessionkey_len != 32)
     {
-        ezdev_sdk_kernel_log_debug(mkernel_internal_platform_appoint_error, 0, "parse_refreshsessionkey_ii en_sessionkey_len is not 32\n");
+        ezdev_sdk_kernel_log_debug(mkernel_internal_platform_appoint_error, 0, "parse_refreshsessionkey_ii en_sessionkey_len is:%d not 32");
         return mkernel_internal_platform_appoint_error;
     }
 
 	sdk_error = aes_cbc_128_dec_padding(authi_affair->master_key, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, en_sessionkey_len, ase_dst, &ase_dst_len);
 	if (sdk_error != mkernel_internal_succ)
 	{
-		ezdev_sdk_kernel_log_debug(mkernel_internal_platform_appoint_error, 0, "parse_refreshsessionkey_ii aes_cbc_128_dec error :%d\n", sdk_error);
+		ezdev_sdk_kernel_log_debug(mkernel_internal_platform_appoint_error, 0, "parse_refreshsessionkey_ii aes_cbc_128_dec error :%d", sdk_error);
 		return sdk_error;
 	}
 
@@ -1310,7 +1227,7 @@ static mkernel_internal_error parse_refreshsessionkey_ii(lbs_affair *authi_affai
     return_random_1 = ase_dst[0];
     if (return_random_1 != authi_affair->random_1)
     {
-        ezdev_sdk_kernel_log_debug(mkernel_internal_platform_appoint_error, 0, "parse_refreshsessionkey_ii random_1 error, my:%d, get:%d\n", authi_affair->random_1, return_random_1);
+        ezdev_sdk_kernel_log_debug(mkernel_internal_platform_appoint_error, 0, "parse_refreshsessionkey_ii random_1 error, my:%d, get:%d", authi_affair->random_1, return_random_1);
         return mkernel_internal_random1_check_error;
     }
 
@@ -1332,11 +1249,10 @@ static mkernel_internal_error wait_refreshsessionkey_ii(ezdev_sdk_kernel *sdk_ke
 		return sdk_error;
 	}
 
-	if (rev_cmd != DEV_PROTOCOL_RESPONSE_DEVID)  //这里保持0x8不变
+	if (rev_cmd != DEV_PROTOCOL_RESPONSE_DEVID)
 	{
 		return mkernel_internal_net_read_error_request;
 	}
-    //refresh sessionkey和creat dev-id的响应是一样的
 	sdk_error = parse_refreshsessionkey_ii(authi_affair, remain_len);
 	ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "parse_refreshsessionkey_ii end\n");
 
@@ -1363,7 +1279,6 @@ static mkernel_internal_error wait_stun_refreshsessionkey_ii(ezdev_sdk_kernel *s
 
 	return sdk_error;
 }
-
 mkernel_internal_error refreshsessionkey_iii_serialize(lbs_affair *auth_affair)
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
@@ -1404,7 +1319,6 @@ mkernel_internal_error send_refreshsessionkey_iii(ezdev_sdk_kernel *sdk_kernel, 
 		return sdk_error;
 	}
 
-	//header//这里仍然采用0x9(DEV_PROTOCOL_APPLY_DEVID_CFM),保持和原来使用的定义一样
 	sdk_error = header_serialize_old(&authi_affair->global_out_packet, DEV_PROTOCOL_APPLY_DEVID_CFM, authi_affair->global_out_packet.payload_buf_off);
 	if (sdk_error != mkernel_internal_succ)
 	{
@@ -1412,7 +1326,7 @@ mkernel_internal_error send_refreshsessionkey_iii(ezdev_sdk_kernel *sdk_kernel, 
 	}
 
 	sdk_error = send_lbs_msg(sdk_kernel, authi_affair);
-	ezdev_sdk_kernel_log_debug(sdk_error, 0, "send_refreshsessionkey_iii complete\n");
+	ezdev_sdk_kernel_log_debug(sdk_error, 0, "send_refreshsessionkey_iii complete");
 	return mkernel_internal_succ;
 }
 
@@ -1441,10 +1355,9 @@ mkernel_internal_error send_stun_refreshsessionkey_iii(ezdev_sdk_kernel *sdk_ker
 	}
 
 	sdk_error = send_lbs_msg(sdk_kernel, authi_affair);
-	ezdev_sdk_kernel_log_debug(sdk_error, 0, "send_stun_refreshsessionkey_iii complete\n");
+	ezdev_sdk_kernel_log_debug(sdk_error, 0, "send_stun_refreshsessionkey_iii complete");
 	return mkernel_internal_succ;
 }
-
 static mkernel_internal_error crypto_data_req_das_serialize(lbs_affair *auth_affair)
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
@@ -1476,10 +1389,7 @@ static mkernel_internal_error crypto_data_req_das_serialize(lbs_affair *auth_aff
 			sdk_error = mkernel_internal_json_format_error;
 			break;
 		}
-
 		json_len = strlen(json_buf);
-
-		//保证 json_len_padding > json_len
 		json_len_padding = calculate_padding_len(json_len);
 		if (ezdev_sdk_json_default_size > json_len_padding)
 		{
@@ -1573,8 +1483,6 @@ static mkernel_internal_error crypto_data_req_stun_serialize(lbs_affair *auth_af
 		}
 
 		json_len = strlen(json_buf);
-
-		//保证 json_len_padding > json_len
 		json_len_padding = calculate_padding_len(json_len);
 		if (ezdev_sdk_json_default_size > json_len_padding)
 		{
@@ -1657,7 +1565,7 @@ static mkernel_internal_error send_crypto_data_req(ezdev_sdk_kernel *sdk_kernel,
 		return sdk_error;
 	}
 
-	//header
+
 	sdk_error = header_serialize_old(&authi_affair->global_out_packet, DEV_PROTOCOL_CRYPTO_DATA_REQ, authi_affair->global_out_packet.payload_buf_off);
 	if (sdk_error != mkernel_internal_succ)
 	{
@@ -1665,7 +1573,7 @@ static mkernel_internal_error send_crypto_data_req(ezdev_sdk_kernel *sdk_kernel,
 	}
 
 	sdk_error = send_lbs_msg(sdk_kernel, authi_affair);
-	ezdev_sdk_kernel_log_debug(sdk_error, 0, "send_crypto_data_req complete\n");
+	ezdev_sdk_kernel_log_debug(sdk_error, 0, "send_crypto_data_req complete");
 	return mkernel_internal_succ;
 }
 
@@ -1679,14 +1587,12 @@ static mkernel_internal_error parse_crypto_data_rsp_das(lbs_affair *authi_affair
 	EZDEV_SDK_UINT32 de_dst_len = 0;
 
 	authi_affair->global_in_packet.payload_buf_off += 3;
-
-	//取返回码
 	memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
 	authi_affair->global_in_packet.payload_buf_off++;
 
 	if (result_code != 0)
 	{
-		ezdev_sdk_kernel_log_debug(mkernel_internal_platform_error, result_code, "parse_crypto_data_rsp_das platform return error code:%d\n", result_code);
+		ezdev_sdk_kernel_log_debug(mkernel_internal_platform_error, result_code, "parse_crypto_data_rsp_das platform return error code:%d", result_code);
 		return mkernel_internal_platform_error + result_code;
 	}
 
@@ -1734,14 +1640,12 @@ static mkernel_internal_error parse_crypto_data_rsp_stun(lbs_affair *authi_affai
 	EZDEV_SDK_UINT32 de_dst_len = 0;
 
 	authi_affair->global_in_packet.payload_buf_off += 3;
-
-	//取返回码
 	memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
 	authi_affair->global_in_packet.payload_buf_off++;
 
 	if (result_code != 0)
 	{
-		ezdev_sdk_kernel_log_debug(mkernel_internal_platform_error, result_code, "parse_crypto_data_rsp_stun platform return error code:%d\n", result_code);
+		ezdev_sdk_kernel_log_debug(mkernel_internal_platform_error, result_code, "parse_crypto_data_rsp_stun platform return error code:%d", result_code);
 		return mkernel_internal_platform_error + result_code;
 	}
 
@@ -1821,10 +1725,10 @@ static mkernel_internal_error wait_crypto_data_rsp_stun(ezdev_sdk_kernel *sdk_ke
 
 	return sdk_error;
 }
+/*********************************************************************************/
 
 static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair)
 {
-	//需要做域名解析
 
 	mkernel_internal_error result_ = mkernel_internal_succ;
 	char szRealIp[ezdev_sdk_ip_max_len] = {0};
@@ -1833,7 +1737,7 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
 		authi_affair->lbs_net_work = sdk_kernel->platform_handle.net_work_create(g_binding_nic);
 		if (authi_affair->lbs_net_work == NULL)
 		{
-			ezdev_sdk_kernel_log_error(result_, 0, "lbs_connect net_work_create error\n");
+			ezdev_sdk_kernel_log_error(result_, 0, "lbs_connect net_work_create error");
 			result_ = mkernel_internal_net_connect_error;
 			break;
 		}
@@ -1841,7 +1745,7 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
 		result_ = sdk_kernel->platform_handle.net_work_connect(authi_affair->lbs_net_work, sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_port, 5 * 1000, szRealIp);
 		if (result_ != mkernel_internal_succ)
 		{
-			ezdev_sdk_kernel_log_warn(result_, 0, "lbs_connect net_work_connect host error, server:%s, ip:%s, port:%d\n", sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_ip, sdk_kernel->server_info.server_port);
+			ezdev_sdk_kernel_log_warn(result_, 0, "lbs_connect net_work_connect host error, server:%s, ip:%s, port:%d", sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_ip, sdk_kernel->server_info.server_port);
 
 			sdk_kernel->platform_handle.net_work_disconnect(authi_affair->lbs_net_work);
 			sdk_kernel->platform_handle.net_work_destroy(authi_affair->lbs_net_work);
@@ -1850,7 +1754,7 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
 			authi_affair->lbs_net_work = sdk_kernel->platform_handle.net_work_create(g_binding_nic);
 			if (authi_affair->lbs_net_work == NULL)
 			{
-				ezdev_sdk_kernel_log_error(result_, 0, "lbs_connect net_work_create error\n");
+				ezdev_sdk_kernel_log_error(result_, 0, "lbs_connect net_work_create error");
 				result_ = mkernel_internal_net_connect_error;
 				break;
 			}
@@ -1863,7 +1767,7 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
 			result_ = sdk_kernel->platform_handle.net_work_connect(authi_affair->lbs_net_work, sdk_kernel->server_info.server_ip, sdk_kernel->server_info.server_port, 5 * 1000, szRealIp);
 			if (result_ != mkernel_internal_succ)
 			{
-				ezdev_sdk_kernel_log_error(result_, 0, "lbs_connect net_work_connect ip error, server:%s, ip:%s, port:%d\n", sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_ip, sdk_kernel->server_info.server_port);
+				ezdev_sdk_kernel_log_error(result_, 0, "lbs_connect net_work_connect ip error, server:%s, ip:%s, port:%d", sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_ip, sdk_kernel->server_info.server_port);
 				if (mkernel_internal_net_gethostbyname_error != result_)
 				{
 					result_ = mkernel_internal_net_connect_error;
@@ -1873,7 +1777,7 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
 			}
 		}
 
-		ezdev_sdk_kernel_log_info(result_, 0, "lbs_connect suc, host:%s, ip:%s, parseip:%s\n", sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_ip, szRealIp);
+		ezdev_sdk_kernel_log_info(result_, 0, "lbs_connect suc, host:%s, ip:%s, parseip:%s", sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_ip, szRealIp);
 
 		memset(sdk_kernel->server_info.server_ip, 0, ezdev_sdk_ip_max_len);
 		strncpy(sdk_kernel->server_info.server_ip, szRealIp, ezdev_sdk_ip_max_len - 1);
@@ -1898,7 +1802,6 @@ mkernel_internal_error lbs_redirect_with_auth(ezdev_sdk_kernel *sdk_kernel, EZDE
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	lbs_affair auth_redirect;
-	//设置信息
 	das_info revc_das_info;
     void* ctx_client = NULL;
 
@@ -2222,7 +2125,6 @@ mkernel_internal_error lbs_getstun(ezdev_sdk_kernel *sdk_kernel, stun_info *ptr_
 	return sdk_error;
 }
 
-//#define seft_test
 static mkernel_internal_error send_get_secretkey_rsq(ezdev_sdk_kernel *hsdk_kernel, lbs_affair *hlbs_affair, EZDEV_SDK_UINT8 *aesKey, EZDEV_SDK_INT32 aesKeyLen)
 {
 	mkernel_internal_error sdk_rv = mkernel_internal_succ;
@@ -2230,21 +2132,18 @@ static mkernel_internal_error send_get_secretkey_rsq(ezdev_sdk_kernel *hsdk_kern
 	char *pE = "010001";
 	char *pN = "CD6E54AA0B45FEA94F03955C838C0827C9017A066A6B7FA7599FE4E1775E8E4EFD304F15630EDAAAE9C7044FC6EE94F02AD2EE44C644F55E10CD428C3D806F55C1D90D76AF395B5FA3DA155F639515EA272715238D2371A8FC0B64A098145BD0CD13D3B90FCC72B605B393C693BAE6C4BA0990BF8873A9A4CC6489960160ACDF";
 
-	unsigned char pSendBuf[512];	 ///< 往服务器发送的缓冲区
-	unsigned char *p = pSendBuf;	 ///< 缓冲区指针
-	unsigned char buf[128];			 ///< 临时缓冲区
-	unsigned int iLength = 0;		 ///< 临时长度计算
-	unsigned int uiPlainPadding = 0; ///< AES需要补齐长度
-	unsigned short netLen16 = 0;	 ///< 缓存转成网络字节序后的长度
+	unsigned char pSendBuf[512];
+	unsigned char *p = pSendBuf;	
+	unsigned char buf[128];			
+	unsigned int iLength = 0;		
+	unsigned int uiPlainPadding = 0; 
+	unsigned short netLen16 = 0;	 
 	memset(buf, 0, sizeof(buf));
 	memset(pSendBuf, 0, sizeof(pSendBuf));
 
 	do
 	{
-		//首部第一个字节表示约定的加密算法,目前还没有细化，默认为1，AES128+RSA1024
 		*p++ = 0x01;
-
-		//用AES算法对序列号进行加密
 		iLength = sizeof(pSendBuf) - (p - pSendBuf);
 		uiPlainPadding = calculate_padding_len(strlen(hlbs_affair->dev_subserial));
 
@@ -2254,17 +2153,15 @@ static mkernel_internal_error send_get_secretkey_rsq(ezdev_sdk_kernel *hsdk_kern
 			ezdev_sdk_kernel_log_debug(sdk_rv, 0, "Error occur in aes_cbc_128_enc_padding\n");
 			break;
 		}
-
-		//填充AES密文长度
 		netLen16 = htons(iLength);
 		memcpy(p, &netLen16, sizeof(netLen16));
 		p += 2;
 		p += iLength;
 
-		//使用服务器公钥对（AES秘钥+序列号）进行加密，默认PKCS1V1.5 Padding
-		buf[0] = aesKeyLen & 0xFF; ///< 密钥前面填充一个字节长度
+	
+		buf[0] = aesKeyLen & 0xFF; 
 		memcpy(buf + 1, aesKey, aesKeyLen);
-		buf[aesKeyLen + 1] = strlen(hlbs_affair->dev_subserial) & 0xFF; ///< 序列号前面填充一个字节长度
+		buf[aesKeyLen + 1] = strlen(hlbs_affair->dev_subserial) & 0xFF;
 		memcpy(buf + aesKeyLen + 2, hlbs_affair->dev_subserial, strlen(hlbs_affair->dev_subserial));
 		iLength = sizeof(pSendBuf) - (p - pSendBuf);
 
@@ -2275,7 +2172,6 @@ static mkernel_internal_error send_get_secretkey_rsq(ezdev_sdk_kernel *hsdk_kern
 			sdk_rv = mkernel_internal_internal_err;
 			break;
 		}
-		//填充RSA密文长度
 		netLen16 = htons(iLength);
 		memcpy(p, &netLen16, sizeof(netLen16));
 		p += 2;
@@ -2299,7 +2195,7 @@ static mkernel_internal_error send_get_secretkey_rsq(ezdev_sdk_kernel *hsdk_kern
 		sdk_rv = send_lbs_msg(hsdk_kernel, hlbs_affair);
 		if (mkernel_internal_succ != sdk_rv)
 		{
-			ezdev_sdk_kernel_log_debug(sdk_rv, 0, "Error occur in send_lbs_msg\n");
+			ezdev_sdk_kernel_log_debug(sdk_rv, 0, "Error occur in send_lbs_msg");
 			break;
 		}
 	} while (0);
@@ -2316,7 +2212,7 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 	EZDEV_SDK_UINT8 result_code = 0;
 	EZDEV_SDK_UINT8 pPlainText[256];
 	EZDEV_SDK_UINT32 iPlainTextLen = sizeof(pPlainText);
-	EZDEV_SDK_UINT16 netLen16 = 0; ///< 网络字节序的长度
+	EZDEV_SDK_UINT16 netLen16 = 0;
 	EZDEV_SDK_UINT16 _interval = 0;
 	EZDEV_SDK_UINT32 _duration = 0;
 	EZDEV_SDK_UINT8 *p;
@@ -2326,7 +2222,7 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 	{
 		if (mkernel_internal_succ != (sdk_rv = wait_assign_response(hsdk_kernel, hlbs_affair, &rev_cmd, &remain_len)))
 		{
-			ezdev_sdk_kernel_log_debug(sdk_rv, 0, "Error occur in wait_assign_response\n");
+			ezdev_sdk_kernel_log_debug(sdk_rv, 0, "Error occur in wait_assign_response");
 			break;
 		}
 
@@ -2335,21 +2231,16 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 			sdk_rv = mkernel_internal_net_read_error_request;
 			break;
 		}
-
-		//头三个字节是协议版本号，不关心 
 		hlbs_affair->global_in_packet.payload_buf_off = 3;
 
-		//判断返回码
 		result_code = *(hlbs_affair->global_in_packet.payload_buf + hlbs_affair->global_in_packet.payload_buf_off++);
 
-		//解析密文长度 
 		memcpy(&netLen16, hlbs_affair->global_in_packet.payload_buf + hlbs_affair->global_in_packet.payload_buf_off, sizeof(short));
 		hlbs_affair->global_in_packet.payload_buf_off += 2;
 
 		if (hlbs_affair->global_in_packet.payload_buf_off + ntohs(netLen16) + 6 > remain_len)
 		{
-			ezdev_sdk_kernel_log_debug(sdk_rv, result_code, "rsp data len out of range, real len = %d\n", remain_len);
-			//如果包长度解析出错，默认30s一次，周期24小时
+			ezdev_sdk_kernel_log_debug(sdk_rv, result_code, "rsp data len out of range, real len = %d", remain_len);
 			*interval = 30;
 			*duration = 3600 * 24;
 			sdk_rv = mkernel_internal_rev_invalid_packet;
@@ -2357,20 +2248,19 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 		}
 		else
 		{
-			//计算重试间隔和周期
 			memcpy(&_interval, hlbs_affair->global_in_packet.payload_buf + hlbs_affair->global_in_packet.payload_buf_off + ntohs(netLen16), sizeof(_interval));
 			memcpy(&_duration, hlbs_affair->global_in_packet.payload_buf + hlbs_affair->global_in_packet.payload_buf_off + ntohs(netLen16) + sizeof(_interval), sizeof(_duration));
 
 			*interval = ntohs(_interval);
 			*duration = ntohl(_duration);
-			ezdev_sdk_kernel_log_debug(sdk_rv, result_code, "interval= %d, duration = %d\n", *interval, *duration);
+			ezdev_sdk_kernel_log_debug(sdk_rv, result_code, "interval= %d, duration = %d", *interval, *duration);
 		}
 
 		if (0 != result_code)
 		{
 			sdk_rv = mkernel_internal_platform_error + result_code;
 
-			ezdev_sdk_kernel_log_debug(sdk_rv, result_code, "wait_get_secretkey_rsp platform return error\n");
+			ezdev_sdk_kernel_log_debug(sdk_rv, result_code, "wait_get_secretkey_rsp platform return error");
 			break;
 		}
 
@@ -2381,8 +2271,6 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 			ezdev_sdk_kernel_log_debug(sdk_rv, 0, "Error occur in aes_cbc_128_dec_padding\n");
 			break;
 		}
-
-		//明文为1字节长度+secretkey + 1字节长度+序列号
 		p = pPlainText;
 		if (*p > ezdev_sdk_devserial_maxlen ||
 			*p > iPlainTextLen)
@@ -2395,9 +2283,8 @@ static mkernel_internal_error wait_get_secretkey_rsp(ezdev_sdk_kernel *hsdk_kern
 		*secretKeyLen = *p;
 		p += *p + 1;
 
-		if (strlen(hlbs_affair->dev_subserial) != *p ||									 ///< 序列号长度不相等
-			(p - pPlainText + *p) > iPlainTextLen ||									 ///< 计算的长度大于报文长度
-			memcmp(++p, hlbs_affair->dev_subserial, strlen(hlbs_affair->dev_subserial))) ///< 序列号不相等
+		if (strlen(hlbs_affair->dev_subserial) != *p ||(p - pPlainText + *p) > iPlainTextLen ||									
+			memcmp(++p, hlbs_affair->dev_subserial, strlen(hlbs_affair->dev_subserial))) 
 		{
 			sdk_rv = mkernel_internal_rev_invalid_packet;
 			break;
@@ -2411,24 +2298,19 @@ mkernel_internal_error cnt_state_lbs_apply_serectkey(ezdev_sdk_kernel *hsdk_kern
 {
 	mkernel_internal_error sdk_rv = mkernel_internal_internal_err;
 
-	//realtek rtos mbedtls伪随机数相关部分编译有问题
 #ifndef _REALTEK_RTOS_
-	EZDEV_SDK_UINT8 aesKey[32] = {0};							   ///< ASE密钥
-	EZDEV_SDK_UINT8 aesKey_hex[32] = {0};						   ///< 十六进制的AES秘钥
-	EZDEV_SDK_INT8 aesKeyLen = 16;								   ///< 默认使用AES128
-	EZDEV_SDK_UINT8 secretKey[ezdev_sdk_verify_code_maxlen] = {0}; ///< 获取的secretkey
+	EZDEV_SDK_UINT8 aesKey[32] = {0};							   
+	EZDEV_SDK_UINT8 aesKey_hex[32] = {0};						   
+	EZDEV_SDK_INT8 aesKeyLen = 16;								   
+	EZDEV_SDK_UINT8 secretKey[ezdev_sdk_verify_code_maxlen] = {0};
 	EZDEV_SDK_INT8 secretKeyLen8 = sizeof(secretKey);
 	EZDEV_SDK_INT32 secretKeyLen32 = sizeof(secretKey);
 	int i = 0;
+
 	lbs_affair hlbs_affair;
-
 	memset(&hlbs_affair, 0, sizeof(hlbs_affair));
-
-	//生成随机数作为AES秘钥
 	if (0 != ezRandomGen(aesKey, aesKeyLen))
 		return sdk_rv;
-
-	// 服务器只支持可见字符的秘钥，转十六进制
 	for (i = 0; i < aesKeyLen / 2; ++i)
 	{
 		sprintf((char *)aesKey_hex + 2 * i, "%02x", aesKey[i]);
@@ -2463,8 +2345,6 @@ mkernel_internal_error cnt_state_lbs_apply_serectkey(ezdev_sdk_kernel *hsdk_kern
 
 		hsdk_kernel->secretkey_applied = EZDEV_SDK_TRUE;
 		secretKeyLen32 = (EZDEV_SDK_INT32)secretKeyLen8;
-
-		// 回调上层接口保存secretKey,然后再获取一次,成功则认为申请secretKey流程完成
 		if (mkernel_internal_succ != (sdk_rv = hsdk_kernel->platform_handle.curing_data_save(sdk_curingdata_secretkey, secretKey, secretKeyLen32)))
 		{
 			ezdev_sdk_kernel_log_debug(sdk_rv, 0, "Error occur in curing_data_save\n");
@@ -2478,7 +2358,7 @@ mkernel_internal_error cnt_state_lbs_apply_serectkey(ezdev_sdk_kernel *hsdk_kern
 		if (mkernel_internal_succ != (sdk_rv = hsdk_kernel->platform_handle.curing_data_load(sdk_curingdata_secretkey, secretKey, &secretKeyLen32)) ||
 			secretKeyLen32 > ezdev_sdk_verify_code_maxlen)
 		{
-			ezdev_sdk_kernel_log_error(sdk_rv, 0, "An error occur in load secretkey, return len = %d\n", secretKeyLen32);
+			ezdev_sdk_kernel_log_error(sdk_rv, 0, "An error occur in load secretkey, return len = %d", secretKeyLen32);
 			sdk_rv = mkernel_internal_value_load_err;
 			break;
 		}

@@ -1,16 +1,15 @@
 /*******************************************************************************
- * Copyright © 2017-2021 Ezviz Inc.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- *
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *   http://www.eclipse.org/org/documents/edl-v10.php.
- *******************************************************************************/
-
+* Copyright © 2017-2021 Ezviz Inc.
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* and Eclipse Distribution License v1.0 which accompany this distribution.
+*
+* The Eclipse Public License is available at
+*    http://www.eclipse.org/legal/epl-v10.html
+* and the Eclipse Distribution License is available at
+*   http://www.eclipse.org/org/documents/edl-v10.php.
+*******************************************************************************/
 #include "ezdev_sdk_kernel_access.h"
 #include "mkernel_internal_error.h"
 #include "sdk_kernel_def.h"
@@ -33,19 +32,10 @@ extern ezdev_sdk_kernel g_ezdev_sdk_kernel;
 
 static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kernel, EZDEV_SDK_UINT8 nUpper)
 {
-	/**
-	* \brief   启动SDK 存在 几个情况 dev_id 是否存在   masterkey是否存在
-	*			完成上线
-	*             
-	*/
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	int type = 0;
 	if (strcmp("", (const char*)sdk_kernel->dev_id) == 0)
 	{
-		/**
-		* \brief   走认证上线流程 需要创建das_id  masterkey
-		*             
-		*/
 	    ezdev_sdk_kernel_log_info(0, 0, "dev_id is empty\n");
 		sdk_error = lbs_redirect_createdevid_with_auth(sdk_kernel, nUpper);
 		type = 0;
@@ -54,20 +44,12 @@ static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kerne
 	{
 		if (strcmp("", (const char*)sdk_kernel->master_key) == 0)
 		{
-			/**
-			* \brief   走认证上线流程 需要创建masterkey
-			*             
-			*/
 		    ezdev_sdk_kernel_log_info(0, 0, "masterkey is empty\n");
 			sdk_error = lbs_redirect_with_auth(sdk_kernel, nUpper);
 			type = 1;
 		}
 		else
 		{
-			/**
-			* \brief   刷新sesseion key
-			*             
-			*/
 			sdk_error = lbs_redirect(sdk_kernel);
 			type = 2;
 		}
@@ -86,10 +68,6 @@ static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel* sdk_kerne
 		ezdev_sdk_kernel_log_info(0, 0, "memset masterkey in memory\n");
 		memset(sdk_kernel->master_key, 0, ezdev_sdk_masterkey_len);
 	}
-
-	/**
-	 * 如果验证出错，可能是由于摘要计算大小写原因（历史原因），先尝试一下摘要小写的情况，
-	 */
 	if (sdk_error == mkernel_internal_platform_lbs_signcheck_error && nUpper != 0)
 	{
 		sdk_error = cnt_state_lbs_redirect(sdk_kernel, 0);
@@ -108,20 +86,11 @@ static mkernel_internal_error cnt_state_das_reged(ezdev_sdk_kernel* sdk_kernel)
 
 static mkernel_internal_error cnt_state_das_fast_reg(ezdev_sdk_kernel* sdk_kernel)
 {
-	/**
-	 * \brief   sdk wifi快速重连过程
-	 */
-
-	
 	return das_light_reg_v2(sdk_kernel);
 }
 
 static mkernel_internal_error cnt_state_das_fast_reg_v3(ezdev_sdk_kernel* sdk_kernel)
 {
-	/**
-	 * \brief   sdk RF快速重连过程
-	 */
-    
 	return das_light_reg_v3(sdk_kernel);
 }
 
@@ -134,9 +103,6 @@ static mkernel_internal_error cnt_state_das_work(ezdev_sdk_kernel* sdk_kernel)
 
 static mkernel_internal_error cnt_state_das_retry(ezdev_sdk_kernel* sdk_kernel)
 {
-	/**
-	 * \brief   sdk重连过程
-	 */
 	return das_light_reg(sdk_kernel);
 }
 
@@ -146,7 +112,6 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 
 	if (sdk_entrance_authcode_invalid == sdk_kernel->entr_state)
 	{
-		//如果是因为申请secretkey失败，需要根据服务器配置的时间间隔和总时长来进行重试
 		if (!sdk_kernel->platform_handle.time_isexpired_bydiff(sdk_kernel->cnt_state_timer, sdk_kernel->secretkey_interval*1000) || 
 			sdk_kernel->lbs_redirect_times > sdk_kernel->secretkey_duration)
 		{
@@ -175,13 +140,11 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 	{
 		ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_lbs_redirect");
 		broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-
-		 //如果是连接出错或者重新匹配认证协议的话则不做衰变
         if (mkernel_internal_net_connect_error == sdk_error || mkernel_internal_net_gethostbyname_error == sdk_error || mkernel_internal_platform_lbs_auth_type_need_rematch == sdk_error)
 		{
 			sdk_kernel->lbs_redirect_times = 1;
 		}
-		else if (mkernel_internal_platform_lbs_sign_check_fail == sdk_error && !sdk_kernel->secretkey_applied)	///<	如果验证出错，则走申请secretkey流程
+		else if (mkernel_internal_platform_lbs_sign_check_fail == sdk_error && !sdk_kernel->secretkey_applied)
 		{
 			EZDEV_SDK_UINT16 _interval = 30;
 			EZDEV_SDK_UINT32 _duration = 3600*24;
@@ -198,7 +161,6 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 			{
 				ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_lbs_apply_serectkey");
 				broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-				/** 如果验证码不合规的设备未绑定设备，则通知上层通过app去申请secretkey */
 				if (mkernel_internal_platform_secretkey_no_user == sdk_error)
 				{
 					ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_invaild_authcode");
@@ -215,7 +177,7 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 				{
 					sdk_kernel->entr_state = sdk_entrance_authcode_invalid;
 					sdk_kernel->cnt_state = sdk_cnt_unredirect;
-					sdk_kernel->lbs_redirect_times+=_interval;  					///<	把lbs_redirect_times当做时间计数器使用
+					sdk_kernel->lbs_redirect_times+=_interval;  	
 					sdk_kernel->secretkey_interval = _interval;
 					sdk_kernel->secretkey_duration = _duration;
 				}
@@ -223,7 +185,6 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel* sdk_kernel)
 		}
 		else
 		{
-			/* 重定向失败 计数 */
 			if (++sdk_kernel->lbs_redirect_times >= 60)
 				sdk_kernel->lbs_redirect_times = 60;
 		}
@@ -258,7 +219,7 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel* sdk_kernel)
 			memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
 			memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
 			memcpy(context.lbs_domain, sdk_kernel->server_info.server_name, ezdev_sdk_ip_max_len);
-			ezdev_sdk_kernel_log_info(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_switchover");
+			ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_switchover");
 			broadcast_user_event(sdk_kernel_event_switchover, (void*)&context, sizeof(context));
 			sdk_kernel->entr_state = sdk_entrance_normal;
 		}
@@ -273,7 +234,7 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel* sdk_kernel)
 			memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
 			memcpy(context.das_domain, sdk_kernel->redirect_das_info.das_domain, ezdev_sdk_ip_max_len);
 			memcpy(context.das_serverid, sdk_kernel->redirect_das_info.das_serverid, ezdev_sdk_ip_max_len);
-			ezdev_sdk_kernel_log_info(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_online");
+			ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_online");
 			broadcast_user_event(sdk_kernel_event_online, (void*)&context, sizeof(context));
 		}
 	}
@@ -532,7 +493,6 @@ mkernel_internal_error access_server_yield(ezdev_sdk_kernel* sdk_kernel)
 
 mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg* pubmsg)
 {
-	/* 由于对于body的处理后期需要用ase做加密，直接在这里做padding */
 	EZDEV_SDK_INT32 input_length_padding = 0;
 	ezdev_sdk_kernel_pubmsg_exchange* new_pubmsg_exchange = NULL; 
 	mkernel_internal_error kernel_internal_error = mkernel_internal_succ;
@@ -579,9 +539,7 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
 
 	buf_padding(new_pubmsg_exchange->msg_conntext.msg_body, input_length_padding, pubmsg->msg_body_len);
 
-	new_pubmsg_exchange->max_send_count = 1;	// 主动下线消息只发一次
-
-	/*非阻塞式往消息队列里push内容 最终由SDKboot模块创建的主线程驱动消息发送*/
+	new_pubmsg_exchange->max_send_count = 1;
 	kernel_internal_error= das_send_pubmsg_async(&g_ezdev_sdk_kernel, new_pubmsg_exchange);
     ezdev_sdk_kernel_log_info(0, 0, "das_send_pubmsg_async offline msg send ,error code:%d",kernel_internal_error);
 	if (kernel_internal_error != mkernel_internal_succ)
@@ -611,11 +569,6 @@ mkernel_internal_error send_offline_msg_to_platform(EZDEV_SDK_UINT32 seq)
     mkernel_internal_error sdk_error = mkernel_internal_succ;
 
 	req = ezxml_new("Request");
-	if(NULL == req)
-	{    
-		return mkernel_internal_malloc_error;
-
-	}
 	ezxml_add_child(req, "DevSerial",1);
 	ezxml_set_txt(req->child, ezdev_sdk_kernel_getdevinfo_bykey("dev_subserial"));
 	ezxml_add_child(req, "Authorization",2);
@@ -644,10 +597,10 @@ mkernel_internal_error send_offline_msg_to_platform(EZDEV_SDK_UINT32 seq)
     {
         ezdev_sdk_kernel_log_info(sdk_error, sdk_error, "sdk_kernel_inner_send offline msg failed,error code:%d",sdk_error);
     }
+    
+	free(msg_body_offline);	
+	msg_body_offline = NULL;
+	ezxml_free(req);
 
-    free(msg_body_offline);	
-    msg_body_offline = NULL;
-    ezxml_free(req);
-
-    return sdk_error;
+	return sdk_error;
 }

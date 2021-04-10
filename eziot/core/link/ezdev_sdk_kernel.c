@@ -104,34 +104,24 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
         }
 
         memset(&g_ezdev_sdk_kernel, 0, sizeof(g_ezdev_sdk_kernel));
-
-        //当前设备支持一种认证类型ECDH
-        //根据dev_auth_type_count大小，增加dev_auth_type_group[1]、dev_auth_type_group[2]......dev_auth_type_group[63]
         g_ezdev_sdk_kernel.dev_def_auth_type = sdk_dev_auth_protocol_ecdh;
         g_ezdev_sdk_kernel.dev_cur_auth_type = sdk_dev_auth_protocol_ecdh;
         g_ezdev_sdk_kernel.dev_last_auth_type = sdk_dev_auth_protocol_ecdh;
         g_ezdev_sdk_kernel.dev_auth_type_count = 1;
         g_ezdev_sdk_kernel.dev_auth_type_group[0] = sdk_dev_auth_protocol_ecdh;
 
-        /* 设置默认心跳时间 */
         g_ezdev_sdk_kernel.das_keepalive_interval = ezdev_sdk_das_default_keepaliveinterval;
 
-        /* 设置服务器信息 */
         strncpy(g_ezdev_sdk_kernel.server_info.server_name, pconfig->server.host, ezdev_sdk_name_len - 1);
         g_ezdev_sdk_kernel.server_info.server_port = pconfig->server.port;
 
-        /* 设置回调函数 */
         memcpy(&g_ezdev_sdk_kernel.platform_handle, handle, sizeof(ezdev_sdk_kernel_platform_handle));
-
-        /* 解析json数据，并设置设备信息 */
         sdk_error = mkiE2ezE(json_parse_devinfo(pconfig->pdev_info, &g_ezdev_sdk_kernel.dev_info));
         if (sdk_error != ezdev_sdk_kernel_succ)
         {
             break;
         }
-        /**
-		 *	通过回调获取验证码
-		 */
+
         if (ezdev_sdk_kernel_succ == (sdk_error = handle->curing_data_load(sdk_curingdata_secretkey, szDev_vcode, &iDev_vcode)) &&iDev_vcode <= ezdev_sdk_verify_code_maxlen)
         {
             strncpy(g_ezdev_sdk_kernel.dev_info.dev_verification_code, (char *)szDev_vcode, iDev_vcode);
@@ -141,7 +131,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
             sdk_error = ezdev_sdk_kernel_value_load;
             break;
         }
-        /* 初始化链接状态 */
+  
         g_ezdev_sdk_kernel.lbs_redirect_times = 0;
         g_ezdev_sdk_kernel.das_retry_times = 0;
         g_ezdev_sdk_kernel.secretkey_applied = EZDEV_SDK_FALSE;
@@ -157,10 +147,9 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
             sdk_error = ezdev_sdk_kernel_memory;
             break;
         }
-        /* 初始化风控信息 */
+
         g_ezdev_sdk_kernel.access_risk = sdk_no_risk_control;
 
-        /* 加载dev_id和masterkey */
         g_ezdev_sdk_kernel.platform_handle.key_value_load(sdk_keyvalue_devid, g_ezdev_sdk_kernel.dev_id, ezdev_sdk_devid_len);
         g_ezdev_sdk_kernel.platform_handle.key_value_load(sdk_keyvalue_masterkey, g_ezdev_sdk_kernel.master_key, ezdev_sdk_masterkey_len);
         if (1 > reg_mode || reg_mode > 5)
@@ -172,7 +161,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
             g_ezdev_sdk_kernel.reg_mode = reg_mode;
         }
 
-        if (pconfig->pdas_info && 0!= pconfig->pdas_info->bLightreg)   ///< 快速注册
+        if (pconfig->pdas_info && 0!= pconfig->pdas_info->bLightreg)
         {
             g_ezdev_sdk_kernel.redirect_das_info.das_port = pconfig->pdas_info->das_port;
             g_ezdev_sdk_kernel.redirect_das_info.das_udp_port = pconfig->pdas_info->das_udp_port;
@@ -190,12 +179,9 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
                 g_ezdev_sdk_kernel.cnt_state = sdk_cnt_das_fast_reg_v3;
             }
         }
-        /* 初始化领域和公共领域 */
         common_module_init();
 
         extend_init(event_notice_cb);
-
-        /* 初始化MQTT和消息队列 */
         das_object_init(&g_ezdev_sdk_kernel);
 
         g_mutex_lock = g_ezdev_sdk_kernel.platform_handle.thread_mutex_create();
@@ -382,7 +368,6 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_yield_user()
 
 ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
 {
-    /* 由于对于body的处理后期需要用ase做加密，直接在这里做padding */
     EZDEV_SDK_INT32 input_length_padding = 0;
     ezdev_sdk_kernel_pubmsg_exchange *new_pubmsg_exchange = NULL;
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
@@ -444,7 +429,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
     new_pubmsg_exchange->msg_conntext.msg_body_len = input_length_padding;
     memcpy(new_pubmsg_exchange->msg_conntext.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
     buf_padding(new_pubmsg_exchange->msg_conntext.msg_body, input_length_padding, pubmsg->msg_body_len);
-    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count; //默认最多发送2次
+    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count;
 
     if (pubmsg->msg_response == 0)
     {
@@ -467,7 +452,6 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
         new_pubmsg_exchange->msg_conntext.externel_ctx_len = pubmsg->externel_ctx_len;
     }
 
-    /*非阻塞式往消息队列里push内容 最终由SDKboot模块创建的主线程驱动消息发送*/
     kernel_error = mkiE2ezE(das_send_pubmsg_async(&g_ezdev_sdk_kernel, new_pubmsg_exchange));
     if (kernel_error != ezdev_sdk_kernel_succ)
     {
@@ -558,10 +542,8 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubm
     new_pubmsg_exchange->msg_conntext_v3.msg_body_len = input_length_padding;
     memcpy(new_pubmsg_exchange->msg_conntext_v3.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
     buf_padding(new_pubmsg_exchange->msg_conntext_v3.msg_body, input_length_padding, pubmsg->msg_body_len);
-    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count; //默认最多发送2次
+    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count;
     new_pubmsg_exchange->msg_conntext_v3.msg_seq = pubmsg->msg_seq;
-
-    /*非阻塞式往消息队列里push内容 最终由SDKboot模块创建的主线程驱动消息发送*/
     kernel_error = mkiE2ezE(das_send_pubmsg_async_v3(&g_ezdev_sdk_kernel, new_pubmsg_exchange));
     if (kernel_error != ezdev_sdk_kernel_succ)
     {
@@ -713,7 +695,6 @@ EZDEV_SDK_KERNEL_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_server_info(ser
 
     if (NULL == ptr_server_info)
     {
-        //现在只有一对LBS、DAS
         *ptr_count = 1;
         return ezdev_sdk_kernel_succ;
     }

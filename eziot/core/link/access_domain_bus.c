@@ -35,7 +35,6 @@ static mkernel_internal_error bus_handle_domainconfig_keepalive(ezdev_sdk_kernel
 	{
 		return mkernel_internal_json_parse_error;
 	}
-
 	json_interval = bscJSON_GetObjectItem(json_item, "Interval");
 	if (NULL == json_interval)
 	{
@@ -47,13 +46,8 @@ static mkernel_internal_error bus_handle_domainconfig_keepalive(ezdev_sdk_kernel
 		return mkernel_internal_get_error_json;
 	}
 
-	/**
-	* \brief   更新心跳时间
-	*/
 	sdk_kernel->das_keepalive_interval = json_interval->valueint;
-	/**
-	* \brief   心跳时间改变事件回调
-	*/
+
 	das_keepalive_interval_changed_event_cb(sdk_kernel->das_keepalive_interval);
 
 	return mkernel_internal_succ;
@@ -61,44 +55,6 @@ static mkernel_internal_error bus_handle_domainconfig_keepalive(ezdev_sdk_kernel
 
 static mkernel_internal_error bus_handle_domainconfig_ntp(ezdev_sdk_kernel *sdk_kernel, bscJSON *json_item)
 {
-	// 	sdk_kernel_event_ntp ntp_event;
-	// 	bscJSON *json_Addr = NULL;
-	// 	bscJSON *json_Port = NULL;
-	// 	bscJSON *json_Interval = NULL;
-	// 	bscJSON *json_Timezone = NULL;
-	// 	if (NULL == json_item)
-	// 	{
-	// 		return mkernel_internal_json_parse_error;
-	// 	}
-	//
-	// 	json_Addr = bscJSON_GetObjectItem(json_item, "Addr");
-	// 	json_Port = bscJSON_GetObjectItem(json_item, "Port");
-	// 	json_Interval = bscJSON_GetObjectItem(json_item, "Interval");
-	// 	json_Timezone = bscJSON_GetObjectItem(json_item, "Timezone");
-	// 	if (NULL == json_Addr || NULL == json_Port || NULL == json_Interval || NULL == json_Timezone)
-	// 	{
-	// 		return mkernel_internal_get_error_json;
-	// 	}
-	//
-	// 	if (json_Port->type != bscJSON_Number || json_Interval->type != bscJSON_Number ||
-	// 		json_Addr->type != bscJSON_String || json_Addr->valuestring == NULL ||
-	// 		json_Timezone->type != bscJSON_String || json_Timezone->valuestring == NULL)
-	// 	{
-	// 		return mkernel_internal_get_error_json;
-	// 	}
-	//
-	// 	memset(&ntp_event, 0, sizeof(sdk_kernel_event_ntp));
-	//
-	// 	ntp_event.ntp_interval = json_Interval->valueint;
-	// 	ntp_event.ntp_port = json_Interval->valueint;
-	// 	strncpy(ntp_event.ntp_addr, json_Addr->valuestring, ezdev_sdk_ip_max_len - 1);
-	// 	strncpy(ntp_event.ntp_timezone, json_Timezone->valuestring, ezdev_sdk_timezone_max_len -1);
-	//
-	/**
-	* \brief   将NTP信息回调出去
-	*/
-	//sdk_kernel->kernel_event_notice_cb(sdk_kernel_event_ntp_info, (void*)(&ntp_event));
-
 	return mkernel_internal_succ;
 }
 
@@ -116,10 +72,8 @@ static mkernel_internal_error bus_handle_domainconfig(ezdev_sdk_kernel *sdk_kern
 	{
 		return mkernel_internal_json_parse_error;
 	}
-
 	json_keepalive = bscJSON_GetObjectItem(json_root, "KeepAlive");
 	json_ntp = bscJSON_GetObjectItem(json_root, "NTP");
-	//	bscJSON *json_httpdns = bscJSON_GetObjectItem(json_root, "httpDNS");
 	if (json_keepalive != NULL)
 	{
 		bus_handle_domainconfig_keepalive(sdk_kernel, json_keepalive);
@@ -127,9 +81,6 @@ static mkernel_internal_error bus_handle_domainconfig(ezdev_sdk_kernel *sdk_kern
 	if (json_ntp != NULL)
 	{
 		bus_handle_domainconfig_ntp(sdk_kernel, json_keepalive);
-	}
-	if (json_ntp != NULL)
-	{
 	}
 	bscJSON_Delete(json_root);
 	return mkernel_internal_succ;
@@ -141,7 +92,6 @@ static mkernel_internal_error bus_handle_set_keeplive_time_rsp(ezdev_sdk_kernel 
 	bscJSON *json_root = NULL;
 	bscJSON *json_result = NULL;
 	bscJSON *json_interval = NULL;
-
 	do
 	{
 		if (NULL == ptr_submsg->buf)
@@ -183,9 +133,6 @@ static mkernel_internal_error bus_handle_set_keeplive_time_rsp(ezdev_sdk_kernel 
 
 static mkernel_internal_error bus_handle_dev_redirect(ezdev_sdk_kernel *sdk_kernel, const ezdev_sdk_kernel_submsg *ptr_submsg)
 {
-	/**
-	* \brief   重定向 entr_state 标记由于平台原因导致切换的 cnt_state 标记需要重新做重定向
-	*/
 	char domain_name[ezdev_sdk_name_len] = {0};
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	do
