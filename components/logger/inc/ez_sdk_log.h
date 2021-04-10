@@ -30,11 +30,12 @@
 #include <stdint.h>
 
 /* output log's level */
-#define LVL_ERROR   1  ///< 某个业务出错,不影响其他业务
-#define LVL_WARN    2  ///< 打印业务过程中必要的关键信息
-#define LVL_INFO    3  ///< 较详细的信息
-#define LVL_DEBUG   4  ///< 更为详细的信息
-#define LVL_VERBOSE 5  ///< 不限制打印,默认不开启
+
+#define LVL_ERROR   1  ///< err info 
+#define LVL_WARN    2  ///< warning info
+#define LVL_INFO    3  ///< common info
+#define LVL_DEBUG   4  ///< debug info
+#define LVL_VERBOSE 5  ///< no limit
 
 #define TAG_SDK      "T_SDK"
 #define TAG_SHADOW   "T_SHADOW"
