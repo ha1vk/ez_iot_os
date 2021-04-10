@@ -97,4 +97,41 @@ int base_sample_stop()
 	return 0;
 }
 
+int base_report_token(int type)
+{
+    ez_bind_token_t bind_token;
+    memset(&bind_token, 0, sizeof(bind_token));
+	char token[128]  ={0};
+	ez_base_err err  = EZ_SUCCESS;
+    switch (type)
+    {
+    case 0:
+    {
+			bind_token.type = TOUCH_BIND;
+			bind_token.int_token = 123456;
+            ez_log_e(TAG_APP, "int_token:%d\n", bind_token.int_token);
+    }
+    break;
+    case 1:
+    {         
+			strncpy(token, "test_token",sizeof(token) - 1);
+			bind_token.type = BIND_USER;
+			bind_token.str_oken = token;
+			ez_log_e(TAG_APP,"base_report_token:%s\n", bind_token.str_oken);
+    }
+    break;
+    default:
+     break;
+    }
+	
+	err = ez_base_report_bind_token(&bind_token);
+	if(EZ_SUCCESS!=err)
+	{
+		ez_log_e(TAG_APP,"ez_base_report_bind_token failed:%d\n", err);
+        return -1;
+	}
+
+    return 0;
+}
+
 
