@@ -1,0 +1,7 @@
+{
+       "version": "V1.0.0",
+       "old_file": "app_old.img",
+       "new_file": "app_new.img",
+       "patch_file": "app_patch.img",
+       "buf_max":10240
+}
