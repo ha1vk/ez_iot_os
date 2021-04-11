@@ -10,6 +10,8 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * Contributors:
+ *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
 #include <Windows.h>
 #include "pthread.h"

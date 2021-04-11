@@ -1,4 +1,15 @@
-
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -103,8 +114,8 @@ TEST(ezpatch, simple)
   /*check degist*/
   unsigned char new_file_md5[16] = {0};
   unsigned char new_file_patch_md5[16] = {0};
-  ASSERT_TRUE(0 == ezdev_file_md5(new_path, new_file_md5));
-  ASSERT_TRUE(0 == ezdev_file_md5(patch2new_path, new_file_patch_md5));
+  ASSERT_TRUE(0 == ez_calc_file_md5(new_path, new_file_md5));
+  ASSERT_TRUE(0 == ez_calc_file_md5(patch2new_path, new_file_patch_md5));
   ASSERT_TRUE(0 == memcmp(new_file_md5, new_file_patch_md5, sizeof(new_file_md5)));
 }
 
@@ -178,8 +189,8 @@ TEST(ezpatch, fragment)
   /*check degist*/
   unsigned char new_file_md5[16] = {0};
   unsigned char new_file_patch_md5[16] = {0};
-  ASSERT_TRUE(0 == ezdev_file_md5(new_path, new_file_md5));
-  ASSERT_TRUE(0 == ezdev_file_md5(patch2new_path, new_file_patch_md5));
+  ASSERT_TRUE(0 == ez_calc_file_md5(new_path, new_file_md5));
+  ASSERT_TRUE(0 == ez_calc_file_md5(patch2new_path, new_file_patch_md5));
   ASSERT_TRUE(0 == memcmp(new_file_md5, new_file_patch_md5, sizeof(new_file_md5)));
 }
 
@@ -306,8 +317,8 @@ TEST(ezpatch, single_partition)
   /*check degist*/
   unsigned char new_file_md5[16] = {0};
   unsigned char new_file_patch_md5[16] = {0};
-  ASSERT_TRUE(0 == ezdev_file_md5(new_path, new_file_md5));
-  ASSERT_TRUE(0 == ezdev_file_md5(old_path, new_file_patch_md5));
+  ASSERT_TRUE(0 == ez_calc_file_md5(new_path, new_file_md5));
+  ASSERT_TRUE(0 == ez_calc_file_md5(old_path, new_file_patch_md5));
   ASSERT_TRUE(0 == memcmp(new_file_md5, new_file_patch_md5, sizeof(new_file_md5)));
 
   bscomptls_md5_starts_2();

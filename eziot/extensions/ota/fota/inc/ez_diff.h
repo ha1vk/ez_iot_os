@@ -1,14 +1,15 @@
-/**
- * @file ez_diff.h
- * @xurongjun (xurongjun@hikvision.com)
- * @brief 实现差分包生成
- * @version 0.1
- * @date 2019-05-29
- * 
- * @copyright Copyright (c) 2019
- * 
- */
-
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *******************************************************************************/
 #if defined(__linux__)
 #include <unistd.h>
 #endif
@@ -41,7 +42,7 @@ extern "C"
      * 
      * @param old_path original package path
      * @param new_path new package path
-     * @param patch_path 生成的差分包路径
+     * @param patch_path 
      * @param level zip level(1-9), The higher the level is, the more memory will be needed during merging.
      * @return 0 success !0 failed 
      */

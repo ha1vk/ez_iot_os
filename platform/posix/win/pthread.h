@@ -9,7 +9,7 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
-* Contributors:
+ * Contributors:
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
 #ifndef _H_PTHREAD_H_

@@ -20,6 +20,8 @@
         "ez_sdk_errno.h": "c",
         "ez_sdk_ota.h": "c",
         "ezdev_sdk_kernel_common.h": "c",
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "cstdio": "c",
+        "fstream": "c"
     }
 }
