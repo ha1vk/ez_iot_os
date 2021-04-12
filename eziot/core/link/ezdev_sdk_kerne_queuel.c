@@ -82,6 +82,7 @@ void fini_queue()
 	ezdev_sdk_kernel_inner_cb_notic *ptr_inner_cb_notic = NULL;
 	clear_queue_submsg();
 	clear_queue_submsg_v3();
+	clear_queue_pubmsg_exchange();
 	clear_queue_pubmsg_exchange_v3();
 	do
 	{

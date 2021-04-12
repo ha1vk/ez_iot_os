@@ -569,6 +569,10 @@ mkernel_internal_error send_offline_msg_to_platform(EZDEV_SDK_UINT32 seq)
     mkernel_internal_error sdk_error = mkernel_internal_succ;
 
 	req = ezxml_new("Request");
+	if(NULL == req)
+	{
+		return mkernel_internal_malloc_error;
+	}
 	ezxml_add_child(req, "DevSerial",1);
 	ezxml_set_txt(req->child, ezdev_sdk_kernel_getdevinfo_bykey("dev_subserial"));
 	ezxml_add_child(req, "Authorization",2);

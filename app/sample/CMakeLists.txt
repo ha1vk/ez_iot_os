@@ -60,8 +60,13 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/utility
                     ${PROJECT_SOURCE_DIR}/extensions/base
                     ${PROJECT_SOURCE_DIR}/extensions/ota
                     ${PROJECT_SOURCE_DIR}/extensions/model
-                    ${PROJECT_SOURCE_DIR}/../../inc
+                    ${PROJECT_SOURCE_DIR}/../../eziot/core/inc
+                    ${PROJECT_SOURCE_DIR}/../../eziot/extensions/dev_bind/inc
+                    ${PROJECT_SOURCE_DIR}/../../eziot/extensions/dev_model/inc
+                    ${PROJECT_SOURCE_DIR}/../../eziot/extensions/ota/inc
+                    ${PROJECT_SOURCE_DIR}/../eziotlink/inc
                     ${PROJECT_SOURCE_DIR}/../../components/json
+                    ${PROJECT_SOURCE_DIR}/../../components/logger/inc
                     ${PROJECT_SOURCE_DIR}/../../include)
 #添加依赖库目录
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/../../lib/gcc)
