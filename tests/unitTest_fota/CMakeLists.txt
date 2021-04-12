@@ -39,22 +39,23 @@ SET(lib_ezbspatch -lezbspatch -lbz2)
 
 #SET(src_files  ${unittest_ezpatch} ${src_unittest_comm})
 
-AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/third_party/json  json)
-AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/third_party/md5  md5)
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../third_party_lib/json  json)
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../third_party_lib/md5  md5)
 AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/  src)
 
 #头文件搜索路径
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/third_party/googletest/include
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../third_party_lib/googletest/include
+                    ${PROJECT_SOURCE_DIR}/../third_party_lib/googletest/include/gtest
                     ${PROJECT_SOURCE_DIR}/../inc
-                    ${PROJECT_SOURCE_DIR}/../../eziot/extensions/ota/fota/inc
-                    ${PROJECT_SOURCE_DIR}/third_party/json
-                    ${PROJECT_SOURCE_DIR}/third_party/md5
-                    ${PROJECT_SOURCE_DIR}/third_party/googletest/include/gtest
+                    ${PROJECT_SOURCE_DIR}/../../eziot/extensions/ota/ota_diff_patch/inc
+                    ${PROJECT_SOURCE_DIR}/../third_party_lib/json
+                    ${PROJECT_SOURCE_DIR}/../third_party_lib/md5
+
                     )
 
 #添加依赖库目录
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/../../lib
-                 ${PROJECT_SOURCE_DIR}/third_party/googletest/lib)
+                 ${PROJECT_SOURCE_DIR}/../third_party_lib/googletest/lib)
 
 #添加需要编译的源文件
 ADD_EXECUTABLE(testunit_ez_bspatch  ${md5} ${json} ${src})
