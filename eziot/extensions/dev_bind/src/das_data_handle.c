@@ -40,8 +40,6 @@
 
 static char g_user_operation_code[OPERATION_CODE_LEN] = {0};
 
-static const char *get_verify_code(void);
-
 static int msg2dev_set_userid(const char *userid);
 
 static ez_base_cb_t g_base_cb = {0};
@@ -109,7 +107,6 @@ int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, cons
     {
         pubmsg.msg_qos = QOS_T1;
     }
-
     pubmsg.msg_response = msg_response;
     pubmsg.msg_seq = *msg_seq;
 
@@ -139,7 +136,7 @@ int ez_send_msg2plat(unsigned char* msg,unsigned int len, const int cmd_id, cons
     return 0;
 }
 
-int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const char *cmd_version, unsigned int msg_req, req_rsp_handle _handle)
+int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const char *cmd_version, unsigned int msg_req, req_rsp_handle h_fun)
 {
     ezxml_t req;
     ezxml_t rsp;
@@ -174,7 +171,7 @@ int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const c
                 break;
             }
         }
-        ret = _handle(req);
+        ret = h_fun(req);
     } while (0);
 
     sprintf(err, "%d", ret);
@@ -207,6 +204,31 @@ int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const c
         strrsp = NULL;
     }
     return ret;
+}
+
+static const char *get_verify_code(void)
+{
+    const char *dev_user_operation_code = g_user_operation_code;
+    const char *dev_verify_code = ezdev_sdk_kernel_getdevinfo_bykey("dev_verification_code");
+    if (strlen(dev_user_operation_code))
+    {
+        ez_log_v(TAG_BASE,"operation:%s\n",dev_user_operation_code);
+        return dev_user_operation_code;
+    }
+
+    if (dev_verify_code == NULL)
+    {
+        ez_log_e(TAG_BASE,"dev_verify_code is null\n");
+        return NULL;
+    }
+
+    if (strlen(dev_verify_code))
+    {
+        ez_log_v(TAG_BASE,"verify:%s\n",dev_verify_code);
+        return dev_verify_code;
+    }
+
+    return NULL;
 }
 
 int verify_challengecode_req(ezxml_t req)
@@ -372,34 +394,6 @@ int pu2plt_query_userid_req()
 
     return ret;
 }
-
-
-
-static const char *get_verify_code(void)
-{
-    const char *dev_user_operation_code = g_user_operation_code;
-    const char *dev_verify_code = ezdev_sdk_kernel_getdevinfo_bykey("dev_verification_code");
-    if (strlen(dev_user_operation_code))
-    {
-        ez_log_v(TAG_BASE,"operation:%s\n",dev_user_operation_code);
-        return dev_user_operation_code;
-    }
-
-    if (dev_verify_code == NULL)
-    {
-        ez_log_e(TAG_BASE,"dev_verify_code is null\n");
-        return NULL;
-    }
-
-    if (strlen(dev_verify_code))
-    {
-        ez_log_v(TAG_BASE,"verify:%s\n",dev_verify_code);
-        return dev_verify_code;
-    }
-
-    return NULL;
-}
-
 static int msg2dev_set_userid(const char *userid)
 {
     int ret = 0;
