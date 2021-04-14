@@ -411,11 +411,6 @@ static mkernel_internal_error deserialize_common(unsigned char *common_buf, EZDE
 		bscJSON_Delete(json_item);
 		json_item = NULL;
 	}
-	// 	if (comon_buf != NULL)
-	// 	{
-	// 		free(comon_buf);
-	// 		comon_buf = NULL;
-	// 	}
 	return sdk_error;
 }
 
@@ -1428,22 +1423,11 @@ void das_object_init(ezdev_sdk_kernel *sdk_kernel)
 {
 	EZDEV_SDK_UNUSED(sdk_kernel)
 	MQTTNetInit(&g_DasNetWork);
-
-	//	MQTTClientInit(&g_DasClient, &g_DasNetWork, 10*1000, g_sendbuf, ezdev_sdk_send_buf_max, g_readbuf, ezdev_sdk_recv_buf_max);
-
 	memset(g_sendbuf, 0, ezdev_sdk_send_buf_max);
 	memset(g_readbuf, 0, ezdev_sdk_recv_buf_max);
 
 	MQTTClientInit(&g_DasClient, &g_DasNetWork, 6 * 1000, g_sendbuf, ezdev_sdk_send_buf_max, g_readbuf, ezdev_sdk_recv_buf_max);
     
-	/*if(das_getGoTcpAlways() == 0)
-	{
-        coapClientInit(sdk_kernel, &g_DasClientByCoap);
-        g_DasClientByCoap.sendData2Up = sendData2Up4coap;
-        g_DasClientByCoap.genaralSeq = genaral_seq;
-    }*/
-
-	/* 初始化消息队列 */
 	init_queue(ezdev_sdk_queue_max, ezdev_sdk_queue_max, ezdev_sdk_queue_max * 4);
 }
 

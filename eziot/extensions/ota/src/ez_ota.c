@@ -248,10 +248,7 @@ static void ota_file_download_thread(void *arg)
     }
     free(file_info);
     file_info = NULL;
-
     g_download_status = 0;
-
-    return ;
 }
 
 ez_err_e  ez_ota_file_download(ota_download_info_t *input_info, get_file_cb file_cb, notify_cb notify, void* user_data)
@@ -289,7 +286,8 @@ ez_err_e  ez_ota_file_download(ota_download_info_t *input_info, get_file_cb file
         strncpy(file_info->check_sum, (char*)input_info->digest, sizeof(file_info->check_sum)- 1);
 
         strncpy(thread_name, "ez_ota_download", sizeof(thread_name) -1);
-        handle =  hal_thread_create((int8_t*)thread_name, ota_file_download_thread, stack_size, 0, (void*)file_info);
+        hal_thread_fun_t  th_download = ota_file_download_thread;
+        handle =  hal_thread_create((int8_t*)thread_name, th_download, stack_size, 0, (void*)file_info);
         if (NULL == handle)
         {
             ez_log_e(TAG_OTA,"ota_download_tread create error\n");
