@@ -366,7 +366,7 @@ int main(void)
 				{
 					ez_log_d(TAG_APP,"---------ez_sdk_init Succ-------------\n");
 				}
-	/*#ifdef TEST_BASE_ENABLE
+	#ifdef TEST_BASE_ENABLE
 			base_sample_start();
 	#endif  
 	#ifdef TEST_OTA_ENABLE
@@ -374,11 +374,11 @@ int main(void)
 	#endif       
 	#ifdef TEST_MODEL_ENABLE
 			model_sample_start();
-	#endif   */
+	#endif  
 	            ez_sdk_start();
 			} 
 
-	/*#ifdef TEST_BASE_ENABLE
+	#ifdef TEST_BASE_ENABLE
 			if (!strcmp(message, "query\n"))  
 			{
 				base_sample_query_user_id();
@@ -387,9 +387,9 @@ int main(void)
 			{
 				base_sample_set_operation_code();
 			}
-	#endif*/
+	#endif
 
-	/*#ifdef TEST_OTA_ENABLE
+	#ifdef TEST_OTA_ENABLE
 		    ///< called first when device start 
 			if (!strcmp(message, "modu\n"))  
 			{
@@ -405,12 +405,11 @@ int main(void)
 			{
 				ota_sample_status_report(2);
 			}
-	#endif*/
-
+	#endif
 			if (!strcmp(message, "stop\n"))
 			{
 				ez_sdk_stop();
-	/*#ifdef TEST_BASE_ENABLE
+	#ifdef TEST_BASE_ENABLE
 				base_sample_stop();
 	#endif   
 	#ifdef TEST_OTA_ENABLE
@@ -418,7 +417,7 @@ int main(void)
 	#endif  
     #ifdef TEST_MODEL_ENABLE
 			    model_sample_stop();
-	#endif */  
+	#endif 
 	            ez_sdk_deinit();
 			}
 		}
