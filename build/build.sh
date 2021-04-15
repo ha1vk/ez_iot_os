@@ -45,7 +45,7 @@ function cleanall() {
         cd ${PRJ_PWD}/${file}/build
         make clean
         cd ..
-        rm -rf build
+        #rm -rf build
 		echo "---clean ${file} end---"
 	done
 }
