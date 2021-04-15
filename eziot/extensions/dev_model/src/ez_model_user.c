@@ -382,6 +382,7 @@ int ez_model_send_reply(ez_basic_info* basic_info, ez_model_msg* msg, ez_err_inf
     if(context)
     {
         free(context);
+        context = NULL;
     }
 
     return ret;
@@ -450,6 +451,7 @@ int ez_model_send_user_msg(ez_basic_info* basic_info, ez_model_msg* msg, ez_msg_
     if(context)
     {
         free(context);
+        context = NULL;
     }
     return ret;
 }
