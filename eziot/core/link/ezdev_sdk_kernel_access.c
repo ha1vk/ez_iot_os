@@ -206,6 +206,11 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel* sdk_kernel)
 	ezdev_sdk_kernel_log_trace(0, 0, "cnt_state_das_reged, times:%d \n", sdk_kernel->das_retry_times);
 
 	sdk_error = cnt_state_das_reged(sdk_kernel);
+	if(sdk_error == mkernel_internal_mqtt_session_exist)
+	{
+		sdk_error = cnt_state_das_fast_reg(sdk_kernel);
+	}
+
 	if (sdk_error == mkernel_internal_succ)
 	{
 		sdk_kernel->cnt_state = sdk_cnt_das_reged;
