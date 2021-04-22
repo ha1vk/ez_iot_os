@@ -302,7 +302,7 @@ static mkernel_internal_error cnt_das_retry_do(ezdev_sdk_kernel* sdk_kernel)
 	{
 		ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_das_retry_do");
 		broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-		if (sdk_kernel->das_retry_times++ >= 10)
+		if (sdk_kernel->das_retry_times++ >= 3)
 		{
 			sdk_offline_context context = {0};
 
