@@ -89,15 +89,6 @@ typedef enum
  */
 typedef void (*ez_event_notice)(ez_event_e event_id, void * context);
 
-/** 
- *  \brief		定义日志打印回调
- *  \method		ez_log_notice
- *  \param[in] 	level					日志等级
- *  \param[in] 	sdk_error				SDK错误码
- *  \param[in] 	othercode				其他的错误码
- *  \param[in] 	buf						消息存放地址
- */
-typedef void (*ez_log_notice)(log_level_e level, EZDEV_SDK_INT32 sdk_error, EZDEV_SDK_INT32 othercode, const char *buf);
 
 /** 
  *  \brief		定义加载关键信息的函数
@@ -179,7 +170,6 @@ typedef struct
 typedef struct
 {
 	ez_event_notice event_notice;			            ///< 事件通知回调
-	ez_log_notice   log_notice;				            ///< 日志回调
 }ez_notice_t;
 
 /**

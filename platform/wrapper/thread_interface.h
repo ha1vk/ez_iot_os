@@ -16,30 +16,44 @@
 
 #include "thread_platform_wrapper.h"
 
+typedef void * ez_thread_t;
+typedef void * ez_mutex_t;
+
+typedef struct{
+	void (* task_fun)(void *task_arg);	//线程入口函数
+	void *task_arg;						//入口函数的传入参数
+	unsigned char priority;				//线程的优先级
+	unsigned int stackSize;				//程堆栈的大小
+	char task_name[64];					//线程名称
+	unsigned int tick;					//线程的时间片大小
+}ez_task_init_parm;
 
 /** 
  *  \brief		创建线程
- *  \method		sdk_thread_create
- *  \param[in] 	handle 线程上下文
- *  \return 	成功返回0 失败返回-1
+ *  \method		ez_thread_create
+ *  \param[in] 	taskParam 线程上下文
+ *  \return 	成功返回线程句柄 失败返回NULL
  */
-int sdk_thread_create(thread_handle* handle);
+ez_thread_t ez_thread_create(ez_task_init_parm *taskParam);
 
 /** 
  *  \brief		线程销毁
- *  \method		sdk_thread_destroy
+ *  \method		ez_thread_destroy
  *  \param[in] 	handle 线程上下文
  *  \return 	成功返回0 失败返回-1
  */
-int sdk_thread_destroy(thread_handle* handle);
+int ez_thread_destroy(ez_thread_t handle);
 
-/** 
- *  \brief		线程休眠
- *  \method		sdk_thread_sleep
- *  \param[in] 	time_ms 休眠时间（毫秒）
- */
-void sdk_thread_sleep(unsigned int time_ms);
 
+ez_mutex_t ez_mutex_create(void);
+
+int ez_mutex_destory(ez_mutex_t mutex);
+
+int ez_mutex_lock(ez_mutex_t mutex);
+
+int ez_mutex_unlock(ez_mutex_t mutex);
+
+int ez_delay_ms(unsigned int time_ms);
 //typedef struct thread_handle_platform thread_handle;
 
 #endif

@@ -14,15 +14,6 @@
 #ifndef H_PLATFORM_DEFINE_H_
 #define H_PLATFORM_DEFINE_H_
 
-typedef void *ezdev_sdk_mutex;
-
-#define LOG_PLATFORM_INTERFACE                                                  \
-	extern void log_print_error(int sdk_error, int othercode, const char *buf); \
-	extern void log_print_warn(int sdk_error, int othercode, const char *buf);  \
-	extern void log_print_info(int sdk_error, int othercode, const char *buf);  \
-	extern void log_print_debug(int sdk_error, int othercode, const char *buf); \
-	extern void log_print_trace(int sdk_error, int othercode, const char *buf); \
-	extern void log_print(const char *fmt, ...);
 
 #define NET_PLATFORM_INTERFACE                                                                                                                                         \
 	extern ezdev_sdk_net_work net_create();                                                                                                                            \
@@ -46,11 +37,7 @@ typedef void *ezdev_sdk_mutex;
 	extern void Platform_TimerCountdown(ezdev_sdk_time time, unsigned int timeout);           \
 	extern EZDEV_SDK_UINT32 Platform_TimerLeftMS(ezdev_sdk_time time);                        \
 	extern void Platform_TimeDestroy(ezdev_sdk_time time);                                    \
-	extern void sdk_thread_sleep(unsigned int time_ms);
 
 #define MUTEX_PLATFORM_INTERFACE                                              \
-	extern ezdev_sdk_mutex sdk_platform_thread_mutex_create();                \
-	extern void sdk_platform_thread_mutex_destroy(ezdev_sdk_mutex ptr_mutex); \
-	extern int sdk_platform_thread_mutex_lock(ezdev_sdk_mutex ptr_mutex);     \
-	extern int sdk_platform_thread_mutex_unlock(ezdev_sdk_mutex ptr_mutex);
+	
 #endif //H_PLATFORM_DEFINE_H_

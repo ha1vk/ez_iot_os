@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include "pthread.h"
 #include "bscJSON.h"
-#include "hal_thread.h"
 #include "ezdev_sdk_kernel.h"
 #include "ezdev_sdk_kernel_error.h"
 #include "ezdev_sdk_kernel_struct.h"

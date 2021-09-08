@@ -327,13 +327,12 @@ typedef struct
 	EZDEV_SDK_INT32 (*key_value_save)(sdk_keyvalue_type valuetype, unsigned char* keyvalue, EZDEV_SDK_INT32 keyvalue_size);				///<	写信息的函数，必须处理secretkey的写操作
 	EZDEV_SDK_INT32 (*curing_data_load)(sdk_curingdata_type valuetype, unsigned char* keyvalue, EZDEV_SDK_INT32 *keyvalue_maxsize);		///<    读信息的函数，必须处理secretkey的读操作
 	EZDEV_SDK_INT32 (*curing_data_save)(sdk_curingdata_type valuetype, unsigned char* keyvalue, EZDEV_SDK_INT32 keyvalue_size);			///<	写信息的函数，必须处理secretkey的写操作
+
 	
-	void (*sdk_kernel_log)(sdk_log_level level, EZDEV_SDK_INT32 sdk_error, EZDEV_SDK_INT32 othercode, const char * buf);
-	
-	ezdev_sdk_mutex (*thread_mutex_create)();
-	void (*thread_mutex_destroy)(ezdev_sdk_mutex ptr_mutex);
-	int (*thread_mutex_lock)(ezdev_sdk_mutex ptr_mutex);
-	int (*thread_mutex_unlock)(ezdev_sdk_mutex ptr_mutex);
+	ez_mutex_t (*thread_mutex_create)();
+	void (*thread_mutex_destroy)(ez_mutex_t ptr_mutex);
+	int (*thread_mutex_lock)(ez_mutex_t ptr_mutex);
+	int (*thread_mutex_unlock)(ez_mutex_t ptr_mutex);
 } ezdev_sdk_kernel_platform_handle;
 
 /**

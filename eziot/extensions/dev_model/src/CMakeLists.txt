@@ -29,24 +29,21 @@ else()
 endif()
 
 AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/  ez_model)
-AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../../../../components/utility/double_link_list  ez_list)
-AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../../../../platform/hal/hal_thread/linux  hal_thread)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/
                     ${PROJECT_SOURCE_DIR}/../inc
 					${PROJECT_SOURCE_DIR}/../../../../components/json
 					${PROJECT_SOURCE_DIR}/../../../../components/utility/double_link_list
 					${PROJECT_SOURCE_DIR}/../../../../components/logger/inc
-					${PROJECT_SOURCE_DIR}/../../../../platform/hal/inc
                     ${PROJECT_SOURCE_DIR}/../../../../include
 					${PROJECT_SOURCE_DIR}/../../../core/inc)
 
 #同时生成静态库和动态库，target的名字要唯一，但是生成的库名可以重定义
-ADD_LIBRARY(ez_model_static STATIC ${ez_model} ${ez_list} ${hal_thread})
+ADD_LIBRARY(ez_model_static STATIC ${ez_model})
 SET_TARGET_PROPERTIES(ez_model_static PROPERTIES OUTPUT_NAME ez_iot_model)
 
 IF (${DYNAMIC})
-ADD_LIBRARY(ez_model_shared SHARED ${ez_model} ${ez_list} ${hal_thread})
+ADD_LIBRARY(ez_model_shared SHARED ${ez_model})
 SET_TARGET_PROPERTIES(ez_model_shared PROPERTIES OUTPUT_NAME ez_iot_model)
 ENDIF (${DYNAMIC})
 

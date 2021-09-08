@@ -20,7 +20,7 @@
 #include "ezdev_sdk_kernel.h"
 #include "bscJSON.h"
 #include "ez_sdk_log.h"
-#include "hal_thread.h"
+#include "thread_interface.h"
 #include "webclient.h"
 #include "ez_sdk_ota.h"
 #include "ez_ota_extern.h"
@@ -255,9 +255,9 @@ ez_err_e  ez_ota_file_download(ota_download_info_t *input_info, get_file_cb file
 {
     ez_err_e err = ez_errno_succ;
     ez_ota_file_info_t *file_info = NULL;
-    char thread_name[32] = {0};
-    void* handle =NULL;
-    int stack_size = 64*1024;
+    ez_thread_t g_ota_thread;
+    ez_task_init_parm task_para;
+
     ez_log_d(TAG_OTA, "ezdev_ota_download start!\n");
     if(0!=g_download_status)
     {
@@ -285,17 +285,18 @@ ez_err_e  ez_ota_file_download(ota_download_info_t *input_info, get_file_cb file
         strncpy(file_info->url, (char*)input_info->url, sizeof(file_info->url)-1);
         strncpy(file_info->check_sum, (char*)input_info->digest, sizeof(file_info->check_sum)- 1);
 
-        strncpy(thread_name, "ez_ota_download", sizeof(thread_name) -1);
-        hal_thread_fun_t  th_download = ota_file_download_thread;
-        handle =  hal_thread_create((int8_t*)thread_name, th_download, stack_size, 0, (void*)file_info);
-        if (NULL == handle)
-        {
+        memset(&task_para, 0, sizeof(ez_task_init_parm));
+        task_para.task_fun = ota_file_download_thread;
+        snprintf(task_para.task_name, 16, "ez_ota_download");
+        task_para.priority = 0;
+        task_para.stackSize = 512*1024;
+        task_para.task_arg = (void*)file_info;
+        g_ota_thread = ez_thread_create(&task_para);
+        if (g_ota_thread == NULL){
             ez_log_e(TAG_OTA,"ota_download_tread create error\n");
             err = ez_errno_ota_memory;
             break;
         }
-        hal_thread_detach(handle);
-        handle = NULL;
 
         g_download_status = 1;
 

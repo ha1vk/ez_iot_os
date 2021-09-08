@@ -22,6 +22,8 @@
         "ezdev_sdk_kernel_common.h": "c",
         "pthread.h": "c",
         "cstdio": "c",
-        "fstream": "c"
+        "fstream": "c",
+        "thread_interface.h": "c",
+        "sdk_kernel_def.h": "c"
     }
 }

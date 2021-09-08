@@ -31,25 +31,22 @@ ENDIF (${P2PV3})
 
 
 AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/  ota)
-AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../../../../platform/hal/hal_thread/linux  hal_thread)
-AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/../../../../components/http/webclient webclient)
 	
 #头文件搜索路径
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/
                     ${PROJECT_SOURCE_DIR}/../inc
                     ${PROJECT_SOURCE_DIR}/../../../../components/http/webclient
-					${PROJECT_SOURCE_DIR}/../../../../platform/hal/inc
 					${PROJECT_SOURCE_DIR}/../../../../components/json
 					${PROJECT_SOURCE_DIR}/../../../../components/logger/inc
                     ${PROJECT_SOURCE_DIR}/../../../../include
 					${PROJECT_SOURCE_DIR}/../../../core/inc
                     )
 #同时生成静态库和动态库，target的名字要唯一，但是生成的库名可以重定义
-ADD_LIBRARY(ez_iot_ota_static STATIC ${ota} ${hal_thread}  ${webclient})
+ADD_LIBRARY(ez_iot_ota_static STATIC ${ota})
 SET_TARGET_PROPERTIES(ez_iot_ota_static PROPERTIES OUTPUT_NAME ez_iot_ota)
 
 IF (${DYNAMIC})
-ADD_LIBRARY(ez_iot_ota_shared SHARED ${ota} ${hal_thread} ${webclient})
+ADD_LIBRARY(ez_iot_ota_shared SHARED ${ota})
 SET_TARGET_PROPERTIES(ez_iot_ota_shared PROPERTIES OUTPUT_NAME ez_iot_ota)
 ENDIF (${DYNAMIC})
 

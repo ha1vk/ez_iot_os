@@ -21,8 +21,8 @@
 #include "ez_sdk_api.h"
 
 
-thread_handle  g_main_thread = {0};
-thread_handle  g_user_thread = {0};
+ez_thread_t g_main_thread;
+ez_thread_t g_user_thread;
 ez_init_info_t g_init_config = {{0}, {0}};
 
 EZDEVSDK_CONFIG_INTERFACE
@@ -56,7 +56,7 @@ unsigned int sdk_main_thread(void *user_data)
         {
             break;
         }
-        sdk_thread_sleep(10);
+        ez_delay_ms(10);
     } while (g_running && sdk_error != ezdev_sdk_kernel_invald_call);
 
     ez_log_i(TAG_SDK,"sdk_main_thread exit\n");
@@ -71,7 +71,7 @@ unsigned int sdk_user_thread(void *user_data)
     {
         sdk_error = ezdev_sdk_kernel_yield_user();
 
-        sdk_thread_sleep(10);
+        ez_delay_ms(10);
 
     } while (g_running && sdk_error != ezdev_sdk_kernel_invald_call);
 
@@ -109,33 +109,6 @@ int win_socket_fini()
 
 #endif // WIN32
 
-void sdk_kernel_logprint(sdk_log_level level, EZDEV_SDK_INT32 sdk_error, EZDEV_SDK_INT32 othercode, const char *buf)
-{
-    if (g_init_config.notice.log_notice == NULL)
-    {
-        return;
-    }
-    switch (level)
-    {
-    case sdk_log_error:
-        g_init_config.notice.log_notice(log_error, sdk_error, othercode, buf);
-        break;
-    case sdk_log_warn:
-        g_init_config.notice.log_notice(log_warn, sdk_error, othercode, buf);
-        break;
-    case sdk_log_info:
-        g_init_config.notice.log_notice(log_info, sdk_error, othercode, buf);
-        break;
-    case sdk_log_debug:
-        g_init_config.notice.log_notice(log_debug, sdk_error, othercode, buf);
-        break;
-    case sdk_log_trace:
-        g_init_config.notice.log_notice(log_trace, sdk_error, othercode, buf);
-        break;
-    default:
-        break;
-    }
-}
 
 void value_load(sdk_keyvalue_type valuetype, unsigned char *keyvalue, EZDEV_SDK_INT32 keyvalue_maxsize)
 {
@@ -325,16 +298,15 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
         sdk_cb_fun.time_countdown        = Platform_TimerCountdown;
         sdk_cb_fun.time_leftms           = Platform_TimerLeftMS;
         sdk_cb_fun.time_destroy          = Platform_TimeDestroy;
-        sdk_cb_fun.sdk_kernel_log        = sdk_kernel_logprint;
         sdk_cb_fun.key_value_load        = value_load;
         sdk_cb_fun.key_value_save        = value_save;
         sdk_cb_fun.curing_data_load      = curing_data_load;
         sdk_cb_fun.curing_data_save      = curing_data_save;
-        sdk_cb_fun.thread_mutex_create   = sdk_platform_thread_mutex_create;
-        sdk_cb_fun.thread_mutex_destroy  = sdk_platform_thread_mutex_destroy;
-        sdk_cb_fun.thread_mutex_lock     = sdk_platform_thread_mutex_lock;
-        sdk_cb_fun.thread_mutex_unlock   = sdk_platform_thread_mutex_unlock;
-        sdk_cb_fun.time_sleep            = sdk_thread_sleep;
+        sdk_cb_fun.thread_mutex_create   = ez_mutex_create;
+        sdk_cb_fun.thread_mutex_destroy  = ez_mutex_destory;
+        sdk_cb_fun.thread_mutex_lock     = ez_mutex_lock;
+        sdk_cb_fun.thread_mutex_unlock   = ez_mutex_unlock;
+        sdk_cb_fun.time_sleep            = ez_delay_ms;
 
 
         strncpy(config.server.host, pserver_info->host, sizeof(config.server.host) - 1);
@@ -387,6 +359,7 @@ EZDEV_SDK_INT32 ez_sdk_init(const ez_server_info_t* pserver_info, const ez_init_
 EZDEV_SDK_INT32 ez_sdk_start()
 {
     int result = 0;
+    ez_task_init_parm task_para;
     ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
 
     kernel_error = ezdev_sdk_kernel_start();
@@ -397,20 +370,27 @@ EZDEV_SDK_INT32 ez_sdk_start()
     do
     {
         g_running = 1;
-        memset(&g_main_thread, 0, sizeof(g_main_thread));
-        memset(&g_user_thread, 0, sizeof(g_user_thread));
+        memset(&task_para, 0, sizeof(ez_task_init_parm));
 
-        g_main_thread.task_do = sdk_main_thread;
-        snprintf(g_main_thread.thread_name, 16, BOOT_MAIN_THREAD_NAME);
-        result = sdk_thread_create(&g_main_thread);
-        if (result != 0)
-        {
+        task_para.task_fun = sdk_main_thread;
+        snprintf(task_para.task_name, 16, BOOT_MAIN_THREAD_NAME);
+        task_para.priority = 1;
+        task_para.stackSize = 512*1024;
+        g_main_thread = ez_thread_create(&task_para);
+        if (g_main_thread == NULL){
             break;
         }
 
-        g_user_thread.task_do = sdk_user_thread;
-        snprintf(g_user_thread.thread_name, 16, BOOT_USER_THREAD_NAME);
-        result = sdk_thread_create(&g_user_thread);
+        memset(&task_para, 0, sizeof(ez_task_init_parm));
+        task_para.task_fun = sdk_user_thread;
+        snprintf(task_para.task_name, 16, BOOT_USER_THREAD_NAME);
+        task_para.priority = 2;
+        task_para.stackSize = 512*1024;
+        g_user_thread = ez_thread_create(&task_para);
+        if (g_user_thread == NULL){
+            break;
+        }
+
     } while (0);
 
     if (result != 0)
@@ -420,8 +400,10 @@ EZDEV_SDK_INT32 ez_sdk_start()
         g_running = 0;
         ezdev_sdk_kernel_stop();
 
-        sdk_thread_destroy(&g_main_thread);
-        sdk_thread_destroy(&g_user_thread);
+        ez_thread_destroy(g_main_thread);
+        ez_thread_destroy(g_user_thread);
+        g_main_thread = NULL;
+        g_user_thread = NULL;
 
         result = ezdev_sdk_kernel_internal;
     }
@@ -436,8 +418,10 @@ EZDEV_SDK_INT32 ez_sdk_stop()
     if (g_running)
     {
         g_running = 0;
-        sdk_thread_destroy(&g_main_thread);
-        sdk_thread_destroy(&g_user_thread);
+        ez_thread_destroy(g_main_thread);
+        ez_thread_destroy(g_user_thread);
+        g_main_thread = NULL;
+        g_user_thread = NULL;
     }
 
     kernel_error = ezdev_sdk_kernel_stop();

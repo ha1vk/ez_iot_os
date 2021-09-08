@@ -43,6 +43,7 @@
 #define TAG_OTA      "T_OTA"
 #define TAG_APP      "T_APP"
 #define TAG_BASE     "T_BASE"
+#define TAG_MICRO    "T_MICRO"
 
 #ifdef __cplusplus
 extern "C"
