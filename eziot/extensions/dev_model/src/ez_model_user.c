@@ -12,15 +12,19 @@
 * Contributors:
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
-#include <stdio.h>
+
 #include <string.h>
-#include <stdlib.h>
 #include "ez_sdk_log.h"
 #include "ez_model_def.h"
 #include "ez_model_comm.h"
 #include "ez_model_user.h"
 #include "ez_model_bus.h"
-
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
 
 #define EZ_CODE_VERSION         "V1.1.0"
 
@@ -338,7 +342,7 @@ int ez_model_send_reply(ez_basic_info* basic_info, ez_model_msg* msg, ez_err_inf
     strncpy(mod_info.resource_id, basic_info->resource_id,  EZ_RES_ID_LEN- 1);
     strncpy(mod_info.sub_serial, basic_info->subserial,  EZ_SUB_SERIAL_LEN- 1);
 
-    snprintf(mod_info.ext_msg, EZ_EXT_MSG_LEN,"%s/%s", basic_info->domain, basic_info->identifier);
+    ez_snprintf(mod_info.ext_msg, EZ_EXT_MSG_LEN,"%s/%s", basic_info->domain, basic_info->identifier);
     ez_log_v(TAG_MOD,"ez_model_send_reply, msg json type:%d\n", msg->type);
     msg_seq =  msg_attr->msg_seq;
     msg_qos =  msg_attr->msg_qos;
@@ -381,7 +385,7 @@ int ez_model_send_reply(ez_basic_info* basic_info, ez_model_msg* msg, ez_err_inf
     }
     if(context)
     {
-        free(context);
+        ez_free(context);
         context = NULL;
     }
 
@@ -408,7 +412,7 @@ int ez_model_send_user_msg(ez_basic_info* basic_info, ez_model_msg* msg, ez_msg_
     strncpy(mod_info.resource_type, basic_info->resource_type, EZ_RES_TYPE_LEN - 1);
     strncpy(mod_info.resource_id, basic_info->resource_id,  EZ_RES_ID_LEN- 1);
     strncpy(mod_info.sub_serial, basic_info->subserial,  EZ_SUB_SERIAL_LEN- 1);
-    snprintf(mod_info.ext_msg, EZ_EXT_MSG_LEN,"%s/%s",basic_info->domain, basic_info->identifier);
+    ez_snprintf(mod_info.ext_msg, EZ_EXT_MSG_LEN,"%s/%s",basic_info->domain, basic_info->identifier);
 
     msg_seq =  msg_attr->msg_seq;
     msg_qos =  msg_attr->msg_qos;
@@ -450,7 +454,7 @@ int ez_model_send_user_msg(ez_basic_info* basic_info, ez_model_msg* msg, ez_msg_
     }
     if(context)
     {
-        free(context);
+        ez_free(context);
         context = NULL;
     }
     return ret;
@@ -473,7 +477,7 @@ int ez_model_send_origin_msg(ez_basic_info* basic_info, const char* msg, unsigne
     strncpy(mod_info.resource_type, basic_info->resource_type, EZ_RES_TYPE_LEN - 1);
     strncpy(mod_info.resource_id, basic_info->resource_id,  EZ_RES_ID_LEN- 1);
     strncpy(mod_info.sub_serial, basic_info->subserial,  EZ_SUB_SERIAL_LEN- 1);
-    snprintf(mod_info.ext_msg, EZ_EXT_MSG_LEN,"%s/%s",basic_info->domain, basic_info->identifier);
+    ez_snprintf(mod_info.ext_msg, EZ_EXT_MSG_LEN,"%s/%s",basic_info->domain, basic_info->identifier);
     msg_seq =  msg_attr->msg_seq;
     msg_qos =  msg_attr->msg_qos;
 
@@ -513,7 +517,7 @@ static char g_model_version[128] = {0};
 
 const char* ez_model_get_version()
 {
-    snprintf(g_model_version, sizeof(g_model_version), "%s", EZ_CODE_VERSION);
+    ez_snprintf(g_model_version, sizeof(g_model_version), "%s", EZ_CODE_VERSION);
     ez_log_v(TAG_MOD,"ez_model_version:%s\n", g_model_version); 
 
     return g_model_version;

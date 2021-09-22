@@ -18,10 +18,17 @@
 #include "bscJSON.h"
 #include "ez_sdk_log.h"
 #include "das_data_handle.h"
-#include "ezdev_sdk_kernel_struct.h"
-#include "ezdev_sdk_kernel.h"
+#include "ez_sdk_api.h"
+#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_api_struct.h"
 #include "ez_base_def.h"
 #include "ez_base_api.h"
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
 
 #define EZ_BASE_RSP 1
 #define EZ_BASE_REQ 0
@@ -200,7 +207,7 @@ int das_req_rsp_handle(int req_cmd, void *buf, int buf_len, int rsp_cmd, const c
     }
     if(NULL!=strrsp)
     {
-        free(strrsp);
+        ez_free(strrsp);
         strrsp = NULL;
     }
     return ret;
@@ -388,7 +395,7 @@ int pu2plt_query_userid_req()
     }
     if(NULL!=strreq)
     {
-        free(strreq);
+        ez_free(strreq);
         strreq = NULL;
     }
 
@@ -594,7 +601,7 @@ static ez_base_err report_bind_user_token(const char* ptoken)
     }
     if(NULL!=strjson)
     {
-        free(strjson);
+        ez_free(strjson);
         strjson = NULL;
     }
     
@@ -639,7 +646,7 @@ static ez_base_err report_touch_bind_token(const int token)
     }
     if(NULL!=strjson)
     {
-        free(strjson);
+        ez_free(strjson);
         strjson = NULL;
     }
     

@@ -12,19 +12,21 @@
 * Contributors:
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
-#include <sys/types.h>
-#include <sys/syscall.h>
 #include <dirent.h>
-#include <sys/time.h>
-#include <time.h>
 #include <string>
 #include <unistd.h>
-#include <signal.h>
 #include "base_typedef.h"
 #include "inireader.h"
-#include "ezdev_sdk_kernel.h"
+#include "ez_sdk_api_struct.h"
 #include "ez_sdk_log.h"
 #include "ez_sdk_api.h"
+
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
 
 #ifdef TEST_BASE_ENABLE
 #include "base_sample.h"
@@ -172,29 +174,6 @@ void event_notice_callback(ez_event_e event_id, void * context)
 	}
 }
 
-void log_notice_callback(log_level_e level, int sdk_error, int othercode, const char *buf)
-{	
-	switch (level)
-	{
-	case log_error:
-	    ez_log_e(TAG_APP,"sdk_error:%d, othercode:%d, info:%s \n",sdk_error, othercode, buf);
-	    break;
-	case log_warn:
-	    ez_log_w(TAG_APP,"sdk_error:%d, othercode:%d, info:%s \n",sdk_error, othercode, buf);
-	    break;
-	case log_info:
-	    ez_log_i(TAG_APP,"sdk_error:%d, othercode:%d, info:%s \n",sdk_error, othercode, buf);
-	    break;
-	case log_debug:
-	    ez_log_d(TAG_APP,"sdk_error:%d, othercode:%d, info:%s \n",sdk_error, othercode, buf);
-	    break;
-	case log_trace:
-	    ez_log_v(TAG_APP,"sdk_error:%d, othercode:%d, info:%s \n",sdk_error, othercode, buf);
-	    break;
-	default:
-	    break;
-	}
-}
 
 void key_value_load_callback(ez_key_type_e type, unsigned char* keyvalue, EZDEV_SDK_UINT32 keyvalue_maxsize)
 {
@@ -307,6 +286,7 @@ int main(void)
         }
         /*set log level*/
         ez_sdk_set_log_level(log_level);
+		ez_sdk_set_log_level(5);
         host_len = lbs_domain.length();
         memset(&server, 0, sizeof(server));
 
@@ -333,7 +313,6 @@ int main(void)
         init_info.config.data_save = curing_data_save_cb;  
        
         init_info.notice.event_notice = event_notice_callback;
-        init_info.notice.log_notice = log_notice_callback;
 
 		while (true)
 		{
@@ -359,7 +338,7 @@ int main(void)
 				sdk_err = ez_sdk_init(&server, &init_info, 1);
 				if (ezdev_sdk_kernel_succ != sdk_err)
 				{
-					ez_log_e(TAG_APP,"ez_sdk_init failed, code: %d\n", sdk_err);
+					ez_log_e(TAG_APP,"ez_sdk_init failed, code: 0x%08x\n", sdk_err);
 					break;
 				}
 				else

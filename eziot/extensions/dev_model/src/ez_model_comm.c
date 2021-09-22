@@ -12,8 +12,8 @@
 * Contributors:
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
-#include "stdlib.h"
-#include "string.h"
+//#include <stdlib.h>
+#include <string.h>
 #include "ez_sdk_log.h"
 #include "ez_model_comm.h"
 

@@ -12,20 +12,17 @@
 * Contributors:
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
-#include <string.h>
-#include <unistd.h>
-#include <time.h>
-#include <stdlib.h>
-#include "pthread.h"
+#include "thread_interface.h"
 #include "bscJSON.h"
-#include "ezdev_sdk_kernel.h"
+#include "ez_sdk_api_struct.h"
+#include "ez_sdk_api.h"
 #include "ezdev_sdk_kernel_error.h"
-#include "ezdev_sdk_kernel_struct.h"
 #include "ez_sdk_log.h"
 #include "ez_ota_def.h"
 #include "ez_ota_extern.h"
 #include "ez_ota_bus.h"
 #include "ez_ota_user.h"
+#include "mem_interface.h"
 
 
 static int g_quit = 0;
@@ -76,7 +73,7 @@ static int ez_ota_upgrade_to_device(ota_res_t* pres, unsigned int seq, void* buf
         int array_size = bscJSON_GetArraySize(pJSfile_info);
         ez_log_d(TAG_OTA,"ota upgrade file num:%d\n", array_size); 
         ez_upgrade_info.file_num = array_size;
-        ez_upgrade_info.pota_files = (ota_file_info_t*)malloc(sizeof(ota_file_info_t)*array_size);
+        ez_upgrade_info.pota_files = (ota_file_info_t*)ez_malloc(sizeof(ota_file_info_t)*array_size);
         if(NULL == ez_upgrade_info.pota_files)
         {
             ez_log_e(TAG_OTA,"pota_files malloc err\n"); 
@@ -94,22 +91,22 @@ static int ez_ota_upgrade_to_device(ota_res_t* pres, unsigned int seq, void* buf
            bscJSON* pJSmodule = bscJSON_GetObjectItem(tmp, "module");
            if(pJSmodule)
            {
-               snprintf((char*)ez_upgrade_info.pota_files[i].mod_name, sizeof(ez_upgrade_info.pota_files[i].mod_name),"%s", pJSmodule->valuestring);
+               ez_snprintf((char*)ez_upgrade_info.pota_files[i].mod_name, sizeof(ez_upgrade_info.pota_files[i].mod_name),"%s", pJSmodule->valuestring);
            }
            bscJSON* pJSurl = bscJSON_GetObjectItem(tmp, "url");
            if(pJSurl)
            {
-               snprintf((char*)ez_upgrade_info.pota_files[i].url, sizeof(ez_upgrade_info.pota_files[i].url),"%s", pJSurl->valuestring);
+               ez_snprintf((char*)ez_upgrade_info.pota_files[i].url, sizeof(ez_upgrade_info.pota_files[i].url),"%s", pJSurl->valuestring);
            }
            bscJSON* pJSdigest = bscJSON_GetObjectItem(tmp, "digest");
            if(pJSdigest)
            {
-               snprintf((char*)ez_upgrade_info.pota_files[i].digest, sizeof(ez_upgrade_info.pota_files[i].digest),"%s",pJSdigest->valuestring);
+               ez_snprintf((char*)ez_upgrade_info.pota_files[i].digest, sizeof(ez_upgrade_info.pota_files[i].digest),"%s",pJSdigest->valuestring);
            }
            bscJSON* pJSfw_ver = bscJSON_GetObjectItem(tmp, "fw_ver");
            if(pJSfw_ver)
            {
-               snprintf((char*)ez_upgrade_info.pota_files[i].fw_ver, sizeof(ez_upgrade_info.pota_files[i].fw_ver),"%s",pJSfw_ver->valuestring);
+               ez_snprintf((char*)ez_upgrade_info.pota_files[i].fw_ver, sizeof(ez_upgrade_info.pota_files[i].fw_ver),"%s",pJSfw_ver->valuestring);
            }
            bscJSON* pJSsize = bscJSON_GetObjectItem(tmp, "size");
            if(pJSsize)
@@ -119,7 +116,7 @@ static int ez_ota_upgrade_to_device(ota_res_t* pres, unsigned int seq, void* buf
            bscJSON* pJSdiffs = bscJSON_GetObjectItem(tmp, "diffs");
            if(pJSdiffs&& bscJSON_Object== pJSdiffs->type)
            {
-                ez_upgrade_info.pota_files[i].pdiffs = (ota_file_diff_t*)malloc(sizeof(ota_file_diff_t));
+                ez_upgrade_info.pota_files[i].pdiffs = (ota_file_diff_t*)ez_malloc(sizeof(ota_file_diff_t));
                 if(NULL == ez_upgrade_info.pota_files[i].pdiffs)
                 {
                     ez_log_e(TAG_OTA,"pdiffs malloc err\n"); 
@@ -129,17 +126,17 @@ static int ez_ota_upgrade_to_device(ota_res_t* pres, unsigned int seq, void* buf
                 bscJSON* diffs_url= bscJSON_GetObjectItem(pJSdiffs,"url");
                 if(diffs_url)
                 {
-                    snprintf((char*)ez_upgrade_info.pota_files[i].pdiffs->url, sizeof(ez_upgrade_info.pota_files[i].pdiffs->url),"%s", diffs_url->valuestring);
+                    ez_snprintf((char*)ez_upgrade_info.pota_files[i].pdiffs->url, sizeof(ez_upgrade_info.pota_files[i].pdiffs->url),"%s", diffs_url->valuestring);
                 }
                 bscJSON*diffs_digest = bscJSON_GetObjectItem(pJSdiffs,"digest");
                 if(diffs_digest)
                 {
-                    snprintf((char*)ez_upgrade_info.pota_files[i].pdiffs->digest,sizeof(ez_upgrade_info.pota_files[i].pdiffs->digest), "%s", diffs_digest->valuestring);
+                    ez_snprintf((char*)ez_upgrade_info.pota_files[i].pdiffs->digest,sizeof(ez_upgrade_info.pota_files[i].pdiffs->digest), "%s", diffs_digest->valuestring);
                 }
                 bscJSON*diffs_fw_ver_dst = bscJSON_GetObjectItem(pJSdiffs,"fw_ver_dst");
                 if(diffs_fw_ver_dst)
                 {
-                    snprintf((char*)ez_upgrade_info.pota_files[i].pdiffs->fw_ver_dst, sizeof(ez_upgrade_info.pota_files[i].pdiffs->fw_ver_dst),"%s", diffs_fw_ver_dst->valuestring);
+                    ez_snprintf((char*)ez_upgrade_info.pota_files[i].pdiffs->fw_ver_dst, sizeof(ez_upgrade_info.pota_files[i].pdiffs->fw_ver_dst),"%s", diffs_fw_ver_dst->valuestring);
                 }
                 bscJSON*diffs_size = bscJSON_GetObjectItem(pJSdiffs,"size");
                 if(diffs_size)
@@ -160,7 +157,7 @@ static int ez_ota_upgrade_to_device(ota_res_t* pres, unsigned int seq, void* buf
     {
         if(pjson_rsp)
         {
-            snprintf(errcode, sizeof(errcode), "0x%#08x", ret);
+            ez_snprintf(errcode, sizeof(errcode), "0x%#08x", ret);
             bscJSON_AddStringToObject(pjson_rsp,"code", errcode);
             bscJSON_AddStringToObject(pjson_rsp,"errorMsg","Succeeded");
         }
@@ -172,7 +169,7 @@ static int ez_ota_upgrade_to_device(ota_res_t* pres, unsigned int seq, void* buf
     else
     {
        
-        snprintf(errcode, sizeof(errcode), "0x%#08x", ret);
+        ez_snprintf(errcode, sizeof(errcode), "0x%#08x", ret);
         bscJSON_AddStringToObject(pjson_rsp,"code", errcode);
         bscJSON_AddStringToObject(pjson_rsp,"errorMsg","device receive failed!");
     }
@@ -198,16 +195,16 @@ static int ez_ota_upgrade_to_device(ota_res_t* pres, unsigned int seq, void* buf
         {
             if(ez_upgrade_info.pota_files[i].pdiffs)
             {
-                free(ez_upgrade_info.pota_files[i].pdiffs);
+                ez_free(ez_upgrade_info.pota_files[i].pdiffs);
                 ez_upgrade_info.pota_files[i].pdiffs = NULL;
             }
         }
-        free(ez_upgrade_info.pota_files);
+        ez_free(ez_upgrade_info.pota_files);
         ez_upgrade_info.pota_files = NULL;
     }
     if(response)
     {
-        free(response);
+        ez_free(response);
     }
 
     if(proot)
@@ -349,7 +346,7 @@ ez_err_e ezdev_ota_module_info_report(const ota_res_t *pres, const ota_modules_t
     }
     if(sz_pmodules)
     {
-        free(sz_pmodules);
+        ez_free(sz_pmodules);
         sz_pmodules = NULL;
     }
     return ota_err;

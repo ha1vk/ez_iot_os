@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <tchar.h> 
 #include "base_typedef.h"
-#include "ezdev_sdk_kernel.h"
+#include "ez_sdk_api_struct.h"
 #include "ez_sdk_log.h"
 #include "ez_sdk_api.h"
 #include "base_sample.h"

@@ -18,6 +18,18 @@
 
 typedef void*				EZDEV_SDK_PTR;
 
+#if (defined(_WIN32) || defined(_WIN64))
+#  if defined(EZ_OS_API_EXPORTS)
+#    define EZ_OS_API_EXTERN __declspec(dllexport)
+#  else
+#    define EZ_OS_API_EXTERN __declspec(dllimport)
+#  endif
+#  define EZ_OS_API_CALL __stdcall
+#else
+#  define EZ_OS_API_EXTERN
+#  define EZ_OS_API_CALL
+#endif
+
 #define EZDEV_SDK_UNUSED(var)	(void)var;		
 
 #if defined (_WIN32) || defined(_WIN64)

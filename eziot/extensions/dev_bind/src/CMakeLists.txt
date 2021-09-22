@@ -21,13 +21,13 @@ AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/  dev_bind)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/
                     ${PROJECT_SOURCE_DIR}/../inc
 					${PROJECT_SOURCE_DIR}/das_protocol_def
-					${PROJECT_SOURCE_DIR}/../../../../components/mbedtls
-					${PROJECT_SOURCE_DIR}/../../../../components/json
-					${PROJECT_SOURCE_DIR}/../../../../components/xml
-					${PROJECT_SOURCE_DIR}/../../../../components/logger/inc
+					${PROJECT_SOURCE_DIR}/../../../../components/src/json
+					${PROJECT_SOURCE_DIR}/../../../../components/src/xml
+					${PROJECT_SOURCE_DIR}/../../../../components/src/logger
+					${PROJECT_SOURCE_DIR}/../../../../components/src/mbedtls
                     ${PROJECT_SOURCE_DIR}/../../../../include
-					${PROJECT_SOURCE_DIR}/../../../core/inc
-					${PROJECT_SOURCE_DIR}/../../../core/link)
+					${PROJECT_SOURCE_DIR}/../../../../platform/inc
+					${PROJECT_SOURCE_DIR}/../../../core/inc)
 #同时生成静态库和动态库，target的名字要唯一，但是生成的库名可以重定义
 ADD_LIBRARY(ez_iot_base_static STATIC ${dev_bind})
 SET_TARGET_PROPERTIES(ez_iot_base_static PROPERTIES OUTPUT_NAME ez_iot_base)
@@ -38,4 +38,4 @@ SET_TARGET_PROPERTIES(ez_iot_base_shared PROPERTIES OUTPUT_NAME ez_iot_base)
 ENDIF (${DYNAMIC})
 
 #设置生成的库文件存放路径为lib
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../lib/linux)
+SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../lib)

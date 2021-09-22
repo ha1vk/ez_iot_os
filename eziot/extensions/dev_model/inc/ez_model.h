@@ -15,19 +15,15 @@
 #ifndef EZ_MODEL_H_
 #define EZ_MODEL_H_
 
-#if defined(_WIN32) || defined(_WIN64)
-#ifdef GLOBAL_DECL_EXPORTS
-#define EZ_MODEL_API __declspec(dllexport)
-#else 
-#define EZ_MODEL_API __declspec(dllimport)
-#endif
-#define GLOBAL_CALLBACK __stdcall
-#else
-#define EZ_MODEL_API
-#define GLOBAL_CALLBACK
-#endif
 
 #include "ez_model_def.h"
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
+#include "base_typedef.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -40,7 +36,7 @@ extern "C"
  *  \param[out] 
  *  \return  当前封装版本号，非空
  */
-    EZ_MODEL_API int ez_model_domain_reg(const ez_domain_reg *domain_reg);
+    EZ_OS_API_EXTERN int EZ_OS_API_CALL ez_model_domain_reg(const ez_domain_reg *domain_reg);
 
 /** 
  *  \brief	   领域反注册
@@ -48,7 +44,7 @@ extern "C"
  *  \param[in] domain ,注册的domian标识
  *  \return  当前封装版本号，非空
  */
-    EZ_MODEL_API int ez_model_domain_dereg(const char *domain);
+    EZ_OS_API_EXTERN int EZ_OS_API_CALL ez_model_domain_dereg(const char *domain);
 
 /** 
  *  \brief		设备回复das下发的请求
@@ -59,7 +55,7 @@ extern "C"
  *  \param[in]  msg_attr 发送消息属性
  *  \return  0成功 非0 失败
  */
-    EZ_MODEL_API int ez_model_reply_to_das(ez_basic_info *basic_info, ez_model_msg *msg, ez_err_info *status, ez_msg_attr *msg_attr);
+    EZ_OS_API_EXTERN int EZ_OS_API_CALL ez_model_reply_to_das(ez_basic_info *basic_info, ez_model_msg *msg, ez_err_info *status, ez_msg_attr *msg_attr);
 
 /** 
  *  \brief	发送消息接口,可以通过该接口实现事件/属性的上报/操作查询等
@@ -69,7 +65,7 @@ extern "C"
  *  \param[in]  msg_attr     发送消息属性
  *  \return  0成功 非0 失败
  */
-    EZ_MODEL_API int ez_model_send_msg(ez_basic_info *basic_info, ez_model_msg *msg, ez_msg_attr *msg_attr);
+    EZ_OS_API_EXTERN int EZ_OS_API_CALL ez_model_send_msg(ez_basic_info *basic_info, ez_model_msg *msg, ez_msg_attr *msg_attr);
 
 /** 
  *  \brief	发送消息给das,kuzhong
@@ -81,14 +77,14 @@ extern "C"
  *  \param[in]  msg_attr     发送消息属性
  *  \return  0成功 非0 失败
  */
-    EZ_MODEL_API int ez_model_send_to_platform(ez_basic_info *basic_info, const char *msg, unsigned int msg_len, int msg_response, ez_msg_attr *msg_attr);
+    EZ_OS_API_EXTERN int EZ_OS_API_CALL ez_model_send_to_platform(ez_basic_info *basic_info, const char *msg, unsigned int msg_len, int msg_response, ez_msg_attr *msg_attr);
     /** 
  *  \brief	获取当前封装版本号
  *  \method		ez_model_get_current_version
  *  \param[out] 
  *  \return  当前封装版本号,未初始化时返回NULL
  */
-    EZ_MODEL_API const char *ez_model_get_current_version();
+    EZ_OS_API_EXTERN const char * EZ_OS_API_CALL ez_model_get_current_version();
 
 /** 
  *  \brief	设置默认回调函数,用于未注册的领域消息的接收
@@ -96,7 +92,7 @@ extern "C"
  *  \param[in]  ez_data_router消息回调
  *  \return  0成功 非0 失败
  */
-    EZ_MODEL_API int ez_model_reg_default_cb(ez_model_default_cb *ez_data_router);
+    EZ_OS_API_EXTERN int EZ_OS_API_CALL ez_model_reg_default_cb(ez_model_default_cb *ez_data_router);
 
 /** 
  *  \brief	    清除默认回调信息及模块反初始化
@@ -104,7 +100,7 @@ extern "C"
  *  \param[in]  ez_data_router
  *  \return  0成功 
  */
-    EZ_MODEL_API int ez_model_dereg_default_cb(ez_model_default_cb *ez_data_router);
+    EZ_OS_API_EXTERN int EZ_OS_API_CALL ez_model_dereg_default_cb(ez_model_default_cb *ez_data_router);
 
 #ifdef __cplusplus
 }

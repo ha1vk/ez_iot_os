@@ -21,8 +21,8 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 
 SET(lib_ez_core  -lez_iot_core)
-SET(lib_ez_link  -lez_iot_link)
-SET(lib_ez_log   -lez_iot_log)
+SET(lib_ez_platform  -lez_os_platform)
+SET(lib_ez_components   -lez_iot_components)
 SET(lib_rt -lpthread -lm -lrt)
 
 
@@ -60,14 +60,11 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/utility
                     ${PROJECT_SOURCE_DIR}/extensions/base
                     ${PROJECT_SOURCE_DIR}/extensions/ota
                     ${PROJECT_SOURCE_DIR}/extensions/model
-                    ${PROJECT_SOURCE_DIR}/../../eziot/core/inc
-                    ${PROJECT_SOURCE_DIR}/../../eziot/extensions/dev_bind/inc
-                    ${PROJECT_SOURCE_DIR}/../../eziot/extensions/dev_model/inc
-                    ${PROJECT_SOURCE_DIR}/../../eziot/extensions/ota/inc
-                    ${PROJECT_SOURCE_DIR}/../eziotlink/inc
-                    ${PROJECT_SOURCE_DIR}/../../components/json
-                    ${PROJECT_SOURCE_DIR}/../../components/logger/inc
-                    ${PROJECT_SOURCE_DIR}/../../include)
+                    ${PROJECT_SOURCE_DIR}/../../inc
+                    ${PROJECT_SOURCE_DIR}/../../include
+                    ${PROJECT_SOURCE_DIR}/../../components/src/json
+                    ${PROJECT_SOURCE_DIR}/../../components/src/logger
+                    ${PROJECT_SOURCE_DIR}/../../components/src)
 #添加依赖库目录
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/../../lib/gcc)
 
@@ -79,9 +76,10 @@ target_link_libraries(main_sample_bin
                         ${lib_model}
                         ${lib_ota}
                         ${lib_base}
-                        ${lib_ez_link}
-                        ${lib_ez_log}
                         ${lib_ez_core}
-                        ${lib_rt})
+                        ${lib_rt}
+                        ${lib_ez_components}
+                        ${lib_ez_platform}
+                        )
 
 SET_TARGET_PROPERTIES(main_sample_bin PROPERTIES OUTPUT_NAME hellosample)

@@ -15,24 +15,15 @@
 #ifndef _EZ_SDK_OTA_H_
 #define _EZ_SDK_OTA_H_
 
-#if defined(_WIN32) || defined(_WIN64)
-
-#ifdef GLOBAL_DECL_EXPORTS
-#define EZIOT_API __declspec(dllexport)
-#else //GLOBAL_DECL_EXPORTS
-#define EZIOT_API __declspec(dllimport)
-#endif //GLOBAL_DECL_EXPORTS
-
-#define GLOBAL_CALLBACK __stdcall
-
-#else
-#define EZIOT_API
-
-#define GLOBAL_CALLBACK
-#endif
 
 #include <stdint.h>
-
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
+#include "base_typedef.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -223,7 +214,7 @@ extern "C"
      * @param pdata_cbs 
      * @return ez_err_e 
      */
-    EZIOT_API ez_err_e ez_iot_ota_init(ota_init_t *pota_init);
+    EZ_OS_API_EXTERN ez_err_e EZ_OS_API_CALL ez_iot_ota_init(ota_init_t *pota_init);
 
     /**
      * @brief 上报升级模块信息
@@ -232,7 +223,7 @@ extern "C"
      * @param  timeout_ms 暂未使用
      * @return ez_err_e 
      */
-    EZIOT_API ez_err_e ez_iot_ota_modules_report(const ota_res_t *pres, const ota_modules_t* pmodules, uint32_t timeout_ms);
+    EZ_OS_API_EXTERN ez_err_e EZ_OS_API_CALL ez_iot_ota_modules_report(const ota_res_t *pres, const ota_modules_t* pmodules, uint32_t timeout_ms);
 
     /**
      * @brief 通知升级服务，设备待升级，设备开机上报一次即可
@@ -240,7 +231,7 @@ extern "C"
      * @param pres 设备信息，NULL标识当前设备，!NULL标识子设备
      * @return ez_err_e 
      */
-    EZIOT_API ez_err_e ez_iot_ota_status_ready(const ota_res_t *pres, int8_t* pmodule);
+    EZ_OS_API_EXTERN ez_err_e EZ_OS_API_CALL ez_iot_ota_status_ready(const ota_res_t *pres, int8_t* pmodule);
 
     /**
      * @brief 升级成功信息上报
@@ -248,7 +239,7 @@ extern "C"
      * @param pres 设备信息，NULL标识当前设备，!NULL标识子设备
      * @return ez_err_e 
      */
-    EZIOT_API ez_err_e ez_iot_ota_status_succ(const ota_res_t *pres, int8_t* pmodule);
+    EZ_OS_API_EXTERN ez_err_e EZ_OS_API_CALL ez_iot_ota_status_succ(const ota_res_t *pres, int8_t* pmodule);
 
     /**
      * @brief 升级失败信息上报
@@ -259,7 +250,7 @@ extern "C"
      * @param code 升级失败错误码
      * @return ez_err_e 
      */
-    EZIOT_API ez_err_e ez_iot_ota_status_fail(const ota_res_t *pres, int8_t* pmodule, int8_t* perr_msg, ota_errcode_e code);
+    EZ_OS_API_EXTERN ez_err_e EZ_OS_API_CALL ez_iot_ota_status_fail(const ota_res_t *pres, int8_t* pmodule, int8_t* perr_msg, ota_errcode_e code);
 
     /**
      * @brief 上报设备升级进度,请按照服务下发间隔时间上报,app点击升级后,需要在10s时间内上报一次进度信息,否则app端可能会直接提示升级成功
@@ -268,7 +259,7 @@ extern "C"
      * @param progress 升级进度 1-100
      * @return ez_err_e 
      */
-    EZIOT_API ez_err_e ez_iot_ota_progress_report(const ota_res_t *pres, int8_t* pmodule, ota_status_e status, int16_t progress);
+    EZ_OS_API_EXTERN ez_err_e EZ_OS_API_CALL ez_iot_ota_progress_report(const ota_res_t *pres, int8_t* pmodule, ota_status_e status, int16_t progress);
 
     /**
      * @brief 下载升级包
@@ -277,13 +268,13 @@ extern "C"
      * @param notify      下载过程信息通知，包括超时,c
      * @return ez_err_e 
      */
-    EZIOT_API ez_err_e ez_iot_ota_download(ota_download_info_t *input_info, get_file_cb file_cb, notify_cb notify, void *user_data);
+    EZ_OS_API_EXTERN ez_err_e EZ_OS_API_CALL ez_iot_ota_download(ota_download_info_t *input_info, get_file_cb file_cb, notify_cb notify, void *user_data);
 
     /**
      * @brief 升级模块反初始化
      * 
      */
-    EZIOT_API ez_err_e ez_iot_ota_deinit();
+    EZ_OS_API_EXTERN ez_err_e EZ_OS_API_CALL ez_iot_ota_deinit();
 
 #ifdef __cplusplus
 }

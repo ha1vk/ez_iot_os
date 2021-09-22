@@ -3,7 +3,7 @@
 
 PRJ_PWD=$(dirname "$PWD")
 LOC_PWD=${PRJ_PWD}
-SUBDIRS='app/eziotlink/src eziot/core/link components/logger/src eziot/extensions/dev_model/src eziot/extensions/ota/src eziot/extensions/dev_bind/src'
+SUBDIRS='platform/src eziot/core/src components/src eziot/extensions/dev_model/src eziot/extensions/ota/src eziot/extensions/dev_bind/src'
 VERSION='V1.1.0'
 TOOL_STRIP=""
 DYNAMIC_SWITCH=int0
@@ -69,9 +69,9 @@ function buildone() {
 	
 	# 更新头文件和库文件
 	cp ${LOC_PWD}/${LOC_Name}/../inc/*.h ${LOC_PWD}/inc
-	cp ${LOC_PWD}/${LOC_Name}/../lib/linux/*.a ${LOC_PWD}/lib/$ToolChain
+	cp ${LOC_PWD}/${LOC_Name}/../lib/*.a ${LOC_PWD}/lib/$ToolChain
 	if [ $DYNAMIC_SWITCH -eq 1 ]; then
-		cp ${LOC_PWD}/${LOC_Name}/../lib/linux/*.so ${LOC_PWD}/lib/$ToolChain/dynamic
+		cp ${LOC_PWD}/${LOC_Name}/../lib/*.so ${LOC_PWD}/lib/$ToolChain/dynamic
 		$TOOL_STRIP ${LOC_PWD}/lib/$ToolChain/dynamic/*.so
 	fi
 
@@ -98,7 +98,7 @@ function buildall() {
 	done
 	
 	# 导出SDK的所有文件
-	export_ez_iot_sdk
+	#export_ez_iot_sdk
 }
 
 function export_ez_iot_sdk()
@@ -107,7 +107,7 @@ function export_ez_iot_sdk()
 	rm -rf ${LOC_PWD}/export/$EXPORT_PRE$ToolChain
 	mkdir -p ${LOC_PWD}/export/$EXPORT_PRE$ToolChain
 	cp -rf ${LOC_PWD}/inc/. ${LOC_PWD}/export/$EXPORT_PRE$ToolChain/inc
-	cp -rf ${LOC_PWD}/lib/$ToolChain/. ${LOC_PWD}/export/$EXPORT_PRE$ToolChain/lib
+	cp -rf ${LOC_PWD}/lib/. ${LOC_PWD}/export/$EXPORT_PRE$ToolChain/lib
 }
 
 # 生成ToolChain.cmake文件

@@ -14,15 +14,22 @@
  *******************************************************************************/
 #include "ez_base_api.h"
 #include "ez_base_def.h"
-#include "ezdev_sdk_kernel.h"
-#include "ezdev_sdk_kernel_struct.h"
+#include "ez_sdk_api.h"
+#include "ezdev_sdk_kernel_error.h"
 #include "ezdev_sdk_kernel_inner.h"
+#include "ez_sdk_api_struct.h"
 #include "ez_sdk_log.h"
 #include "das_data_handle.h"
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
 
 static int g_inited = 0;
 
-EZ_BASE_API ez_base_err ez_base_init(const ez_base_init_t *pinit)
+EZ_OS_API_EXTERN ez_base_err ez_base_init(const ez_base_init_t *pinit)
 {
     int ret = 0;
     ez_base_err err = EZ_SUCCESS;
@@ -65,7 +72,7 @@ EZ_BASE_API ez_base_err ez_base_init(const ez_base_init_t *pinit)
     return err;
 }
 
-EZ_BASE_API ez_base_err ez_base_deinit()
+EZ_OS_API_EXTERN ez_base_err ez_base_deinit()
 {
 
     if (!g_inited)
@@ -82,7 +89,7 @@ EZ_BASE_API ez_base_err ez_base_deinit()
     return EZ_SUCCESS;
 }
 
-EZ_BASE_API ez_base_err ez_base_send_msg(const unsigned char* buf, const unsigned int len, const int cmd_id, ez_attr_t* msg_attr)
+EZ_OS_API_EXTERN ez_base_err ez_base_send_msg(const unsigned char* buf, const unsigned int len, const int cmd_id, ez_attr_t* msg_attr)
 {
     int ret = 0;
     ez_base_err err  = EZ_SUCCESS;
@@ -108,16 +115,16 @@ EZ_BASE_API ez_base_err ez_base_send_msg(const unsigned char* buf, const unsigne
 
     return err;
 }
-EZ_BASE_API ez_base_err ez_base_report_bind_token(const ez_bind_token_t *ptoken)
+EZ_OS_API_EXTERN ez_base_err ez_base_report_bind_token(const ez_bind_token_t *ptoken)
 {
     return base_report_bind_token(ptoken);
 }
 
-EZ_BASE_API ez_base_err ez_base_set_operation_code(const char *pcode, const int len)
+EZ_OS_API_EXTERN ez_base_err ez_base_set_operation_code(const char *pcode, const int len)
 {
     return base_set_operation_code(pcode, len);
 }
-EZ_BASE_API ez_base_err ez_base_query_userid()
+EZ_OS_API_EXTERN ez_base_err ez_base_query_userid()
 {
     int ret = 0;
     ez_base_err err  = EZ_SUCCESS;

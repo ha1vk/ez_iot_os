@@ -13,8 +13,9 @@
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
 #include "ez_sdk_log.h"
-#include "ezdev_sdk_kernel.h"
-#include "ezdev_sdk_kernel_struct.h"
+#include "ez_sdk_api.h"
+#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_api_struct.h"
 #include "ez_model_bus.h"
 
 int ez_model_msg2platform(unsigned char *context, unsigned int context_len, ez_model_info_t *param, unsigned int *msg_seq, int msg_response, int msg_qos)

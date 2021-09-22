@@ -21,20 +21,6 @@
 #ifndef H_EZDEV_SDK_KERNEL_ERROR_H_
 #define H_EZDEV_SDK_KERNEL_ERROR_H_
 
-#if defined (_WIN32) || defined(_WIN64)
-
-#ifdef MICRO_KERNEL_EXPORTS
-#define EZDEV_SDK_KERNEL_API	__declspec(dllexport)
-#else
-#define EZDEV_SDK_KERNEL_API __declspec(dllimport)
-#endif
-
-#define EZDEV_SDK_KERNEL_CALLBACK __stdcall
-#else
-#define EZDEV_SDK_KERNEL_API 
-
-#define EZDEV_SDK_KERNEL_CALLBACK 
-#endif
 
 #define BASE_ERROR		0xE0000000
 #define NET_ERROR		0x00000100

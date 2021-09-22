@@ -17,7 +17,7 @@
 #define _H_DAS_DATA_HANDLE_H_
 
 #include "ezxml.h"
-#include "ezdev_sdk_kernel_struct.h"
+#include "ez_sdk_api_struct.h"
 #include "ez_base_api.h"
 
 typedef int (*req_rsp_handle)(ezxml_t req);

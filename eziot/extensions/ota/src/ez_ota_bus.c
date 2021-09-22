@@ -17,9 +17,10 @@
 #include "ez_ota.h"
 #include "ez_ota_def.h"
 #include "ez_sdk_log.h"
-#include "ezdev_sdk_kernel.h"
+
+#include "ez_sdk_api.h"
 #include "ezdev_sdk_kernel_error.h"
-#include "ezdev_sdk_kernel_struct.h"
+#include "ez_sdk_api_struct.h"
 
 ez_err_e ez_ota_send_msg_to_platform(unsigned char *msg, int msg_len, const ota_res_t *pres, const char *msg_type,
 									 const char *method, int response, unsigned int *msg_seq, int msg_qos)

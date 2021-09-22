@@ -12,15 +12,9 @@
 * Contributors:
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-#include <unistd.h>
-#include <time.h>
-#include "ezdev_sdk_kernel.h"
+#include "ez_sdk_api.h"
 #include "bscJSON.h"
 #include "ez_sdk_log.h"
-#include "thread_interface.h"
 #include "webclient.h"
 #include "ez_sdk_ota.h"
 #include "ez_ota_extern.h"
@@ -28,6 +22,12 @@
 #include "ez_ota.h"
 #include "ez_ota_bus.h"
 #include "ez_ota_user.h"
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
 
 #define ez_ota_url_len    270
 #define ez_ota_md5_len    32
@@ -109,7 +109,7 @@ ez_err_e ez_progress_report(const ota_res_t *pres, const int8_t* pmodule, const 
 
     if(sz_progress)
     {
-        free(sz_progress);
+        ez_free(sz_progress);
         sz_progress = NULL;
     }
     if(pJsRoot)
@@ -126,7 +126,7 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
     int ret = -1;
     unsigned int need_readlen = 1;
     httpclient_t  *h_client = NULL;
-    char* recvbuffer = (char*)malloc(readlen);
+    char* recvbuffer = (char*)ez_malloc(readlen);
     int status  = 0;
     unsigned int content_len = 0;
     ez_log_d(TAG_OTA,"file_download: total_len:%d, readlen:%d, offset:%d\n", *total_len, readlen, *offset);
@@ -200,7 +200,7 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
     ez_log_d(TAG_OTA,"download,ret: %d\n", ret);
     if(recvbuffer)
     {
-        free(recvbuffer);
+        ez_free(recvbuffer);
         recvbuffer = NULL;
     }
     if(h_client)
@@ -246,7 +246,7 @@ static void ota_file_download_thread(void *arg)
         ez_log_e(TAG_OTA,"http_upgrade_download return err,ret:%d, retry_times:%d \n", ret, retry_times);
         file_info->notify(result_failed, file_info->user_data);
     }
-    free(file_info);
+    ez_free(file_info);
     file_info = NULL;
     g_download_status = 0;
 }
@@ -265,7 +265,7 @@ ez_err_e  ez_ota_file_download(ota_download_info_t *input_info, get_file_cb file
     }
     do
     {
-        file_info = (ez_ota_file_info_t*)malloc(sizeof(ez_ota_file_info_t));
+        file_info = (ez_ota_file_info_t*)ez_malloc(sizeof(ez_ota_file_info_t));
         if(NULL == file_info)
         {
             ez_log_e(TAG_OTA,"malloc download_param failed!\n");
@@ -287,9 +287,7 @@ ez_err_e  ez_ota_file_download(ota_download_info_t *input_info, get_file_cb file
 
         memset(&task_para, 0, sizeof(ez_task_init_parm));
         task_para.task_fun = ota_file_download_thread;
-        snprintf(task_para.task_name, 16, "ez_ota_download");
-        task_para.priority = 0;
-        task_para.stackSize = 512*1024;
+        ez_snprintf(task_para.task_name, 16, "ez_ota_download");
         task_para.task_arg = (void*)file_info;
         g_ota_thread = ez_thread_create(&task_para);
         if (g_ota_thread == NULL){
@@ -297,6 +295,7 @@ ez_err_e  ez_ota_file_download(ota_download_info_t *input_info, get_file_cb file
             err = ez_errno_ota_memory;
             break;
         }
+        ez_thread_detach(g_ota_thread);
 
         g_download_status = 1;
 
@@ -306,7 +305,7 @@ ez_err_e  ez_ota_file_download(ota_download_info_t *input_info, get_file_cb file
     {
         if(file_info)
         {
-            free(file_info);
+            ez_free(file_info);
             file_info = NULL;
         }
     }

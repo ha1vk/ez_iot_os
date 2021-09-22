@@ -19,9 +19,15 @@
 #include "ez_sdk_log.h"
 #include "ez_model_def.h"
 #include "ez_model.h"
-#include "ezdev_sdk_kernel_struct.h"
+#include "ez_sdk_api_struct.h"
 #include "base_typedef.h"
 #include "model_sample.h"
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
 
 #define CHECK_NULL(cond) \
     if((cond))           \
@@ -32,7 +38,7 @@
 #define SAFE_FREE(p) \
     if (p)           \
     {                \
-        free(p);     \
+        ez_free(p);     \
         p = NULL;    \
     }
 

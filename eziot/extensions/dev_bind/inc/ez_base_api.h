@@ -15,21 +15,13 @@
 #ifndef _H_EZ_BASE_API_H_
 #define _H_EZ_BASE_API_H_
 
-#if defined(_WIN32) || defined(_WIN64)
-
-#ifdef EZ_BASE_DECL_EXPORTS
-#define EZ_BASE_API __declspec(dllexport)
-#else
-#define EZ_BASE_API __declspec(dllimport)
-#endif
-
-#define GLOBAL_CALLBACK __stdcall
-
-#else
-#define EZ_BASE_API
-
-#define GLOBAL_CALLBACK
-#endif
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
+#include "base_typedef.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -141,14 +133,14 @@ extern "C"
     * @param pinit  init info 
     * return 0-success !0-failed   /ref ez_base_err
     */
-	EZ_BASE_API ez_base_err ez_base_init(const ez_base_init_t *pinit);
+	EZ_OS_API_EXTERN ez_base_err EZ_OS_API_CALL ez_base_init(const ez_base_init_t *pinit);
 
 	  /** 
     * @brief ez_base_report_bind_token, report bind token 
     * @param ptoken  bind token info 
     * return 0-success !0-failed   /ref ez_base_err
     */
-	EZ_BASE_API ez_base_err ez_base_report_bind_token(const ez_bind_token_t *ptoken);
+	EZ_OS_API_EXTERN ez_base_err EZ_OS_API_CALL ez_base_report_bind_token(const ez_bind_token_t *ptoken);
     /** 
     * @brief ez_base_send_msg, for sending user msg to das
     * @param buf      user msg buf
@@ -158,27 +150,27 @@ extern "C"
 	* @param msg_seq  init info
     * return 0-success !0-failed   /ref ez_base_err
     */
-	EZ_BASE_API ez_base_err ez_base_send_msg(const unsigned char* buf, const unsigned int len, const int cmd_id, ez_attr_t* msg_attr);
+	EZ_OS_API_EXTERN ez_base_err EZ_OS_API_CALL ez_base_send_msg(const unsigned char* buf, const unsigned int len, const int cmd_id, ez_attr_t* msg_attr);
     /** 
     * @brief ez_base_set_operation_code, For device binding
     * @param pcode  operation_code
 	* @param len    operation_code len ,less than 128
     * return 0-success !0-failed   /ref ez_base_err
     */
-	EZ_BASE_API ez_base_err ez_base_set_operation_code(const char *pcode, const int len);
+	EZ_OS_API_EXTERN ez_base_err EZ_OS_API_CALL ez_base_set_operation_code(const char *pcode, const int len);
 
 	/** 
     * @brief ez_base_query_userid,For querying userid 
     * @param void 
     * return 0-success !0-failed   /ref ez_base_err
     */
-	EZ_BASE_API ez_base_err ez_base_query_userid();
+	EZ_OS_API_EXTERN ez_base_err EZ_OS_API_CALL ez_base_query_userid();
     /** 
     * @brief ez_base_deinit
     * @param void 
     * return 0-success !0-failed   /ref ez_base_err
     */
-	EZ_BASE_API ez_base_err ez_base_deinit();
+	EZ_OS_API_EXTERN ez_base_err EZ_OS_API_CALL ez_base_deinit();
 
 	
 

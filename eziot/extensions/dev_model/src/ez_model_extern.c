@@ -17,13 +17,18 @@
 #include <float.h>
 #include <limits.h>
 #include <math.h>
-#include <stdbool.h>
 
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
 #include "thread_interface.h"
+#include "time_interface.h"
 #include "double_linked_list.h"
 #include "ez_sdk_log.h"
-#include "ezdev_sdk_kernel.h"
-#include "ezdev_sdk_kernel_struct.h"
+#include "ez_sdk_api.h"
+#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_api_struct.h"
 
 #include "ez_model_bus.h"
 #include "ez_model_comm.h"
@@ -118,7 +123,7 @@ static int ez_model_add_domain_info(list_t *list, const ez_domain_reg *domain_re
     {
         return EZ_CODE_MODEL_DOMAIN_REGED;
     }
-    pnode = (ez_domain_node_t *)malloc(sizeof(ez_domain_node_t));
+    pnode = (ez_domain_node_t *)ez_malloc(sizeof(ez_domain_node_t));
     if (NULL == pnode)
     {
         ez_log_e(TAG_MOD, "ez_domain_node_t malloc err\n");
@@ -126,11 +131,11 @@ static int ez_model_add_domain_info(list_t *list, const ez_domain_reg *domain_re
     }
     memset(pnode, 0, sizeof(ez_domain_node_t));
 
-    pnode->domain_info = (ez_domain_reg *)malloc(sizeof(ez_domain_reg));
+    pnode->domain_info = (ez_domain_reg *)ez_malloc(sizeof(ez_domain_reg));
     if (NULL == pnode->domain_info)
     {
         ez_log_e(TAG_MOD, "domain_info malloc err\n");
-        free(pnode);
+        ez_free(pnode);
         pnode = NULL;
         return EZ_CODE_MODEL_MALLOC_ERR;
     }
@@ -170,11 +175,11 @@ int ez_dereg_domain(const char *domain)
     {
         if (pnode->domain_info)
         {
-            free(pnode->domain_info);
+            ez_free(pnode->domain_info);
             pnode->domain_info = NULL;
         }
         list_delete_node(&g_model_domains, &pnode->node);
-        free(pnode);
+        ez_free(pnode);
         pnode = NULL;
     }
     ez_mutex_unlock(g_model_domain_lock_h);
@@ -683,7 +688,7 @@ static void tlv_destroy(ez_model_msg *ptlv)
 
     if (NULL != ptlv->value && (model_data_type_object == ptlv->type || model_data_type_array == ptlv->type))
     {
-        free(ptlv->value);
+        ez_free(ptlv->value);
         ptlv->value = NULL;
     }
 

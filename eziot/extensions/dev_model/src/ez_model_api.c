@@ -19,6 +19,12 @@
 #include "ez_model_def.h"
 #include "ez_model_extern.h"
 #include "ez_model_user.h"
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
 
 static int g_inited = 0;
 
@@ -61,7 +67,7 @@ static int ez_model_fini()
 	return 0;
 }
 
-EZ_MODEL_API int ez_model_domain_reg(const ez_domain_reg *domain_reg)
+EZ_OS_API_EXTERN int ez_model_domain_reg(const ez_domain_reg *domain_reg)
 {
 	EZ_ERR_CODE_E ret = EZ_CODE_SUCESS;
 	if (NULL == domain_reg)
@@ -79,7 +85,7 @@ EZ_MODEL_API int ez_model_domain_reg(const ez_domain_reg *domain_reg)
 	return ez_reg_domain(domain_reg);
 }
 
-EZ_MODEL_API int ez_model_domain_dereg(const char *domain)
+EZ_OS_API_EXTERN int ez_model_domain_dereg(const char *domain)
 {
 	if (!g_inited)
 	{
@@ -98,7 +104,7 @@ EZ_MODEL_API int ez_model_domain_dereg(const char *domain)
 	return EZ_CODE_SUCESS;
 }
 
-EZ_MODEL_API int ez_model_reply_to_das(ez_basic_info *basic_info, ez_model_msg *msg, ez_err_info *status, ez_msg_attr *msg_attr)
+EZ_OS_API_EXTERN int ez_model_reply_to_das(ez_basic_info *basic_info, ez_model_msg *msg, ez_err_info *status, ez_msg_attr *msg_attr)
 {
 	int ret = -1;
 	if (!g_inited)
@@ -116,7 +122,7 @@ EZ_MODEL_API int ez_model_reply_to_das(ez_basic_info *basic_info, ez_model_msg *
 	return ret;
 }
 
-EZ_MODEL_API int ez_model_send_msg(ez_basic_info *basic_info, ez_model_msg *msg, ez_msg_attr *msg_attr)
+EZ_OS_API_EXTERN int ez_model_send_msg(ez_basic_info *basic_info, ez_model_msg *msg, ez_msg_attr *msg_attr)
 {
 	int ret = -1;
 	if (!g_inited)
@@ -135,7 +141,7 @@ EZ_MODEL_API int ez_model_send_msg(ez_basic_info *basic_info, ez_model_msg *msg,
 	return ret;
 }
 
-EZ_MODEL_API int ez_model_send_to_platform(ez_basic_info *basic_info, const char *msg, unsigned int msg_len, int msg_response, ez_msg_attr *msg_attr)
+EZ_OS_API_EXTERN int ez_model_send_to_platform(ez_basic_info *basic_info, const char *msg, unsigned int msg_len, int msg_response, ez_msg_attr *msg_attr)
 {
 	int ret = -1;
 	if (!g_inited)
@@ -152,7 +158,7 @@ EZ_MODEL_API int ez_model_send_to_platform(ez_basic_info *basic_info, const char
 	return ret;
 }
 
-EZ_MODEL_API const char *ez_model_get_current_version()
+EZ_OS_API_EXTERN const char *ez_model_get_current_version()
 {
 	if (!g_inited)
 	{
@@ -161,7 +167,7 @@ EZ_MODEL_API const char *ez_model_get_current_version()
 	return ez_model_get_version();
 }
 
-EZ_MODEL_API int ez_model_reg_default_cb(ez_model_default_cb *ez_data_router)
+EZ_OS_API_EXTERN int ez_model_reg_default_cb(ez_model_default_cb *ez_data_router)
 {
 	int ret = -1;
 	if (!g_inited)
@@ -176,7 +182,7 @@ EZ_MODEL_API int ez_model_reg_default_cb(ez_model_default_cb *ez_data_router)
 	return ez_set_data_route_cb(ez_data_router);
 }
 
-EZ_MODEL_API int ez_model_dereg_default_cb(ez_model_default_cb *ez_data_router)
+EZ_OS_API_EXTERN int ez_model_dereg_default_cb(ez_model_default_cb *ez_data_router)
 {
 	ez_set_data_route_cb(ez_data_router);
 

@@ -12,9 +12,6 @@
 * Contributors:
  *    shenhongyin - initial API and implementation and/or initial documentation
  *******************************************************************************/
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "ez_sdk_ota.h"
 
 

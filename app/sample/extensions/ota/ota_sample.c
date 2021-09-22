@@ -15,11 +15,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
+
 #include <unistd.h>
 #include <signal.h>
 #include <assert.h>
-#include <pthread.h>
+#include "file_interface.h"
+#include "io_interface.h"
+#include "mem_interface.h"
+#include "network_interface.h"
+#include "thread_interface.h"
+#include "time_interface.h"
 #include "ez_sdk_log.h"
 
 #include "ez_sdk_ota.h"
@@ -132,7 +137,7 @@ int  ota_sample_stop()
     return 0;
 }
 
-static void *ota_process_report(void* arg)
+static void ota_process_report(void* arg)
 {
     int percent = 0;
     g_progress_interval = 1;
@@ -187,24 +192,28 @@ static void *ota_process_report(void* arg)
         }
         percent += 5;
         //按照下发的间隔上报
-        usleep(g_progress_interval*1000*1000);
+        ez_delay_ms(g_progress_interval*1000);
     }
-    usleep(5000*1000);
+    ez_delay_ms(5000);
     ez_iot_ota_status_succ(&res, (int8_t*)pmodule);
-    return 0;
+   
 }
 
 static int  ota_sample_progress_report()
 {
-    pthread_t thread;
+    ez_task_init_parm task_para;
+    ez_thread_t g_ota_thread;
     ez_log_i(TAG_APP,"-------------progress_report report ----------\n");
-    int ret = pthread_create(&thread, NULL, ota_process_report, NULL);
-    if (0!=ret)
-    {
-        ez_log_i(TAG_APP,"test ota_start_report task create error\n");
+    memset(&task_para, 0, sizeof(ez_task_init_parm));
+    task_para.task_fun = ota_process_report;
+    ez_snprintf(task_para.task_name, 18, "ota_process_report");
+    task_para.task_arg = NULL;
+    g_ota_thread = ez_thread_create(&task_para);
+    if (g_ota_thread == NULL){
+        ez_log_e(TAG_APP,"test ota_start_report task create error\n");
         return -1;
     }
-    pthread_detach(thread);
+    ez_thread_detach(g_ota_thread);
 
     return 0;
 }
@@ -240,7 +249,7 @@ int ota_sample_download_file(ota_upgrade_info_t* pupgrade_info)
     {
         download_info.total_size = pupgrade_info->pota_files[0].size;
 
-        snprintf((char*)download_info.url, sizeof(download_info.url), "https://%s", (char*)pupgrade_info->pota_files[0].url); 
+        ez_snprintf((char*)download_info.url, sizeof(download_info.url), "https://%s", (char*)pupgrade_info->pota_files[0].url); 
         ez_log_i(TAG_APP,"url:%s \n",(char*)download_info.url);
         strncpy((char*)download_info.digest, (char*)pupgrade_info->pota_files[0].digest, sizeof(download_info.digest) -1); 
         ez_iot_ota_download(&download_info,file_cb, notify, NULL);

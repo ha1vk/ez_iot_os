@@ -26,7 +26,7 @@ extern "C"
 {
 #endif
 
-    EZIOT_API ez_err_e ez_iot_ota_init(ota_init_t *pota_init)
+    EZ_OS_API_EXTERN ez_err_e ez_iot_ota_init(ota_init_t *pota_init)
     {
         ez_err_e suc = ez_errno_succ;
         if (!pota_init)
@@ -51,7 +51,7 @@ extern "C"
         return suc;
     }
 
-    EZIOT_API ez_err_e ez_iot_ota_modules_report(const ota_res_t *pres, const ota_modules_t *pmodules, uint32_t timeout_ms)
+    EZ_OS_API_EXTERN ez_err_e ez_iot_ota_modules_report(const ota_res_t *pres, const ota_modules_t *pmodules, uint32_t timeout_ms)
     {
         if (0 == g_ota_inited)
         {
@@ -65,7 +65,7 @@ extern "C"
         return ezdev_ota_module_info_report(pres, pmodules, timeout_ms);
     }
 
-    EZIOT_API ez_err_e ez_iot_ota_status_ready(const ota_res_t *pres, int8_t *pmodule)
+    EZ_OS_API_EXTERN ez_err_e ez_iot_ota_status_ready(const ota_res_t *pres, int8_t *pmodule)
     {
         if (!g_ota_inited)
         {
@@ -74,7 +74,7 @@ extern "C"
         return ez_progress_report(pres, pmodule, NULL, ota_code_none, ota_state_ready, 0);
     }
 
-    EZIOT_API ez_err_e ez_iot_ota_status_succ(const ota_res_t *pres, int8_t *pmodule)
+    EZ_OS_API_EXTERN ez_err_e ez_iot_ota_status_succ(const ota_res_t *pres, int8_t *pmodule)
     {
         if (!g_ota_inited)
         {
@@ -83,7 +83,7 @@ extern "C"
         return ez_progress_report(pres, pmodule, NULL, ota_code_none, ota_state_succ, 0);
     }
 
-    EZIOT_API ez_err_e ez_iot_ota_status_fail(const ota_res_t *pres, int8_t *pmodule, int8_t *perr_msg, ota_errcode_e code)
+    EZ_OS_API_EXTERN ez_err_e ez_iot_ota_status_fail(const ota_res_t *pres, int8_t *pmodule, int8_t *perr_msg, ota_errcode_e code)
     {
         if (!g_ota_inited)
         {
@@ -92,7 +92,7 @@ extern "C"
         return ez_progress_report(pres, pmodule, perr_msg, code, ota_state_failed, 0);
     }
 
-    EZIOT_API ez_err_e ez_iot_ota_progress_report(const ota_res_t *pres, int8_t *pmodule, ota_status_e status, int16_t progress)
+    EZ_OS_API_EXTERN ez_err_e ez_iot_ota_progress_report(const ota_res_t *pres, int8_t *pmodule, ota_status_e status, int16_t progress)
     {
         if (!g_ota_inited)
         {
@@ -105,7 +105,7 @@ extern "C"
         return ez_progress_report(pres, pmodule, NULL, ota_code_none, status, progress);
     }
 
-    EZIOT_API ez_err_e ez_iot_ota_download(ota_download_info_t *input_info, get_file_cb file_cb, notify_cb notify, void *user_data)
+    EZ_OS_API_EXTERN ez_err_e ez_iot_ota_download(ota_download_info_t *input_info, get_file_cb file_cb, notify_cb notify, void *user_data)
     {
         if (!g_ota_inited)
         {
@@ -119,7 +119,7 @@ extern "C"
         return ez_ota_file_download(input_info, file_cb, notify, user_data);
     }
 
-    EZIOT_API ez_err_e ez_iot_ota_deinit()
+    EZ_OS_API_EXTERN ez_err_e ez_iot_ota_deinit()
     {
         if (!g_ota_inited)
         {
