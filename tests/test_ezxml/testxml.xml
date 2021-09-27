@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Result>resultcode</Result>
-    <base>
-        <rsp>response</rsp>
-    </base>
-    <User Id="123456" Name="test">Userid</User>
-    <Code>code123456</Code>
-</Response>
