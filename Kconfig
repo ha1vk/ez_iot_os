@@ -1,0 +1,23 @@
+
+mainmenu "EZOS Kconfig configuration"
+
+menu "Toolchain configuration"
+    config TOOLCHAIN_PATH
+        string "toolchain path"
+        default ""
+
+    config TOOLCHAIN_PREFIX
+        string "toolchain prefix"
+        default ""
+endmenu
+
+menu "Ez-iot-sdk configuration"
+    osource "${EZOS_PATH}/src/core/Kconfig"
+    osource "${EZOS_PATH}/src/link/Kconfig"
+    osource "${EZOS_PATH}/src/extensions/*/Kconfig"
+    osource "${PROJECT_PATH}/*/Kconfig"
+endmenu
+
+menu "Components configuration"
+    osource "${EZOS_PATH}/components/*/Kconfig"
+endmenu
