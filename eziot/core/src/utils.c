@@ -19,18 +19,22 @@
 #include "mkernel_internal_error.h"
 #include "ezdev_sdk_kernel_error.h"
 
-#if !defined(BSCOMPTLS_CONFIG_FILE)
+#if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else
-#include BSCOMPTLS_CONFIG_FILE
+#include MBEDTLS_CONFIG_FILE
 #endif
 
-#if defined(BSCOMPTLS_PLATFORM_C)
+#if defined(MBEDTLS_PLATFORM_C)
 #include "mbedtls/platform.h"
 #else
 #include <stdio.h>
-#define bscomptls_printf     printf
+#define mbedtls_printf     printf
 #endif
+
+#define TIMESPEC_THOUSAND 1000
+#define TIMESPEC_MILLION 1000000
+#define TIMESPEC_BILLION 1000000000
 
 #ifndef _REALTEK_RTOS_
 
@@ -38,128 +42,148 @@ int ezRandomGen(unsigned char *buf, unsigned int len)
 {
 	int ret = 0;
 	char *identifier = "ezDevSDK";
-	bscomptls_ctr_drbg_context ctr_drbg;
-	bscomptls_entropy_context entropy;
-	bscomptls_ctr_drbg_init( &ctr_drbg );
-	bscomptls_entropy_init( &entropy );
+	mbedtls_ctr_drbg_context ctr_drbg;
+	mbedtls_entropy_context entropy;
+	mbedtls_ctr_drbg_init( &ctr_drbg );
+	mbedtls_entropy_init( &entropy );
 	do 
 	{
-		if(0 != (ret = bscomptls_ctr_drbg_seed( &ctr_drbg, bscomptls_entropy_func, &entropy, (unsigned char*)identifier, strlen(identifier))))
+		if(0 != (ret = mbedtls_ctr_drbg_seed( &ctr_drbg, mbedtls_entropy_func, &entropy, (unsigned char*)identifier, strlen(identifier))))
 			break;
 
-		bscomptls_ctr_drbg_set_prediction_resistance( &ctr_drbg, BSCOMPTLS_CTR_DRBG_PR_OFF );
+		mbedtls_ctr_drbg_set_prediction_resistance( &ctr_drbg, MBEDTLS_CTR_DRBG_PR_OFF );
 
-		ret = bscomptls_ctr_drbg_random( &ctr_drbg, buf, len);
+		ret = mbedtls_ctr_drbg_random( &ctr_drbg, buf, len);
 	} while (0);
 
-	bscomptls_ctr_drbg_free( &ctr_drbg );
-	bscomptls_entropy_free( &entropy );
+	mbedtls_ctr_drbg_free( &ctr_drbg );
+	mbedtls_entropy_free( &entropy );
 
 	return ret;
 }
 
 int ezRsaEncrypt(const unsigned char *pIn, int iInLen, unsigned char *pOut, int *iOutLen, const char *pN, const char *pE)
 {
-    int ret = BSCOMPTLS_EXIT_FAILURE;
+    int ret = MBEDTLS_EXIT_FAILURE;
 	char *identifier = "ezDevSDK";
-    bscomptls_rsa_context rsa;
-	bscomptls_ctr_drbg_context ctr_drbg;
-	bscomptls_entropy_context entropy;
-    bscomptls_rsa_init( &rsa, BSCOMPTLS_RSA_PKCS_V15, 0 );
-	bscomptls_ctr_drbg_init( &ctr_drbg );
-	bscomptls_entropy_init( &entropy );
+    mbedtls_rsa_context rsa;
+	mbedtls_ctr_drbg_context ctr_drbg;
+	mbedtls_entropy_context entropy;
+    mbedtls_rsa_init( &rsa, MBEDTLS_RSA_PKCS_V15, 0 );
+	mbedtls_ctr_drbg_init( &ctr_drbg );
+	mbedtls_entropy_init( &entropy );
 
 	do 
 	{
-		if(0 != bscomptls_ctr_drbg_seed( &ctr_drbg, bscomptls_entropy_func,
+		if(0 != mbedtls_ctr_drbg_seed( &ctr_drbg, mbedtls_entropy_func,
 			&entropy, (const unsigned char *) identifier,
 			strlen( identifier ) ))
 		{
 			break;
 		}
 
-		if (0 != bscomptls_mpi_read_string(&rsa.N, 16, pN) ||
-			0 != bscomptls_mpi_read_string(&rsa.E, 16, pE))
+		if (0 != mbedtls_mpi_read_string(&rsa.N, 16, pN) ||
+			0 != mbedtls_mpi_read_string(&rsa.E, 16, pE))
 		{
 			break;
 		}
 
-		rsa.len = ( bscomptls_mpi_bitlen( &rsa.N ) + 7 ) >> 3;
+		rsa.len = ( mbedtls_mpi_bitlen( &rsa.N ) + 7 ) >> 3;
 		if( *iOutLen < rsa.len )
 		{
 			///< buf too small
 			break;
 		}
 
-		if (0 != bscomptls_rsa_pkcs1_encrypt( &rsa, bscomptls_ctr_drbg_random, &ctr_drbg, BSCOMPTLS_RSA_PUBLIC,
+		if (0 != mbedtls_rsa_pkcs1_encrypt( &rsa, mbedtls_ctr_drbg_random, &ctr_drbg, MBEDTLS_RSA_PUBLIC,
 			iInLen, pIn, pOut))
 		{
 			break;
 		}
 		
-		ret = BSCOMPTLS_EXIT_SUCCESS;
+		ret = MBEDTLS_EXIT_SUCCESS;
 		*iOutLen = rsa.len;
 	} while (0);
 
-	bscomptls_ctr_drbg_free( &ctr_drbg );
-	bscomptls_entropy_free( &entropy );
-	bscomptls_rsa_free( &rsa );
+	mbedtls_ctr_drbg_free( &ctr_drbg );
+	mbedtls_entropy_free( &entropy );
+	mbedtls_rsa_free( &rsa );
 	return ret;
 }
 
 int ezRsaDecrypt(const unsigned char *pIn, int iInLen, unsigned char *pOut, int *iOutLen, const char *pP, const char *pQ, 
 				 const char *pN, const char *pD, const char *pE)
 {
-	int ret = BSCOMPTLS_EXIT_FAILURE;
+	int ret = MBEDTLS_EXIT_FAILURE;
 	char *identifier = "ezDevSDK";
-	bscomptls_rsa_context rsa;
-	bscomptls_ctr_drbg_context ctr_drbg;
-	bscomptls_entropy_context entropy;
+	mbedtls_rsa_context rsa;
+	mbedtls_ctr_drbg_context ctr_drbg;
+	mbedtls_entropy_context entropy;
     size_t olen = *iOutLen;
-	bscomptls_rsa_init( &rsa, BSCOMPTLS_RSA_PKCS_V15, 0 );
-	bscomptls_ctr_drbg_init( &ctr_drbg );
-	bscomptls_entropy_init( &entropy );
+	mbedtls_rsa_init( &rsa, MBEDTLS_RSA_PKCS_V15, 0 );
+	mbedtls_ctr_drbg_init( &ctr_drbg );
+	mbedtls_entropy_init( &entropy );
 	
 
 	do 
 	{
-		if(0 != bscomptls_ctr_drbg_seed( &ctr_drbg, bscomptls_entropy_func,
+		if(0 != mbedtls_ctr_drbg_seed( &ctr_drbg, mbedtls_entropy_func,
 			&entropy, (const unsigned char *) identifier,
 			strlen( identifier ) ))
 		{
 			break;
 		}
 
-		if (0 != bscomptls_mpi_read_string(&rsa.N, 16, pN) ||
-			0 != bscomptls_mpi_read_string(&rsa.D, 16, pD) ||
-			0 != bscomptls_mpi_read_string(&rsa.E, 16, pE) ||
-			0 != bscomptls_mpi_read_string(&rsa.P, 16, pP) ||
-			0 != bscomptls_mpi_read_string(&rsa.Q, 16, pQ))
+		if (0 != mbedtls_mpi_read_string(&rsa.N, 16, pN) ||
+			0 != mbedtls_mpi_read_string(&rsa.D, 16, pD) ||
+			0 != mbedtls_mpi_read_string(&rsa.E, 16, pE) ||
+			0 != mbedtls_mpi_read_string(&rsa.P, 16, pP) ||
+			0 != mbedtls_mpi_read_string(&rsa.Q, 16, pQ))
 		{
 			break;
 		}
 
-		rsa.len = ( bscomptls_mpi_bitlen( &rsa.N ) + 7 ) >> 3;
+		rsa.len = ( mbedtls_mpi_bitlen( &rsa.N ) + 7 ) >> 3;
 
 		if( iInLen != rsa.len)		///< Invalid RSA signature format
 		{
 			break;
 		}
 
-		if (0 != bscomptls_rsa_pkcs1_decrypt( &rsa, bscomptls_ctr_drbg_random, &ctr_drbg, BSCOMPTLS_RSA_PRIVATE,
+		if (0 != mbedtls_rsa_pkcs1_decrypt( &rsa, mbedtls_ctr_drbg_random, &ctr_drbg, MBEDTLS_RSA_PRIVATE,
 				&olen, pIn, pOut, olen))
 		{
 			break;
 		}
 
 		*iOutLen = (int)olen; 
-		ret = BSCOMPTLS_EXIT_SUCCESS;
+		ret = MBEDTLS_EXIT_SUCCESS;
 	} while (0);
 
-	bscomptls_ctr_drbg_free( &ctr_drbg );
-	bscomptls_entropy_free( &entropy );
-	bscomptls_rsa_free( &rsa );
+	mbedtls_ctr_drbg_free( &ctr_drbg );
+	mbedtls_entropy_free( &entropy );
+	mbedtls_rsa_free( &rsa );
 	return ret;
+}
+
+void md5_hexdump(unsigned const char* src, int len,  int upper, unsigned char* dst)
+{
+    int i;
+    char fmt[8];
+
+    if (upper)
+    {
+        strcpy(fmt, "%02X");
+    } 
+    else 
+    {
+        strcpy(fmt, "%02x");
+    }
+
+    for (i = 0; i < len; ++i) 
+    {
+        sprintf((char*)dst + 2 * i, fmt, src[i]);
+    }
 }
 
 #endif // _REALTEK_RTOS_
@@ -358,4 +382,52 @@ int get_module_build_date(char* pbuf)
 	sprintf(pbuf, " build %02d%02d%02d", year, month, day);
 	
 	return 0;
+}
+
+char ezcore_time_isexpired_bydiff(osal_timespec_t *assign_timer, unsigned int time_ms)
+{
+    osal_timespec_t now, res;
+    if (NULL == assign_timer)
+    {
+        return (char)1;
+    }
+
+    osal_time_get_clock(&now);
+    res.tv_sec = assign_timer->tv_sec - now.tv_sec;
+    res.tv_nsec = assign_timer->tv_nsec - now.tv_nsec;
+    if (res.tv_nsec < 0)
+    {
+        --res.tv_sec;
+        res.tv_nsec += TIMESPEC_BILLION;
+    }
+
+    if ((res.tv_sec * TIMESPEC_THOUSAND + res.tv_nsec / TIMESPEC_MILLION) > time_ms)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+
+    return res.tv_sec < 0 || (res.tv_sec == 0 && res.tv_nsec <= 0);
+}
+
+void ezcore_time_countdown(osal_timespec_t *assign_timer, unsigned int time_count)
+{
+    osal_timespec_t now;
+    if (NULL == assign_timer)
+    {
+        return;
+    }
+
+    osal_time_get_clock(&now);
+    assign_timer->tv_sec = assign_timer->tv_sec + now.tv_sec;
+    assign_timer->tv_nsec = assign_timer->tv_sec + now.tv_nsec;
+
+    if (assign_timer->tv_nsec >= TIMESPEC_BILLION)
+    {
+        ++assign_timer->tv_sec;
+        assign_timer->tv_nsec -= TIMESPEC_BILLION;
+    }
 }

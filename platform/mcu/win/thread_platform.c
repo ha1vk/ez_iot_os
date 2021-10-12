@@ -14,8 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <process.h>
-#include "thread_interface.h"
-#include "io_interface.h"
+#include "osal_thread.h"
+#include "osal_io.h"
 
 struct targ
 {

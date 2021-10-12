@@ -194,9 +194,9 @@ macro(do_lib_building name)
                 message(STATUS "Find component Kconfig of ${base_dir}")
                 list(APPEND components_kconfig_files ${component_dir}/Kconfig)
             endif()
-            if(EXISTS ${component_dir}/config_defaults.mk)
+            if(EXISTS ${component_dir}/.config_defaults)
                 message(STATUS "Find component defaults config of ${base_dir}")
-                list(APPEND kconfig_defaults_files_args --defaults "${component_dir}/config_defaults.mk")
+                list(APPEND kconfig_defaults_files_args --defaults "${component_dir}/.config_defaults")
             endif()
         endif()
     endforeach()
@@ -213,31 +213,12 @@ macro(do_lib_building name)
                 message(STATUS "Find component Kconfig of ${base_dir}")
                 list(APPEND components_kconfig_files ${component_dir}/Kconfig)
             endif()
-            if(EXISTS ${component_dir}/config_defaults.mk)
+            if(EXISTS ${component_dir}/.config_defaults)
                 message(STATUS "Find component defaults config of ${base_dir}")
-                list(APPEND kconfig_defaults_files_args --defaults "${component_dir}/config_defaults.mk")
+                list(APPEND kconfig_defaults_files_args --defaults "${component_dir}/.config_defaults")
             endif()
         endif()
     endforeach()
-
-    # Find components in SDK's components folder, register components
-    # file(GLOB component_dirs ${EZOS_PATH}/components/*)
-    # foreach(component_dir ${component_dirs})
-    #     is_path_component(is_component ${component_dir})
-    #     if(is_component)
-    #         message(STATUS "Find component: ${component_dir}")
-    #         get_filename_component(base_dir ${component_dir} NAME)
-    #         list(APPEND components_dirs ${component_dir})
-    #         if(EXISTS ${component_dir}/Kconfig)
-    #             message(STATUS "Find component Kconfig of ${base_dir}")
-    #             list(APPEND components_kconfig_files ${component_dir}/Kconfig)
-    #         endif()
-    #         if(EXISTS ${component_dir}/config_defaults.mk)
-    #             message(STATUS "Find component defaults config of ${base_dir}")
-    #             list(APPEND kconfig_defaults_files_args --defaults "${component_dir}/config_defaults.mk")
-    #         endif()
-    #     endif()
-    # endforeach()
 
     # Find components in mcu folder
     file(GLOB project_component_dirs ${PROJECT_SOURCE_DIR}/*)
@@ -256,22 +237,14 @@ macro(do_lib_building name)
     endforeach()
 
     # Find default config file
-    if(DEFAULT_CONFIG_FILE)
-        if(EXISTS ${PROJECT_SOURCE_DIR}/.config.mk)
-            message(STATUS "Find project defaults config(.config.mk)")
-            list(APPEND kconfig_defaults_files_args --defaults "${PROJECT_SOURCE_DIR}/.config.mk")
-        endif()
-        message(STATUS "Project defaults config file:${DEFAULT_CONFIG_FILE}")
-        list(APPEND kconfig_defaults_files_args --defaults "${DEFAULT_CONFIG_FILE}")
-    else()
-        if(EXISTS ${PROJECT_SOURCE_DIR}/config_defaults.mk)
-            message(STATUS "Find project defaults config(config_defaults.mk)")
-            list(APPEND kconfig_defaults_files_args --defaults "${PROJECT_SOURCE_DIR}/config_defaults.mk")
-        endif()
-        if(EXISTS ${PROJECT_SOURCE_DIR}/.config.mk)
-            message(STATUS "Find project defaults config(.config.mk)")
-            list(APPEND kconfig_defaults_files_args --defaults "${PROJECT_SOURCE_DIR}/.config.mk")
-        endif()
+    if(EXISTS ${PROJECT_SOURCE_DIR}/.config_defaults)
+        message(STATUS "Find project defaults config(.config_defaults)")
+        list(APPEND kconfig_defaults_files_args --defaults "${PROJECT_SOURCE_DIR}/.config_defaults")
+    endif()
+
+    if(EXISTS ${PROJECT_SOURCE_DIR}/.config)
+        message(STATUS "Find project defaults config(.config)")
+        list(APPEND kconfig_defaults_files_args --defaults "${PROJECT_SOURCE_DIR}/.config")
     endif()
 
     # Generate config file from Kconfig
@@ -289,9 +262,9 @@ macro(do_lib_building name)
                             --menuconfig False
                             --env "EZOS_PATH=${EZOS_PATH}"
                             --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
-                            --output makefile ${PROJECT_BINARY_DIR}/config/ezos_gconfig.mk
-                            --output cmake  ${PROJECT_BINARY_DIR}/config/ezos_gconfig.cmake
-                            --output header ${PROJECT_BINARY_DIR}/config/ezos_gconfig.h
+                            --output config ${PROJECT_PATH}/config/.config
+                            --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
+                            --output header ${PROJECT_PATH}/config/ezos_gconfig.h
                             )
     set(generate_config_cmd2 ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
                             --kconfig "${EZOS_PATH}/Kconfig"
@@ -299,9 +272,9 @@ macro(do_lib_building name)
                             --menuconfig True
                             --env "EZOS_PATH=${EZOS_PATH}"
                             --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
-                            --output makefile ${PROJECT_BINARY_DIR}/config/ezos_gconfig.mk
-                            --output cmake  ${PROJECT_BINARY_DIR}/config/ezos_gconfig.cmake
-                            --output header ${PROJECT_BINARY_DIR}/config/ezos_gconfig.h
+                            --output config ${PROJECT_PATH}/config/.config
+                            --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
+                            --output header ${PROJECT_PATH}/config/ezos_gconfig.h
                             )
     execute_process(COMMAND ${generate_config_cmd} RESULT_VARIABLE cmd_res)
 
@@ -310,7 +283,7 @@ macro(do_lib_building name)
     endif()
 
     # Include confiurations
-    set(ezos_gconfig_dir "${PROJECT_BINARY_DIR}/config")
+    set(ezos_gconfig_dir "${PROJECT_PATH}/config")
     include(${ezos_gconfig_dir}/ezos_gconfig.cmake)
     if(WIN32)
         set(EXT ".exe")
@@ -347,7 +320,7 @@ macro(do_lib_building name)
     # we didn't generate build info for cmake and makefile for if we do, it will always rebuild cmake
     # everytime we execute make
     set(gen_build_info_config_cmd ${python}  ${EZOS_PATH}/tools/kconfig/update_build_info.py
-                                  --configfile header ${PROJECT_BINARY_DIR}/config/global_build_info_time.h ${PROJECT_BINARY_DIR}/config/global_build_info_version.h
+                                  --configfile header ${PROJECT_PATH}/config/ezos_build_info_time.h ${PROJECT_PATH}/config/ezos_build_info_version.h
                                   )
     add_custom_target(update_build_info COMMAND ${gen_build_info_config_cmd})
 

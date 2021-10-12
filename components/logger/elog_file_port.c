@@ -27,7 +27,7 @@
  */
 
 #include "elog_file.h"
-#include "thread_interface.h"
+#include "osal_thread.h"
 
 static ez_mutex_t file_w_mutex;
 

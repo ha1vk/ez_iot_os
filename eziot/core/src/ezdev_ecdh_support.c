@@ -80,7 +80,7 @@ static int rnd_pseudo_rand( void *rng_state, unsigned char *output, size_t len )
 }
 
 
-mkernel_internal_error ezdev_generate_publickey(bscomptls_ecdh_context* ctx_client, unsigned char* pubkey, EZDEV_SDK_UINT32* pubkey_len)
+mkernel_internal_error ezdev_generate_publickey(mbedtls_ecdh_context* ctx_client, unsigned char* pubkey, EZDEV_SDK_UINT32* pubkey_len)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
     unsigned char buf[1000];
@@ -98,20 +98,20 @@ mkernel_internal_error ezdev_generate_publickey(bscomptls_ecdh_context* ctx_clie
             break;
         }
 
-        ret = bscomptls_ecp_group_load( &ctx_client->grp, BSCOMPTLS_ECP_DP_SECP384R1);
+        ret = mbedtls_ecp_group_load( &ctx_client->grp, MBEDTLS_ECP_DP_SECP384R1);
         if(ret != 0)
         {   
-            sdk_error = mkernel_internal_bscomptls_ecp_group_load_err;
+            sdk_error = mkernel_internal_mbedtls_ecp_group_load_err;
             ezdev_sdk_kernel_log_warn(0, 0, "ecp_group_load err,ret: %d\n", ret);
             break;
         }
 
         memset( buf, 0x00, sizeof( buf )); 
 
-        ret = bscomptls_ecdh_make_public(ctx_client, &public_key_len, buf, 1000, &rnd_pseudo_rand, &rnd_info );
+        ret = mbedtls_ecdh_make_public(ctx_client, &public_key_len, buf, 1000, &rnd_pseudo_rand, &rnd_info );
         if(ret != 0)
         {   
-            sdk_error = mkernel_internal_bscomptls_ecdh_read_public_err;
+            sdk_error = mkernel_internal_mbedtls_ecdh_read_public_err;
             ezdev_sdk_kernel_log_warn(0, 0, "ecdh_make_public err,ret:%d\n", ret);
             break;
         } 
@@ -125,7 +125,7 @@ mkernel_internal_error ezdev_generate_publickey(bscomptls_ecdh_context* ctx_clie
 }
 
 
-mkernel_internal_error ezdev_generate_masterkey(bscomptls_ecdh_context* ctx_client, unsigned char* peer_pubkey,EZDEV_SDK_UINT32 peer_pubkey_len,\
+mkernel_internal_error ezdev_generate_masterkey(mbedtls_ecdh_context* ctx_client, unsigned char* peer_pubkey,EZDEV_SDK_UINT32 peer_pubkey_len,\
                                            unsigned char* masterkey, EZDEV_SDK_UINT32 *masterkey_len)
 {
     int ret = 0;
@@ -145,18 +145,18 @@ mkernel_internal_error ezdev_generate_masterkey(bscomptls_ecdh_context* ctx_clie
         }
         input_key[0] = ezdev_sdk_ecdh_publickey_len;// 首字节填充public长度97
         memcpy(&input_key[1], peer_pubkey, peer_pubkey_len);// 将97个字符的publickey拷贝进去
-        ret = bscomptls_ecdh_read_public(ctx_client, input_key, ezdev_sdk_ecdh_key_len + 1);
+        ret = mbedtls_ecdh_read_public(ctx_client, input_key, ezdev_sdk_ecdh_key_len + 1);
         if(ret!=0)
         {
-            ezdev_sdk_kernel_log_warn(0, 0, "bscomptls_ecdh_read_public error,ret:%d\n", ret);
-            sdk_error = mkernel_internal_bscomptls_ecdh_read_public_err;
+            ezdev_sdk_kernel_log_warn(0, 0, "mbedtls_ecdh_read_public error,ret:%d\n", ret);
+            sdk_error = mkernel_internal_mbedtls_ecdh_read_public_err;
             break;
         }
-        ret = bscomptls_ecdh_calc_secret(ctx_client, &master_key_len, masterkey, 1000, &rnd_pseudo_rand, &rnd_info );
+        ret = mbedtls_ecdh_calc_secret(ctx_client, &master_key_len, masterkey, 1000, &rnd_pseudo_rand, &rnd_info );
         if(ret!=0)
         {
-            ezdev_sdk_kernel_log_warn(0, 0, "bscomptls_ecdh_calc_secret error,ret:%d\n", ret);
-            sdk_error = mkernel_internal_bscomptls_ecdh_calc_secret_err;
+            ezdev_sdk_kernel_log_warn(0, 0, "mbedtls_ecdh_calc_secret error,ret:%d\n", ret);
+            sdk_error = mkernel_internal_mbedtls_ecdh_calc_secret_err;
             break;
         }
 

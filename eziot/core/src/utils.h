@@ -14,6 +14,8 @@
 #ifndef _EZDEVSDK_UTILS_H
 #define _EZDEVSDK_UTILS_H
 
+#include "osal_time.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -55,6 +57,16 @@ int ezRsaEncrypt(const unsigned char *pIn, int iInLen, unsigned char *pOut, int 
 int ezRsaDecrypt(const unsigned char *pIn, int iInLen, unsigned char *pOut, int *iOutLen, const char *pP, const char *pQ, 
 				 const char *pN, const char *pD, const char *pE);
 
+/**
+ * @brief 
+ * 
+ * @param src 
+ * @param len 
+ * @param upper 
+ * @param dst 
+ */
+void md5_hexdump(unsigned const char* src, int len,  int upper, unsigned char* dst);
+
 /** 
  *  \brief			内部错误码转外部错误码
  *  \method			mkiE2ezE
@@ -66,6 +78,23 @@ unsigned int mkiE2ezE(unsigned int mkernel_err);
  *  \method			get_module_build_date
  */
 int get_module_build_date(char* pbuf);
+
+/**
+ * @brief 
+ * 
+ * @param assign_timer 
+ * @param time_ms 
+ * @return char 
+ */
+char ezcore_time_isexpired_bydiff(osal_timespec_t *assign_timer, unsigned int time_ms);
+
+/**
+ * @brief 
+ * 
+ * @param assign_timer 
+ * @param time_count 
+ */
+void ezcore_time_countdown(osal_timespec_t *assign_timer, unsigned int time_count);
 
 #ifdef __cplusplus
 }

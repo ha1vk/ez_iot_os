@@ -22,12 +22,12 @@
 #include "ez_sdk_api_struct.h"
 #include "base_typedef.h"
 #include "model_sample.h"
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
+#include "osal_network.h"
+#include "osal_thread.h"
+#include "osal_time.h"
 
 #define CHECK_NULL(cond) \
     if((cond))           \

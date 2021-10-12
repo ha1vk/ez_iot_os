@@ -16,12 +16,28 @@
 
 #include "ez_sdk_api_struct.h"
 #include "ezdev_sdk_kernel_error.h"
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
+#include "osal_network.h"
+#include "osal_thread.h"
+#include "osal_time.h"
+
+#if (defined(_WIN32) || defined(_WIN64))
+#if !define(EZOS_API)
+#if defined(EZ_OS_API_EXPORTS)
+#define EZOS_API __declspec(dllexport)
+#else
+#define EZOS_API __declspec(dllimport)
+#endif
+#if !define(EZOS_CALL)
+#define EZOS_CALL __stdcall
+#endif
+#endif
+#else
+#define EZOS_API
+#define EZOS_CALL
+#endif
 
 #ifdef __cplusplus
 extern "C"

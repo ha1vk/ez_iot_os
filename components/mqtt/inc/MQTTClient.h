@@ -23,7 +23,6 @@
 #endif
 
 
-#include "MQTTNet.h"
 #include "MQTTPacket.h"
 #include <stdio.h>
 
@@ -59,11 +58,11 @@ typedef struct Network
 /* The Timer structure must be defined in the platform specific header,
  * and have the following functions to operate on it.  */
 
-// extern void TimerInit(Timer*);
-// extern char TimerIsExpired(Timer*);
-// extern void TimerCountdownMS(Timer*, unsigned int);
-// extern void TimerCountdown(Timer*, unsigned int);
-// extern int TimerLeftMS(Timer*);
+extern void TimerInit(Timer*);
+extern char TimerIsExpired(Timer*);
+extern void TimerCountdownMS(Timer*, unsigned int);
+extern void TimerCountdown(Timer*, unsigned int);
+extern int TimerLeftMS(Timer*);
 
 typedef struct MQTTMessage
 {
@@ -122,7 +121,6 @@ typedef struct MQTTClient
  * @param command_timeout_ms
  * @param
  */
-DLLExport void MQTTClientFini(MQTTClient* c);
 DLLExport void MQTTClientInit(MQTTClient* client, Network* network, unsigned int command_timeout_ms,
 		unsigned char* sendbuf, size_t sendbuf_size, unsigned char* readbuf, size_t readbuf_size);
 

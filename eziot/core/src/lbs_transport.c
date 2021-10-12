@@ -31,12 +31,12 @@
 #include "ase_support.h"
 #include "json_parser.h"
 #include "utils.h"
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
+#include "osal_network.h"
+#include "osal_thread.h"
+#include "osal_time.h"
 
 #if !defined(_REALTEK_RTOS_) && !defined(_WIN32)
 #include <arpa/inet.h>
@@ -66,8 +66,8 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
     unsigned char sharekey_sha256_dst[ezdev_sdk_sha256_len];
     unsigned char sharekey_sha256_dst_hex[ezdev_sdk_sha256_hex_len + 1];
 
-    bscomptls_md_context_t sha1_ctx;
-    const bscomptls_md_info_t *info_sha1 = NULL;
+    mbedtls_md_context_t sha1_ctx;
+    const mbedtls_md_info_t *info_sha1 = NULL;
 
 	memset(sharekey_src, 0, ezdev_sdk_total_len);
     memset(sharekey_dst, 0, 16);
@@ -82,15 +82,15 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
 
 	sharekey_src_len += strlen(sdk_kernel->dev_info.dev_subserial);
 
-    bscomptls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
+    mbedtls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
 
 	if (nUpper != 0)
 	{
-        bscomptls_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
+        md5_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
 	}
 	else
 	{
-        bscomptls_hexdump(sharekey_dst, 16, 0, sharekey_dst_hex);
+        md5_hexdump(sharekey_dst, 16, 0, sharekey_dst_hex);
 	}
 
 	memset(sharekey_src, 0, ezdev_sdk_total_len);
@@ -100,33 +100,33 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
 
     sharekey_src_len = ezdev_sdk_md5_len + sharekey_salt_len;
 
-    bscomptls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
-    bscomptls_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
+    mbedtls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
+    md5_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
 
 	memset(sharekey_src, 0, ezdev_sdk_total_len);
     memcpy(sharekey_src, sharekey_dst_hex, ezdev_sdk_md5_len);
     sharekey_src_len = ezdev_sdk_md5_len;
 
-    bscomptls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
-    bscomptls_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
+    mbedtls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
+    md5_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
 
-    bscomptls_md_init(&sha1_ctx);
-    info_sha1 = bscomptls_md_info_from_type(BSCOMPTLS_MD_SHA256);
+    mbedtls_md_init(&sha1_ctx);
+    info_sha1 = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     if (info_sha1 == NULL)
     {
         return;
     }
 
-    if (bscomptls_md_setup(&sha1_ctx, info_sha1, 1) != 0)
+    if (mbedtls_md_setup(&sha1_ctx, info_sha1, 1) != 0)
     {
         return;
     }
 
-    bscomptls_pkcs5_pbkdf2_hmac(&sha1_ctx, sharekey_dst_hex, ezdev_sdk_md5_len, \
+    mbedtls_pkcs5_pbkdf2_hmac(&sha1_ctx, sharekey_dst_hex, ezdev_sdk_md5_len, \
                                     (const unsigned char*)ezdev_sdk_sharekey_salt, sharekey_salt_len, ezdev_sdk_pbkdf2_hmac_times, ezdev_sdk_sha256_len, sharekey_sha256_dst);
-    bscomptls_hexdump(sharekey_sha256_dst, ezdev_sdk_sha256_len, 1, sharekey_sha256_dst_hex);
+    md5_hexdump(sharekey_sha256_dst, ezdev_sdk_sha256_len, 1, sharekey_sha256_dst_hex);
 
-    bscomptls_md_free(&sha1_ctx);
+    mbedtls_md_free(&sha1_ctx);
 
     memcpy(redirect_affair->share_key, sharekey_sha256_dst_hex + ezdev_sdk_sha256_offset, ezdev_sdk_sharekey_len);
 	redirect_affair->share_key_len = ezdev_sdk_sharekey_len;
@@ -393,7 +393,7 @@ static mkernel_internal_error digital_sign_serialize_sha384(lbs_packet *lbs_pack
 	EZDEV_SDK_UINT32 sign_input_len = 0;
 	unsigned char sign_input[ezdev_sdk_total_len];
 	unsigned char sign_output[64];
-	EZDEV_SDK_INT32 bscomptls_result;
+	EZDEV_SDK_INT32 mbedtls_result;
 
 	if ((lbs_pack->payload_buf_off + 64) > lbs_pack->payload_buf_Len)
 	{
@@ -408,15 +408,15 @@ static mkernel_internal_error digital_sign_serialize_sha384(lbs_packet *lbs_pack
 	memset(sign_output, 0, 64);
 	memcpy(sign_input, sign_src, sign_src_len);
 	sign_input_len = sign_src_len;
-	bscomptls_sha512(sign_input, sign_input_len, sign_output, 1);
+	mbedtls_sha512(sign_input, sign_input_len, sign_output, 1);
 
 	memset(sign_input, 0, ezdev_sdk_total_len);
 	memcpy(sign_input, sign_output, 64);
 	sign_input_len = strlen((const char*)sign_input);
 
 	memset(sign_output, 0, 64);
-	bscomptls_result = bscomptls_md_hmac(bscomptls_md_info_from_string("SHA384"), master_key, master_key_len, sign_input, 48, sign_output);
-	if (bscomptls_result != 0)
+	mbedtls_result = mbedtls_md_hmac(mbedtls_md_info_from_string("SHA384"), master_key, master_key_len, sign_input, 48, sign_output);
+	if (mbedtls_result != 0)
 	{
 		return mkernel_internal_hmac_error;
 	}
@@ -435,7 +435,7 @@ static mkernel_internal_error digital_sign_serialize_and_check_sha384(unsigned c
 	EZDEV_SDK_UINT32 sign_input_len = 0;
 	unsigned char sign_input[ezdev_sdk_total_len];
 	unsigned char sign_output[64];
-	EZDEV_SDK_INT32 bscomptls_result = 0;
+	EZDEV_SDK_INT32 mbedtls_result = 0;
 
 	if (sign_src_len > 128)
 	{
@@ -452,23 +452,23 @@ static mkernel_internal_error digital_sign_serialize_and_check_sha384(unsigned c
 
 	memcpy(sign_input, sign_src, sign_src_len);
 	sign_input_len = sign_src_len;
-	bscomptls_sha512(sign_input, sign_input_len, sign_output, 1);
+	mbedtls_sha512(sign_input, sign_input_len, sign_output, 1);
 
 	memset(sign_input, 0, ezdev_sdk_total_len);
 	memcpy(sign_input, sign_output, 48);
 	memset(sign_output, 0, 64);
 
-	bscomptls_result = bscomptls_md_hmac(bscomptls_md_info_from_string("SHA384"), master_key, master_key_len, sign_input, 48, sign_output);
-	if (bscomptls_result != 0)
+	mbedtls_result = mbedtls_md_hmac(mbedtls_md_info_from_string("SHA384"), master_key, master_key_len, sign_input, 48, sign_output);
+	if (mbedtls_result != 0)
 	{
-		ezdev_sdk_kernel_log_debug(bscomptls_result, 0, "bscomptls_md_hmac error\n");
+		ezdev_sdk_kernel_log_debug(mbedtls_result, 0, "mbedtls_md_hmac error\n");
 		return mkernel_internal_hmac_error;
 	}
 
-	bscomptls_result = memcmp(target_sign, sign_output, 48);
-	if (bscomptls_result != 0)
+	mbedtls_result = memcmp(target_sign, sign_output, 48);
+	if (mbedtls_result != 0)
 	{
-		ezdev_sdk_kernel_log_debug(bscomptls_result, 0, "bscomptls_md_hmac check error\n");
+		ezdev_sdk_kernel_log_debug(mbedtls_result, 0, "mbedtls_md_hmac check error\n");
 		return mkernel_internal_hmac_compare_error;
 	}
 
@@ -692,13 +692,13 @@ static mkernel_internal_error send_authentication_i(ezdev_sdk_kernel *sdk_kernel
         switch (sdk_kernel->dev_cur_auth_type)
         {
         case sdk_dev_auth_protocol_ecdh:
-            sdk_error = ezdev_generate_publickey((bscomptls_ecdh_context*)ctx_client, pubkey, &pubkey_len);
+            sdk_error = ezdev_generate_publickey((mbedtls_ecdh_context*)ctx_client, pubkey, &pubkey_len);
             if (sdk_error != mkernel_internal_succ)
             {
                 ezdev_sdk_kernel_log_debug(0, 0, "generate_public_key error!\n");
                 break;
             }
-            bscomptls_hexdump(pubkey, pubkey_len, 1, pubkeyhex);
+            md5_hexdump(pubkey, pubkey_len, 1, pubkeyhex);
 
             sdk_error = aes_128_encrypt_pubkey(authi_affair, pubkey, pubkey_len, encrypt_data, &encrypt_data_len, tag_data, tag_data_len);
             if (sdk_error != mkernel_internal_succ)
@@ -846,14 +846,14 @@ static mkernel_internal_error parse_authentication_ii(ezdev_sdk_kernel *sdk_kern
             return sdk_error;
         }
         memset(masterkey, 0, 48);
-        sdk_error = ezdev_generate_masterkey((bscomptls_ecdh_context*)ctx_client, peer_pubkey, peer_pubkey_len, masterkey, &masterkey_len);
+        sdk_error = ezdev_generate_masterkey((mbedtls_ecdh_context*)ctx_client, peer_pubkey, peer_pubkey_len, masterkey, &masterkey_len);
         if (sdk_error != mkernel_internal_succ)
         {
             ezdev_sdk_kernel_log_error(0, 0, "generate_master_key error\n");
             return sdk_error;
         }
         memset(md5_masterkey, 0, 16);
-        bscomptls_md5(masterkey, masterkey_len, md5_masterkey);
+        mbedtls_md5(masterkey, masterkey_len, md5_masterkey);
         break;
     default:
         return mkernel_internal_internal_err;
@@ -1815,12 +1815,12 @@ mkernel_internal_error lbs_redirect_with_auth(ezdev_sdk_kernel *sdk_kernel, EZDE
     switch (sdk_kernel->dev_cur_auth_type)
     {
     case sdk_dev_auth_protocol_ecdh:
-        ctx_client = (bscomptls_ecdh_context*)ez_malloc(sizeof(bscomptls_ecdh_context));
+        ctx_client = (mbedtls_ecdh_context*)ez_malloc(sizeof(mbedtls_ecdh_context));
         if (ctx_client == NULL)
         {
             return mkernel_internal_mem_lack;
         }
-        bscomptls_ecdh_init((bscomptls_ecdh_context*)ctx_client);
+        mbedtls_ecdh_init((mbedtls_ecdh_context*)ctx_client);
         sdk_kernel->dev_last_auth_type = sdk_kernel->dev_cur_auth_type;
         break;
     default:
@@ -1888,7 +1888,7 @@ mkernel_internal_error lbs_redirect_with_auth(ezdev_sdk_kernel *sdk_kernel, EZDE
     switch (sdk_kernel->dev_last_auth_type)
     {
     case sdk_dev_auth_protocol_ecdh:
-        bscomptls_ecdh_free((bscomptls_ecdh_context* )ctx_client);
+        mbedtls_ecdh_free((mbedtls_ecdh_context* )ctx_client);
         if (ctx_client != NULL)
         {
             ez_free(ctx_client);
@@ -1916,12 +1916,12 @@ mkernel_internal_error lbs_redirect_createdevid_with_auth(ezdev_sdk_kernel *sdk_
     switch (sdk_kernel->dev_cur_auth_type)
     {
     case sdk_dev_auth_protocol_ecdh:
-        ctx_client = (bscomptls_ecdh_context*)ez_malloc(sizeof(bscomptls_ecdh_context));
+        ctx_client = (mbedtls_ecdh_context*)ez_malloc(sizeof(mbedtls_ecdh_context));
         if (ctx_client == NULL)
         {
             return mkernel_internal_mem_lack;
         }
-        bscomptls_ecdh_init((bscomptls_ecdh_context* )ctx_client);
+        mbedtls_ecdh_init((mbedtls_ecdh_context* )ctx_client);
         sdk_kernel->dev_last_auth_type = sdk_kernel->dev_cur_auth_type;
     	break;
     default:
@@ -1989,7 +1989,7 @@ mkernel_internal_error lbs_redirect_createdevid_with_auth(ezdev_sdk_kernel *sdk_
     switch (sdk_kernel->dev_last_auth_type)
     {
     case sdk_dev_auth_protocol_ecdh:
-        bscomptls_ecdh_free((bscomptls_ecdh_context*)ctx_client);
+        mbedtls_ecdh_free((mbedtls_ecdh_context*)ctx_client);
         if (ctx_client != NULL)
         {
             ez_free(ctx_client);

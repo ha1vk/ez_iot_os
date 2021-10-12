@@ -1,0 +1,8 @@
+menu "mbedtls configuration"
+    config CONFIG_COMPONENT_MBEDTLS_ENABLED
+        bool "Enable include static lib(from gcc)"
+        default n
+        help
+            Enable include static lib(from gcc)
+endmenu
+

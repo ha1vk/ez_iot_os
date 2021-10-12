@@ -11,7 +11,7 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
 
-#include "network_interface.h"
+#include "osal_network.h"
 #include <stdio.h>
 #include <string.h>
 #include <WinSock2.h>

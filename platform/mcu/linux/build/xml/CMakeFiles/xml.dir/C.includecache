@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/xurongjun/git/ez_iot_os/components/xml/inc/ezxml.h
+stdlib.h
+-
+stdio.h
+-
+
+/home/xurongjun/git/ez_iot_os/components/xml/src/ezxml.c
+stdlib.h
+-
+stdio.h
+-
+stdarg.h
+-
+string.h
+-
+ctype.h
+-
+osal_mem.h
+/home/xurongjun/git/ez_iot_os/components/xml/src/osal_mem.h
+osal_io.h
+/home/xurongjun/git/ez_iot_os/components/xml/src/osal_io.h
+sys/mman.h
+-
+ezxml.h
+/home/xurongjun/git/ez_iot_os/components/xml/src/ezxml.h
+
+/home/xurongjun/git/ez_iot_os/platform/osal/osal_io.h
+stdio.h
+-
+stdio.h
+-
+
+/home/xurongjun/git/ez_iot_os/platform/osal/osal_mem.h
+stdlib.h
+-
+

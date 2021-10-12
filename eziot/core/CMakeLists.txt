@@ -18,6 +18,8 @@
     list(APPEND ADD_REQUIREMENTS osal)
     list(APPEND ADD_REQUIREMENTS cJSON)
     list(APPEND ADD_REQUIREMENTS mqtt)
+    list(APPEND ADD_REQUIREMENTS mbedtls)
+    list(APPEND ADD_REQUIREMENTS xml)
     ###############################################
 
     ############ Add static libs ##################

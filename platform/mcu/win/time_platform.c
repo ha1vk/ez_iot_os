@@ -11,7 +11,7 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  *******************************************************************************/
 
-#include "time_interface.h"
+#include "osal_time.h"
 #include <time.h>
 #include <stdint.h>
 #include <windef.h>

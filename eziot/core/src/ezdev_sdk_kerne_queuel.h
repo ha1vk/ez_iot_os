@@ -18,7 +18,7 @@
 #include "mkernel_internal_error.h"
 #include "base_typedef.h"
 #include "sdk_kernel_def.h"
-#include "mem_interface.h"
+#include "osal_mem.h"
 
 #define QUEUE_DEFINE(MSGTYPE)						\
 typedef struct 	tag_queque_element_##MSGTYPE		\

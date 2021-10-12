@@ -15,9 +15,9 @@
 #ifndef _EZ_SDK_LOG_H_
 #define _EZ_SDK_LOG_H_
 
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
 #include "network_interface.h"
 #include "thread_interface.h"
 #include "time_interface.h"

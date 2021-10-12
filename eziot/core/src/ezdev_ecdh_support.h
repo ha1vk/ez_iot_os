@@ -39,8 +39,8 @@ typedef struct
     uint32_t v0, v1;
 } rnd_pseudo_info;
 
-    mkernel_internal_error ezdev_generate_publickey(bscomptls_ecdh_context* ctx_client, unsigned char* pubkey, EZDEV_SDK_UINT32* pubkey_len); 
-    mkernel_internal_error ezdev_generate_masterkey(bscomptls_ecdh_context* ctx_client, unsigned char* peer_pubkey, EZDEV_SDK_UINT32 peer_pubkey_len, unsigned char* masterkey, EZDEV_SDK_UINT32 *masterkey_len);
+    mkernel_internal_error ezdev_generate_publickey(mbedtls_ecdh_context* ctx_client, unsigned char* pubkey, EZDEV_SDK_UINT32* pubkey_len); 
+    mkernel_internal_error ezdev_generate_masterkey(mbedtls_ecdh_context* ctx_client, unsigned char* peer_pubkey, EZDEV_SDK_UINT32 peer_pubkey_len, unsigned char* masterkey, EZDEV_SDK_UINT32 *masterkey_len);
 
 	
 	

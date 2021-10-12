@@ -1,5 +1,5 @@
-menu "ezos core configuration"
-    config CONFIG_IOT_CORE_ENABLED
+menu "ez-iot core configuration"
+    config IOT_CORE_ENABLED
         bool "Enable ez-iot core"
         default y
 endmenu

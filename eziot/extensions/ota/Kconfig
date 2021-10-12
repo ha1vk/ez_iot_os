@@ -1,0 +1,5 @@
+menu "ez-iot extension ota configuration"
+    config IOT_EXT_OTA_ENABLED
+        bool "Enable ez-iot extension ota"
+        default y
+endmenu

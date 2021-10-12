@@ -30,14 +30,12 @@
 #include "dev_protocol_def.h"
 #include "ezdev_sdk_kerne_queuel.h"
 #include "MQTTPublish.h"
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
-
-
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
+#include "osal_network.h"
+#include "osal_thread.h"
+#include "osal_time.h"
 
 EZDEV_SDK_KERNEL_RISK_CONTROL_INTERFACE
 EZDEV_SDK_KERNEL_EXTEND_INTERFACE
@@ -91,7 +89,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
     }
     do
     {
-        bscomptls_platform_set_calloc_free(_calloc_func, free);
+        mbedtls_platform_set_calloc_free(_calloc_func, free);
 
         if(NULL == pconfig||NULL == pconfig->pdev_info||strlen(pconfig->server.host)>ezdev_sdk_name_len
            ||NULL == handle||NULL == event_notice_cb)
@@ -100,10 +98,8 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
         }
 
         if (handle->key_value_load == NULL || handle->net_work_connect == NULL || handle->net_work_read == NULL || handle->net_work_write == NULL ||
-            handle->net_work_disconnect == NULL || handle->time_creator == NULL || handle->time_isexpired_bydiff == NULL ||
-            handle->time_isexpired == NULL || handle->time_countdownms == NULL || handle->time_countdown == NULL || handle->time_leftms == NULL ||
-            handle->time_destroy == NULL || handle->key_value_load == NULL || handle->key_value_save == NULL || 
-            handle->curing_data_load == NULL || handle->curing_data_save == NULL)
+            handle->net_work_disconnect == NULL || handle->time_get_clock == NULL || handle->time_delay == NULL || handle->key_value_load == NULL || 
+            handle->key_value_save == NULL || handle->curing_data_load == NULL || handle->curing_data_save == NULL)
         {
             sdk_error = ezdev_sdk_kernel_params_invalid;
             break;
@@ -147,12 +143,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
         g_ezdev_sdk_kernel.entr_state = sdk_entrance_normal;
         g_ezdev_sdk_kernel.my_state = sdk_idle0;
         g_ezdev_sdk_kernel.cnt_state = sdk_cnt_unredirect;
-        g_ezdev_sdk_kernel.cnt_state_timer = g_ezdev_sdk_kernel.platform_handle.time_creator();
-        if(NULL == g_ezdev_sdk_kernel.cnt_state_timer)
-        {
-            sdk_error = ezdev_sdk_kernel_memory;
-            break;
-        }
+        g_ezdev_sdk_kernel.platform_handle.time_get_clock(&g_ezdev_sdk_kernel.cnt_state_timer);
 
         g_ezdev_sdk_kernel.access_risk = sdk_no_risk_control;
 
@@ -205,14 +196,6 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
     {
         g_ezdev_sdk_kernel.my_state = sdk_idle;
     }
-    else
-    {
-        if(NULL!=g_ezdev_sdk_kernel.cnt_state_timer)
-        {
-            g_ezdev_sdk_kernel.platform_handle.time_destroy(g_ezdev_sdk_kernel.cnt_state_timer);
-            g_ezdev_sdk_kernel.cnt_state_timer = NULL;
-        }
-    }
 
     return sdk_error;
 }
@@ -230,8 +213,6 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_fini()
     extend_fini();
 
     common_module_fini();
-
-    g_ezdev_sdk_kernel.platform_handle.time_destroy(g_ezdev_sdk_kernel.cnt_state_timer);
 
     if(g_mutex_lock)
     {
@@ -341,7 +322,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_stop()
         if (mkernel_internal_queue_empty == get_queue_pubmsg_exchange(&ptr_pubmsg_exchange))
             break;
 
-        g_ezdev_sdk_kernel.platform_handle.time_sleep(100);
+        g_ezdev_sdk_kernel.platform_handle.time_delay(100);
         if (wait4times++ > 3)
             break;
     }

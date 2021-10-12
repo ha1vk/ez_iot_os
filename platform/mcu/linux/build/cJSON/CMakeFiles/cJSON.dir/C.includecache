@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/xurongjun/git/ez_iot_os/components/cJSON/inc/cJSON.h
+stddef.h
+-
+
+/home/xurongjun/git/ez_iot_os/components/cJSON/src/cJSON.c
+string.h
+-
+stdio.h
+-
+math.h
+-
+stdlib.h
+-
+float.h
+-
+limits.h
+-
+ctype.h
+-
+locale.h
+-
+assert.h
+-
+cJSON.h
+/home/xurongjun/git/ez_iot_os/components/cJSON/src/cJSON.h
+

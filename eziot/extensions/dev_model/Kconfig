@@ -1,0 +1,5 @@
+menu "ez-iot extension model configuration"
+    config IOT_EXT_MODEL_ENABLED
+        bool "Enable ez-iot extension model"
+        default y
+endmenu

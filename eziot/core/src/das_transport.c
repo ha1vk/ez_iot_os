@@ -20,6 +20,7 @@
 #include "ezdev_sdk_kerne_queuel.h"
 #include "cJSON.h"
 #include "MQTTClient.h"
+#include "MQTTPorting.h"
 #include "ase_support.h"
 #include "ezdev_sdk_kernel_extend.h"
 #include "ezdev_sdk_kernel_common.h"
@@ -27,7 +28,7 @@
 #include "ezdev_sdk_kernel_event.h"
 #include "access_domain_bus.h"
 #include "utils.h"
-#include "mem_interface.h"
+#include "osal_mem.h"
 
 EXTERN_QUEUE_FUN(submsg)
 EXTERN_QUEUE_FUN(pubmsg_exchange)
@@ -42,6 +43,8 @@ EZDEV_SDK_KERNEL_COMMON_INTERFACE
 EZDEV_SDK_KERNEL_RISK_CONTROL_INTERFACE
 EZDEV_SDK_KERNEL_EVENT_INTERFACE
 
+extern ezdev_sdk_kernel g_ezdev_sdk_kernel;
+
 MQTTClient g_DasClient;
 Network g_DasNetWork;
 unsigned char g_sendbuf[ezdev_sdk_send_buf_max];
@@ -52,6 +55,13 @@ static EZDEV_SDK_BOOL g_is_first_session = EZDEV_SDK_TRUE;
 static mkernel_internal_error das_subscribe_revc_topic(ezdev_sdk_kernel *sdk_kernel, EZDEV_SDK_INT8 open);
 static mkernel_internal_error das_message_send(ezdev_sdk_kernel *sdk_kernel);
 static mkernel_internal_error das_send_pubmsg(ezdev_sdk_kernel *sdk_kernel, ezdev_sdk_kernel_pubmsg *pubmsg);
+
+static void MQTTNetInit(Network* net_work);
+static mkernel_internal_error MQTTNetConnect(Network* net_work, char* ip, int port);
+static int MQTTNet_read(Network* n, unsigned char* buffer, int len, int timeout_ms);
+static int MQTTNet_write(Network* n, unsigned char* buffer, int len, int timeout_ms);
+static void MQTTNetDisconnect(Network* net_work);
+static void MQTTNetFini(Network* net_work);
 
 static mkernel_internal_error serialize_payload_common_v3(EZDEV_SDK_UINT32 msg_seq, unsigned char **output_buf, EZDEV_SDK_UINT16 *output_length)
 {
@@ -1438,8 +1448,6 @@ void das_object_fini(ezdev_sdk_kernel *sdk_kernel)
 	memset(g_sendbuf, 0, ezdev_sdk_send_buf_max);
 	memset(g_readbuf, 0, ezdev_sdk_recv_buf_max);
 
-	MQTTClientFini(&g_DasClient);
-
 	MQTTNetFini(&g_DasNetWork);
 	fini_queue();
 
@@ -1645,22 +1653,16 @@ mkernel_internal_error das_yield(ezdev_sdk_kernel *sdk_kernel)
 {
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	int mqtt_result = MQTTYield(&g_DasClient, 10);
-	if (mqtt_result != 0)
-	{
-		ezdev_sdk_kernel_log_debug(mkernel_internal_call_mqtt_yield_error, mqtt_result, "das_yield MQTTYield:%d error\n", mqtt_result);
-	}
 
 	do
 	{
-		/**
-		* \brief   判断错误，看socket是否有异常
-		*/
-		if (MQTTNetGetLastError() == mkernel_internal_net_socket_error || MQTTNetGetLastError() == mkernel_internal_net_socket_closed)
+		if (mqtt_result < 0)
 		{
 			sdk_error = mkernel_internal_das_need_reconnect;
 			ezdev_sdk_kernel_log_error(sdk_error, sdk_error, "socket error need rereg\n");
 			break;
 		}
+
 		/**
 		* \brief   更新超时时间
 		*/
@@ -1668,10 +1670,11 @@ mkernel_internal_error das_yield(ezdev_sdk_kernel *sdk_kernel)
 		{
 			g_DasClient.keepAliveInterval = sdk_kernel->das_keepalive_interval;
 		}
+
 		/**
 		* \brief   判断心跳是否超时
 		*/
-		if (!TimerIsExpiredByDiff(&g_DasClient.connect_timer, g_DasClient.keepAliveInterval * 2000))
+		if (!ezcore_time_isexpired_bydiff(&g_DasClient.connect_timer.end_time, g_DasClient.keepAliveInterval * 2000))
 		{
 			//信令发送失败已经在内部上抛
 
@@ -1691,4 +1694,87 @@ mkernel_internal_error das_yield(ezdev_sdk_kernel *sdk_kernel)
 int ezdev_sdk_kernel_get_das_socket(ezdev_sdk_kernel *sdk_kernel)
 {
 	return g_DasNetWork.socket_fd;
+}
+
+static int MQTTNet_write(Network* n, unsigned char* buffer, int len, int timeout_ms)
+{
+	int real_write_buf_size = 0;
+	mkernel_internal_error sdk_error = mkernel_internal_succ;
+	sdk_error = g_ezdev_sdk_kernel.platform_handle.net_work_write(n->socket_fd, buffer, len, timeout_ms, &real_write_buf_size);
+	if (sdk_error == mkernel_internal_succ)
+	{
+		ezdev_sdk_kernel_log_trace(0, 0, "mqtt call net_work_write succ, want:%d, send len:%d", len, real_write_buf_size);
+		return real_write_buf_size;
+	}
+	else
+	{
+		ezdev_sdk_kernel_log_error(sdk_error, sdk_error, "mqtt call net_work_write error:%d", sdk_error);
+		return -1;
+	}
+}
+
+static int MQTTNet_read(Network* n, unsigned char* buffer, int len, int timeout_ms)
+{
+	return g_ezdev_sdk_kernel.platform_handle.net_work_read(n->socket_fd, buffer, len, timeout_ms);
+}
+
+static void MQTTNetInit(Network* network)
+{
+	network->socket_fd = -1;
+	network->mqttread = MQTTNet_read;
+	network->mqttwrite = MQTTNet_write;
+}
+
+static mkernel_internal_error MQTTNetConnect(Network* network, char* ip, int port )
+{
+	mkernel_internal_error error_code = mkernel_internal_succ;
+	char szRealIp[ezdev_sdk_ip_max_len] = {0};
+	do 
+	{
+		network->socket_fd = g_ezdev_sdk_kernel.platform_handle.net_work_create(NULL);
+		if (network->socket_fd < 0)
+		{
+			error_code = mkernel_internal_create_sock_error;
+			break;
+		}
+
+		error_code = g_ezdev_sdk_kernel.platform_handle.net_work_connect(network->socket_fd, ip, port, 5*1000, szRealIp);
+		if (mkernel_internal_succ != error_code && mkernel_internal_net_gethostbyname_error != error_code)
+		{
+			error_code = mkernel_internal_net_connect_error;
+			break;
+		}
+
+	} while (0);
+
+	if (error_code == mkernel_internal_succ)
+	{
+		return error_code;
+	}
+	
+	if (network->socket_fd >= 0)
+	{
+		g_ezdev_sdk_kernel.platform_handle.net_work_disconnect(network->socket_fd);
+		network->socket_fd = -1;
+	}
+
+	return error_code;
+}
+
+static void MQTTNetDisconnect(Network* network)
+{
+	if (network->socket_fd != -1)
+	{
+		g_ezdev_sdk_kernel.platform_handle.net_work_disconnect(network->socket_fd);
+		network->socket_fd = -1;
+	}
+}
+
+static void MQTTNetFini(Network* network)
+{
+	if (network->socket_fd == -1)
+	{
+		return;
+	}
+	network->socket_fd = -1;
 }

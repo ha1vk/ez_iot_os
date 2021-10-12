@@ -6,12 +6,12 @@
 #include <stdarg.h>
 //#include <netdb.h>
 //#include <unistd.h>
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
+#include "osal_network.h"
+#include "osal_thread.h"
+#include "osal_time.h"
 
 //#define _POSIX_C_SOURCE 200112L
 #define RT_USING_SAL

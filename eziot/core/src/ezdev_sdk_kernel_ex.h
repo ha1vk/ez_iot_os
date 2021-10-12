@@ -16,12 +16,28 @@
 
 #include "ezdev_sdk_kernel_struct.h"
 #include "ezdev_sdk_kernel_error.h"
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
+#include "osal_network.h"
+#include "osal_thread.h"
+#include "osal_time.h"
+
+#if (defined(_WIN32) || defined(_WIN64))
+#if !define(EZOS_API)
+#if defined(EZ_OS_API_EXPORTS)
+#define EZOS_API __declspec(dllexport)
+#else
+#define EZOS_API __declspec(dllimport)
+#endif
+#if !define(EZOS_CALL)
+#define EZOS_CALL __stdcall
+#endif
+#endif
+#else
+#define EZOS_API
+#define EZOS_CALL
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -34,7 +50,7 @@ extern "C"
  *  \param[in] 	stun_info * ptr_stun
  *  \return 	EZOS_API ezdev_sdk_kernel_error
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_stun(stun_info* ptr_stun, EZDEV_SDK_BOOL bforce_refresh);
+EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_get_stun(stun_info* ptr_stun, EZDEV_SDK_BOOL bforce_refresh);
 
 /** 
  *  \brief		设置心跳时间
@@ -43,7 +59,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_stun(stun_info* ptr_stun, E
  *  \param[in]  EZDEV_SDK_UINT16 timeout_s  等待服务器响应的超时时间，0表示不等待
  *  \return 	如果不等待响应，信令送进队列返回成功，反之等待平台响应错误码，如果超时，返回等待信令超时。
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SDK_UINT16 internal, EZDEV_SDK_UINT16 timeout_s);
+EZOS_API ezdev_sdk_kernel_error  EZOS_CALL ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SDK_UINT16 internal, EZDEV_SDK_UINT16 timeout_s);
 
 #ifdef __cplusplus
 }

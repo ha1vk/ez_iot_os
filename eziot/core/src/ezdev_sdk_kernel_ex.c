@@ -21,12 +21,12 @@
 #include "mkernel_internal_error.h"
 #include "ezdev_sdk_kerne_queuel.h"
 #include "ase_support.h"
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
+#include "osal_network.h"
+#include "osal_thread.h"
+#include "osal_time.h"
 
 extern ezdev_sdk_kernel g_ezdev_sdk_kernel;
 EXTERN_QUEUE_FUN(pubmsg_exchange)

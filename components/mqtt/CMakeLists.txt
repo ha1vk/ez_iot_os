@@ -1,9 +1,9 @@
-# if(CONFIG_COMPONENT_MQTT_ENABLED)
+# if(CONFIG_COMPONENT_MBEDTLS_ENABLED)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
         )
-    list(APPEND ADD_PRIVATE_INCLUDE "inc_private")
+    # list(APPEND ADD_PRIVATE_INCLUDE "inc_private")
     ###############################################
 
     ############## Add source files ###############
@@ -34,12 +34,11 @@
     #### Just for this component, won't affect other 
     #### modules, including component that depend 
     #### on this component
-    list(APPEND ADD_DEFINITIONS_PRIVATE -DAAAAA=1)
+    list(APPEND ADD_DEFINITIONS_PRIVATE)
 
     #### Add compile option for this component
     #### and components denpend on this component
-    list(APPEND ADD_DEFINITIONS -DAAAAA222=1
-                                -DAAAAA333=1)
+    list(APPEND ADD_DEFINITIONS -DMQTTCLIENT_PLATFORM_HEADER=MQTTPorting.h)
     ###############################################
 
     ############ Add static libs ##################

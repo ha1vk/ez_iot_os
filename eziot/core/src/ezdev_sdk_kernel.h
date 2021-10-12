@@ -19,12 +19,6 @@
 #include "ezdev_sdk_kernel_struct.h"
 #include "ez_sdk_api.h"
 #include "ez_sdk_api_struct.h"
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
 
 /**
  * @addtogroup micro_kernel 微内核模块

@@ -250,7 +250,7 @@ def write_header(filename):
 
 parser = argparse.ArgumentParser(description='generate time info for', prog=os.path.basename(sys.argv[0]))
 
-OUTPUT_FORMATS = {"makefile": write_config,
+OUTPUT_FORMATS = {"config": write_config,
                   "header": write_header,
                   "cmake": write_cmake
                   }

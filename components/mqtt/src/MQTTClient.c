@@ -14,8 +14,8 @@
  *    Allan Stockdill-Mander/Ian Craggs - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
+#include <string.h>
 #include "MQTTClient.h"
-// #include "sdk_kernel_def.h"
 
 static void NewMessageData(MessageData *md, MQTTString *aTopicName, MQTTMessage *aMessage)
 {
@@ -59,7 +59,7 @@ void MQTTClientInit(MQTTClient *c, Network *network, unsigned int command_timeou
 
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
-        memset(c->messageHandlers[i].topicFilter , 0, 512);
+        memset(c->messageHandlers[i].topicFilter, 0, 512);
     }
     c->command_timeout_ms = command_timeout_ms;
     c->buf = sendbuf;
@@ -75,12 +75,6 @@ void MQTTClientInit(MQTTClient *c, Network *network, unsigned int command_timeou
 #if defined(MQTT_TASK)
     MutexInit(&c->mutex);
 #endif
-}
-
-void MQTTClientFini(MQTTClient *c)
-{
-    TimerFini(&c->ping_timer);
-    TimerFini(&c->connect_timer);
 }
 
 static int decodePacket(MQTTClient *c, int *value, int timeout)
@@ -112,14 +106,17 @@ exit:
 
 static int readPacket(MQTTClient *c, Timer *timer)
 {
-    int rc = FAILURE;
     MQTTHeader header = {0};
     int len = 0;
     int rem_len = 0;
 
     /* 1. read the header byte.  This has the packet type in it */
-    if (c->ipstack->mqttread(c->ipstack, c->readbuf, 1, TimerLeftMS(timer)) != 1)
+    int rc = c->ipstack->mqttread(c->ipstack, c->readbuf, 1, TimerLeftMS(timer));
+
+    if (rc != 1)
+    {
         goto exit;
+    }
 
     len = 1;
     /* 2. read the remaining length.  This is variable in itself */
@@ -129,17 +126,15 @@ static int readPacket(MQTTClient *c, Timer *timer)
     if (rem_len + len > c->readbuf_size)
     {
         ezdev_sdk_kernel_log_error(15, 0, "rev packet size range, rem_len = %d, buf size = %d\n", rem_len, c->readbuf_size);
-        MQTTNetSetLastError(15);
+        rc = BUFFER_OVERFLOW;
         goto exit;
     }
 
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
-    if (rem_len > 0 && (c->ipstack->mqttread(c->ipstack, c->readbuf + len, rem_len, 5000 /*TimerLeftMS(timer)*10*/) != rem_len)) 
+    if (rem_len > 0 && (c->ipstack->mqttread(c->ipstack, c->readbuf + len, rem_len, c->command_timeout_ms/*TimerLeftMS(timer)*/ != rem_len)))
     {
-        header.byte = c->readbuf[0];
-        //rc = header.bits.type;
-		ezdev_sdk_kernel_log_error(15, 0, "rev rem packet, rem_len = %d\n", rem_len);
-        MQTTNetSetLastError(15);
+        ezdev_sdk_kernel_log_error(15, 0, "rev rem packet, rem_len = %d\n", rem_len);
+        rc = FAILURE;
         goto exit;
     }
 
@@ -194,7 +189,7 @@ int deliverMessage(MQTTClient *c, MQTTString *topicName, MQTTMessage *message)
     for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
     {
         if (strlen(c->messageHandlers[i].topicFilter) > 0 && (MQTTPacket_equals(topicName, (char *)c->messageHandlers[i].topicFilter) ||
-                                                       isTopicMatched((char *)c->messageHandlers[i].topicFilter, topicName)))
+                                                              isTopicMatched((char *)c->messageHandlers[i].topicFilter, topicName)))
         {
             if (c->messageHandlers[i].fp != NULL)
             {
@@ -241,9 +236,6 @@ int keepalive(MQTTClient *c)
             c->ping_outstanding = 1;
             TimerCountdown(&c->ping_timer, c->keepAliveInterval); // record the fact that we have successfully sent the packet
         }
-
-        TimerFini(&timer);
-        //        }
     }
 
 exit:
@@ -256,11 +248,6 @@ int cycle(MQTTClient *c, Timer *timer)
     unsigned short packet_type = readPacket(c, timer);
     int len = 0, rc = SUCCESS;
 
-    if (MQTTNetGetLastError() == 15 || MQTTNetGetLastError() == 17)
-    {
-        goto exit;
-    }
-
     if (packet_type == CONNACK || packet_type == PUBACK || packet_type == SUBACK ||
         packet_type == PUBLISH || packet_type == PUBREC || packet_type == PUBCOMP || packet_type == PINGRESP)
     {
@@ -270,6 +257,16 @@ int cycle(MQTTClient *c, Timer *timer)
 
     switch (packet_type)
     {
+    default:
+        /* no more data to read, unrecoverable. Or read packet fails due to unexpected network error */
+        rc = packet_type;
+        ezdev_sdk_kernel_log_error(0, 0, "readPacket, code:%d", rc);
+        goto exit;
+
+    case 0:
+        /* timed out reading packet */
+        ezdev_sdk_kernel_log_trace(0, 0, "timed out reading packet");
+        break;
     case CONNACK:
     case PUBACK:
     case SUBACK:
@@ -336,16 +333,15 @@ int MQTTYield(MQTTClient *c, int timeout_ms)
     TimerInit(&timer);
     TimerCountdownMS(&timer, timeout_ms);
 
-    //  	do //��ȥ��ѭ������ֹutcʱ���޸ĵ�����һ��ʱ����ѭ���޷��˳�
-    //      {
-    if (cycle(c, &timer) == FAILURE)
-    {
-        rc = FAILURE;
-        //            break;
-    }
-    //	} while (!TimerIsExpired(&timer));
+    // do {
+    //     if (cycle(c, &timer) < 0) {
+    //         rc = FAILURE;
+    //         break;
+    //     }
+    // } while (!TimerIsExpired(&timer));
 
-    TimerFini(&timer);
+    rc = cycle(c, &timer);
+
     return rc;
 }
 
@@ -367,8 +363,6 @@ void MQTTRun(void *parm)
         MutexUnlock(&c->mutex);
 #endif
     }
-
-    TimerFini(&timer);
 }
 
 #if defined(MQTT_TASK)
@@ -385,19 +379,12 @@ int waitfor(MQTTClient *c, int packet_type, Timer *timer)
     do
     {
         if (TimerIsExpired(timer))
+        {
             break; // we timed out
+        }
+
         rc = cycle(c, timer);
-        if (rc == packet_type)
-        {
-            break;
-        }
-        if (MQTTNetGetLastError() == 15 || MQTTNetGetLastError() == 15)
-        {
-            rc = FAILURE;
-            ezdev_sdk_kernel_log_warn(rc, MQTTNetGetLastError(), "cycle error: %d, socket error:%d, loop out", rc, MQTTNetGetLastError());
-            break;
-        }
-    } while (1);
+    } while (rc != packet_type && rc >= 0);
 
     return rc;
 }
@@ -448,7 +435,6 @@ exit:
 #if defined(MQTT_TASK)
     MutexUnlock(&c->mutex);
 #endif
-    TimerFini(&connect_timer);
     return rc;
 }
 
@@ -509,7 +495,6 @@ exit:
 #if defined(MQTT_TASK)
     MutexUnlock(&c->mutex);
 #endif
-    TimerFini(&timer);
     return rc;
 }
 
@@ -548,7 +533,6 @@ exit:
 #if defined(MQTT_TASK)
     MutexUnlock(&c->mutex);
 #endif
-    TimerFini(&timer);
 
     return rc;
 }
@@ -588,7 +572,7 @@ int MQTTPublish(MQTTClient *c, const char *topicName, MQTTMessage *message)
         unsigned short packetIdRsp;
         unsigned char dup, type;
 
-        //�ȴ���Ӧid��ack��ֱ����ʱΪֹ
+        //??????id??ack??????????
         while (packetTypeWait4 == (rc = waitfor(c, packetTypeWait4, &timer)))
         {
             if (MQTTDeserialize_ack(&type, &dup, &packetIdRsp, c->readbuf, c->readbuf_size) != 1)
@@ -610,7 +594,6 @@ exit:
 #if defined(MQTT_TASK)
     MutexUnlock(&c->mutex);
 #endif
-    TimerFini(&timer);
     return rc;
 }
 
@@ -640,6 +623,5 @@ int MQTTDisconnect(MQTTClient *c)
 #if defined(MQTT_TASK)
     MutexUnlock(&c->mutex);
 #endif
-    TimerFini(&timer);
     return rc;
 }

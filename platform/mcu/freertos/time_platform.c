@@ -13,7 +13,7 @@
 
 #include "ez_sdk_log.h"
 
-#include "time_interface.h"
+#include "osal_time.h"
 
 
 int ez_get_clock_time(ez_timespec *clock)

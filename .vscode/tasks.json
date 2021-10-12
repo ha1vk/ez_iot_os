@@ -4,22 +4,14 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "gcc",
+            "label": "Build ezos",
             "type": "shell",
-            "command": "g++",
-            "args": [
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
-            ],
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}"
-                ]
-            }
-        }
+            "command": "./build.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
     ]
 }

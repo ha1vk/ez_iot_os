@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ez_sdk_log.h"
-#include "thread_interface.h"
+#include "osal_thread.h"
 
 #define 	FREERTOS_DEFAULT_STACKSIZE		2048
 

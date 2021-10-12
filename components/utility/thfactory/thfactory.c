@@ -13,9 +13,9 @@
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
-#include "thread_interface.h"
-#include "time_interface.h"
-#include "mem_interface.h"
+#include "osal_thread.h"
+#include "osal_time.h"
+#include "osal_mem.h"
 
 #include <string.h>
 #include "thfactory.h"

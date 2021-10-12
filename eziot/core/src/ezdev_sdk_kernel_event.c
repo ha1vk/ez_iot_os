@@ -15,12 +15,12 @@
 #include "ezdev_sdk_kerne_queuel.h"
 #include "mkernel_internal_error.h"
 #include "ezdev_sdk_kernel_struct.h"
-#include "file_interface.h"
-#include "io_interface.h"
-#include "mem_interface.h"
-#include "network_interface.h"
-#include "thread_interface.h"
-#include "time_interface.h"
+#include "osal_file.h"
+#include "osal_io.h"
+#include "osal_mem.h"
+#include "osal_network.h"
+#include "osal_thread.h"
+#include "osal_time.h"
 
 EXTERN_QUEUE_FUN(inner_cb_notic)
 EXTERN_QUEUE_BASE_FUN
@@ -45,7 +45,7 @@ static mkernel_internal_error push_event_to_queue(ezdev_sdk_kernel_inner_cb_noti
 		if (mkernel_internal_queue_full == kernel_error)
 		{
 			ezdev_sdk_kernel_log_error(kernel_error, 0, "push_queue_inner_cb_notic return mkernel_internal_queue_full, try again.");
-			get_ezdev_sdk_kernel()->platform_handle.time_sleep(10);
+			get_ezdev_sdk_kernel()->platform_handle.time_delay(10);
 
 			if(count++ > 50)
 				break;

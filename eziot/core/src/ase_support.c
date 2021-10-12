@@ -37,14 +37,14 @@ mkernel_internal_error aes_cbc_128_dec_padding(const unsigned char aes_key[16],
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	EZDEV_SDK_INT32 aes_result = 0;
 	unsigned char iv[16];
-	bscomptls_aes_context aes_ctx;
+	mbedtls_aes_context aes_ctx;
 	EZDEV_SDK_UINT32 index = 0;
 	unsigned char padding_char = 0;
 	unsigned char other_char = 0;
 
 	do 
 	{
-		bscomptls_aes_init( &aes_ctx );
+		mbedtls_aes_init( &aes_ctx );
 		memset((void*)iv, 0, 16);
 		for(index=0;index<8;index++)
 		{
@@ -57,13 +57,13 @@ mkernel_internal_error aes_cbc_128_dec_padding(const unsigned char aes_key[16],
 			break;
 		}
 
-		aes_result = bscomptls_aes_setkey_dec(&aes_ctx, aes_key, 128);
+		aes_result = mbedtls_aes_setkey_dec(&aes_ctx, aes_key, 128);
 		if (aes_result != 0)
 		{
 			sdk_error = mkernel_internal_casll_mbedtls_setdeckey_error;
 			break;
 		}
-		aes_result = bscomptls_aes_crypt_cbc(&aes_ctx, BSCOMPTLS_AES_DECRYPT, input_length, iv, input_buf, output_buf);
+		aes_result = mbedtls_aes_crypt_cbc(&aes_ctx, MBEDTLS_AES_DECRYPT, input_length, iv, input_buf, output_buf);
 		if (aes_result != 0)
 		{
 			sdk_error = mkernel_internal_casll_mbedtls_crypt_error;
@@ -97,7 +97,7 @@ mkernel_internal_error aes_cbc_128_dec_padding(const unsigned char aes_key[16],
 
 	} while (0);
 	
-	bscomptls_aes_free(&aes_ctx);
+	mbedtls_aes_free(&aes_ctx);
 	return sdk_error;
 }
 
@@ -123,7 +123,7 @@ mkernel_internal_error aes_cbc_128_enc_padding(const unsigned char aes_key[16], 
 	mkernel_internal_error sdk_error = mkernel_internal_succ;
 	EZDEV_SDK_INT32 aes_result = 0;
 	unsigned char iv[16];
-	bscomptls_aes_context aes_ctx;
+	mbedtls_aes_context aes_ctx;
 	EZDEV_SDK_INT32 i=0;
 	unsigned char padding_char = 0;
 
@@ -136,20 +136,20 @@ mkernel_internal_error aes_cbc_128_enc_padding(const unsigned char aes_key[16], 
 
 	do 
 	{
-		bscomptls_aes_init( &aes_ctx );
+		mbedtls_aes_init( &aes_ctx );
 		memset(iv, 0, 16);
 		for(i=0;i<8;i++)
 		{
 			iv[i]=i + 0x30;
 		}
 
-		aes_result = bscomptls_aes_setkey_enc(&aes_ctx, aes_key, 128);
+		aes_result = mbedtls_aes_setkey_enc(&aes_ctx, aes_key, 128);
 		if (aes_result != 0)
 		{
             sdk_error = mkernel_internal_casll_mbedtls_setdeckey_error;
 			break;
 		}
-		aes_result = bscomptls_aes_crypt_cbc(&aes_ctx, BSCOMPTLS_AES_ENCRYPT, input_length_padding, iv, input_buf, output_buf);
+		aes_result = mbedtls_aes_crypt_cbc(&aes_ctx, MBEDTLS_AES_ENCRYPT, input_length_padding, iv, input_buf, output_buf);
 		if (aes_result != 0)
 		{
             sdk_error = mkernel_internal_casll_mbedtls_crypt_error;
@@ -157,7 +157,7 @@ mkernel_internal_error aes_cbc_128_enc_padding(const unsigned char aes_key[16], 
 		}
 	} while (0);
 
-	bscomptls_aes_free(&aes_ctx);
+	mbedtls_aes_free(&aes_ctx);
 
 	if (sdk_error == mkernel_internal_succ)
 	{
@@ -176,27 +176,27 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
     mkernel_internal_error sdk_error = mkernel_internal_succ;
     EZDEV_SDK_INT32 gcm_result = 0;
     EZDEV_SDK_INT32 index = 0;
-    bscomptls_gcm_context gcm_ctx;
+    mbedtls_gcm_context gcm_ctx;
     unsigned int key_len = 16 * 8;
-    bscomptls_cipher_id_t cipher = BSCOMPTLS_CIPHER_ID_AES;
+    mbedtls_cipher_id_t cipher = MBEDTLS_CIPHER_ID_AES;
     unsigned char iv[iv_len];
     do
     {
-        bscomptls_gcm_init(&gcm_ctx);
+        mbedtls_gcm_init(&gcm_ctx);
         memset(iv, 0, iv_len);
         for (index = 0; index < iv_len / 2; index++)
         {
             iv[index] = index + 0x30;
         }
 
-        gcm_result = bscomptls_gcm_setkey(&gcm_ctx, cipher, gcm_key, key_len);
+        gcm_result = mbedtls_gcm_setkey(&gcm_ctx, cipher, gcm_key, key_len);
         if (gcm_result != 0)
         {
             sdk_error = mkernel_internal_casll_mbedtls_setdeckey_error;
             break;
         }
 
-        gcm_result = bscomptls_gcm_crypt_and_tag(&gcm_ctx, BSCOMPTLS_GCM_ENCRYPT, input_length/*input_length_padding*/, iv, iv_len, NULL/*addition*/, 0/*add_len*/, input_buf, output_buf, tag_buf_len, output_tag_buf);
+        gcm_result = mbedtls_gcm_crypt_and_tag(&gcm_ctx, MBEDTLS_GCM_ENCRYPT, input_length/*input_length_padding*/, iv, iv_len, NULL/*addition*/, 0/*add_len*/, input_buf, output_buf, tag_buf_len, output_tag_buf);
         if (gcm_result != 0)
         {
             sdk_error = mkernel_internal_casll_mbedtls_crypt_error;
@@ -205,7 +205,7 @@ mkernel_internal_error aes_gcm_128_enc_padding(const unsigned char gcm_key[16], 
 
     } while (0);
 
-    bscomptls_gcm_free(&gcm_ctx);
+    mbedtls_gcm_free(&gcm_ctx);
 
     if (sdk_error == mkernel_internal_succ)
     {
@@ -226,15 +226,15 @@ mkernel_internal_error aes_gcm_128_dec_padding(const unsigned char gcm_key[16], 
     mkernel_internal_error sdk_error = mkernel_internal_succ;
     EZDEV_SDK_INT32 gcm_result = 0;
     unsigned char iv[iv_len];
-    bscomptls_gcm_context gcm_ctx;
-    bscomptls_cipher_id_t cipher = BSCOMPTLS_CIPHER_ID_AES;
+    mbedtls_gcm_context gcm_ctx;
+    mbedtls_cipher_id_t cipher = MBEDTLS_CIPHER_ID_AES;
     unsigned int key_len = 128;
     //static const uint8_t addition[add_len] = { 0xfe, 0xa5, 0x5a, 0xef };
     EZDEV_SDK_UINT32 index = 0;
 
     do
     {
-        bscomptls_gcm_init(&gcm_ctx);
+        mbedtls_gcm_init(&gcm_ctx);
         memset((void*)iv, 0, iv_len);
         for (index = 0; index < iv_len / 2; index++)
         {
@@ -247,14 +247,14 @@ mkernel_internal_error aes_gcm_128_dec_padding(const unsigned char gcm_key[16], 
             break;
         }
 
-        gcm_result = bscomptls_gcm_setkey(&gcm_ctx, cipher, gcm_key, key_len);
+        gcm_result = mbedtls_gcm_setkey(&gcm_ctx, cipher, gcm_key, key_len);
         if (gcm_result != 0)
         {
             sdk_error = mkernel_internal_casll_mbedtls_setdeckey_error;
             break;
         }
 
-        gcm_result = bscomptls_gcm_auth_decrypt(&gcm_ctx, input_length, iv, iv_len, NULL/*addition*/, 0/*add_len*/, input_tag_buf, tag_buf_len, input_buf, output_buf);
+        gcm_result = mbedtls_gcm_auth_decrypt(&gcm_ctx, input_length, iv, iv_len, NULL/*addition*/, 0/*add_len*/, input_tag_buf, tag_buf_len, input_buf, output_buf);
         if (gcm_result != 0)
         {
             sdk_error = mkernel_internal_casll_mbedtls_crypt_error;
@@ -262,7 +262,7 @@ mkernel_internal_error aes_gcm_128_dec_padding(const unsigned char gcm_key[16], 
         }
     } while (0);
 
-    bscomptls_gcm_free(&gcm_ctx);
+    mbedtls_gcm_free(&gcm_ctx);
 
     if (sdk_error == mkernel_internal_succ)
     {
