@@ -1,4 +1,4 @@
-#if(CONFIG_IOT_CORE_ENABLED)
+if(CONFIG_EZIOT_CORE_ENABLED)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
@@ -54,4 +54,4 @@
     # register component, DYNAMIC or SHARED flags will make component compiled to dynamic(shared) lib
     register_component()
 
-#endif()
+endif()

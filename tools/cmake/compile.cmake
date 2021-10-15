@@ -46,6 +46,8 @@ function(register_component)
         message("-- component ${component_name} will compiled to static lib")
     endif()
 
+    message("-- component ${component_name} dependencies:${ADD_REQUIREMENTS}")
+
     # Add src to lib
     if(ADD_SRCS)
         if(to_dynamic_lib)

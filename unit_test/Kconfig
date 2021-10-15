@@ -1,0 +1,49 @@
+config EZIOT_UNIT_TEST_ENABLE
+    bool "Enable Unit Test"
+    default n
+    select EZIOT_COMPONENT_UTEST_ENABLE
+
+config EZIOT_UNIT_TEST_REPORT_LOGLVL
+    int "The log level of the unit test report"
+    range 1 2
+    default 2
+    depends on EZIOT_UNIT_TEST_ENABLE
+
+config EZIOT_UNIT_TEST_SDK_LOGLVL
+    int "The log level for debugging"
+    range 0 5
+    default 0
+    depends on EZIOT_UNIT_TEST_ENABLE
+
+config EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS
+    int "The default timeout of the interface test"
+    default 10
+    depends on EZIOT_UNIT_TEST_ENABLE
+
+config EZIOT_UNIT_TEST_CLOUD_HOST
+    string "Ezviz cloud server address"
+    default "devcn.eziot.com"
+    depends on EZIOT_UNIT_TEST_ENABLE
+
+config EZIOT_UNIT_TEST_CLOUD_PORT
+    int "Ezviz cloud server port"
+    default 8666
+    depends on EZIOT_UNIT_TEST_ENABLE
+
+config EZIOT_UNIT_TEST_DEV_AUTH_MODE
+    int "Device authentication mode"
+    range 0 1
+    default 1
+    depends on EZIOT_UNIT_TEST_ENABLE
+    help
+        0 means SAP auth mode, 1 means license auth mode
+
+config EZIOT_UNIT_TEST_WIFI_SSID
+    string "config Wifi ssid (for wifi module)"
+    default "Lee"
+    depends on EZIOT_UNIT_TEST_ENABLE
+
+config EZIOT_UNIT_TEST_WIFI_PASSWORD
+    string "config Wifi password (for wifi module)"
+    default "12345678"
+    depends on EZIOT_UNIT_TEST_ENABLE

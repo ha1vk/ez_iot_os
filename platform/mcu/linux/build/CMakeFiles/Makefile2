@@ -209,7 +209,7 @@ mbedtls/CMakeFiles/mbedtls.dir/all: CMakeFiles/update_build_info.dir/all
 mbedtls/CMakeFiles/mbedtls.dir/all: osal/CMakeFiles/osal.dir/all
 	$(MAKE) -f mbedtls/CMakeFiles/mbedtls.dir/build.make mbedtls/CMakeFiles/mbedtls.dir/depend
 	$(MAKE) -f mbedtls/CMakeFiles/mbedtls.dir/build.make mbedtls/CMakeFiles/mbedtls.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82 "Built target mbedtls"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81 "Built target mbedtls"
 .PHONY : mbedtls/CMakeFiles/mbedtls.dir/all
 
 # Include target in all.
@@ -219,7 +219,7 @@ all: mbedtls/CMakeFiles/mbedtls.dir/all
 
 # Build rule for subdir invocation for target.
 mbedtls/CMakeFiles/mbedtls.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 68
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 67
 	$(MAKE) -f CMakeFiles/Makefile2 mbedtls/CMakeFiles/mbedtls.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 0
 .PHONY : mbedtls/CMakeFiles/mbedtls.dir/rule
@@ -265,7 +265,7 @@ mqtt/CMakeFiles/mqtt.dir/all: CMakeFiles/update_build_info.dir/all
 mqtt/CMakeFiles/mqtt.dir/all: osal/CMakeFiles/osal.dir/all
 	$(MAKE) -f mqtt/CMakeFiles/mqtt.dir/build.make mqtt/CMakeFiles/mqtt.dir/depend
 	$(MAKE) -f mqtt/CMakeFiles/mqtt.dir/build.make mqtt/CMakeFiles/mqtt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=83,84,85,86,87,88,89,90,91,92,93 "Built target mqtt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=82,83,84,85,86,87,88,89,90,91,92 "Built target mqtt"
 .PHONY : mqtt/CMakeFiles/mqtt.dir/all
 
 # Include target in all.
@@ -275,7 +275,7 @@ all: mqtt/CMakeFiles/mqtt.dir/all
 
 # Build rule for subdir invocation for target.
 mqtt/CMakeFiles/mqtt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 16
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 15
 	$(MAKE) -f CMakeFiles/Makefile2 mqtt/CMakeFiles/mqtt.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 0
 .PHONY : mqtt/CMakeFiles/mqtt.dir/rule
@@ -292,6 +292,61 @@ mqtt/CMakeFiles/mqtt.dir/clean:
 
 # clean rule for target.
 clean: mqtt/CMakeFiles/mqtt.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory utest
+
+# Convenience name for "all" pass in the directory.
+utest/all: utest/CMakeFiles/utest.dir/all
+
+.PHONY : utest/all
+
+# Convenience name for "clean" pass in the directory.
+utest/clean: utest/CMakeFiles/utest.dir/clean
+
+.PHONY : utest/clean
+
+# Convenience name for "preinstall" pass in the directory.
+utest/preinstall:
+
+.PHONY : utest/preinstall
+
+#=============================================================================
+# Target rules for target utest/CMakeFiles/utest.dir
+
+# All Build rule for target.
+utest/CMakeFiles/utest.dir/all: CMakeFiles/update_build_info.dir/all
+	$(MAKE) -f utest/CMakeFiles/utest.dir/build.make utest/CMakeFiles/utest.dir/depend
+	$(MAKE) -f utest/CMakeFiles/utest.dir/build.make utest/CMakeFiles/utest.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=97,98 "Built target utest"
+.PHONY : utest/CMakeFiles/utest.dir/all
+
+# Include target in all.
+all: utest/CMakeFiles/utest.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+utest/CMakeFiles/utest.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 utest/CMakeFiles/utest.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 0
+.PHONY : utest/CMakeFiles/utest.dir/rule
+
+# Convenience name for target.
+utest: utest/CMakeFiles/utest.dir/rule
+
+.PHONY : utest
+
+# clean rule for target.
+utest/CMakeFiles/utest.dir/clean:
+	$(MAKE) -f utest/CMakeFiles/utest.dir/build.make utest/CMakeFiles/utest.dir/clean
+.PHONY : utest/CMakeFiles/utest.dir/clean
+
+# clean rule for target.
+clean: utest/CMakeFiles/utest.dir/clean
 
 .PHONY : clean
 
@@ -331,7 +386,7 @@ all: xml/CMakeFiles/xml.dir/all
 
 # Build rule for subdir invocation for target.
 xml/CMakeFiles/xml.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 6
 	$(MAKE) -f CMakeFiles/Makefile2 xml/CMakeFiles/xml.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 0
 .PHONY : xml/CMakeFiles/xml.dir/rule
@@ -381,7 +436,7 @@ core/CMakeFiles/core.dir/all: xml/CMakeFiles/xml.dir/all
 core/CMakeFiles/core.dir/all: osal/CMakeFiles/osal.dir/all
 	$(MAKE) -f core/CMakeFiles/core.dir/build.make core/CMakeFiles/core.dir/depend
 	$(MAKE) -f core/CMakeFiles/core.dir/build.make core/CMakeFiles/core.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 "Built target core"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 "Built target core"
 .PHONY : core/CMakeFiles/core.dir/all
 
 # Include target in all.
@@ -391,7 +446,7 @@ all: core/CMakeFiles/core.dir/all
 
 # Build rule for subdir invocation for target.
 core/CMakeFiles/core.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 100
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 98
 	$(MAKE) -f CMakeFiles/Makefile2 core/CMakeFiles/core.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 0
 .PHONY : core/CMakeFiles/core.dir/rule
@@ -436,7 +491,7 @@ osal/preinstall:
 osal/CMakeFiles/osal.dir/all: CMakeFiles/update_build_info.dir/all
 	$(MAKE) -f osal/CMakeFiles/osal.dir/build.make osal/CMakeFiles/osal.dir/depend
 	$(MAKE) -f osal/CMakeFiles/osal.dir/build.make osal/CMakeFiles/osal.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=94,95,96,97,98 "Built target osal"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles --progress-num=93,94,95,96 "Built target osal"
 .PHONY : osal/CMakeFiles/osal.dir/all
 
 # Include target in all.
@@ -446,7 +501,7 @@ all: osal/CMakeFiles/osal.dir/all
 
 # Build rule for subdir invocation for target.
 osal/CMakeFiles/osal.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 4
 	$(MAKE) -f CMakeFiles/Makefile2 osal/CMakeFiles/osal.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/CMakeFiles 0
 .PHONY : osal/CMakeFiles/osal.dir/rule

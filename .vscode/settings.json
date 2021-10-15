@@ -36,6 +36,7 @@
         "base_typedef.h": "c",
         "ezxml.h": "c",
         "mqttclient.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "ezos_gconfig.h": "c"
     }
 }

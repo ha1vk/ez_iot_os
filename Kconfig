@@ -11,7 +11,7 @@ menu "Toolchain configuration"
         default ""
 endmenu
 
-menu "Ez-iot-sdk configuration"
+menu "Ez-IoT-SDK configuration"
     osource "${EZOS_PATH}/eziot/core/Kconfig"
     osource "${EZOS_PATH}/eziot/link/Kconfig"
     osource "${EZOS_PATH}/eziot/extensions/*/Kconfig"
@@ -20,4 +20,8 @@ endmenu
 
 menu "Components configuration"
     osource "${EZOS_PATH}/components/*/Kconfig"
+endmenu
+
+menu "Unit-Test configuration"
+    osource "${EZOS_PATH}/unit_test/Kconfig"
 endmenu

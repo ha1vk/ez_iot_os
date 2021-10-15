@@ -1,9 +1,9 @@
-if(CONFIG_EZIOT_COMPONENT_EZXML_ENABLE)
+if(CONFIG_EZIOT_COMPONENT_UTEST_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
         )
-    # list(APPEND ADD_PRIVATE_INCLUDE "inc_private")
+    # list(APPEND ADD_PRIVATE_INCLUDE "include_private")
     ###############################################
 
     ############## Add source files ###############
@@ -15,7 +15,7 @@ if(CONFIG_EZIOT_COMPONENT_EZXML_ENABLE)
     ###############################################
 
     ###### Add required/dependent components ######
-    list(APPEND ADD_REQUIREMENTS osal)
+    # list(APPEND ADD_REQUIREMENTS component1)
     ###############################################
 
     ############ Add static libs ##################
@@ -34,11 +34,12 @@ if(CONFIG_EZIOT_COMPONENT_EZXML_ENABLE)
     #### Just for this component, won't affect other 
     #### modules, including component that depend 
     #### on this component
-    # list(APPEND ADD_DEFINITIONS_PRIVATE)
+    list(APPEND ADD_DEFINITIONS_PRIVATE -DUTEST_TC_USE_CONSTRUCTOR)
 
     #### Add compile option for this component
     #### and components denpend on this component
-    # list(APPEND ADD_DEFINITIONS)
+    # list(APPEND ADD_DEFINITIONS -DAAAAA222=1
+    #                             -DAAAAA333=1)
     ###############################################
 
     ############ Add static libs ##################

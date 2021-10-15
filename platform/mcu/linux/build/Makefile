@@ -176,6 +176,19 @@ mqtt/fast:
 .PHONY : mqtt/fast
 
 #=============================================================================
+# Target rules for targets named utest
+
+# Build rule for target.
+utest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 utest
+.PHONY : utest
+
+# fast build rule for target.
+utest/fast:
+	$(MAKE) -f utest/CMakeFiles/utest.dir/build.make utest/CMakeFiles/utest.dir/build
+.PHONY : utest/fast
+
+#=============================================================================
 # Target rules for targets named xml
 
 # Build rule for target.
@@ -227,6 +240,7 @@ help:
 	@echo "... cJSON"
 	@echo "... mbedtls"
 	@echo "... mqtt"
+	@echo "... utest"
 	@echo "... xml"
 	@echo "... core"
 	@echo "... osal"

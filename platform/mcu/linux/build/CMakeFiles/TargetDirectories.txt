@@ -11,6 +11,9 @@
 /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/mqtt/CMakeFiles/rebuild_cache.dir
 /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/mqtt/CMakeFiles/mqtt.dir
 /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/mqtt/CMakeFiles/edit_cache.dir
+/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/utest/CMakeFiles/rebuild_cache.dir
+/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/utest/CMakeFiles/utest.dir
+/home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/utest/CMakeFiles/edit_cache.dir
 /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/xml/CMakeFiles/rebuild_cache.dir
 /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/xml/CMakeFiles/xml.dir
 /home/xurongjun/git/ez_iot_os/platform/mcu/linux/build/xml/CMakeFiles/edit_cache.dir

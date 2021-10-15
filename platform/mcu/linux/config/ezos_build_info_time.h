@@ -3,11 +3,11 @@
 
 #define BUILD_TIME_YEAR   2021
 #define BUILD_TIME_MONTH  10
-#define BUILD_TIME_DAY    12
-#define BUILD_TIME_HOUR   16
-#define BUILD_TIME_MINUTE 47
-#define BUILD_TIME_SECOND 35
-#define BUILD_TIME_WEEK_OF_DAY 1
-#define BUILD_TIME_YEAR_OF_DAY 285
+#define BUILD_TIME_DAY    15
+#define BUILD_TIME_HOUR   15
+#define BUILD_TIME_MINUTE 49
+#define BUILD_TIME_SECOND 26
+#define BUILD_TIME_WEEK_OF_DAY 4
+#define BUILD_TIME_YEAR_OF_DAY 288
 
 //compile append define end

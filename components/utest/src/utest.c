@@ -104,7 +104,7 @@ int utest_init(void)
 #elif defined (__ICCARM__) || defined(__ICCRX__)    /* for IAR Compiler */
     tc_table = (utest_tc_export_t)__section_begin("UtestTcTab");
     tc_num = (utest_tc_export_t)__section_end("UtestTcTab") - tc_table;
-#elif defined(UTEST_TC_USE_CONSTRUCTOR) 			/* for ez iot sdk  */
+#elif defined(UTEST_TC_USE_CONSTRUCTOR)             /* for ez iot sdk  */
     memset(_utest_testcase, 0, sizeof(_utest_testcase));
     tc_table = (utest_tc_export_t)&_utest_testcase;
     tc_num = 0;

@@ -1,0 +1,5 @@
+menu "Component utest configuration"
+    config EZIOT_COMPONENT_UTEST_ENABLE
+        bool "Enable utest"
+        default n
+endmenu

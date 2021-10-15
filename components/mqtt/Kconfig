@@ -1,8 +1,6 @@
-menu "Component1 configuration"
-    config COMPONENT1_INCLUDE_STATIC_LIB
-        bool "Enable include static lib(from gcc)"
-        default n
-        help
-            Enable include static lib(from gcc)
+menu "Component mqtt configuration"
+    config EZIOT_COMPONENT_MQTT_ENABLE
+        bool "Enable mqtt client"
+        default y
 endmenu
 

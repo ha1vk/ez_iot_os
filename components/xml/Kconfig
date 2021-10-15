@@ -1,8 +1,6 @@
-menu "Component1 configuration"
-    config COMPONENT1_INCLUDE_STATIC_LIB
-        bool "Enable include static lib(from gcc)"
-        default n
-        help
-            Enable include static lib(from gcc)
+menu "Component ezxml configuration"
+    config EZIOT_COMPONENT_EZXML_ENABLE
+        bool "Enable ezxml"
+        default y
 endmenu
 
