@@ -1,4 +1,3 @@
-#cmake版本要求
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 ####### Prepare building environment ##########
@@ -60,69 +59,33 @@ else()
     message(FATAL_ERROR "The utest component must be enabled!")
 endif()
 
-if(UNITTEST_KV_ENABLE)
-    message(STATUS "UNITTEST_KV_ENABLE")
-    AUX_SOURCE_DIRECTORY(${PROJECT_INC_DIR}/components/FlashDB/src src_ut_flashdb)
-    SET(src_ut_kvdb  ${PROJECT_SRC_DIR}/ut_kvdb/ut_kvdb.c)
-    ADD_DEFINITIONS("-DUNITTEST_KV_ENABLE")
-    
-endif()
+if(CONFIG_EZIOT_COMPONENT_FLASHDB_ENABLE)
+    message(STATUS "CONFIG_EZIOT_COMPONENT_FLASHDB_ENABLE")
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_flashdb.c)
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/kv_imp.c)
 
-if(UNITTEST_ONLINE_ENABLE)
-    message(STATUS "UNITTEST_ONLINE_ENABLE")
-    SET(src_ut_online ${PROJECT_SRC_DIR}/ut_online/ut_online.c)
-    SET(lib_sdk -lez_iot -lez_linkcore)
-    ADD_DEFINITIONS("-DUNITTEST_ONLINE_ENABLE")
-endif()
+    list(APPEND UT_INC_DIRS ${ENV_UTPORT_PATH})
+    list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/utest/inc)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/flashdb)
 
-if(UNITTEST_TSL_ENABLE)
-    message(STATUS "UNITTEST_TSL_ENABLE")
-    SET(src_ut_tsl ${PROJECT_SRC_DIR}/ut_tsl.c)
-    SET(lib_sdk -lez_iot -lez_linkcore)
-    ADD_DEFINITIONS("-UNITTEST_TSL_ENABLE")
-endif()
+    list(APPEND UT_DEPENS -lflashdb)
 
-if(UNITTEST_GATWAY_ENABLE)
-    message(STATUS "UNITTEST_GATWAY_ENABLE")
-    SET(src_ut_getway ${PROJECT_SRC_DIR}/ut_getway.c)
-    SET(lib_sdk -lez_iot -lez_linkcore)
-    ADD_DEFINITIONS("-DUNITTEST_GATWAY_ENABLE")
-endif()
-
-if(UNITTEST_OTA_ENABLE)
-    message(STATUS "UNITTEST_OTA_ENABLE")
-    SET(src_ut_ota ${PROJECT_SRC_DIR}/ut_ota.c)
-    SET(lib_sdk -lez_iot -lez_linkcore)
-    ADD_DEFINITIONS("-DUNITTEST_OTA_ENABLE")
-endif()
-
-if(UNITTEST_LOGGER_ENABLE)
-    message(STATUS "UNITTEST_LOGGER_ENABLE")
-    SET(src_ut_logger ${PROJECT_SRC_DIR}/ut_logger.c)
-    SET(lib_sdk -lez_iot -lez_linkcore)
-    ADD_DEFINITIONS("-DUNITTEST_LOGGER_ENABLE")
-endif()
-
-if(UNITTEST_BIND_ENABLE)
-    message(STATUS "UNITTEST_BIND_ENABLE")
-    SET(src_ut_bind ${PROJECT_SRC_DIR}/ut_bind/ut_bind.c)
-    SET(lib_sdk -lez_iot -lez_linkcore)
-    ADD_DEFINITIONS("-DUNITTEST_BIND_ENABLE")
+    list(APPEND UT_DEFINITIONS -DUTEST_TC_USE_CONSTRUCTOR)
 endif()
 
 ##############################################根据开关定义编译的文件和链接的库#############################################
 
-
+#预编译宏
 ADD_DEFINITIONS(${UT_DEFINITIONS})
 
 #头文件搜索路径
 INCLUDE_DIRECTORIES(${UT_INC_DIRS})
 
-#添加依赖库目录
+#依赖库目录
 LINK_DIRECTORIES(${UT_DEPEN_DIRS})
 
-#添加需要编译的源文件
+#源文件
 ADD_EXECUTABLE(ut_iotsdk ${UT_SRCS})
 
-#添加链接库
+#链接依赖库
 target_link_libraries(ut_iotsdk ${UT_DEPENS})

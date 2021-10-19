@@ -1,25 +1,226 @@
-# RT-Thread 编程风格
+# ez_iot_os 编程风格
 
-这是一份 RT-Thread 开发人员的开发指引。RT-Thread 做为一份开源软件，它需要由不同
-的人采用合作的方式完成，这份文档是开发人员的一个指引。RT-Thread 的开发人员请遵
-守这样的编程风格。同时对于使用 RT-Thread 的用户，也可通过这份文档了解 RT-Thread
-代码内部一些约定从而比较容易的把握到 RT-Thread 的实现方式。
+| **版本号** | **修订内容** | **修订人**     | **修订日期** |
+| ---------- | ------------ | -------------- | ------------ |
+| 0.1        | 文档初版     | 陈腾飞、徐荣军 | 2021/10/18   |
 
-## 1.目录名称
+这是一份 ez_iot_os 开发人员的开发指引。ez_iot_os做为一份开源软件，它需要由不同的人采用合作的方式完成，这份文档是开发人员的一个指引。ez_iot_os的开发人员请遵守这样的编程风格。同时对于使用 ez_iot_os的用户，也可通过这份文档了解ez_iot_os代码内部一些约定从而比较容易的把握到ez_iot_os的实现方式。
 
-目录名称如果无特殊的需求，请使用全小写的形式；目录名称应能够反应部分的意思，例
-如各芯片移植由其芯片名称构成或芯片类别构成；components 目录下能够反映组件的意义。
+## 一、注释规范
 
-## 2.文件名称
+### 1. 文件头注释
 
-文件名称如果无特殊的需求(如果是引用其他地方，可以保留相应的名称)，请使用全小写
-的形式。另外为了避免文件名重名的问题，一些地方请尽量不要使用通用化、使用频率高
-的名称。
+在每个原文件头上，应该包括相应的版权信息：
 
-## 3.头文件定义
+```c
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ * Contributors:
+ * chentengfei (chentengfei5@ezvizlife.com)
+  *******************************************************************************/
+```
 
-C语言头文件为了避免多次重复包含，需要定义一个符号。这个符号的定义形式请采用如下
-的风格：
+### 2. 函数声明注释
+
+```c
+/**
+ *	@fn			函数名
+ *  @brief      函数摘要
+ *  @param[in]  入参变量的描述
+ *  @param[out] 出参变量的描述
+ *  @return     返回值描述
+ */
+```
+
+### 3. 全局变量注释
+
+```c
+static ez_ble_event_cb g_event_cb = NULL;	// 蓝牙事件回调
+static os_bool g_adapter_inited = os_false; // sdk初始化标志
+```
+
+## 二、 命名规范
+
+### 1. 目录名称
+
+- 目录名称如果无特殊的需求，请使用全小写的形式；
+- 目录名称应能够反应部分的意思，例如各芯片移植由其芯片名称构成或芯片类别构成；
+- components 目录下能够反映组件的意义。
+
+### 2. 文件名称
+
+- 文件名称如果无特殊的需求(如果是引用其他地方，可以保留相应的名称)，请使用全小写的形式。
+- 另外为了避免文件名重名的问题，一些地方请尽量不要使用通用化、使用频率高的名称。
+- 和萤石云相关的业务组件，对外头文件应采用统一命名风格，规则为：ez_iot_name_type。
+- 跨平台相关文件命名规则为：ez_os_name。如：
+
+```shell
+通用组件：
+ezxml.h
+webclient.h
+
+萤石业务组件：
+ez_iot_err.h
+ez_iot_core.h
+ez_iot_link.h
+ez_iot_bind.h
+ez_iot_shadow.h
+ez_iot_tsl.h
+ez_iot_ota.h
+ez_iot_hub.h
+
+跨平台文件：
+ezos_system.h
+ezos_libc.h
+ezos_thread.h
+ezos_time.h
+ezos_wifi.h
+ezos_uart.h
+ezos_pwm.h
+```
+
+### 3. 函数命名
+
+变量和函数统一采用小写字母加下划线格式命名，函数名和变量名必须有明确的含义，对外导出的函数和变量应加上模块前缀。如：
+
+```c
+/**
+ *  @brief      aes cbc padding encrypt.
+ *  @param[in]  aes_key[16]: secret key
+ *  @param[in]  input_buf: plain text which needs to be encrypted
+ *  @param[in]  input_len: the length of plain text
+ *  @param[out] output_buf: cipher text encrypted from plain text
+ *  @param[out] output_len: the length of cipher text
+ *  @return     0 for success, nonzero for failed
+ */
+int hal_aes_cbc_padding_encrypt(const unsigned char aes_key[16], unsigned char *input_buf, int input_len, unsigned char *output_buf, int *output_len);
+```
+
+### 4. 全局变量
+
+全局变量在最前面加上***“g_”***前缀
+
+```c
+static os_bool g_app_connected = os_false;
+static uint8_t g_mtu = HAL_MTU_MAX;
+```
+
+### 5. 宏定义
+
+宏定义统一使用大写字母加下划线命名，并在后面加上详细注释，如：
+
+```c
+#define EZ_BLE_GATT_ADV_MSG_LEN         31          // length of the message which gap advertise
+#define EZ_BLE_GATT_MAC_LEN             6           // length of mac address of the device
+```
+
+
+
+可配置项应全部抽取至Kconfig，由Kconfig统一进行差异化配置，最终生成的三个配置文件：.config、ezos_gconfig.cmake，ezos_gconfig.h，分别用于makefile、cmake及源程序。配置项规则为：CONFIG_EZIOT_TYPE_NAME_FUNC。
+
+- CONFIG_ 由Kconfig自动添加
+- EZIOT_约定的固定前缀
+- TYPE_ 组件类别
+- NAME_ 组件名
+- FUNC 组件内可配置的功能项
+
+```
+#define CONFIG_EZIOT_CORE_ENABLED 1
+#define CONFIG_EZIOT_CORE_MQTT_TASK_PRIORITY 10
+#define CONFIG_EZIOT_CORE_MQTT_TASK_STACK 6144
+#define CONFIG_EZIOT_LINK_ENABLED 1
+#define CONFIG_EZIOT_EXT_BIND_ENABLED 1
+#define CONFIG_EZIOT_EXT_MODEL_ENABLED 1
+#define CONFIG_EZIOT_EXT_OTA_ENABLED 1
+#define CONFIG_EZIOT_COMPONENT_CJSON_ENABLE 1
+#define CONFIG_EZIOT_COMPONENT_MBEDTLS_ENABLED 1
+#define CONFIG_EZIOT_COMPONENT_MQTT_ENABLE 1
+#define CONFIG_EZIOT_COMPONENT_UTEST_ENABLE 1
+#define CONFIG_EZIOT_COMPONENT_EZXML_ENABLE 1
+#define CONFIG_EZIOT_UNIT_TEST_ENABLE 1
+#define CONFIG_EZIOT_UNIT_TEST_REPORT_LOGLVL 2
+#define CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL 0
+#define CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS 10
+#define CONFIG_EZIOT_UNIT_TEST_CLOUD_HOST "devcn.eziot.com"
+#define CONFIG_EZIOT_UNIT_TEST_CLOUD_PORT 8666
+#define CONFIG_EZIOT_UNIT_TEST_DEV_AUTH_MODE 1
+#define CONFIG_EZIOT_UNIT_TEST_WIFI_SSID "Lee"
+#define CONFIG_EZIOT_UNIT_TEST_WIFI_PASSWORD "12345678"
+```
+
+### 6. 结构体
+
+结构体后面加上***“_t”***后缀，并在每个参数后加上详细注释
+
+```c
+typedef struct  
+{
+    struct  
+    {
+        uint8_t *recv_buf;      // recv_buf, the entire msg from GATT
+        uint8_t recv_len;       // recv_len, the msg length of recv_buf
+    } recv;
+    struct
+    {
+        uint8_t *rsp_buf;       // rsp_buf, used to store rsp msg generated by BLE_SDK
+        uint16_t rsp_len;       // rsp_len, the msg length of rsp_buf
+        uint8_t need_rsp;       // need rsp or not depends on BLE_SDK. if 0, ignore rsp_buf
+    } rsp;
+} ez_ble_msg_private_t;
+```
+
+### 7. 枚举
+
+枚举类型最后面加上***“_e”***后缀，枚举定义大写字母加下划线
+
+```c
+typedef enum
+{
+    EZ_BLE_CB_EVENT_AUTHED,         // occurs when auth success
+    EZ_BLE_CB_EVENT_AUTH_FAILED,    // occurs when auth failed
+
+    EZ_BLE_CB_EVENT_UPGRADING,      // occurs when ota start success
+    EZ_BLE_CB_EVENT_OTA_FAILED,     // occurs when ota failed
+    EZ_BLE_CB_EVENT_OTA_SUCC,       // occurs when ota success
+} ez_ble_cb_event_e;
+```
+
+### 8. 基础类型
+
+避免使用int、char等类型符号，使用int8_t、int32_t此类符号
+
+```c
+typedef struct  
+{
+    struct  
+    {
+        uint8_t *recv_buf;      // recv_buf, the entire msg from GATT
+        uint8_t recv_len;       // recv_len, the msg length of recv_buf
+    } recv;
+    struct
+    {
+        uint8_t *rsp_buf;       // rsp_buf, used to store rsp msg generated by BLE_SDK
+        uint16_t rsp_len;       // rsp_len, the msg length of rsp_buf
+        uint8_t need_rsp;       // need rsp or not depends on BLE_SDK. if 0, ignore rsp_buf
+    } rsp;
+} ez_ble_msg_private_t;
+```
+
+## 三、质量规范
+
+### 1. 头文件定义
+
+C语言头文件为了避免多次重复包含，需要定义一个符号。这个符号的定义形式请采用如下的风格：
 
 ```c
     #ifndef __FILE_H__
@@ -28,101 +229,98 @@ C语言头文件为了避免多次重复包含，需要定义一个符号。这�
     #endif
 ```
 
-即定义的符号两侧采用 "__" 以避免重名，另外也可以根据文件名中是否包含多个词语而
-采用 "_" 连接起来。
+即定义的符号两侧采用 "\_" 以避免重名，另外也可以根据文件名中是否包含多个词语而采用 "\_" 连接起来。
 
-## 4.文件头注释
+### 2. 参数校验
 
-在每个源文件文件头上，应该包括相应的版权信息，Change Log 记录：
-
-```c
-    /*
-     * File      : rtthread.h
-     * This file is part of RT-Thread RTOS
-     * COPYRIGHT (C) 2006 - 2012, RT-Thread Development Team
-     *
-     *  This program is free software; you can redistribute it and/or modify
-     *  it under the terms of the GNU General Public License as published by
-     *  the Free Software Foundation; either version 2 of the License, or
-     *  (at your option) any later version.
-     *
-     *  This program is distributed in the hope that it will be useful,
-     *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-     *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     *  GNU General Public License for more details.
-     *
-     *  You should have received a copy of the GNU General Public License along
-     *  with this program; if not, write to the Free Software Foundation, Inc.,
-     *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-     *
-     * Change Logs:
-     * Date           Author       Notes
-     * 2006-03-18     Bernard      the first version
-     * 2006-04-26     Bernard      add semaphore APIs
-     * ...
-     */
-```
-
-例如采用如上的形式。
-
-## 5.结构体定义
-
-结构体名称请使用小写英文名的形式，单词与单词之间采用 "_" 连接，例如：
+检查入参的有效性，如指针判空等。
 
 ```c
-    struct rt_list_node
+int32_t fun_a(char *str)
+{
+    if (NULL == str)
     {
-        struct rt_list_node *next;
-        struct rt_list_node *prev;
-    };
+        /*异常处理*/
+    }
+}
 ```
 
-其中，"{"，"}" 独立占用一行，后面的成员定义使用缩进的方式定义。
+为避免代码过于繁琐，内部static类函数，可在保证无误的情况下，不做指针判空。
 
-结构体等的类型定义请以结构体名称加上 "_t" 的形式作为名称，例如：
+### 3. 函数返回值检验
+
+- 函数调用若存在返回值，则必须进行校验
+
+  ```c
+  {
+      int32_t ret = fun_a();
+      if (/*返回值条件*/)
+      {
+          /*返回值处理逻辑*/
+      }
+  }
+  ```
+
+- malloc申请内存，必须判断返回指针的有效性
+
+  ```c
+  	char *buf = (char *)malloc(100);
+  	if (NULL == buf)
+      {
+          /*malloc失败异常处理*/
+      }
+  ```
+
+### 4. 字节对齐
+
+结构体字段定义保持4字节对齐，不足的用res补齐
 
 ```c
-    typedef struct rt_list_node rt_list_t;
+    typedef struct
+    {
+        char ssid[32+1];        // 设备连接的wifi ssid
+        char password[64+1];    // 设备连接的wifi password
+        
+        char cc[4];             //res换成国家码cc
+        char res[2];
+        char token[128];        // app端校验的token
+    
+        char domain[128];       // 设备注册平台地址;
+        char device_id[32];     // 设备uuid，可选配置
+        int err_code;           // wifi配置错误码
+    } ez_iot_ap_wifi_info_t;
 ```
 
-因为内核中对象引用方便的缘故，采用了对象内核指针作为类型定义的形式，例如：
+### 5. 初始化
 
-```c
-    typedef struct rt_timer* rt_timer_t;
-```
+- 所有的变量都必须进行初始化
 
-## 6.宏定义
+- memset初始化变量时，大小必须用sizeof，禁止直接使用数字
 
-在RT-Thread中，请使用大写英文名称作为宏定义，单词之间使用 "_" 连接，例如：
+  ```c
+  struct_a_t st_a = {0};
+  memset(&st_a, 0, sizeof(st_a));
+  ```
 
-```c
-    #define RT_TRUE                         1
-```
+### 6. 函数规范
 
-## 7.函数名称、声明
+- 函数长度建议不超过100行
+- 函数体中不允许出现三层以上if-else嵌套或for循环嵌套
 
-函数名称请使用小写英文的形式，单词之间使用 "_" 连接。提供给上层应用使用的 API
-接口，必须在相应的头文件中声明；如果函数入口参数是空，必须使用 void 作为入口参
-数，例如：
+### 7. 全局变量
 
-```c
-    rt_thread_t rt_thread_self(void);
-```
+- 不允许出现跨文件或模块的全局变量
+- 全局变量要加static修饰，只在当前文件生效。若需要跨文件使用，则需要用api封装返回。
 
-## 8.注释编写
 
-请使用英文做为注释，使用中文注释将意味着在编写代码时需要来回不停的切换中英文输
-入法从而打断编写代码的思路。并且使用英文注释也能够比较好的与中国以外的技术者进
-行交流。
 
-源代码的注释不应该过多，更多的说明应该是代码做了什么，仅当个别关键点才需要一些
-相应提示性的注释以解释一段复杂的算法它是如何工作的。对语句的注释只能写在它的上
-方或右方，其他位置都是非法的。
+## 四、 排版规范
 
-## 9.缩进及分行
+### 1. 缩进及分行
 
-缩进请采用 4 个空格的方式。如果没有什么特殊意义，请在 "{" 后进行分行，并在下一
-行都采用缩进的方式，例如：
+- 缩进请采用 4 个空格的方式
+
+  如果没有什么特殊意义，请在 "{" 后进行分行，并在下一行都采用缩进的方式，例如：
 
 ```c
     if (condition)
@@ -131,8 +329,8 @@ C语言头文件为了避免多次重复包含，需要定义一个符号。这�
     }
 ```
 
-唯一的例外是 swtich 语句，switch-case 语句采用 case 语句与 swtich 对齐的方式，
-例如：
+​      唯一的例外是 swtich 语句，switch-case 语句采用 case 语句与 swtich 对齐的方式，
+​      例如：
 
 ```c
     switch (value)
@@ -142,11 +340,35 @@ C语言头文件为了避免多次重复包含，需要定义一个符号。这�
     }
 ```
 
-case 语句与前面的 switch 语句对齐，后续的语句则采用缩进的方式。
+​	case 语句与前面的 switch 语句对齐，后续的语句则采用缩进的方式。
 
-分行上，如果没有什么特殊考虑，请**不要在代码中连续使用两个以上的空行**。
+- **不要在代码中连续使用两个以上的空行**
 
-## 10.大括号与空格
+- 不允许多个短语句写在同一行中，即一行只允许写一条语句
+
+  ```c
+  /*不允许的情况*/
+  {
+      char *buf = NULL;
+      if (NULL == (buf = malloc(100)))
+      {
+          /*异常处理*/
+      }
+  }
+  
+  /*正确做法*/
+  {
+      char *buf = malloc(100);
+      if (NULL == buf)
+      {
+          /*异常处理*/
+      }
+  }
+  ```
+
+- **if、for、do、while、case、switch、default等语句独自占一行，且if、for、do、while等语句的执行语句部分无论多少都要加括号{}**
+
+### 2. 大括号与空格
 
 从代码阅读角度，建议每个大括号单独占用一行，而不是跟在语句的后面，例如：
 
@@ -173,8 +395,7 @@ case 语句与前面的 switch 语句对齐，后续的语句则采用缩进的�
     }
 ```
 
-建议在括号前留出一个空格(涉及的包括 if、for、while、swtich 语句)，而运算表达式
-中，运算符与字符串间留一个空格。另外，不要在括号的表达式两侧留空格，例如：
+建议在括号前留出一个空格(涉及的包括 if、for、while、swtich 语句)，而运算表达式中，运算符与字符串间留一个空格。另外，不要在括号的表达式两侧留空格，例如：
 
 ```c
     if ( x <= y )
@@ -183,66 +404,41 @@ case 语句与前面的 switch 语句对齐，后续的语句则采用缩进的�
     }
 ```
 
-这样括号内两侧的空格是不允许的。
+这样括号内两侧的空格是**不允许**的。
 
-## 11.trace、log信息
+### 3.使用astyle自动格式化代码
 
-在 RT-Thread 中，普遍使用的 log 方式是 rt_kprintf。rt_kprintf 在 RT-Thread 被实
-现成一个采用轮询、非中断方式的字串输出，能够适合于在中断这类"即时"显示日志的场
-合。因为这种轮询方式的存在，也必然会影响到日志输出的时序关系。
-
-建议在代码中不要频繁的使用 rt_kprintf 作为日志输出，除非你真正的明白，你的代码
-运行占用的时间多一些也没什么关系。
-
-日志输出应该被设计成正常情况下是关闭状态(例如通过一个变量或宏就能够开启)，并且
-当真正输出日志时，日志是易懂易定位问题的方式。"天书式"的日志系统是糟糕的，不合
-理的。
-
-## 12.函数
-
-在内核编程中，函数应该尽量精简，仅完成相对独立的简单功能。函数的实现不应该太长
-，函数实现太长，应该反思能够如何修改(或拆分)使得函数更为精简、易懂。
-
-## 13.对象
-
-RT-Thread 内核采用了 C 语言对象化技术，命名表现形式是：对象名结构体表示类定义、
-对象名 + 动词短语形式表示类方法，例如：
-
-```c
-    struct rt_timer
-    {
-        struct rt_object parent;
-        /* other fields */
-    };
-    typedef struct rt_timer* rt_timer_t;
+```
+参数：--style=allman
+      --indent=spaces=4
+      --pad-oper
+      --pad-header
+      --unpad-paren
+      --suffix=none
+      --align-pointer=name
+      --lineend=linux
+      --convert-tabs
+      --verbose
 ```
 
-结构体定义 rt_timer 代表了 timer 对象的类定义；
+
+
+## 五、 日志规范
+
+### 1. 日志打印
+
+ez_iot_os中，有统一的日志打印接口，如下：
 
 ```c
-    rt_timer_t rt_timer_create(const char* name,
-        void (*timeout)(void* parameter), void* parameter,
-        rt_tick_t time, rt_uint8_t flag);
-    rt_err_t rt_timer_delete(rt_timer_t timer);
-    rt_err_t rt_timer_start(rt_timer_t timer);
-    rt_err_t rt_timer_stop(rt_timer_t timer);
+ez_log_a(tag, ...) ///< 致命错误，导致整个程序无法继续运行
+ez_log_e(tag, ...) ///< 某个业务出错，不影响其他业务
+ez_log_w(tag, ...) ///< 打印业务过程中必要的关键信息，尽量简短（WARN<=会记入文件）
+ez_log_i(tag, ...) ///< 较详细的信息,一般用于输出某些变量值（不允许刷屏）
+ez_log_d(tag, ...) ///< 更为详细的信息，每行带有行号，（不允许刷屏）
+ez_log_v(tag, ...) ///< 不限制打印，每行带有行号，默认不开启，用于追踪流程。（允许刷屏）
+
+FUNC_IN(tag)       ///< 记录追踪对外接口调用流程，打印等级为ez_log_v
+FUNC_OUT(tag)      ///< 记录追踪对外接口调用流程，打印等级为ez_log_v
+FUNC_OUT_RV(tag)   ///< 记录追踪对外接口调用流程，带返回值，打印等级为ez_log_v
 ```
 
-rt_timer + 动词短语的形式表示能够应用于 timer 对象的方法。
-
-在创建一个新的对象时，应该思考好，对象的内存操作处理：是否允许一个静态对象存在
-，或仅仅支持从堆中动态分配的对象。
-
-## 14. 用 astyle 自动格式化代码
-
-    参数：--style=allman
-          --indent=spaces=4
-          --indent-preproc-block
-          --pad-oper
-          --pad-header
-          --unpad-paren
-          --suffix=none
-          --align-pointer=name
-          --lineend=linux
-          --convert-tabs
-          --verbose
