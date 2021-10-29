@@ -135,14 +135,14 @@ extern void destroy_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic *ptr_inner_cb
 		if (NULL != ack_ctx)
 		{
 			if (NULL != ack_ctx->externel_ctx)
-				ez_free(ack_ctx->externel_ctx);
+				ezos_free(ack_ctx->externel_ctx);
 
-			ez_free(ack_ctx);
+			ezos_free(ack_ctx);
 		}
 
 		if (NULL != ack_ctx_v3)
 		{
-			ez_free(ack_ctx_v3);
+			ezos_free(ack_ctx_v3);
 		}
 		
 	} while (0);
@@ -151,16 +151,16 @@ extern void destroy_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic *ptr_inner_cb
 	{
 		if (NULL != ptr_inner_cb_notic->cb_event.event_context)
 		{
-			ez_free(ptr_inner_cb_notic->cb_event.event_context);
+			ezos_free(ptr_inner_cb_notic->cb_event.event_context);
 			ptr_inner_cb_notic->cb_event.event_context = NULL;
 		}
 
-		ez_free(ptr_inner_cb_notic);
+		ezos_free(ptr_inner_cb_notic);
 	}
 }
 
 /*****************
-ezdev_sdk_kernel_error pop_queue_submsg(ezdev_sdk_kernel_submsg** submsg)
+ez_sdk_error pop_queue_submsg(ezdev_sdk_kernel_submsg** submsg)
 {
 	if (g_ezdev_sdk_kernel_queue.submsg_queque_head == NULL)
 	{
@@ -185,14 +185,14 @@ ezdev_sdk_kernel_error pop_queue_submsg(ezdev_sdk_kernel_submsg** submsg)
 	return ezdev_sdk_kernel_succ;
 }
 
-ezdev_sdk_kernel_error push_queue_submsg(ezdev_sdk_kernel_submsg* submsg)
+ez_sdk_error push_queue_submsg(ezdev_sdk_kernel_submsg* submsg)
 {
 	ezdev_sdk_kernel_submsg_queque* submsg_queque_element = NULL;
 	if (g_ezdev_sdk_kernel_queue.submsg_size >= g_ezdev_sdk_kernel_queue.submsg_maxsize)
 	{
 		return ezdev_sdk_kernel_queue_full;
 	}
-	submsg_queque_element = (ezdev_sdk_kernel_submsg_queque*)ez_malloc(sizeof(ezdev_sdk_kernel_submsg_queque);
+	submsg_queque_element = (ezdev_sdk_kernel_submsg_queque*)ezos_malloc(sizeof(ezdev_sdk_kernel_submsg_queque);
 	if (submsg_queque_element == NULL)
 	{
 		return ezdev_sdk_kernel_malloc_error;

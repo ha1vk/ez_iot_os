@@ -15,11 +15,11 @@
 #define H_EZDEV_SDK_KERNEL_STRUCT_H_
 
 #include "base_typedef.h"
-#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_error.h"
 #include "mkernel_internal_error.h"
 #include "ez_sdk_api_struct.h"
-#include "osal_time.h"
-#include "osal_thread.h"
+#include "ezos_time.h"
+#include "ezos_thread.h"
 
 
 /**
@@ -92,13 +92,11 @@ typedef struct
     int  (*net_work_write)(int socket_fd, unsigned char *write_buf, EZDEV_SDK_INT32 write_buf_size, EZDEV_SDK_INT32 write_timeout_ms, EZDEV_SDK_INT32 *real_write_buf_size);
     void (*net_work_disconnect)(int socket_fd);
 
-    int (*time_get_clock)(osal_timespec_t *clock);
+    int (*time_get_clock)(ezos_timespec_t *clock);
     void (*time_delay)(unsigned int time_ms);
 
 	void (*key_value_load)(sdk_keyvalue_type valuetype, unsigned char* keyvalue, EZDEV_SDK_INT32 keyvalue_maxsize);						///<	读信息的函数，必须处理secretkey的读操作
 	EZDEV_SDK_INT32 (*key_value_save)(sdk_keyvalue_type valuetype, unsigned char* keyvalue, EZDEV_SDK_INT32 keyvalue_size);				///<	写信息的函数，必须处理secretkey的写操作
-	EZDEV_SDK_INT32 (*curing_data_load)(sdk_curingdata_type valuetype, unsigned char* keyvalue, EZDEV_SDK_INT32 *keyvalue_maxsize);		///<    读信息的函数，必须处理secretkey的读操作
-	EZDEV_SDK_INT32 (*curing_data_save)(sdk_curingdata_type valuetype, unsigned char* keyvalue, EZDEV_SDK_INT32 keyvalue_size);			///<	写信息的函数，必须处理secretkey的写操作
 
 	ez_mutex_t (*thread_mutex_create)();
 	int (*thread_mutex_destroy)(ez_mutex_t ptr_mutex);

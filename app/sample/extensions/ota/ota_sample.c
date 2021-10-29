@@ -19,12 +19,12 @@
 #include <unistd.h>
 #include <signal.h>
 #include <assert.h>
-#include "osal_file.h"
-#include "osal_io.h"
-#include "osal_mem.h"
-#include "osal_network.h"
-#include "osal_thread.h"
-#include "osal_time.h"
+#include "ezos_file.h"
+#include "ezos_io.h"
+#include "ezos_mem.h"
+#include "ezos_network.h"
+#include "ezos_thread.h"
+#include "ezos_time.h"
 #include "ez_sdk_log.h"
 
 #include "ez_sdk_ota.h"
@@ -192,9 +192,9 @@ static void ota_process_report(void* arg)
         }
         percent += 5;
         //按照下发的间隔上报
-        ez_delay_ms(g_progress_interval*1000);
+        ezos_delay_ms(g_progress_interval*1000);
     }
-    ez_delay_ms(5000);
+    ezos_delay_ms(5000);
     ez_iot_ota_status_succ(&res, (int8_t*)pmodule);
    
 }
@@ -206,14 +206,14 @@ static int  ota_sample_progress_report()
     ez_log_i(TAG_APP,"-------------progress_report report ----------\n");
     memset(&task_para, 0, sizeof(ez_task_init_parm));
     task_para.task_fun = ota_process_report;
-    ez_snprintf(task_para.task_name, 18, "ota_process_report");
+    ezos_snprintf(task_para.task_name, 18, "ota_process_report");
     task_para.task_arg = NULL;
-    g_ota_thread = ez_thread_create(&task_para);
+    g_ota_thread = ezos_thread_create(&task_para);
     if (g_ota_thread == NULL){
         ez_log_e(TAG_APP,"test ota_start_report task create error\n");
         return -1;
     }
-    ez_thread_detach(g_ota_thread);
+    ezos_thread_detach(g_ota_thread);
 
     return 0;
 }
@@ -249,7 +249,7 @@ int ota_sample_download_file(ota_upgrade_info_t* pupgrade_info)
     {
         download_info.total_size = pupgrade_info->pota_files[0].size;
 
-        ez_snprintf((char*)download_info.url, sizeof(download_info.url), "https://%s", (char*)pupgrade_info->pota_files[0].url); 
+        ezos_snprintf((char*)download_info.url, sizeof(download_info.url), "https://%s", (char*)pupgrade_info->pota_files[0].url); 
         ez_log_i(TAG_APP,"url:%s \n",(char*)download_info.url);
         strncpy((char*)download_info.digest, (char*)pupgrade_info->pota_files[0].digest, sizeof(download_info.digest) -1); 
         ez_iot_ota_download(&download_info,file_cb, notify, NULL);

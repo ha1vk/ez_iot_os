@@ -28,7 +28,7 @@
 #include "ezdev_sdk_kernel_event.h"
 #include "access_domain_bus.h"
 #include "utils.h"
-#include "osal_mem.h"
+#include "ezos_mem.h"
 
 EXTERN_QUEUE_FUN(submsg)
 EXTERN_QUEUE_FUN(pubmsg_exchange)
@@ -173,8 +173,8 @@ static mkernel_internal_error serialize_lightreginfo(ezdev_sdk_kernel *sdk_kerne
 		}
 		jsonstring_len = strlen(lightreg_jsstr);
 		jsonstring_len_padding = calculate_padding_len(jsonstring_len);
-		input_buf = (unsigned char *)ez_malloc(jsonstring_len_padding);
-		enc_output_buf = (unsigned char *)ez_malloc(jsonstring_len_padding);
+		input_buf = (unsigned char *)ezos_malloc(jsonstring_len_padding);
+		enc_output_buf = (unsigned char *)ezos_malloc(jsonstring_len_padding);
 		if (enc_output_buf == NULL)
 		{
 			sdk_error = mkernel_internal_malloc_error;
@@ -183,7 +183,7 @@ static mkernel_internal_error serialize_lightreginfo(ezdev_sdk_kernel *sdk_kerne
 
 		if (input_buf == NULL)
 		{
-			ez_free(enc_output_buf);
+			ezos_free(enc_output_buf);
 			enc_output_buf = NULL;
 			sdk_error = mkernel_internal_malloc_error;
 			break;
@@ -194,7 +194,7 @@ static mkernel_internal_error serialize_lightreginfo(ezdev_sdk_kernel *sdk_kerne
 		sdk_error = aes_cbc_128_enc_padding(sdk_kernel->session_key, input_buf, jsonstring_len, jsonstring_len_padding, enc_output_buf, output_length);
 		if (sdk_error != mkernel_internal_succ)
 		{
-			ez_free(enc_output_buf);
+			ezos_free(enc_output_buf);
 			enc_output_buf = NULL;
 			break;
 		}
@@ -207,12 +207,12 @@ static mkernel_internal_error serialize_lightreginfo(ezdev_sdk_kernel *sdk_kerne
 	}
 	if (lightreg_jsstr != NULL)
 	{
-		ez_free(lightreg_jsstr);
+		ezos_free(lightreg_jsstr);
 		lightreg_jsstr = NULL;
 	}
 	if (input_buf != NULL)
 	{
-		ez_free(input_buf);
+		ezos_free(input_buf);
 		input_buf = NULL;
 	}
 
@@ -269,8 +269,8 @@ static mkernel_internal_error serialize_devinfo(ezdev_sdk_kernel *sdk_kernel, un
 		}
 		devinfo_jsonstring_len = strlen(devinfo_jsonstring);
 		devinfo_jsonstring_len_padding = calculate_padding_len(devinfo_jsonstring_len);
-		input_buf = (unsigned char *)ez_malloc(devinfo_jsonstring_len_padding);
-		enc_output_buf = (unsigned char *)ez_malloc(devinfo_jsonstring_len_padding);
+		input_buf = (unsigned char *)ezos_malloc(devinfo_jsonstring_len_padding);
+		enc_output_buf = (unsigned char *)ezos_malloc(devinfo_jsonstring_len_padding);
 		if (enc_output_buf == NULL)
 		{
 			sdk_error = mkernel_internal_malloc_error;
@@ -279,7 +279,7 @@ static mkernel_internal_error serialize_devinfo(ezdev_sdk_kernel *sdk_kernel, un
 
 		if (input_buf == NULL)
 		{
-			ez_free(enc_output_buf);
+			ezos_free(enc_output_buf);
 			enc_output_buf = NULL;
 			sdk_error = mkernel_internal_malloc_error;
 			break;
@@ -294,7 +294,7 @@ static mkernel_internal_error serialize_devinfo(ezdev_sdk_kernel *sdk_kernel, un
 											enc_output_buf, output_length);
 		if (sdk_error != mkernel_internal_succ)
 		{
-			ez_free(enc_output_buf);
+			ezos_free(enc_output_buf);
 			enc_output_buf = NULL;
 			break;
 		}
@@ -308,12 +308,12 @@ static mkernel_internal_error serialize_devinfo(ezdev_sdk_kernel *sdk_kernel, un
 	}
 	if (devinfo_jsonstring != NULL)
 	{
-		ez_free(devinfo_jsonstring);
+		ezos_free(devinfo_jsonstring);
 		devinfo_jsonstring = NULL;
 	}
 	if (input_buf != NULL)
 	{
-		ez_free(input_buf);
+		ezos_free(input_buf);
 		input_buf = NULL;
 	}
 
@@ -443,11 +443,11 @@ static void handle_sub_msg_v3(ezdev_sdk_kernel_submsg_v3 *ptr_submsg)
 	{
 		if (ptr_submsg->buf != NULL)
 		{
-			ez_free(ptr_submsg->buf);
+			ezos_free(ptr_submsg->buf);
 			ptr_submsg->buf = NULL;
 		}
 
-		ez_free(ptr_submsg);
+		ezos_free(ptr_submsg);
 		ptr_submsg = NULL;
 	}
 }
@@ -493,11 +493,11 @@ static void handle_sub_msg(ezdev_sdk_kernel_submsg *ptr_submsg)
 	{
 		if (ptr_submsg->buf != NULL)
 		{
-			ez_free(ptr_submsg->buf);
+			ezos_free(ptr_submsg->buf);
 			ptr_submsg->buf = NULL;
 		}
 
-		ez_free(ptr_submsg);
+		ezos_free(ptr_submsg);
 		ptr_submsg = NULL;
 	}
 }
@@ -565,7 +565,7 @@ static void das_message_receive_v3(MessageData *msg_data)
 	memset(dev_serial, 0, ezdev_sdk_devserial_maxlen);
 	do
 	{
-		ptr_submsg = (ezdev_sdk_kernel_submsg_v3 *)ez_malloc(sizeof(ezdev_sdk_kernel_submsg_v3));
+		ptr_submsg = (ezdev_sdk_kernel_submsg_v3 *)ezos_malloc(sizeof(ezdev_sdk_kernel_submsg_v3));
 		if (ptr_submsg == NULL)
 		{
 			ezdev_sdk_kernel_log_debug(mkernel_internal_malloc_error, 0, "das_message_receive_v3 mallc submsg error ");
@@ -613,7 +613,7 @@ static void das_message_receive_v3(MessageData *msg_data)
 		   }
         }
 		//将整个报文解密
-		output_buf = (unsigned char *)ez_malloc(msg_data->message->payloadlen);
+		output_buf = (unsigned char *)ezos_malloc(msg_data->message->payloadlen);
 		if (NULL == output_buf)
 		{
 			ezdev_sdk_kernel_log_debug(mkernel_internal_malloc_error, 0, "receive_v3 malloc err,module:%s\n", ptr_submsg->module);
@@ -656,7 +656,7 @@ static void das_message_receive_v3(MessageData *msg_data)
 			* \brief   数据为空
 			*/
 		    //数据为空包的时候不能直接返回空指针,这里malloc一个字节的空间
-			ptr_submsg->buf = ez_malloc(sizeof(char));
+			ptr_submsg->buf = ezos_malloc(sizeof(char));
 			if(NULL == ptr_submsg->buf)
 			{  
 				ezdev_sdk_kernel_log_error(mkernel_internal_malloc_error, 0, "parse das msg context is empty,malloc err");
@@ -667,7 +667,7 @@ static void das_message_receive_v3(MessageData *msg_data)
 			ptr_submsg->buf_len = sizeof(char);
 			ezdev_sdk_kernel_log_debug(sdk_error, 0, "Recv v3 empty context  module:%s, seq:%d", ptr_submsg->module, ptr_submsg->msg_seq);
 
-			ez_free(output_buf);
+			ezos_free(output_buf);
 			output_buf = NULL;
 		}
 		ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "das_message_receive_v3 payloadlen:%lu, seq:%d", msg_data->message->payloadlen, ptr_submsg->msg_seq);
@@ -684,12 +684,12 @@ static void das_message_receive_v3(MessageData *msg_data)
 
 	if (ptr_submsg != NULL)
 	{
-		ez_free(ptr_submsg);
+		ezos_free(ptr_submsg);
 		ptr_submsg = NULL;
 	}
 	if (output_buf != NULL)
 	{
-		ez_free(output_buf);
+		ezos_free(output_buf);
 		output_buf = NULL;
 	}
 }
@@ -697,7 +697,7 @@ static void das_message_receive_v3(MessageData *msg_data)
 
 void das_message_receive_ex(MessageData* msg_data)
 {
-    ezdev_sdk_kernel_error sdk_error = ezdev_sdk_kernel_succ;
+    ez_sdk_error sdk_error = ezdev_sdk_kernel_succ;
     ezdev_sdk_kernel_submsg* ptr_submsg = NULL;
     EZDEV_SDK_INT32 division_num = 0;
     EZDEV_SDK_UINT16 common_len = 0;
@@ -716,7 +716,7 @@ void das_message_receive_ex(MessageData* msg_data)
 	{
 		goto fail;
 	}
-    ptr_submsg = (ezdev_sdk_kernel_submsg*)ez_malloc(sizeof(ezdev_sdk_kernel_submsg));
+    ptr_submsg = (ezdev_sdk_kernel_submsg*)ezos_malloc(sizeof(ezdev_sdk_kernel_submsg));
     if (ptr_submsg == NULL)
     {
         ezdev_sdk_kernel_log_debug(ezdev_sdk_kernel_memory, 0, "das_message_receive_ex mallc submsg error ");
@@ -740,7 +740,7 @@ void das_message_receive_ex(MessageData* msg_data)
 		sdk_error = ezdev_sdk_kernel_data_len_range;
 		goto fail;
 	}
-	output_buf = (unsigned char *)ez_malloc(msg_data->message->payloadlen);
+	output_buf = (unsigned char *)ezos_malloc(msg_data->message->payloadlen);
 	if ( NULL == output_buf )
 	{
 		ezdev_sdk_kernel_log_debug(ezdev_sdk_kernel_memory, 0, "das_message_receive_ex malloc error,domain:%d, cmd:%d, lenstring len:%d \n", ptr_submsg->msg_domain_id, ptr_submsg->msg_command_id, msg_data->topicName->lenstring.len);
@@ -782,7 +782,7 @@ void das_message_receive_ex(MessageData* msg_data)
 		ptr_submsg->buf = NULL;
 		ptr_submsg->buf_len = 0;
 
-		ez_free(output_buf);
+		ezos_free(output_buf);
 		output_buf = NULL;
 	}
 	ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "das_message_receive_ex msg_topic:%s, seq:%d\n", msg_topic, ptr_submsg->msg_seq);
@@ -809,12 +809,12 @@ fail:
 
 	if (ptr_submsg != NULL)
 	{
-		ez_free(ptr_submsg);
+		ezos_free(ptr_submsg);
 		ptr_submsg = NULL;
 	}
 	if (output_buf != NULL)
 	{
-		ez_free(output_buf);
+		ezos_free(output_buf);
 		output_buf = NULL;
 	}
 }
@@ -840,7 +840,7 @@ static void das_message_receive(MessageData *msg_data)
 	memset(dev_serial, 0, ezdev_sdk_devserial_maxlen);
 	do
 	{
-		ptr_submsg = (ezdev_sdk_kernel_submsg *)ez_malloc(sizeof(ezdev_sdk_kernel_submsg));
+		ptr_submsg = (ezdev_sdk_kernel_submsg *)ezos_malloc(sizeof(ezdev_sdk_kernel_submsg));
 		if (ptr_submsg == NULL)
 		{
 			ezdev_sdk_kernel_log_debug(mkernel_internal_malloc_error, 0, "das_message_receive mallc submsg error ");
@@ -868,7 +868,7 @@ static void das_message_receive(MessageData *msg_data)
 		/**
 		 * \brief   将整个报文解密
 		 */
-		output_buf = (unsigned char *)ez_malloc(msg_data->message->payloadlen);
+		output_buf = (unsigned char *)ezos_malloc(msg_data->message->payloadlen);
 		if (NULL == output_buf)
 		{
 			ezdev_sdk_kernel_log_debug(mkernel_internal_malloc_error, 0, "das_message_receive mallc error,domain:%d, cmd:%d, len:%d\n", ptr_submsg->msg_domain_id, ptr_submsg->msg_command_id, msg_data->topicName->lenstring.len);
@@ -907,7 +907,7 @@ static void das_message_receive(MessageData *msg_data)
 		else
 		{
 			//数据为空包的时候不能直接返回空指针,这里malloc一个字节的空间
-			ptr_submsg->buf = ez_malloc(sizeof(char));
+			ptr_submsg->buf = ezos_malloc(sizeof(char));
 			if(NULL == ptr_submsg->buf)
 			{  
 				ezdev_sdk_kernel_log_error(mkernel_internal_malloc_error, 0, "parse das msg context is empty,malloc err\n");
@@ -918,7 +918,7 @@ static void das_message_receive(MessageData *msg_data)
 			ptr_submsg->buf_len = sizeof(char);
 			ezdev_sdk_kernel_log_debug(sdk_error, 0, "Recv v2 empty context, domain_id:%d, cmd_id:%d, seq:%d\n", ptr_submsg->msg_domain_id, ptr_submsg->msg_command_id, ptr_submsg->msg_seq);
 
-			ez_free(output_buf);
+			ezos_free(output_buf);
 			output_buf = NULL;
 		}
 		ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "das_message_receive msg_topic:%s, seq:%d\n", msg_topic, ptr_submsg->msg_seq);
@@ -935,12 +935,12 @@ static void das_message_receive(MessageData *msg_data)
 
 	if (ptr_submsg != NULL)
 	{
-		ez_free(ptr_submsg);
+		ezos_free(ptr_submsg);
 		ptr_submsg = NULL;
 	}
 	if (output_buf != NULL)
 	{
-		ez_free(output_buf);
+		ezos_free(output_buf);
 		output_buf = NULL;
 	}
 }
@@ -994,8 +994,8 @@ static mkernel_internal_error das_send_pubmsg_v3(ezdev_sdk_kernel *sdk_kernel, e
 			break;
 		}
 		payload_buf_len = calculate_padding_len(common_output_buf_len + 2 + pubmsg->msg_body_len);
-		payload_buf = (unsigned char *)ez_malloc(payload_buf_len);
-		payload_buf_enc = (unsigned char *)ez_malloc(payload_buf_len);
+		payload_buf = (unsigned char *)ezos_malloc(payload_buf_len);
+		payload_buf_enc = (unsigned char *)ezos_malloc(payload_buf_len);
 		if (payload_buf == NULL || payload_buf_enc == NULL)
 		{
 			ezdev_sdk_kernel_log_error(mkernel_internal_malloc_error, 0, "malloc payload len error\n");
@@ -1036,17 +1036,17 @@ static mkernel_internal_error das_send_pubmsg_v3(ezdev_sdk_kernel *sdk_kernel, e
     
 	if (common_output_buf)
 	{
-		ez_free(common_output_buf);
+		ezos_free(common_output_buf);
 		common_output_buf = NULL;
 	}
 	if (payload_buf)
 	{
-		ez_free(payload_buf);
+		ezos_free(payload_buf);
 		payload_buf = NULL;
 	}
 	if (payload_buf_enc)
 	{
-		ez_free(payload_buf_enc);
+		ezos_free(payload_buf_enc);
 		payload_buf_enc = NULL;
 	}
 	return sdk_error;
@@ -1094,8 +1094,8 @@ static mkernel_internal_error das_send_pubmsg(ezdev_sdk_kernel *sdk_kernel, ezde
 		}
 		payload_buf_len = calculate_padding_len(common_output_buf_len + 2 + pubmsg->msg_body_len);
 		// = common_output_buf_len + 2 + pubmsg->msg_body_len;
-		payload_buf = (unsigned char *)ez_malloc(payload_buf_len);
-		payload_buf_enc = (unsigned char *)ez_malloc(payload_buf_len);
+		payload_buf = (unsigned char *)ezos_malloc(payload_buf_len);
+		payload_buf_enc = (unsigned char *)ezos_malloc(payload_buf_len);
 		if (payload_buf == NULL || payload_buf_enc == NULL)
 		{
 			ezdev_sdk_kernel_log_error(mkernel_internal_malloc_error, 0, "malloc payload error\n");
@@ -1139,17 +1139,17 @@ static mkernel_internal_error das_send_pubmsg(ezdev_sdk_kernel *sdk_kernel, ezde
 
 	if(NULL != common_output_buf)
 	{
-		ez_free(common_output_buf);
+		ezos_free(common_output_buf);
 		common_output_buf = NULL;
 	}
 	if(NULL != payload_buf)
 	{
-		ez_free(payload_buf);
+		ezos_free(payload_buf);
 		payload_buf = NULL;
 	}
 	if(NULL != payload_buf_enc)
 	{
-		ez_free(payload_buf_enc);
+		ezos_free(payload_buf_enc);
 		payload_buf_enc = NULL;
 	}
 	return sdk_error;
@@ -1204,9 +1204,9 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
             ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err failed,module:%s ,msg_type:%s\n",context.module, context.msg_type);
 		}
 		if (ptr_pubmsg_exchange->msg_conntext_v3.msg_body)
-			ez_free(ptr_pubmsg_exchange->msg_conntext_v3.msg_body);
+			ezos_free(ptr_pubmsg_exchange->msg_conntext_v3.msg_body);
 
-		ez_free(ptr_pubmsg_exchange);
+		ezos_free(ptr_pubmsg_exchange);
 	} while (0);
 
 	return sdk_error;	
@@ -1262,13 +1262,13 @@ static mkernel_internal_error send_message_to_das_v2(ezdev_sdk_kernel *sdk_kerne
 		if (mkernel_internal_succ != broadcast_runtime_err(TAG_MSG_ACK, mkiE2ezE(sdk_error), &context, sizeof(context)))
 		{
 			if (NULL == ptr_pubmsg_exchange->msg_conntext.externel_ctx)
-				ez_free(ptr_pubmsg_exchange->msg_conntext.externel_ctx);
+				ezos_free(ptr_pubmsg_exchange->msg_conntext.externel_ctx);
 		}
 
 		if (ptr_pubmsg_exchange->msg_conntext.msg_body)
-			ez_free(ptr_pubmsg_exchange->msg_conntext.msg_body);
+			ezos_free(ptr_pubmsg_exchange->msg_conntext.msg_body);
 
-		ez_free(ptr_pubmsg_exchange);
+		ezos_free(ptr_pubmsg_exchange);
 	} while (0);
 
 	return sdk_error;
@@ -1403,7 +1403,7 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
 
 	if (will_message != NULL)
 	{
-		ez_free(will_message);
+		ezos_free(will_message);
 		will_message = NULL;
 	}
 

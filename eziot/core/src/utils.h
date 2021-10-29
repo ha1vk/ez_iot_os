@@ -14,7 +14,7 @@
 #ifndef _EZDEVSDK_UTILS_H
 #define _EZDEVSDK_UTILS_H
 
-#include "osal_time.h"
+#include "ezos_time.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -86,7 +86,7 @@ int get_module_build_date(char* pbuf);
  * @param time_ms 
  * @return char 
  */
-char ezcore_time_isexpired_bydiff(osal_timespec_t *assign_timer, unsigned int time_ms);
+char ezcore_time_isexpired_bydiff(ezos_timespec_t *assign_timer, unsigned int time_ms);
 
 /**
  * @brief 
@@ -94,7 +94,7 @@ char ezcore_time_isexpired_bydiff(osal_timespec_t *assign_timer, unsigned int ti
  * @param assign_timer 
  * @param time_count 
  */
-void ezcore_time_countdown(osal_timespec_t *assign_timer, unsigned int time_count);
+void ezcore_time_countdown(ezos_timespec_t *assign_timer, unsigned int time_count);
 
 #ifdef __cplusplus
 }

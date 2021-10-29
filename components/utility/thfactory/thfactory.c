@@ -13,9 +13,9 @@
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
-#include "osal_thread.h"
-#include "osal_time.h"
-#include "osal_mem.h"
+#include "ezos_thread.h"
+#include "ezos_time.h"
+#include "ezos_mem.h"
 
 #include <string.h>
 #include "thfactory.h"
@@ -86,7 +86,7 @@ static void jobqueue_destroy(jobqueue *jobqueue_p);
 
 thfactory_t *thfactory_new(void)
 {
-    thfactory_t *thfactory_new = (thfactory_t *)ez_malloc(sizeof(thfactory_t));
+    thfactory_t *thfactory_new = (thfactory_t *)ezos_malloc(sizeof(thfactory_t));
     if (NULL == thfactory_new)
     {
         return NULL;
@@ -107,7 +107,7 @@ thfactory_t *thfactory_new(void)
 void thfactory_del(thfactory_t *thiz)
 {
     thiz->final(thiz);
-    ez_free(thiz);
+    ezos_free(thiz);
 }
 
 /* ========================== THREADPOOL ============================ */
@@ -129,7 +129,7 @@ static int thfactory_init(thfactory_t *thiz, int num_threads, int flags, int tas
         thiz->m_num_threads_working = 0;
 
         ///< malloc任务队列
-        if (NULL == (thiz->m_jobqueue = (jobqueue *)ez_malloc(sizeof(jobqueue))))
+        if (NULL == (thiz->m_jobqueue = (jobqueue *)ezos_malloc(sizeof(jobqueue))))
         {
             err("thfactory_init(): Could not allocate memory for job queue1\n");
             break;
@@ -140,17 +140,17 @@ static int thfactory_init(thfactory_t *thiz, int num_threads, int flags, int tas
         {
             err("thfactory_init(): Could not allocate memory for job queue2\n");
             jobqueue_destroy(thiz->m_jobqueue);
-            ez_free(thiz->m_jobqueue);
+            ezos_free(thiz->m_jobqueue);
             thiz->m_jobqueue = NULL;
             break;
         }
 
         ///< malloc构造线程池
-        if (NULL == (thiz->m_threads = (void **)ez_malloc(thiz->m_max_threads * sizeof(struct thread *))))
+        if (NULL == (thiz->m_threads = (void **)ezos_malloc(thiz->m_max_threads * sizeof(struct thread *))))
         {
             err("thpool_init(): Could not allocate memory for threads\n");
             jobqueue_destroy(thiz->m_jobqueue);
-            ez_free(thiz->m_jobqueue);
+            ezos_free(thiz->m_jobqueue);
             thiz->m_jobqueue = NULL;
             break;
         }
@@ -168,11 +168,11 @@ static int thfactory_init(thfactory_t *thiz, int num_threads, int flags, int tas
             /* 等到所有线程全部启动 */
             while (thiz->m_num_threads_alive != thiz->m_max_threads)
             {
-                ez_delay_ms(1000);
+                ezos_delay_ms(1000);
             }
         }
 
-        thiz->m_thcount_lock = ez_mutex_create();
+        thiz->m_thcount_lock = ezos_mutex_create();
         if(thiz->m_thcount_lock == NULL){
             
         }
@@ -199,7 +199,7 @@ static int thfactory_add_task(thfactory_t *thiz, int (*func_ptr)(void *), void *
             break;
         }
 
-        if (NULL == (newjob = (struct job *)ez_malloc(sizeof(struct job))))
+        if (NULL == (newjob = (struct job *)ezos_malloc(sizeof(struct job))))
         {
             err("thfactory_add_task(): Could not allocate memory for new job\n");
             break;
@@ -214,7 +214,7 @@ static int thfactory_add_task(thfactory_t *thiz, int (*func_ptr)(void *), void *
         if( jobcount < 0)
         {
             err("job queue is full,release the rest job,please retry \n");
-            ez_free(newjob);
+            ezos_free(newjob);
             break;
         }
         ret = 0;
@@ -224,7 +224,7 @@ static int thfactory_add_task(thfactory_t *thiz, int (*func_ptr)(void *), void *
 
         if (jobcount > thiz->m_num_threads_alive && thiz->m_num_threads_alive < thiz->m_max_threads)
         {
-            ez_mutex_lock(thiz->m_thcount_lock);
+            ezos_mutex_lock(thiz->m_thcount_lock);
             for (n = 0; n < thiz->m_max_threads; n++)
             {
                 if (NULL == thiz->m_threads[n])
@@ -233,7 +233,7 @@ static int thfactory_add_task(thfactory_t *thiz, int (*func_ptr)(void *), void *
                     break;
                 }
             }
-            ez_mutex_unlock(thiz->m_thcount_lock);
+            ezos_mutex_unlock(thiz->m_thcount_lock);
         }
     } while (0);
 
@@ -280,14 +280,14 @@ static void thfactory_final(thfactory_t *thiz)
     /* 等待所有线程退出 */
     while (thiz->m_num_threads_alive)
     {
-        ez_delay_ms(1000);
+        ezos_delay_ms(1000);
     }
 
     /* 销毁任务队列 */
     jobqueue_destroy((jobqueue *)thiz->m_jobqueue);
-    ez_free(thiz->m_jobqueue);
+    ezos_free(thiz->m_jobqueue);
 
-    ez_free(thiz->m_threads);
+    ezos_free(thiz->m_threads);
     thiz->m_threads = NULL;
     thiz->m_jobqueue = NULL;
     thiz->m_binited = 0;
@@ -316,7 +316,7 @@ static int thread_init(thfactory_t *thfactory_p, struct thread **thread_p, int i
         return -1;
     }
 
-    *thread_p = (struct thread *)ez_malloc(sizeof(struct thread));
+    *thread_p = (struct thread *)ezos_malloc(sizeof(struct thread));
 
     if (*thread_p == NULL)
     {
@@ -332,7 +332,7 @@ static int thread_init(thfactory_t *thfactory_p, struct thread **thread_p, int i
 
     sprintf(task_para.task_name, "ezthpool-tid-%d", id);
     task_para.task_arg = (*thread_p);
-    (*thread_p)->pthread = ez_thread_create(&task_para);
+    (*thread_p)->pthread = ezos_thread_create(&task_para);
     if ((*thread_p)->pthread == NULL){
         ez_log_e(TAG_APP,"Failed to create NetCheckTask thread.\n");
         return -1;
@@ -355,9 +355,9 @@ static void thread_do(struct thread *thread_p)
     int thread_index = thread_p->id;
 
     /* 更新线程存活计数器 */
-    ez_mutex_lock(thfactory_p->m_thcount_lock);
+    ezos_mutex_lock(thfactory_p->m_thcount_lock);
     thfactory_p->m_num_threads_alive += 1;
-    ez_mutex_unlock(thfactory_p->m_thcount_lock);
+    ezos_mutex_unlock(thfactory_p->m_thcount_lock);
 
     do
     {
@@ -367,9 +367,9 @@ static void thread_do(struct thread *thread_p)
             ezsem_wait(((jobqueue *)thfactory_p->m_jobqueue)->has_jobs);
         }
 
-        ez_mutex_lock(thfactory_p->m_thcount_lock);
+        ezos_mutex_lock(thfactory_p->m_thcount_lock);
         thfactory_p->m_num_threads_working++;
-        ez_mutex_unlock(thfactory_p->m_thcount_lock);
+        ezos_mutex_unlock(thfactory_p->m_thcount_lock);
 
         /* 从任务队列中获取一个任务 */
         int (*func_buff)(void *);
@@ -380,23 +380,23 @@ static void thread_do(struct thread *thread_p)
             func_buff = job_p->function;
             arg_buff = job_p->arg;
             func_buff(arg_buff);
-            ez_free(job_p);
+            ezos_free(job_p);
         }
 
-        ez_mutex_lock(thfactory_p->m_thcount_lock);
+        ezos_mutex_lock(thfactory_p->m_thcount_lock);
         if (0 == --thfactory_p->m_num_threads_working)
         {
             
         }
-        ez_mutex_unlock(thfactory_p->m_thcount_lock);
+        ezos_mutex_unlock(thfactory_p->m_thcount_lock);
     } while (thfactory_p->m_threads_keepalive);
 
     /* 更新线程存活计数器，销毁线程上下文 */
-    ez_mutex_lock(thfactory_p->m_thcount_lock);
+    ezos_mutex_lock(thfactory_p->m_thcount_lock);
     thfactory_p->m_num_threads_alive--;
     thread_destroy(thread_p);
     thfactory_p->m_threads[thread_index] = NULL;
-    ez_mutex_unlock(thfactory_p->m_thcount_lock);
+    ezos_mutex_unlock(thfactory_p->m_thcount_lock);
 
     return NULL;
 }
@@ -404,7 +404,7 @@ static void thread_do(struct thread *thread_p)
 /* Frees a thread  */
 static void thread_destroy(thread *thread_p)
 {
-    ez_free(thread_p);
+    ezos_free(thread_p);
 }
 
 /* ============================ JOB QUEUE =========================== */
@@ -423,7 +423,7 @@ static int jobqueue_init(jobqueue *jobqueue_p, int max_job_num)
         return -1;
     }
 
-    jobqueue_p->rwmutex = ez_mutex_create();
+    jobqueue_p->rwmutex = ezos_mutex_create();
     if(jobqueue_p->rwmutex == NULL){
         
     }
@@ -446,7 +446,7 @@ static void jobqueue_clear(jobqueue *jobqueue_p)
         if (NULL != arg_free_func)
             arg_free_func(arg_p);
 
-        ez_free(job_p);
+        ezos_free(job_p);
     }
 }
 
@@ -455,13 +455,13 @@ static void jobqueue_clear(jobqueue *jobqueue_p)
 static int jobqueue_push(jobqueue *jobqueue_p, struct job *newjob)
 {
     int count = 0;
-    ez_mutex_lock(jobqueue_p->rwmutex);
+    ezos_mutex_lock(jobqueue_p->rwmutex);
     newjob->prev = NULL;
 
     if(jobqueue_p->len > jobqueue_p->max_num)
     {
         //队列已满吧,不再继续添加任务
-        ez_mutex_unlock(jobqueue_p->rwmutex);
+        ezos_mutex_unlock(jobqueue_p->rwmutex);
         return -1;
     }
     switch (jobqueue_p->len)
@@ -479,7 +479,7 @@ static int jobqueue_push(jobqueue *jobqueue_p, struct job *newjob)
     count = ++jobqueue_p->len;
 
     ezsem_post(jobqueue_p->has_jobs);
-    ez_mutex_unlock(jobqueue_p->rwmutex);
+    ezos_mutex_unlock(jobqueue_p->rwmutex);
 
     return count;
 }
@@ -490,7 +490,7 @@ static int jobqueue_push(jobqueue *jobqueue_p, struct job *newjob)
  */
 static struct job *jobqueue_pull(jobqueue *jobqueue_p)
 {
-    ez_mutex_lock(jobqueue_p->rwmutex);
+    ezos_mutex_lock(jobqueue_p->rwmutex);
     job *job_p = jobqueue_p->front;
 
     switch (jobqueue_p->len)
@@ -512,7 +512,7 @@ static struct job *jobqueue_pull(jobqueue *jobqueue_p)
         ezsem_post(jobqueue_p->has_jobs);
     }
 
-    ez_mutex_unlock(jobqueue_p->rwmutex);
+    ezos_mutex_unlock(jobqueue_p->rwmutex);
     return job_p;
 }
 

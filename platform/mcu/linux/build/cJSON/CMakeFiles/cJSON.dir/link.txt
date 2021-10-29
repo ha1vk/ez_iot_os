@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcJSON.a  CMakeFiles/cJSON.dir/src/cJSON.c.o
-/usr/bin/ranlib libcJSON.a

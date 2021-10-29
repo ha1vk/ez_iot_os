@@ -21,7 +21,7 @@
 #include "utils.h"
 #include "ezxml.h"
 #include "ase_support.h"
-#include "osal_mem.h"
+#include "ezos_mem.h"
 
 LBS_TRANSPORT_INTERFACE
 DAS_TRANSPORT_INTERFACE
@@ -145,45 +145,45 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel *sdk_kernel)
         {
             sdk_kernel->lbs_redirect_times = 1;
         }
-        else if (mkernel_internal_platform_lbs_sign_check_fail == sdk_error && !sdk_kernel->secretkey_applied)
-        {
-            EZDEV_SDK_UINT16 _interval = 30;
-            EZDEV_SDK_UINT32 _duration = 3600 * 24;
+        // else if (mkernel_internal_platform_lbs_sign_check_fail == sdk_error && !sdk_kernel->secretkey_applied)
+        // {
+        //     EZDEV_SDK_UINT16 _interval = 30;
+        //     EZDEV_SDK_UINT32 _duration = 3600 * 24;
 
-            sdk_error = cnt_state_lbs_apply_serectkey(sdk_kernel, &_interval, &_duration);
-            ezdev_sdk_kernel_log_info(sdk_error, 0, "apply_serectkey lbs return :%d, _interval:%d, _duration:%d", sdk_error, _interval, _duration);
-            if (mkernel_internal_succ == sdk_error)
-            {
-                sdk_kernel->entr_state = sdk_entrance_normal;
-                sdk_kernel->cnt_state = sdk_cnt_unredirect;
-                sdk_kernel->lbs_redirect_times = 0;
-            }
-            else
-            {
-                ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_lbs_apply_serectkey");
-                broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-                if (mkernel_internal_platform_secretkey_no_user == sdk_error)
-                {
-                    ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_invaild_authcode");
-                    broadcast_user_event(sdk_kernel_event_invaild_authcode, NULL, 0);
-                }
+        //     sdk_error = cnt_state_lbs_apply_serectkey(sdk_kernel, &_interval, &_duration);
+        //     ezdev_sdk_kernel_log_info(sdk_error, 0, "apply_serectkey lbs return :%d, _interval:%d, _duration:%d", sdk_error, _interval, _duration);
+        //     if (mkernel_internal_succ == sdk_error)
+        //     {
+        //         sdk_kernel->entr_state = sdk_entrance_normal;
+        //         sdk_kernel->cnt_state = sdk_cnt_unredirect;
+        //         sdk_kernel->lbs_redirect_times = 0;
+        //     }
+        //     else
+        //     {
+        //         ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_lbs_apply_serectkey");
+        //         broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
+        //         if (mkernel_internal_platform_secretkey_no_user == sdk_error)
+        //         {
+        //             ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_invaild_authcode");
+        //             broadcast_user_event(sdk_kernel_event_invaild_authcode, NULL, 0);
+        //         }
 
-                if (EZDEV_SDK_TRUE == sdk_kernel->secretkey_applied)
-                {
-                    sdk_kernel->entr_state = sdk_entrance_normal;
-                    sdk_kernel->cnt_state = sdk_cnt_unredirect;
-                    sdk_kernel->lbs_redirect_times = 0;
-                }
-                else
-                {
-                    sdk_kernel->entr_state = sdk_entrance_authcode_invalid;
-                    sdk_kernel->cnt_state = sdk_cnt_unredirect;
-                    sdk_kernel->lbs_redirect_times += _interval;
-                    sdk_kernel->secretkey_interval = _interval;
-                    sdk_kernel->secretkey_duration = _duration;
-                }
-            }
-        }
+        //         if (EZDEV_SDK_TRUE == sdk_kernel->secretkey_applied)
+        //         {
+        //             sdk_kernel->entr_state = sdk_entrance_normal;
+        //             sdk_kernel->cnt_state = sdk_cnt_unredirect;
+        //             sdk_kernel->lbs_redirect_times = 0;
+        //         }
+        //         else
+        //         {
+        //             sdk_kernel->entr_state = sdk_entrance_authcode_invalid;
+        //             sdk_kernel->cnt_state = sdk_cnt_unredirect;
+        //             sdk_kernel->lbs_redirect_times += _interval;
+        //             sdk_kernel->secretkey_interval = _interval;
+        //             sdk_kernel->secretkey_duration = _duration;
+        //         }
+        //     }
+        // }
         else
         {
             if (++sdk_kernel->lbs_redirect_times >= 60)
@@ -515,7 +515,7 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
         return mkernel_internal_msg_len_overrange;
     }
 
-    new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange *)ez_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange));
+    new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange *)ezos_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange));
     if (new_pubmsg_exchange == NULL)
     {
         return mkernel_internal_malloc_error;
@@ -530,10 +530,10 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
     new_pubmsg_exchange->msg_conntext.msg_command_id = pubmsg->msg_command_id;
     input_length_padding = pubmsg->msg_body_len;
 
-    new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char *)ez_malloc(input_length_padding);
+    new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char *)ezos_malloc(input_length_padding);
     if (new_pubmsg_exchange->msg_conntext.msg_body == NULL)
     {
-        ez_free(new_pubmsg_exchange);
+        ezos_free(new_pubmsg_exchange);
         new_pubmsg_exchange = NULL;
 
         ezdev_sdk_kernel_log_error(mkernel_internal_malloc_error, mkernel_internal_malloc_error, "mkernel_internal malloc input_length_padding:%d error", input_length_padding);
@@ -554,11 +554,11 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
         {
             if (new_pubmsg_exchange->msg_conntext.msg_body != NULL)
             {
-                ez_free(new_pubmsg_exchange->msg_conntext.msg_body);
+                ezos_free(new_pubmsg_exchange->msg_conntext.msg_body);
                 new_pubmsg_exchange->msg_conntext.msg_body = NULL;
             }
 
-            ez_free(new_pubmsg_exchange);
+            ezos_free(new_pubmsg_exchange);
             new_pubmsg_exchange = NULL;
         }
     }
@@ -580,7 +580,7 @@ mkernel_internal_error send_offline_msg_to_platform(EZDEV_SDK_UINT32 seq)
         return mkernel_internal_malloc_error;
     }
     ezxml_add_child(req, "DevSerial", 1);
-    ezxml_set_txt(req->child, ezdev_sdk_kernel_getdevinfo_bykey("dev_subserial"));
+    ezxml_set_txt(req->child, ez_sdk_getdevinfo_bykey("dev_subserial"));
     ezxml_add_child(req, "Authorization", 2);
 
     msg_body_offline = (unsigned char *)ezxml_toxml(req);
@@ -608,7 +608,7 @@ mkernel_internal_error send_offline_msg_to_platform(EZDEV_SDK_UINT32 seq)
         ezdev_sdk_kernel_log_info(sdk_error, sdk_error, "sdk_kernel_inner_send offline msg failed,error code:%d", sdk_error);
     }
 
-    ez_free(msg_body_offline);
+    ezos_free(msg_body_offline);
     msg_body_offline = NULL;
     ezxml_free(req);
 

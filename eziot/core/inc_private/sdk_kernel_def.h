@@ -16,7 +16,7 @@
 
 #include "base_typedef.h"
 #include "ezdev_sdk_kernel_struct.h"
-#include "osal_time.h"
+#include "ezos_time.h"
 
 #define ezdev_sdk_recv_topic_len									128		   ///<	设备SDK 一些命名的长度
 #define ezdev_sdk_type_len											16		   ///<	设备SDK 类型长度
@@ -263,7 +263,7 @@ typedef struct
 	sdk_entrance_state	entr_state;												///<	sdk入口状态
 	sdk_state			my_state;												///<	sdk状态
 	sdk_cloud_cnt_state cnt_state;												///<	连接状态											
-	osal_timespec_t		cnt_state_timer;										///<	重连相关的定时器
+	ezos_timespec_t		cnt_state_timer;										///<	重连相关的定时器
 	
 	char dev_subserial[ezdev_sdk_devserial_maxlen];
 	unsigned char master_key[ezdev_sdk_masterkey_len];

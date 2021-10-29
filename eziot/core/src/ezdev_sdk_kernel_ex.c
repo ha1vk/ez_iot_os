@@ -21,12 +21,12 @@
 #include "mkernel_internal_error.h"
 #include "ezdev_sdk_kerne_queuel.h"
 #include "ase_support.h"
-#include "osal_file.h"
-#include "osal_io.h"
-#include "osal_mem.h"
-#include "osal_network.h"
-#include "osal_thread.h"
-#include "osal_time.h"
+#include "ezos_file.h"
+#include "ezos_io.h"
+#include "ezos_mem.h"
+#include "ezos_network.h"
+#include "ezos_thread.h"
+#include "ezos_time.h"
 
 extern ezdev_sdk_kernel g_ezdev_sdk_kernel;
 EXTERN_QUEUE_FUN(pubmsg_exchange)
@@ -34,10 +34,10 @@ LBS_TRANSPORT_INTERFACE
 DAS_TRANSPORT_INTERFACE
 ASE_SUPPORT_INTERFACE
 
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_stun(stun_info* ptr_stun, EZDEV_SDK_BOOL bforce_refresh)
+EZOS_API ez_sdk_error ezdev_sdk_kernel_get_stun(stun_info* ptr_stun, EZDEV_SDK_BOOL bforce_refresh)
 {
 	static stun_info stun_info_cache = {0};
-	ezdev_sdk_kernel_error rv = ezdev_sdk_kernel_succ;
+	ez_sdk_error rv = ezdev_sdk_kernel_succ;
 
 	do
 	{
@@ -70,9 +70,9 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_stun(stun_info* ptr_stun, E
 	return rv;
 }
 
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SDK_UINT16 internal, EZDEV_SDK_UINT16 timeout_s)
+EZOS_API ez_sdk_error ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SDK_UINT16 internal, EZDEV_SDK_UINT16 timeout_s)
 {
-	ezdev_sdk_kernel_error rv = 0;
+	ez_sdk_error rv = 0;
 	cJSON * pJsonRoot = NULL;
 	char * json_buf= NULL;
 	ezdev_sdk_kernel_pubmsg_exchange *new_pubmsg_exchange = NULL;
@@ -86,7 +86,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SD
 	do 
 	{
 		pJsonRoot = cJSON_CreateObject();
-		new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange*)ez_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange));
+		new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange*)ezos_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange));
 		
 		if(!pJsonRoot || !new_pubmsg_exchange)
 		{
@@ -108,7 +108,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SD
 		new_pubmsg_exchange->msg_conntext.msg_command_id = DAS_CMD_PU2CENPLTSETKEEPALIVETIMEREQ;
 
 		input_length_padding = strlen(json_buf);
-		new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char*)ez_malloc(input_length_padding+1);
+		new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char*)ezos_malloc(input_length_padding+1);
 		if (NULL == new_pubmsg_exchange->msg_conntext.msg_body)
 		{
 			rv = ezdev_sdk_kernel_memory;
@@ -127,7 +127,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SD
 
 	if(json_buf)
 	{
-        ez_free(json_buf);
+        ezos_free(json_buf);
 	}
     if(pJsonRoot)
 	{
@@ -140,11 +140,11 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_keepalive_interval(EZDEV_SD
 		{
 			if (new_pubmsg_exchange->msg_conntext.msg_body != NULL)
 			{
-				ez_free(new_pubmsg_exchange->msg_conntext.msg_body);
+				ezos_free(new_pubmsg_exchange->msg_conntext.msg_body);
 				new_pubmsg_exchange->msg_conntext.msg_body=NULL;
 			}
 
-			ez_free(new_pubmsg_exchange);
+			ezos_free(new_pubmsg_exchange);
 			new_pubmsg_exchange = NULL;
 		}
 	}

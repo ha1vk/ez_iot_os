@@ -1,2 +1,0 @@
-/usr/bin/ar qc libosal.a  CMakeFiles/osal.dir/osal_network.c.o CMakeFiles/osal.dir/osal_sem.c.o CMakeFiles/osal.dir/osal_thread.c.o CMakeFiles/osal.dir/osal_time.c.o
-/usr/bin/ranlib libosal.a

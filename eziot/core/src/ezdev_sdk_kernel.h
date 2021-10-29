@@ -15,7 +15,7 @@
 #define H_EZDEV_SDK_KERNEL_H_
 
 #include "base_typedef.h"
-#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_error.h"
 #include "ezdev_sdk_kernel_struct.h"
 #include "ez_sdk_api.h"
 #include "ez_sdk_api_struct.h"
@@ -77,7 +77,7 @@ extern "C"
  *  \return 	ezdev_sdk_kernel_succ、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_json_invalid、ezdev_sdk_kernel_json_format、 \n
  *				ezdev_sdk_kernel_value_load、ezdev_sdk_kernel_invald_call
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig,
+EZOS_API ez_sdk_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig,
                                                                   const ezdev_sdk_kernel_platform_handle* phandle,
 																  const sdk_kernel_event_notice event_notice_cb,
 																  EZDEV_SDK_INT8 reg_mode);
@@ -87,7 +87,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfi
  *  \method		ezdev_sdk_kernel_fini
  *  \return 	ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_fini();
+EZOS_API ez_sdk_error ezdev_sdk_kernel_fini();
 
 /** 
  *  \brief		微内核通用领域加载接口（非线程安全）
@@ -96,7 +96,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_fini();
  *  \param[in] 	common_module	通用领域模块信息
  *  \return 	ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call、ezdev_sdk_kernel_params_invalid
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_common_module_load(const ezdev_sdk_kernel_common_module* common_module);
+EZOS_API ez_sdk_error ezdev_sdk_kernel_common_module_load(const ezdev_sdk_kernel_common_module* common_module);
 
 /** 
  *  \brief		微内核启动接口（非线程安全）
@@ -104,14 +104,14 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_common_module_load(const ezdev_
  *  \method		ezdev_sdk_kernel_start
  *  \return 	ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_start();
+EZOS_API ez_sdk_error ezdev_sdk_kernel_start();
 
 /** 
  *  \brief		微内核停止接口（非线程安全）
  *  \method		ezdev_sdk_kernel_stop
  *  \return 	ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_stop();
+EZOS_API ez_sdk_error ezdev_sdk_kernel_stop();
 
 /** 
  *  \brief		微内核内部业务驱动接口，通过外部线程驱动接口，内部执行业务
@@ -121,7 +121,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_stop();
  *				ezdev_sdk_kernel_internal、ezdev_sdk_kernel_value_load、ezdev_sdk_kernel_value_save、ezdev_sdk_kernel_memory、NET_ERROR、\n
  *				LBS_ERROR、SECRETKEY_ERROR、DAS_ERROR
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_yield();
+EZOS_API ez_sdk_error ezdev_sdk_kernel_yield();
 
 /** 
  *  \brief		微内核用户业务驱动接口，通过外部线程驱动接口，用于消息分发到上层领域和应用
@@ -129,7 +129,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_yield();
  *	\note		从消息队列取出消息，通过回调的方式分发到上层领域和应用
  *  \return 	ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call、ezdev_sdk_kernel_extend_no_find
  */
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_yield_user();
+EZOS_API ez_sdk_error ezdev_sdk_kernel_yield_user();
 
 
 #ifdef __cplusplus

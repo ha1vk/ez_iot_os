@@ -29,7 +29,7 @@ EZOS 是是萤石官方推出的物联网开发套件，支持 Windows、Linux �
 
 
 ```shell
-cd ./platform/mcu/linux
+cd ./platform/bsp/linux
 rm -r build
 mkdir build && cd build
 cmake ..

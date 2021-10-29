@@ -1,4 +1,4 @@
-cd ./platform/mcu/linux
+cd ./platform/bsp/linux
 rm -r build
 mkdir build
 cd build

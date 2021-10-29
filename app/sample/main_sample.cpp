@@ -21,12 +21,12 @@
 #include "ez_sdk_log.h"
 #include "ez_sdk_api.h"
 
-#include "osal_file.h"
-#include "osal_io.h"
-#include "osal_mem.h"
-#include "osal_network.h"
-#include "osal_thread.h"
-#include "osal_time.h"
+#include "ezos_file.h"
+#include "ezos_io.h"
+#include "ezos_mem.h"
+#include "ezos_network.h"
+#include "ezos_thread.h"
+#include "ezos_time.h"
 
 #ifdef TEST_BASE_ENABLE
 #include "base_sample.h"

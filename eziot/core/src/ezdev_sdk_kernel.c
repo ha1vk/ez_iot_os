@@ -30,12 +30,12 @@
 #include "dev_protocol_def.h"
 #include "ezdev_sdk_kerne_queuel.h"
 #include "MQTTPublish.h"
-#include "osal_file.h"
-#include "osal_io.h"
-#include "osal_mem.h"
-#include "osal_network.h"
-#include "osal_thread.h"
-#include "osal_time.h"
+#include "ezos_file.h"
+#include "ezos_io.h"
+#include "ezos_mem.h"
+#include "ezos_network.h"
+#include "ezos_thread.h"
+#include "ezos_time.h"
 
 EZDEV_SDK_KERNEL_RISK_CONTROL_INTERFACE
 EZDEV_SDK_KERNEL_EXTEND_INTERFACE
@@ -68,7 +68,7 @@ static void *_calloc_func(size_t nmemb, size_t size)
     size_t mem_size;
     void *ptr = NULL;
     mem_size = nmemb * size;
-    ptr = ez_malloc(mem_size);
+    ptr = ezos_malloc(mem_size);
     if (ptr)
     {
         memset(ptr, 0, mem_size);
@@ -76,10 +76,10 @@ static void *_calloc_func(size_t nmemb, size_t size)
     return ptr;
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const ezdev_sdk_kernel_platform_handle* handle,
+ez_sdk_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const ezdev_sdk_kernel_platform_handle* handle,
 											 const sdk_kernel_event_notice event_notice_cb, const EZDEV_SDK_INT8 reg_mode)
 {
-    ezdev_sdk_kernel_error sdk_error = ezdev_sdk_kernel_succ;
+    ez_sdk_error sdk_error = ezdev_sdk_kernel_succ;
     unsigned char szDev_vcode[ezdev_sdk_verify_code_maxlen] = {0};
     EZDEV_SDK_INT32 iDev_vcode = ezdev_sdk_verify_code_maxlen;
 
@@ -99,7 +99,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
 
         if (handle->key_value_load == NULL || handle->net_work_connect == NULL || handle->net_work_read == NULL || handle->net_work_write == NULL ||
             handle->net_work_disconnect == NULL || handle->time_get_clock == NULL || handle->time_delay == NULL || handle->key_value_load == NULL || 
-            handle->key_value_save == NULL || handle->curing_data_load == NULL || handle->curing_data_save == NULL)
+            handle->key_value_save == NULL)
         {
             sdk_error = ezdev_sdk_kernel_params_invalid;
             break;
@@ -123,22 +123,9 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
         {
             break;
         }
-
-        if (ezdev_sdk_kernel_succ == (sdk_error = handle->curing_data_load(sdk_curingdata_secretkey, szDev_vcode, &iDev_vcode)) &&iDev_vcode <= ezdev_sdk_verify_code_maxlen)
-        {
-            strncpy(g_ezdev_sdk_kernel.dev_info.dev_verification_code, (char *)szDev_vcode, iDev_vcode);
-        }
-        else
-        {
-            sdk_error = ezdev_sdk_kernel_value_load;
-            break;
-        }
   
         g_ezdev_sdk_kernel.lbs_redirect_times = 0;
         g_ezdev_sdk_kernel.das_retry_times = 0;
-        g_ezdev_sdk_kernel.secretkey_applied = EZDEV_SDK_FALSE;
-        g_ezdev_sdk_kernel.secretkey_interval = 0;
-        g_ezdev_sdk_kernel.secretkey_duration = 0;
 
         g_ezdev_sdk_kernel.entr_state = sdk_entrance_normal;
         g_ezdev_sdk_kernel.my_state = sdk_idle0;
@@ -200,7 +187,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_init(const sdk_config_t* pconfig, const 
     return sdk_error;
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_fini()
+ez_sdk_error ezdev_sdk_kernel_fini()
 {
     ezdev_sdk_kernel_log_debug(0, 0, "ezdev_sdk_kernel_fini,my_state: %d \n", g_ezdev_sdk_kernel.my_state);
     if (sdk_idle != g_ezdev_sdk_kernel.my_state && sdk_stop != g_ezdev_sdk_kernel.my_state)
@@ -225,7 +212,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_fini()
     return ezdev_sdk_kernel_succ;
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_extend_load(const ezdev_sdk_kernel_extend *external_extend)
+ez_sdk_error ez_sdk_extend_load(const ezdev_sdk_kernel_extend *external_extend)
 {
     if (sdk_idle != g_ezdev_sdk_kernel.my_state && sdk_start != g_ezdev_sdk_kernel.my_state)
     {
@@ -245,7 +232,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_extend_load(const ezdev_sdk_kernel_exten
 }
 
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_extend_load_v3(const ezdev_sdk_kernel_extend_v3 *external_extend_v3)
+ez_sdk_error ez_sdk_extend_load_v3(const ezdev_sdk_kernel_extend_v3 *external_extend_v3)
 {
     if (sdk_idle != g_ezdev_sdk_kernel.my_state && sdk_start != g_ezdev_sdk_kernel.my_state)
     {
@@ -264,7 +251,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_extend_load_v3(const ezdev_sdk_kernel_ex
 }
 
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_common_module_load(const ezdev_sdk_kernel_common_module *common_module)
+ez_sdk_error ezdev_sdk_kernel_common_module_load(const ezdev_sdk_kernel_common_module *common_module)
 {
     if (sdk_idle != g_ezdev_sdk_kernel.my_state)
     {
@@ -279,7 +266,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_common_module_load(const ezdev_sdk_kerne
     return mkiE2ezE(common_module_load(common_module));
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_start()
+ez_sdk_error ezdev_sdk_kernel_start()
 {
     ezdev_sdk_kernel_log_debug(0, 0, "ezdev_sdk_kernel_start,my_state: %d \n", g_ezdev_sdk_kernel.my_state);
     if (sdk_idle != g_ezdev_sdk_kernel.my_state)
@@ -293,7 +280,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_start()
     return ezdev_sdk_kernel_succ;
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_stop()
+ez_sdk_error ezdev_sdk_kernel_stop()
 {
     int wait4times = 0;
     ezdev_sdk_kernel_pubmsg_exchange *ptr_pubmsg_exchange = NULL;
@@ -333,7 +320,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_stop()
     return ezdev_sdk_kernel_succ;
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_yield()
+ez_sdk_error ezdev_sdk_kernel_yield()
 {
     if (sdk_start != g_ezdev_sdk_kernel.my_state)
     {
@@ -343,7 +330,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_yield()
     return mkiE2ezE(access_server_yield(&g_ezdev_sdk_kernel));
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_yield_user()
+ez_sdk_error ezdev_sdk_kernel_yield_user()
 {
     if (sdk_start != g_ezdev_sdk_kernel.my_state)
     {
@@ -353,11 +340,11 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_yield_user()
     return mkiE2ezE(extend_yield(&g_ezdev_sdk_kernel));
 }
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
+ez_sdk_error ez_sdk_send(ezdev_sdk_kernel_pubmsg *pubmsg)
 {
     EZDEV_SDK_INT32 input_length_padding = 0;
     ezdev_sdk_kernel_pubmsg_exchange *new_pubmsg_exchange = NULL;
-    ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
+    ez_sdk_error kernel_error = ezdev_sdk_kernel_succ;
     char cRiskResult = 0;
 
     if (g_ezdev_sdk_kernel.my_state != sdk_start)
@@ -388,7 +375,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
     else if (3 == cRiskResult)
         return mkiE2ezE(mkernel_internal_force_cmd_risk);
 
-    new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange *)ez_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange));
+    new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange *)ezos_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange));
     if (new_pubmsg_exchange == NULL)
     {
         return ezdev_sdk_kernel_memory;
@@ -403,10 +390,10 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
     new_pubmsg_exchange->msg_conntext.msg_command_id = pubmsg->msg_command_id;
 
     input_length_padding = pubmsg->msg_body_len;
-    new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char *)ez_malloc(input_length_padding);
+    new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char *)ezos_malloc(input_length_padding);
     if (new_pubmsg_exchange->msg_conntext.msg_body == NULL)
     {
-        ez_free(new_pubmsg_exchange);
+        ezos_free(new_pubmsg_exchange);
         new_pubmsg_exchange = NULL;
 
         ezdev_sdk_kernel_log_error(ezdev_sdk_kernel_memory, ezdev_sdk_kernel_memory, "malloc input_length_padding:%d error", input_length_padding);
@@ -426,11 +413,11 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
 
     if (NULL != pubmsg->externel_ctx && 0 != pubmsg->externel_ctx_len)
     {
-        new_pubmsg_exchange->msg_conntext.externel_ctx = (unsigned char *)ez_malloc(pubmsg->externel_ctx_len);
+        new_pubmsg_exchange->msg_conntext.externel_ctx = (unsigned char *)ezos_malloc(pubmsg->externel_ctx_len);
         if (NULL == new_pubmsg_exchange->msg_conntext.externel_ctx)
         {
-            ez_free(new_pubmsg_exchange->msg_conntext.msg_body);
-            ez_free(new_pubmsg_exchange);
+            ezos_free(new_pubmsg_exchange->msg_conntext.msg_body);
+            ezos_free(new_pubmsg_exchange);
             ezdev_sdk_kernel_log_error(ezdev_sdk_kernel_memory, 0, "malloc externel_ctx:%d error", pubmsg->externel_ctx_len);
             return ezdev_sdk_kernel_memory;
         }
@@ -446,14 +433,14 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
         {
             if (new_pubmsg_exchange->msg_conntext.msg_body != NULL)
             {
-                ez_free(new_pubmsg_exchange->msg_conntext.msg_body);
+                ezos_free(new_pubmsg_exchange->msg_conntext.msg_body);
                 new_pubmsg_exchange->msg_conntext.msg_body = NULL;
             }
             if (NULL != new_pubmsg_exchange->msg_conntext.externel_ctx)
             {
-                ez_free(new_pubmsg_exchange->msg_conntext.externel_ctx);
+                ezos_free(new_pubmsg_exchange->msg_conntext.externel_ctx);
             }
-            ez_free(new_pubmsg_exchange);
+            ezos_free(new_pubmsg_exchange);
             new_pubmsg_exchange = NULL;
         }
     }
@@ -462,11 +449,11 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg)
 
 
 
-ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubmsg)
+ez_sdk_error ez_sdk_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubmsg)
 {
     EZDEV_SDK_INT32 input_length_padding = 0;
     ezdev_sdk_kernel_pubmsg_exchange_v3 *new_pubmsg_exchange = NULL;
-    ezdev_sdk_kernel_error kernel_error = ezdev_sdk_kernel_succ;
+    ez_sdk_error kernel_error = ezdev_sdk_kernel_succ;
 
     if (g_ezdev_sdk_kernel.my_state != sdk_start)
     {
@@ -489,7 +476,7 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubm
     
     ezdev_sdk_kernel_log_debug(0, 0,"_v3 send buffer size: %d\n", ezdev_sdk_send_buf_max);
 
-    new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange_v3 *)ez_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange_v3));
+    new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange_v3 *)ezos_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange_v3));
     if (new_pubmsg_exchange == NULL)
     {
         return ezdev_sdk_kernel_memory;
@@ -516,10 +503,10 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubm
     strncpy(new_pubmsg_exchange->msg_conntext_v3.ext_msg, pubmsg->ext_msg, ezdev_sdk_ext_msg_len - 1);
  
     input_length_padding = pubmsg->msg_body_len;
-    new_pubmsg_exchange->msg_conntext_v3.msg_body = (unsigned char *)ez_malloc(input_length_padding);
+    new_pubmsg_exchange->msg_conntext_v3.msg_body = (unsigned char *)ezos_malloc(input_length_padding);
     if (new_pubmsg_exchange->msg_conntext_v3.msg_body == NULL)
     {
-        ez_free(new_pubmsg_exchange);
+        ezos_free(new_pubmsg_exchange);
         new_pubmsg_exchange = NULL;
 
         ezdev_sdk_kernel_log_error(ezdev_sdk_kernel_memory, 0, "malloc input_length_padding:%d error", input_length_padding);
@@ -538,19 +525,19 @@ ezdev_sdk_kernel_error ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubm
         {
             if (new_pubmsg_exchange->msg_conntext_v3.msg_body != NULL)
             {
-                ez_free(new_pubmsg_exchange->msg_conntext_v3.msg_body);
+                ezos_free(new_pubmsg_exchange->msg_conntext_v3.msg_body);
                 new_pubmsg_exchange->msg_conntext_v3.msg_body = NULL;
             }
-            ez_free(new_pubmsg_exchange);
+            ezos_free(new_pubmsg_exchange);
             new_pubmsg_exchange = NULL;
         }
     }
     return kernel_error;
 }
 
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_set_net_option(int optname, const void *optval, int optlen)
+EZOS_API ez_sdk_error ez_sdk_set_net_option(int optname, const void *optval, int optlen)
 {
-    ezdev_sdk_kernel_error rv = ezdev_sdk_kernel_succ;
+    ez_sdk_error rv = ezdev_sdk_kernel_succ;
 
     switch (optname)
     {
@@ -631,7 +618,7 @@ const char *inner_get(const char *key)
     }
 }
 
-const char *ezdev_sdk_kernel_getdevinfo_bykey(const char *key)
+const char *ez_sdk_getdevinfo_bykey(const char *key)
 {
     if (g_ezdev_sdk_kernel.my_state == sdk_idle0)
     {
@@ -641,9 +628,9 @@ const char *ezdev_sdk_kernel_getdevinfo_bykey(const char *key)
     return inner_get(key);
 }
 
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_sdk_version(char *pbuf, int *pbuflen)
+EZOS_API ez_sdk_error ez_sdk_get_sdk_version(char *pbuf, int *pbuflen)
 {
-    ezdev_sdk_kernel_error rv = ezdev_sdk_kernel_succ;
+    ez_sdk_error rv = ezdev_sdk_kernel_succ;
     char buf[64] = {0};
 
     if (NULL == pbuflen)
@@ -672,7 +659,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_sdk_version(char *pbuf, int
     return rv;
 }
 
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_server_info(server_info_s *ptr_server_info, int *ptr_count)
+EZOS_API ez_sdk_error ez_sdk_get_server_info(server_info_s *ptr_server_info, int *ptr_count)
 {
     if (g_ezdev_sdk_kernel.my_state != sdk_start)
         return ezdev_sdk_kernel_invald_call;
@@ -701,7 +688,7 @@ EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_get_server_info(server_info_s *
     return ezdev_sdk_kernel_succ;
 }
 
-EZOS_API ezdev_sdk_kernel_error ezdev_sdk_kernel_show_key_info(showkey_info *ptr_showkey_info)
+EZOS_API ez_sdk_error ez_sdk_show_key_info(showkey_info *ptr_showkey_info)
 {
     if (g_ezdev_sdk_kernel.my_state != sdk_start)
         return ezdev_sdk_kernel_invald_call;

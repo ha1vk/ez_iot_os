@@ -18,7 +18,7 @@
 #include "mkernel_internal_error.h"
 #include "base_typedef.h"
 #include "sdk_kernel_def.h"
-#include "osal_mem.h"
+#include "ezos_mem.h"
 
 #define QUEUE_DEFINE(MSGTYPE)						\
 typedef struct 	tag_queque_element_##MSGTYPE		\
@@ -72,9 +72,9 @@ void fini_queue_##MSGTYPE()													\
 																				\
 		g_queue_##MSGTYPE.head = element->next;				\
 																				\
-		ez_free(element->msg);									\
+		ezos_free(element->msg);									\
 		element->msg = NULL;									\
-		ez_free(element);											\
+		ezos_free(element);											\
 	}						\
 	ezdev_sdk_kernel_platform_thread_mutex_unlock(g_queue_##MSGTYPE.lock);	\
 	ezdev_sdk_kernel_platform_thread_mutex_destroy(g_queue_##MSGTYPE.lock);	\
@@ -96,9 +96,9 @@ void fini_queue_v3_##MSGTYPE()													\
 																			\
 		g_queue_raw_##MSGTYPE.head = element->next;				                \
 																			\
-		ez_free(element->msg);									                \
+		ezos_free(element->msg);									                \
 		element->msg = NULL;									            \
-		ez_free(element);											            \
+		ezos_free(element);											            \
 	}						                                                \
 	ezdev_sdk_kernel_platform_thread_mutex_unlock(g_queue_raw_##MSGTYPE.lock);	\
 	ezdev_sdk_kernel_platform_thread_mutex_destroy(g_queue_raw_##MSGTYPE.lock);	\
@@ -135,7 +135,7 @@ mkernel_internal_error pop_queue_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE** submsg)	
 	{																						\
 		g_queue_##MSGTYPE.size--;													\
 	}																						\
-	ez_free(element);																		\
+	ezos_free(element);																		\
 	element = NULL;																			\
 	ezdev_sdk_kernel_platform_thread_mutex_unlock(g_queue_##MSGTYPE.lock);	\
 	return mkernel_internal_succ;															\
@@ -175,7 +175,7 @@ mkernel_internal_error push_queue_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE* submsg)	
 		ezdev_sdk_kernel_platform_thread_mutex_unlock(g_queue_##MSGTYPE.lock);	\
 		return mkernel_internal_queue_full;													\
 	}																						\
-	element = (queque_element_##MSGTYPE*)ez_malloc(sizeof(queque_element_##MSGTYPE));			\
+	element = (queque_element_##MSGTYPE*)ezos_malloc(sizeof(queque_element_##MSGTYPE));			\
 	if (element == NULL)														\
 	{																						\
 		ezdev_sdk_kernel_platform_thread_mutex_unlock(g_queue_##MSGTYPE.lock);	\
@@ -211,7 +211,7 @@ mkernel_internal_error push_queue_head_##MSGTYPE(ezdev_sdk_kernel_##MSGTYPE* sub
 		ezdev_sdk_kernel_platform_thread_mutex_unlock(g_queue_##MSGTYPE.lock);	\
 		return mkernel_internal_queue_full;													\
 	}																						\
-	element = (queque_element_##MSGTYPE*)ez_malloc(sizeof(queque_element_##MSGTYPE));			\
+	element = (queque_element_##MSGTYPE*)ezos_malloc(sizeof(queque_element_##MSGTYPE));			\
 	if (element == NULL)																	\
 	{																						\
 		ezdev_sdk_kernel_platform_thread_mutex_unlock(g_queue_##MSGTYPE.lock);	\

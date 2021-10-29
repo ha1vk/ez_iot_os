@@ -6,12 +6,12 @@
 #include <stdarg.h>
 //#include <netdb.h>
 //#include <unistd.h>
-#include "osal_file.h"
-#include "osal_io.h"
-#include "osal_mem.h"
-#include "osal_network.h"
-#include "osal_thread.h"
-#include "osal_time.h"
+#include "ezos_file.h"
+#include "ezos_io.h"
+#include "ezos_mem.h"
+#include "ezos_network.h"
+#include "ezos_thread.h"
+#include "ezos_time.h"
 
 //#define _POSIX_C_SOURCE 200112L
 #define RT_USING_SAL
@@ -43,15 +43,15 @@
 #endif
 
 #ifndef rt_malloc
-#define rt_malloc ez_malloc
+#define rt_malloc ezos_malloc
 #endif
 
 #ifndef rt_calloc
-#define rt_calloc ez_calloc
+#define rt_calloc ezos_calloc
 #endif
 
 #ifndef rt_realloc
-#define rt_realloc ez_realloc
+#define rt_realloc ezos_realloc
 #endif
 
 #ifndef rt_memset
@@ -59,7 +59,7 @@
 #endif
 
 #ifndef rt_free
-#define rt_free ez_free
+#define rt_free ezos_free
 #endif
 
 #ifndef rt_strdup
@@ -75,7 +75,7 @@
 #endif
 
 #ifndef rt_snprintf
-#define rt_snprintf ez_snprintf
+#define rt_snprintf ezos_snprintf
 #endif
 
 #ifndef rt_strcmp

@@ -17,7 +17,7 @@
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mkernel_internal_error.h"
-#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_error.h"
 
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
@@ -384,15 +384,15 @@ int get_module_build_date(char* pbuf)
 	return 0;
 }
 
-char ezcore_time_isexpired_bydiff(osal_timespec_t *assign_timer, unsigned int time_ms)
+char ezcore_time_isexpired_bydiff(ezos_timespec_t *assign_timer, unsigned int time_ms)
 {
-    osal_timespec_t now, res;
+    ezos_timespec_t now, res;
     if (NULL == assign_timer)
     {
         return (char)1;
     }
 
-    osal_time_get_clock(&now);
+    ezos_time_get_clock(&now);
     res.tv_sec = assign_timer->tv_sec - now.tv_sec;
     res.tv_nsec = assign_timer->tv_nsec - now.tv_nsec;
     if (res.tv_nsec < 0)
@@ -413,15 +413,15 @@ char ezcore_time_isexpired_bydiff(osal_timespec_t *assign_timer, unsigned int ti
     return res.tv_sec < 0 || (res.tv_sec == 0 && res.tv_nsec <= 0);
 }
 
-void ezcore_time_countdown(osal_timespec_t *assign_timer, unsigned int time_count)
+void ezcore_time_countdown(ezos_timespec_t *assign_timer, unsigned int time_count)
 {
-    osal_timespec_t now;
+    ezos_timespec_t now;
     if (NULL == assign_timer)
     {
         return;
     }
 
-    osal_time_get_clock(&now);
+    ezos_time_get_clock(&now);
     assign_timer->tv_sec = assign_timer->tv_sec + now.tv_sec;
     assign_timer->tv_nsec = assign_timer->tv_sec + now.tv_nsec;
 

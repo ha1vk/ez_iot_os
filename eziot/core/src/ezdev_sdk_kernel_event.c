@@ -15,12 +15,12 @@
 #include "ezdev_sdk_kerne_queuel.h"
 #include "mkernel_internal_error.h"
 #include "ezdev_sdk_kernel_struct.h"
-#include "osal_file.h"
-#include "osal_io.h"
-#include "osal_mem.h"
-#include "osal_network.h"
-#include "osal_thread.h"
-#include "osal_time.h"
+#include "ezos_file.h"
+#include "ezos_io.h"
+#include "ezos_mem.h"
+#include "ezos_network.h"
+#include "ezos_thread.h"
+#include "ezos_time.h"
 
 EXTERN_QUEUE_FUN(inner_cb_notic)
 EXTERN_QUEUE_BASE_FUN
@@ -74,7 +74,7 @@ mkernel_internal_error broadcast_user_start()
 {
 	mkernel_internal_error kernel_error = mkernel_internal_succ;
 	ezdev_sdk_kernel_inner_cb_notic *prt_inner_cb_notic = NULL;
-	prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ez_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
+	prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ezos_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
 	if (NULL == prt_inner_cb_notic)
 	{
 		return mkernel_internal_malloc_error;
@@ -98,7 +98,7 @@ mkernel_internal_error broadcast_user_stop()
 {
 	mkernel_internal_error kernel_error = mkernel_internal_succ;
 	ezdev_sdk_kernel_inner_cb_notic *prt_inner_cb_notic = NULL;
-	prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ez_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
+	prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ezos_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
 	if (NULL == prt_inner_cb_notic)
 	{
 		return mkernel_internal_malloc_error;
@@ -121,7 +121,7 @@ mkernel_internal_error broadcast_user_event(sdk_kernel_event_type event_type, vo
 
 	do
 	{
-		prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ez_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
+		prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ezos_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
 		if (NULL == prt_inner_cb_notic)
 		{
 			rv = mkernel_internal_malloc_error;
@@ -130,9 +130,9 @@ mkernel_internal_error broadcast_user_event(sdk_kernel_event_type event_type, vo
 
 		if (NULL != ctx)
 		{
-			if (NULL == (context = (void *)ez_malloc(ctx_size)))
+			if (NULL == (context = (void *)ezos_malloc(ctx_size)))
 			{
-				ez_free(prt_inner_cb_notic);
+				ezos_free(prt_inner_cb_notic);
 				rv = mkernel_internal_malloc_error;
 				break;
 			}
@@ -147,10 +147,10 @@ mkernel_internal_error broadcast_user_event(sdk_kernel_event_type event_type, vo
 		if (mkernel_internal_succ != (rv = push_event_to_queue(prt_inner_cb_notic)))
 		{
 			
-			ez_free(prt_inner_cb_notic);
+			ezos_free(prt_inner_cb_notic);
 
 			if (NULL != context)
-				ez_free(context);
+				ezos_free(context);
 		}
 		ezdev_sdk_kernel_log_info(rv, rv, "broadcast_user_event, type:%d \n", event_type);
 	} while (0);
@@ -158,14 +158,14 @@ mkernel_internal_error broadcast_user_event(sdk_kernel_event_type event_type, vo
 	return rv;
 }
 
-mkernel_internal_error broadcast_runtime_err(err_tag_e err_tag, ezdev_sdk_kernel_error err_code, void *err_ctx, EZDEV_SDK_UINT32 ctx_size)
+mkernel_internal_error broadcast_runtime_err(err_tag_e err_tag, ez_sdk_error err_code, void *err_ctx, EZDEV_SDK_UINT32 ctx_size)
 {
 	mkernel_internal_error rv = mkernel_internal_succ;
 	sdk_runtime_err_context rt_err_ctx = {err_tag, err_code, NULL};
 
 	if (NULL != err_ctx)
 	{
-		if (NULL == (rt_err_ctx.err_ctx = (void *)ez_malloc(ctx_size)))
+		if (NULL == (rt_err_ctx.err_ctx = (void *)ezos_malloc(ctx_size)))
 		{
 			return mkernel_internal_malloc_error;
 		}
@@ -176,7 +176,7 @@ mkernel_internal_error broadcast_runtime_err(err_tag_e err_tag, ezdev_sdk_kernel
 	if (mkernel_internal_succ != (rv = broadcast_user_event(sdk_kernel_event_runtime_err, &rt_err_ctx, sizeof(rt_err_ctx))))
 	{
 		if (NULL != rt_err_ctx.err_ctx)
-			ez_free(rt_err_ctx.err_ctx);
+			ezos_free(rt_err_ctx.err_ctx);
 	}
 
 	return rv;
@@ -186,7 +186,7 @@ mkernel_internal_error broadcast_user_event_reconnect_success()
 {
 	mkernel_internal_error kernel_error = mkernel_internal_succ;
 	ezdev_sdk_kernel_inner_cb_notic *prt_inner_cb_notic = NULL;
-	prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ez_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
+	prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ezos_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
 	if (NULL == prt_inner_cb_notic)
 	{
 		return mkernel_internal_malloc_error;
@@ -205,15 +205,15 @@ mkernel_internal_error das_keepalive_interval_changed_event_cb(int interval)
 	mkernel_internal_error kernel_error = ezdev_sdk_kernel_succ;
 	ezdev_sdk_kernel_inner_cb_notic *prt_inner_cb_notic = NULL;
 	int *context = NULL;
-	prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ez_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
+	prt_inner_cb_notic = (ezdev_sdk_kernel_inner_cb_notic *)ezos_malloc(sizeof(ezdev_sdk_kernel_inner_cb_notic));
 	if (NULL == prt_inner_cb_notic)
 	{
 		return mkernel_internal_malloc_error;
 	}
 
-	if (NULL == (context = (int *)ez_malloc(sizeof(int))))
+	if (NULL == (context = (int *)ezos_malloc(sizeof(int))))
 	{
-		ez_free(prt_inner_cb_notic);
+		ezos_free(prt_inner_cb_notic);
 		return mkernel_internal_malloc_error;
 	}
 

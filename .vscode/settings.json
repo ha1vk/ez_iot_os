@@ -23,9 +23,9 @@
         "pthread.h": "c",
         "cstdio": "c",
         "fstream": "c",
-        "osal_thread.h": "c",
+        "ezos_thread.h": "c",
         "sdk_kernel_def.h": "c",
-        "osal_time.h": "c",
+        "ezos_time.h": "c",
         "time.h": "c",
         "limits": "c",
         "streambuf": "c",
@@ -37,6 +37,8 @@
         "ezxml.h": "c",
         "mqttclient.h": "c",
         "stdio.h": "c",
-        "ezos_gconfig.h": "c"
+        "ezos_gconfig.h": "c",
+        "ezos_thread.h": "c",
+        "ezos_time.h": "c"
     }
 }

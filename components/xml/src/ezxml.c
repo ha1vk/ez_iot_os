@@ -27,8 +27,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
-#include "osal_mem.h"
-#include "osal_io.h"
+#include "ezos_mem.h"
+#include "ezos_io.h"
 
 #define EZXML_NOMMAP
 #ifndef EZXML_NOMMAP
@@ -37,7 +37,7 @@
 #include "ezxml.h"
 
 #if _MSC_VER
-#define ez_snprintf _snprintf
+#define ezos_snprintf _snprintf
 #endif
 
 #define EZXML_WS   "\t\r\n "  // whitespace
@@ -145,7 +145,7 @@ ezxml_t ezxml_err(ezxml_root_t root, char *s, const char *err, ...)
     char *t, fmt[EZXML_ERRL];
     
     for (t = root->s; t < s; t++) if (*t == '\n') line++;
-    ez_snprintf(fmt, EZXML_ERRL, "[error near line %d]: %s", line, err);
+    ezos_snprintf(fmt, EZXML_ERRL, "[error near line %d]: %s", line, err);
 
     va_start(ap, err);
     vsnprintf(root->err, EZXML_ERRL, fmt, ap);
@@ -199,7 +199,7 @@ char *ezxml_decode(char *s, char **ent, char t)
             if (ent[b++]) { // found a match
                 if ((c = strlen(ent[b])) - 1 > (e = strchr(s, ';')) - s) {
                     l = (d = (s - r)) + c + strlen(e); // new length
-                    r = (r == m) ? strcpy(ez_malloc(l), r) : realloc(r, l);
+                    r = (r == m) ? strcpy(ezos_malloc(l), r) : realloc(r, l);
                     e = strchr((s = r + d), ';'); // fix up pointers
                 }
 
@@ -251,9 +251,9 @@ void ezxml_char_content(ezxml_root_t root, char *s, size_t len, char t)
     else { // allocate our own memory and make a copy
         xml->txt = (xml->flags & EZXML_TXTM) // allocate some space
                    ? realloc(xml->txt, (l = strlen(xml->txt)) + len)
-                   : strcpy(ez_malloc((l = strlen(xml->txt)) + len), xml->txt);
+                   : strcpy(ezos_malloc((l = strlen(xml->txt)) + len), xml->txt);
         strcpy(xml->txt + l, s); // add new char content
-        if (s != m) ez_free(s); // ez_free s if it was malloced by ezxml_decode()
+        if (s != m) ezos_free(s); // ezos_free s if it was malloced by ezxml_decode()
     }
 
     if (xml->txt != m) ezxml_set_flag(xml, EZXML_TXTM);
@@ -302,12 +302,12 @@ void ezxml_proc_inst(ezxml_root_t root, char *s, size_t len)
         return;
     }
 
-    if (! root->pi[0]) *(root->pi = ez_malloc(sizeof(char **))) = NULL; //first pi
+    if (! root->pi[0]) *(root->pi = ezos_malloc(sizeof(char **))) = NULL; //first pi
 
     while (root->pi[i] && strcmp(target, root->pi[i][0])) i++; // find target
     if (! root->pi[i]) { // new target
         root->pi = realloc(root->pi, sizeof(char **) * (i + 2));
-        root->pi[i] = ez_malloc(sizeof(char *) * 3);
+        root->pi[i] = ezos_malloc(sizeof(char *) * 3);
         root->pi[i][0] = target;
         root->pi[i][1] = (char *)(root->pi[i + 1] = NULL); // terminate pi list
         root->pi[i][2] = strdup(""); // empty document position list
@@ -331,7 +331,7 @@ short ezxml_internal_dtd(ezxml_root_t root, char *s, size_t len)
     char *t;
 #endif
     
-    pe = memcpy(ez_malloc(sizeof(EZXML_NIL)), EZXML_NIL, sizeof(EZXML_NIL));
+    pe = memcpy(ezos_malloc(sizeof(EZXML_NIL)), EZXML_NIL, sizeof(EZXML_NIL));
 
     for (s[len] = '\0'; s; ) {
         while (*s && *s != '<' && *s != '%') s++; // find next declaration
@@ -358,7 +358,7 @@ short ezxml_internal_dtd(ezxml_root_t root, char *s, size_t len)
             ent[i + 1] = ezxml_decode(v, pe, '%'); // set value
             ent[i + 2] = NULL; // null terminate entity list
             if (! ezxml_ent_ok(n, ent[i + 1], ent)) { // circular reference
-                if (ent[i + 1] != v) ez_free(ent[i + 1]);
+                if (ent[i + 1] != v) ezos_free(ent[i + 1]);
                 ezxml_err(root, v, "circular entity declaration &%s", n);
                 break;
             }
@@ -398,10 +398,10 @@ short ezxml_internal_dtd(ezxml_root_t root, char *s, size_t len)
                 else { ezxml_err(root, t, "malformed <!ATTLIST"); break; }
 
                 if (! root->attr[i]) { // new tag name
-                    root->attr = (! i) ? ez_malloc(2 * sizeof(char **))
+                    root->attr = (! i) ? ezos_malloc(2 * sizeof(char **))
                                        : realloc(root->attr,
                                                  (i + 2) * sizeof(char **));
-                    root->attr[i] = ez_malloc(2 * sizeof(char *));
+                    root->attr[i] = ezos_malloc(2 * sizeof(char *));
                     root->attr[i][0] = t; // set tag name
                     root->attr[i][1] = (char *)(root->attr[i + 1] = NULL);
                 }
@@ -427,7 +427,7 @@ short ezxml_internal_dtd(ezxml_root_t root, char *s, size_t len)
         else if (*(s++) == '%' && ! root->standalone) break;
     }
 
-    ez_free(pe);
+    ezos_free(pe);
     return ! *root->err;
 }
 
@@ -442,7 +442,7 @@ char *ezxml_str2utf8(char **s, size_t *len)
 
     if (be == -1) return NULL; // not UTF-16
 
-    u = ez_malloc(max);
+    u = ezos_malloc(max);
     for (sl = 2; sl < *len - 1; sl += 2) {
         c = (be) ? (((*s)[sl] & 0xFF) << 8) | ((*s)[sl + 1] & 0xFF)  //UTF-16BE
                  : (((*s)[sl + 1] & 0xFF) << 8) | ((*s)[sl] & 0xFF); //UTF-16LE
@@ -473,11 +473,11 @@ void ezxml_free_attr(char **attr) {
     while (attr[i]) i += 2; // find end of attribute list
     m = attr[i + 1]; // list of which names and values are malloced
     for (i = 0; m[i]; i++) {
-        if (m[i] & EZXML_NAMEM) ez_free(attr[i * 2]);
-        if (m[i] & EZXML_TXTM) ez_free(attr[(i * 2) + 1]);
+        if (m[i] & EZXML_NAMEM) ezos_free(attr[i * 2]);
+        if (m[i] & EZXML_TXTM) ezos_free(attr[(i * 2) + 1]);
     }
-    ez_free(m);
-    ez_free(attr);
+    ezos_free(m);
+    ezos_free(attr);
 }
 
 // parse the given xml string and return an ezxml structure
@@ -514,9 +514,9 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
 
             for (l = 0; *s && *s != '/' && *s != '>'; l += 2) { // new attrib
                 attr = (l) ? realloc(attr, (l + 4) * sizeof(char *))
-                           : ez_malloc(4 * sizeof(char *)); // allocate space
+                           : ezos_malloc(4 * sizeof(char *)); // allocate space
                 attr[l + 3] = (l) ? realloc(attr[l + 1], (l / 2) + 2)
-                                  : ez_malloc(2); // mem for list of maloced vals
+                                  : ezos_malloc(2); // mem for list of maloced vals
                 strcpy(attr[l + 3] + (l / 2), " "); // value is not malloced
                 attr[l + 2] = NULL; // null terminate list
                 attr[l + 1] = ""; // temporary attribute value
@@ -624,7 +624,7 @@ ezxml_t ezxml_parse_fp(FILE *fp)
     size_t l, len = 0;
     char *s;
 
-    if (! (s = ez_malloc(EZXML_BUFSIZE))) return NULL;
+    if (! (s = ezos_malloc(EZXML_BUFSIZE))) return NULL;
     do {
         len += (l = fread((s + len), 1, EZXML_BUFSIZE, fp));
         if (l == EZXML_BUFSIZE) s = realloc(s, len + EZXML_BUFSIZE);
@@ -659,7 +659,7 @@ ezxml_t ezxml_parse_fd(int fd)
     }
     else { // mmap failed, read file into memory
 #endif // EZXML_NOMMAP
-        l = read(fd, m = ez_malloc(st.st_size), st.st_size);
+        l = read(fd, m = ezos_malloc(st.st_size), st.st_size);
         root = (ezxml_root_t)ezxml_parse_str(m, l);
         root->len = -1; // so we know to free s in ezxml_free()
 #ifndef EZXML_NOMMAP
@@ -763,7 +763,7 @@ char *ezxml_toxml(ezxml_t xml)
     ezxml_t p = (xml) ? xml->parent : NULL, o = (xml) ? xml->ordered : NULL;
     ezxml_root_t root = (ezxml_root_t)xml;
     size_t len = 0, max = EZXML_BUFSIZE;
-    char *s = strcpy(ez_malloc(max), ""), *t, *n;
+    char *s = strcpy(ezos_malloc(max), ""), *t, *n;
     int i, j, k;
 
     if (! xml || ! xml->name) return realloc(s, len + 1);
@@ -811,34 +811,34 @@ void ezxml_free(ezxml_t xml)
 
     if (! xml->parent) { // free root tag allocations
         for (i = 10; root->ent[i]; i += 2) // 0 - 9 are default entites (<>&"')
-            if ((s = root->ent[i + 1]) < root->s || s > root->e) ez_free(s);
-        ez_free(root->ent); // free list of general entities
+            if ((s = root->ent[i + 1]) < root->s || s > root->e) ezos_free(s);
+        ezos_free(root->ent); // free list of general entities
 
         for (i = 0; (a = root->attr[i]); i++) {
             for (j = 1; a[j++]; j += 2) // free malloced attribute values
-                if (a[j] && (a[j] < root->s || a[j] > root->e)) ez_free(a[j]);
-            ez_free(a);
+                if (a[j] && (a[j] < root->s || a[j] > root->e)) ezos_free(a[j]);
+            ezos_free(a);
         }
-        if (root->attr[0]) ez_free(root->attr); // free default attribute list
+        if (root->attr[0]) ezos_free(root->attr); // free default attribute list
 
         for (i = 0; root->pi[i]; i++) {
             for (j = 1; root->pi[i][j]; j++);
-            ez_free(root->pi[i][j + 1]);
-            ez_free(root->pi[i]);
+            ezos_free(root->pi[i][j + 1]);
+            ezos_free(root->pi[i]);
         }            
-        if (root->pi[0]) ez_free(root->pi); // free processing instructions
+        if (root->pi[0]) ezos_free(root->pi); // free processing instructions
 
-        if (root->len == -1) ez_free(root->m); // malloced xml data
+        if (root->len == -1) ezos_free(root->m); // malloced xml data
 #ifndef EZXML_NOMMAP
         else if (root->len) munmap(root->m, root->len); // mem mapped xml data
 #endif // EZXML_NOMMAP
-        if (root->u) ez_free(root->u); // utf8 conversion
+        if (root->u) ezos_free(root->u); // utf8 conversion
     }
 
     ezxml_free_attr(xml->attr); // tag attributes
-    if ((xml->flags & EZXML_TXTM)) ez_free(xml->txt); // character content
-    if ((xml->flags & EZXML_NAMEM)) ez_free(xml->name); // tag name
-    ez_free(xml);
+    if ((xml->flags & EZXML_TXTM)) ezos_free(xml->txt); // character content
+    if ((xml->flags & EZXML_NAMEM)) ezos_free(xml->name); // tag name
+    ezos_free(xml);
 }
 
 // return parser error message or empty string if none
@@ -853,12 +853,12 @@ ezxml_t ezxml_new(const char *name)
 {
     static char *ent[] = { "lt;", "&#60;", "gt;", "&#62;", "quot;", "&#34;",
                            "apos;", "&#39;", "amp;", "&#38;", NULL };
-    ezxml_root_t root = (ezxml_root_t)memset(ez_malloc(sizeof(struct ezxml_root)), 
+    ezxml_root_t root = (ezxml_root_t)memset(ezos_malloc(sizeof(struct ezxml_root)), 
                                              '\0', sizeof(struct ezxml_root));
     root->xml.name = (char *)name;
     root->cur = &root->xml;
     strcpy(root->err, root->xml.txt = "");
-    root->ent = memcpy(ez_malloc(sizeof(ent)), ent, sizeof(ent));
+    root->ent = memcpy(ezos_malloc(sizeof(ent)), ent, sizeof(ent));
     root->attr = root->pi = (char ***)(root->xml.attr = EZXML_NIL);
     return &root->xml;
 }
@@ -912,7 +912,7 @@ ezxml_t ezxml_add_child(ezxml_t xml, const char *name, size_t off)
     ezxml_t child;
 
     if (! xml) return NULL;
-    child = (ezxml_t)memset(ez_malloc(sizeof(struct ezxml)), '\0',
+    child = (ezxml_t)memset(ezos_malloc(sizeof(struct ezxml)), '\0',
                             sizeof(struct ezxml));
     child->name = (char *)name;
     child->attr = EZXML_NIL;
@@ -942,7 +942,7 @@ ezxml_t ezxml_set_attr(ezxml_t xml, const char *name, const char *value)
     if (! xml->attr[l]) { // not found, add as new attribute
         if (! value) return xml; // nothing to do
         if (xml->attr == EZXML_NIL) { // first attribute
-            xml->attr = ez_malloc(4 * sizeof(char *));
+            xml->attr = ezos_malloc(4 * sizeof(char *));
             xml->attr[1] = strdup(""); // empty list of malloced names/vals
         }
         else xml->attr = realloc(xml->attr, (l + 4) * sizeof(char *));
@@ -1025,7 +1025,7 @@ int main(int argc, char **argv)
 
     xml = ezxml_parse_file(argv[1]);
     printf("%s\n", (s = ezxml_toxml(xml)));
-    ez_free(s);
+    ezos_free(s);
     i = fprintf(stderr, "%s", ezxml_error(xml));
     ezxml_free(xml);
     return (i) ? 1 : 0;

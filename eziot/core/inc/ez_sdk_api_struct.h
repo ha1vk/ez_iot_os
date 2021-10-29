@@ -15,7 +15,7 @@
 #define H_EZDEV_SDK_API_STRUCT_H_
 
 #include "base_typedef.h"
-#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_error.h"
 
 #define version_max_len               32     ///< 版本长度
 #define ezdev_sdk_extend_name_len     32     ///< 扩展模块名字长度
@@ -76,14 +76,6 @@ typedef enum
 	key_count				       ///<	此枚举上限
 }ez_key_type_e;
 
-/**
- * \brief 存取数据类型
- */
-typedef enum
-{
-	data_secretkey,			    ///<	验证码不合规设备重新申请的secretkey，一定要固化
-	type_count				///<	此枚举上限
-}ez_data_type_e;
 
 /** 
  *  \brief		定义事件通知函数
@@ -113,25 +105,6 @@ typedef void (*ez_key_value_load)(ez_key_type_e valuetype, unsigned char* keyval
  */
 typedef EZDEV_SDK_INT32 (*ez_key_value_save)(ez_key_type_e valuetype, unsigned char* keyvalue, EZDEV_SDK_UINT32 keyvalue_size);
 
-/** 
- *  \brief			定义加载关键信息的函数
- *  \method			ez_data_load
- *  \param[in] 		valuetype				数据类型
- *  \param[in] 		keyvalue				数据存放地址
- *  \param[in\out] 	*keyvalue_maxsize		数据缓冲区最大值,返回数据大小
- *  \return 		成功返回0，失败返回非0
- */
-typedef EZDEV_SDK_INT32 (*ez_data_load)(ez_data_type_e valuetype, unsigned char* data, EZDEV_SDK_UINT32 *data_maxsize);
-
-/** 
- *  \brief		定义存储关键信息的函数
- *  \method		ezDevSDK_curing_data_save
- *  \param[in]	valuetype				数据类型
- *  \param[in]	keyvalue				传入数据地址
- *  \param[in] 	keyvalue_size			传入数据长度
- *  \return 	成功返回0，失败返回非0
- */
-typedef EZDEV_SDK_INT32 (*ez_data_save)(ez_data_type_e valuetype, unsigned char* data, EZDEV_SDK_UINT32 data_maxsize);
 
 /**
  * 低功耗设备快速上线.
@@ -160,8 +133,6 @@ typedef struct
 	EZDEV_SDK_UINT8     bUser;					        ///< 是否开启用户回调, 0 dev_id&masterkey通过文件方式存取 !0 通过回调的方式存取
 	ez_key_value_load	value_load;			            ///< 读信息的函数
 	ez_key_value_save   value_save;			            ///< 写信息的函数
-	ez_data_load	    data_load;		                ///< 固化数据的读函数,必须实现
-	ez_data_save 	    data_save;		                ///< 固化数据的写函数,必须实现
 	char                devinfo_path[128];				///< devinfo文件路径
 	char                dev_id[128];					///< dev_id文件路径
 	char                dev_masterkey[128];				///< masterkey文件路径
@@ -340,7 +311,7 @@ typedef enum
 typedef struct
 {
     err_tag_e err_tag;               ///< 错误码类型
-    ezdev_sdk_kernel_error err_code; ///< 错误码
+    ez_sdk_error err_code; ///< 错误码
     EZDEV_SDK_PTR err_ctx;           ///< 错误码上线文
 } sdk_runtime_err_context;
 

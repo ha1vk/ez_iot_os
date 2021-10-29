@@ -18,7 +18,7 @@
  * 2021-10-09     XuRongjun    first version
  *******************************************************************************/
 
-#include "osal_time.h"
+#include "ezos_time.h"
 
 #ifndef _MQTTPORTING_H_
 #define _MQTTPORTING_H_
@@ -37,7 +37,7 @@ extern "C"
 
     typedef struct Timer
     {
-        osal_timespec_t end_time;
+        ezos_timespec_t end_time;
     } Timer;
 
     /**

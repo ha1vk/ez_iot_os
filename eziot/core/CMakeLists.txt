@@ -15,11 +15,12 @@ if(CONFIG_EZIOT_CORE_ENABLED)
     ###############################################
 
     ###### Add required/dependent components ######
-    list(APPEND ADD_REQUIREMENTS osal)
+    list(APPEND ADD_REQUIREMENTS src)
     list(APPEND ADD_REQUIREMENTS cJSON)
     list(APPEND ADD_REQUIREMENTS mqtt)
     list(APPEND ADD_REQUIREMENTS mbedtls)
     list(APPEND ADD_REQUIREMENTS xml)
+	list(APPEND ADD_REQUIREMENTS logger)
     ###############################################
 
     ############ Add static libs ##################

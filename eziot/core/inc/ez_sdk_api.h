@@ -15,7 +15,7 @@
 #define H_EZ_SDK_API_H_
 
 #include "base_typedef.h"
-#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_error.h"
 #include "ez_sdk_api_struct.h"
 
 #if (defined(_WIN32) || defined(_WIN64))
@@ -51,7 +51,7 @@ extern "C"
      * 4---RF管理(表示支持RF托管,由Base设备上报)
      * \return  ezdev_sdk_kernel_succ、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_json_invalid、ezdev_sdk_kernel_json_format、 \n
      * ezdev_sdk_kernel_value_load、ezdev_sdk_kernel_invald_call、ezdev_sdk_kernel_memory、ezdev_sdk_kernel_internal
-     * \see     错误码 ： ezdev_sdk_kernel_error
+     * \see     错误码 ： ez_sdk_error
      */
     EZOS_API EZDEV_SDK_INT32 EZOS_CALL ez_sdk_init(const ez_server_info_t *pserver_info, const ez_init_info_t *pinit, const EZDEV_SDK_UINT32 reg_mode);
 
@@ -59,7 +59,7 @@ extern "C"
      *  \brief      Boot模块启动接口（开启整个SDK，调用完接口后，SDK进入工作模式）
      *  \return     成功返回0 失败详见错误码
      *  \return     ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call
-     *  \see        错误码 ： ezdev_sdk_kernel_error
+     *  \see        错误码 ： ez_sdk_error
      */
     EZOS_API EZDEV_SDK_INT32 EZOS_CALL ez_sdk_start();
 
@@ -67,7 +67,7 @@ extern "C"
      *  \brief      Boot模块停止接口
      *  \return     成功返回0 失败详见错误码
      *  \return     ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call
-     *  \see        错误码 ： ezdev_sdk_kernel_error
+     *  \see        错误码 ： ez_sdk_error
      */
     EZOS_API EZDEV_SDK_INT32 EZOS_CALL ez_sdk_stop();
 
@@ -75,7 +75,7 @@ extern "C"
      *  \brief      Boot模块反初始化接口
      *  \return     成功返回0 失败详见错误码
      *  \return     ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call
-     *  \see        错误码 ： ezdev_sdk_kernel_error
+     *  \see        错误码 ： ez_sdk_error
      */
     EZOS_API EZDEV_SDK_INT32 EZOS_CALL ez_sdk_deinit();
 
@@ -85,7 +85,7 @@ extern "C"
      *  \return     ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_extend_existed、\n
      *              ezdev_sdk_kernel_extend_full
      */
-    EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_extend_load(const ezdev_sdk_kernel_extend *external_extend);
+    EZOS_API ez_sdk_error EZOS_CALL ez_sdk_extend_load(const ezdev_sdk_kernel_extend *external_extend);
 
     /** 
      *  \brief      扩展模块加载接口（非线程安全）
@@ -93,7 +93,7 @@ extern "C"
      *  \return     ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_extend_existed、\n
      *              ezdev_sdk_kernel_extend_full
      */
-    EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_extend_load_v3(const ezdev_sdk_kernel_extend_v3 *extend_info);
+    EZOS_API ez_sdk_error EZOS_CALL ez_sdk_extend_load_v3(const ezdev_sdk_kernel_extend_v3 *extend_info);
 
     /** 
      *  \brief      微内核数据发送接口（线程安全）
@@ -103,7 +103,7 @@ extern "C"
      *              ezdev_sdk_kernel_memory、ezdev_sdk_kernel_queue_full、ezdev_sdk_kernel_extend_no_find、ezdev_sdk_kernel_force_domain_risk、\n
      *              ezdev_sdk_kernel_force_cmd_risk
      */
-    EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_send(ezdev_sdk_kernel_pubmsg *pubmsg);
+    EZOS_API ez_sdk_error EZOS_CALL ez_sdk_send(ezdev_sdk_kernel_pubmsg *pubmsg);
 
     /** 
      *  \brief      微内核数据发送接口 v3协议（线程安全）
@@ -113,7 +113,7 @@ extern "C"
      *              ezdev_sdk_kernel_memory、ezdev_sdk_kernel_queue_full、ezdev_sdk_kernel_extend_no_find、ezdev_sdk_kernel_force_domain_risk、\n
      *              ezdev_sdk_kernel_force_cmd_risk
      */
-    EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubmsg_v3);
+    EZOS_API ez_sdk_error EZOS_CALL ez_sdk_send_v3(ezdev_sdk_kernel_pubmsg_v3 *pubmsg_v3);
 
     /** 
      *  \brief      设置socket参数
@@ -123,15 +123,15 @@ extern "C"
      *  \param[in]  optlen 操作参数长度
      *  \return     ezdev_sdk_kernel_succ、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_buffer_too_small
      */
-    EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_set_net_option(int optname, const void *optval, int optlen);
+    EZOS_API ez_sdk_error EZOS_CALL ez_sdk_set_net_option(int optname, const void *optval, int optlen);
 
     /** 
      *  \brief      萤石设备接入SDK 微内核 设备信息获取接口
-     *  \method     ezdev_sdk_kernel_getdevinfo_bykey
+     *  \method     ez_sdk_getdevinfo_bykey
      *  \param[in]  key 查找键值
      *  \return     成功返回value值指针 失败返回"invalidkey"
      */
-    EZOS_API const char* EZOS_CALL ezdev_sdk_kernel_getdevinfo_bykey(const char *key);
+    EZOS_API const char* EZOS_CALL ez_sdk_getdevinfo_bykey(const char *key);
 
     /** 
      *  \brief          获取微内核的版本号，二次调用
@@ -139,7 +139,7 @@ extern "C"
      *  \param[inout]   pbuflen 如果pbuf为空，返回待拷贝数据长度，否则返回真实拷贝长度
      *  \return         ezdev_sdk_kernel_succ、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_buffer_too_small
      */
-    EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_get_sdk_version(char *pbuf, int *pbuflen);
+    EZOS_API ez_sdk_error EZOS_CALL ez_sdk_get_sdk_version(char *pbuf, int *pbuflen);
 
     /** 
      *  \brief          获取LBS、DAS服务器信息接口，二次调用
@@ -147,14 +147,14 @@ extern "C"
      *  \param[inout]   ptr_count 如果ptr_server_info为空，返回待拷贝数据的数量，否则返回真实拷贝数量
      *  \return         ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_buffer_too_small
      */
-    EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_get_server_info(server_info_s *ptr_server_info, int *ptr_count);
+    EZOS_API ez_sdk_error EZOS_CALL ez_sdk_get_server_info(server_info_s *ptr_server_info, int *ptr_count);
 
     /** 
      *  \brief          show_key功能接口
      *  \param[out]     show_key信息数组
      *  \return         ezdev_sdk_kernel_succ、ezdev_sdk_kernel_invald_call、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_buffer_too_small
      */
-    EZOS_API ezdev_sdk_kernel_error EZOS_CALL ezdev_sdk_kernel_show_key_info(showkey_info *ptr_showkey_info);
+    EZOS_API ez_sdk_error EZOS_CALL ez_sdk_show_key_info(showkey_info *ptr_showkey_info);
 
 #ifdef __cplusplus
 }

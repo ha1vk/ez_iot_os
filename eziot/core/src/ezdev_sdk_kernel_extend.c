@@ -14,7 +14,7 @@
 #include "ezdev_sdk_kernel_extend.h"
 #include "sdk_kernel_def.h"
 #include "ezdev_sdk_kernel_struct.h"
-#include "ezdev_sdk_kernel_error.h"
+#include "ez_sdk_error.h"
 #include "mkernel_internal_error.h"
 #include "access_domain_bus.h"
 #include "dev_protocol_def.h"
@@ -148,10 +148,10 @@ static mkernel_internal_error consume_extend_data_v3(ezdev_sdk_kernel *sdk_kerne
 
             if (ptr_submsg->buf != NULL)
             {
-                ez_free(ptr_submsg->buf);
+                ezos_free(ptr_submsg->buf);
                 ptr_submsg->buf = NULL;
             }
-            ez_free(ptr_submsg);
+            ezos_free(ptr_submsg);
             ptr_submsg = NULL;
         }
 
@@ -209,11 +209,11 @@ static mkernel_internal_error consume_extend_data(ezdev_sdk_kernel *sdk_kernel)
 
             if (ptr_submsg->buf != NULL)
             {
-                ez_free(ptr_submsg->buf);
+                ezos_free(ptr_submsg->buf);
                 ptr_submsg->buf = NULL;
             }
 
-            ez_free(ptr_submsg);
+            ezos_free(ptr_submsg);
             ptr_submsg = NULL;
         }
 
@@ -406,12 +406,12 @@ mkernel_internal_error clear_queue_pubmsg_exchange()
         }
 
         if (NULL != ptr_pubmsg_exchange->msg_conntext.msg_body)
-            ez_free(ptr_pubmsg_exchange->msg_conntext.msg_body);
+            ezos_free(ptr_pubmsg_exchange->msg_conntext.msg_body);
 
         if (NULL != ptr_pubmsg_exchange->msg_conntext.externel_ctx)
-            ez_free(ptr_pubmsg_exchange->msg_conntext.externel_ctx);
+            ezos_free(ptr_pubmsg_exchange->msg_conntext.externel_ctx);
 
-        ez_free(ptr_pubmsg_exchange);
+        ezos_free(ptr_pubmsg_exchange);
         ptr_pubmsg_exchange = NULL;
     } while (1);
 
@@ -432,9 +432,9 @@ mkernel_internal_error clear_queue_pubmsg_exchange_v3()
         }
 
         if (NULL != ptr_pubmsg_exchange->msg_conntext_v3.msg_body)
-            ez_free(ptr_pubmsg_exchange->msg_conntext_v3.msg_body);
+            ezos_free(ptr_pubmsg_exchange->msg_conntext_v3.msg_body);
 
-        ez_free(ptr_pubmsg_exchange);
+        ezos_free(ptr_pubmsg_exchange);
         ptr_pubmsg_exchange = NULL;
     } while (1);
 
@@ -455,9 +455,9 @@ mkernel_internal_error clear_queue_submsg()
         }
 
         if (NULL != ptr_submsg->buf)
-            ez_free(ptr_submsg->buf);
+            ezos_free(ptr_submsg->buf);
 
-        ez_free(ptr_submsg);
+        ezos_free(ptr_submsg);
         ptr_submsg = NULL;
     } while (1);
 
@@ -479,9 +479,9 @@ mkernel_internal_error clear_queue_submsg_v3()
         }
 
         if (NULL != ptr_submsg->buf)
-            ez_free(ptr_submsg->buf);
+            ezos_free(ptr_submsg->buf);
 
-        ez_free(ptr_submsg);
+        ezos_free(ptr_submsg);
         ptr_submsg = NULL;
     } while (1);
 

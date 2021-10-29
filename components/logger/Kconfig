@@ -1,0 +1,5 @@
+menu "Component logger configuration"
+    config EZIOT_COMPONENT_LOGGER_ENABLE
+        bool "Enable logger"
+        default y
+endmenu
