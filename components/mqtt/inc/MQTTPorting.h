@@ -18,7 +18,7 @@
  * 2021-10-09     XuRongjun    first version
  *******************************************************************************/
 
-#include "ezos_time.h"
+#include <ezos.h>
 
 #ifndef _MQTTPORTING_H_
 #define _MQTTPORTING_H_

@@ -28,12 +28,7 @@
 
 #include <elog.h>
 #include <stdio.h>
-#include "ezos_file.h"
-#include "ezos_io.h"
-#include "ezos_mem.h"
-#include "ezos_network.h"
-#include "ezos_thread.h"
-#include "ezos_time.h"
+#include <ezos.h>
 
 
 #ifdef ELOG_FILE_ENABLE

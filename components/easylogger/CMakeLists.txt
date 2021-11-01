@@ -1,4 +1,4 @@
-if(CONFIG_EZIOT_COMPONENT_LOGGER_ENABLE)
+if(CONFIG_EZIOT_COMPONENT_ELOG_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
@@ -16,7 +16,7 @@ if(CONFIG_EZIOT_COMPONENT_LOGGER_ENABLE)
 
     ###### Add required/dependent components ######
     # list(APPEND ADD_REQUIREMENTS component1)
-    list(APPEND ADD_REQUIREMENTS src)
+    list(APPEND ADD_REQUIREMENTS platform)
     ###############################################
 
     ############ Add static libs ##################

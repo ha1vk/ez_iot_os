@@ -32,12 +32,9 @@
 #ifdef ELOG_ASYNC_OUTPUT_ENABLE
 
 #ifdef ELOG_ASYNC_OUTPUT_USING_PTHREAD
-#include "ezos_file.h"
-#include "ezos_io.h"
-#include "ezos_mem.h"
-#include "ezos_network.h"
-#include "ezos_thread.h"
-#include "ezos_time.h"
+#include <pthread.h>
+#include <sched.h>
+#include <semaphore.h>
 /* thread default stack size */
 #ifndef ELOG_ASYNC_OUTPUT_PTHREAD_STACK_SIZE
 #if PTHREAD_STACK_MIN > 4*1024
@@ -58,7 +55,7 @@
 /* asynchronous output log notice */
 static sem_t output_notice;
 /* asynchronous output pthread thread */
-static ez_thread_t async_output_thread;
+static pthread_t async_output_thread;
 #endif /* ELOG_ASYNC_OUTPUT_USING_PTHREAD */
 
 /* the highest output level for async mode, other level will sync output */
@@ -282,7 +279,7 @@ void elog_async_output_notice(void) {
     sem_post(&output_notice);
 }
 
-static void async_output(void *arg) {
+static void *async_output(void *arg) {
     size_t get_log_size = 0;
     static char poll_get_buf[ELOG_ASYNC_POLL_GET_LOG_BUF_SIZE];
 
@@ -332,22 +329,19 @@ ElogErrCode elog_async_init(void) {
     }
 
 #ifdef ELOG_ASYNC_OUTPUT_USING_PTHREAD
-    ez_task_init_parm task_para;
-    ez_thread_t async_output_thread;
+    pthread_attr_t thread_attr;
+    struct sched_param thread_sched_param;
 
     sem_init(&output_notice, 0, 0);
 
-    memset(&task_para, 0, sizeof(ez_task_init_parm));
-    task_para.task_fun = async_output;
-    ezos_snprintf(task_para.task_name, 12, "async_output");
-    task_para.priority = ELOG_ASYNC_OUTPUT_PTHREAD_PRIORITY;
-    task_para.task_arg = NULL;
-    async_output_thread = ezos_thread_create(&task_para);
-    if (async_output_thread == NULL){
-        ez_log_e(TAG_SDK,"test async_output task create error\n");
-        return result;
-    }
-    ezos_thread_detach(async_output_thread);
+    pthread_attr_init(&thread_attr);
+    pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED);
+    pthread_attr_setstacksize(&thread_attr, ELOG_ASYNC_OUTPUT_PTHREAD_STACK_SIZE);
+    pthread_attr_setschedpolicy(&thread_attr, SCHED_RR);
+    thread_sched_param.sched_priority = ELOG_ASYNC_OUTPUT_PTHREAD_PRIORITY;
+    pthread_attr_setschedparam(&thread_attr, &thread_sched_param);
+    pthread_create(&async_output_thread, &thread_attr, async_output, NULL);
+    pthread_attr_destroy(&thread_attr);
 #endif
 
     init_ok = true;

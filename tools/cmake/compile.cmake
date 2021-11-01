@@ -26,7 +26,13 @@ include(${EZOS_PATH}/tools/cmake/tools.cmake)
 
 function(register_component)
     get_filename_component(component_dir ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
-    get_filename_component(component_name ${component_dir} NAME)
+
+    if(ADD_COMPONENT_ALIAS)
+        set(component_name ${ADD_COMPONENT_ALIAS})
+    else()
+        get_filename_component(component_name ${component_dir} NAME)
+    endif()
+
     message(STATUS "[register component: ${component_name} ], path:${component_dir}")
 
     # Get params: DYNAMIC/SHARED

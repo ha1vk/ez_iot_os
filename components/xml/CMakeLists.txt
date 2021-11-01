@@ -15,7 +15,7 @@ if(CONFIG_EZIOT_COMPONENT_EZXML_ENABLE)
     ###############################################
 
     ###### Add required/dependent components ######
-    list(APPEND ADD_REQUIREMENTS src)
+    list(APPEND ADD_REQUIREMENTS platform)
     ###############################################
 
     ############ Add static libs ##################

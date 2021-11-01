@@ -15,7 +15,7 @@
     ###############################################
 
     ###### Add required/dependent components ######
-    list(APPEND ADD_REQUIREMENTS src)
+    list(APPEND ADD_REQUIREMENTS platform)
     ###############################################
 
     ############ Add static libs ##################

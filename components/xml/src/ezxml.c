@@ -27,8 +27,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
-#include "ezos_mem.h"
-#include "ezos_io.h"
+#include <ezos.h>
 
 #define EZXML_NOMMAP
 #ifndef EZXML_NOMMAP

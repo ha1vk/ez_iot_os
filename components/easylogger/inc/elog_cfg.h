@@ -28,31 +28,71 @@
 
 #ifndef _ELOG_CFG_H_
 #define _ELOG_CFG_H_
+
+#include <ezos.h>
+
 /*---------------------------------------------------------------------------*/
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_OUTPUT_ENABLE
 /* enable log output. */
 #define ELOG_OUTPUT_ENABLE
-/* enable log write file. default open this macro */
-// #define ELOG_FILE_ENABLE
-/* enable flush file cache. default open this macro */
-// #define ELOG_FILE_FLUSH_CAHCE_ENABLE
-/* setting static output log level */
+#endif
 /* setting static output log level. range: from ELOG_LVL_ASSERT to ELOG_LVL_VERBOSE */
 #define ELOG_OUTPUT_LVL                          ELOG_LVL_VERBOSE
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_ASSERT_ENABLE
 /* enable assert check */
-// #define ELOG_ASSERT_ENABLE
+#define ELOG_ASSERT_ENABLE
+#endif
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_LINE_BUF_SIZE
 /* buffer size for every line's log */
-#define ELOG_LINE_BUF_SIZE                       2048
+#define ELOG_LINE_BUF_SIZE                       CONFIG_EZIOT_COMPONENT_ELOG_LINE_BUF_SIZE
+#else
+#define ELOG_LINE_BUF_SIZE                       1024
+#endif
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_LINE_NUM_MAX_LEN
 /* output line number max length */
+#define ELOG_LINE_NUM_MAX_LEN                    CONFIG_EZIOT_COMPONENT_ELOG_LINE_NUM_MAX_LEN
+#else
 #define ELOG_LINE_NUM_MAX_LEN                    5
+#endif
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_FILTER_TAG_MAX_LEN
 /* output filter's tag max length */
-#define ELOG_FILTER_TAG_MAX_LEN                  30
+#define ELOG_FILTER_TAG_MAX_LEN                  CONFIG_EZIOT_COMPONENT_ELOG_FILTER_TAG_MAX_LEN
+#else
+#define ELOG_FILTER_TAG_MAX_LEN                  16
+#endif
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_FILTER_KW_MAX_LEN
 /* output filter's keyword max length */
+#define ELOG_FILTER_KW_MAX_LEN                   CONFIG_EZIOT_COMPONENT_ELOG_FILTER_KW_MAX_LEN
+#else
 #define ELOG_FILTER_KW_MAX_LEN                   16
+#endif
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_FILTER_TAG_LVL_MAX_NUM
+/* output filter's tag level max num */
+#define ELOG_FILTER_TAG_LVL_MAX_NUM              CONFIG_EZIOT_COMPONENT_ELOG_FILTER_TAG_LVL_MAX_NUM
+#else
+#define ELOG_FILTER_TAG_LVL_MAX_NUM              5
+#endif
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_NEWLINE_SIGN
 /* output newline sign */
+#define ELOG_NEWLINE_SIGN                        CONFIG_EZIOT_COMPONENT_ELOG_NEWLINE_SIGN
+#else
 #define ELOG_NEWLINE_SIGN                        "\n"
+#endif
+
 /*---------------------------------------------------------------------------*/
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_COLOR_ENABLE
 /* enable log color */
 #define ELOG_COLOR_ENABLE
+#endif
+
 /* change the some level logs to not default color if you want */
 #define ELOG_COLOR_ASSERT                        (F_MAGENTA B_NULL S_NORMAL)
 #define ELOG_COLOR_ERROR                         (F_RED B_NULL S_NORMAL)
@@ -61,20 +101,34 @@
 #define ELOG_COLOR_DEBUG                         (F_GREEN B_NULL S_NORMAL)
 #define ELOG_COLOR_VERBOSE                       (F_BLUE B_NULL S_NORMAL)
 /*---------------------------------------------------------------------------*/
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_ASYNC_OUTPUT_ENABLE
 /* enable asynchronous output mode */
-// #define ELOG_ASYNC_OUTPUT_ENABLE
+#define ELOG_ASYNC_OUTPUT_ENABLE
+#endif
+
 /* the highest output level for async mode, other level will sync output */
 #define ELOG_ASYNC_OUTPUT_LVL                    ELOG_LVL_ASSERT
 /* buffer size for asynchronous output mode */
 #define ELOG_ASYNC_OUTPUT_BUF_SIZE               (ELOG_LINE_BUF_SIZE * 10)
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_ASYNC_LINE_OUTPUT
 /* each asynchronous output's log which must end with newline sign */
 #define ELOG_ASYNC_LINE_OUTPUT
+#endif
+
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_ASYNC_OUTPUT_USING_PTHREAD
 /* asynchronous output mode using POSIX pthread implementation */
 #define ELOG_ASYNC_OUTPUT_USING_PTHREAD
+#endif
+
 /*---------------------------------------------------------------------------*/
+#ifdef CONFIG_EZIOT_COMPONENT_ELOG_BUF_OUTPUT_ENABLE
 /* enable buffered output mode */
-// #define ELOG_BUF_OUTPUT_ENABLE
+#define ELOG_BUF_OUTPUT_ENABLE
+
 /* buffer size for buffered output mode */
 #define ELOG_BUF_OUTPUT_BUF_SIZE                 (ELOG_LINE_BUF_SIZE * 10)
+#endif
 
 #endif /* _ELOG_CFG_H_ */

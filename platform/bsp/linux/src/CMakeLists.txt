@@ -48,4 +48,8 @@ aux_source_directory(. ADD_SRCS)       # collect all source file in src dir, wil
 # set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group libmaix/libtest.a -ltest2 -Wl,--end-group" PARENT_SCOPE)
 ###############################################
 
+############ Set component alias ####################
+set(ADD_COMPONENT_ALIAS "platform")
+###############################################
+
 register_component()
