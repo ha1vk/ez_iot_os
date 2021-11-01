@@ -22,20 +22,49 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * Function:  It is the configure head file for this flash log plugin.
+ * Function:  Portable interface for EasyLogger's file log pulgin.
  * Created on: 2019-01-05
  */
 
-#ifndef _ELOG_FILE_CFG_H_
-#define _ELOG_FILE_CFG_H_
+#include "elog_file.h"
 
-/* EasyLogger file log plugin's using file name */
-#define ELOG_FILE_NAME      "/spiffs/ezlog_file.log"
+/**
+ * EasyLogger flile log pulgin port initialize
+ *
+ * @return result
+ */
+ElogErrCode elog_file_port_init(void)
+{
+    ElogErrCode result = ELOG_NO_ERR;
 
-/* EasyLogger file log plugin's using file max size */
-#define ELOG_FILE_MAX_SIZE  (100 * 1024)
+    /* add your code here */
 
-/* EasyLogger file log plugin's using max rotate file count */
-#define ELOG_FILE_MAX_ROTATE 10
+    return result;
+}
 
-#endif /* _ELOG_FILE_CFG_H_ */
+/**
+ * file log lock
+ */
+void elog_file_port_lock(void) {
+
+    /* add your code here */
+
+}
+
+/**
+ * file log unlock
+ */
+void elog_file_port_unlock(void) {
+
+    /* add your code here */
+
+}
+
+/**
+ * file log deinit
+ */
+void elog_file_port_deinit(void) {
+
+    /* add your code here */
+
+}

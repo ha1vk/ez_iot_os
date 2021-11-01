@@ -22,55 +22,20 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * Function:  Portable interface for EasyLogger's file log pulgin.
+ * Function:  It is the configure head file for this flash log plugin.
  * Created on: 2019-01-05
  */
 
-#include "elog_file.h"
-#include "ezos_thread.h"
+#ifndef _ELOG_FILE_CFG_H_
+#define _ELOG_FILE_CFG_H_
 
-static ez_mutex_t file_w_mutex;
+/* EasyLogger file log plugin's using file name */
+#define ELOG_FILE_NAME                 /* @note you must define it for a value */
 
-/**
- * EasyLogger flile log pulgin port initialize
- *
- * @return result
- */
-ElogErrCode elog_file_port_init(void)
-{
-    ElogErrCode result = ELOG_NO_ERR;
-    /* add your code here */
-    file_w_mutex = ezos_mutex_create();
-    if(file_w_mutex ==  NULL){
-        return ELOG_MALLOC_ERR;
-    }
+/* EasyLogger file log plugin's using file max size */
+#define ELOG_FILE_MAX_SIZE             /* @note you must define it for a value */
 
-    return result;
-}
+/* EasyLogger file log plugin's using max rotate file count */
+#define ELOG_FILE_MAX_ROTATE           /* @note you must define it for a value */
 
-/**
- * file log lock
- */
-void elog_file_port_lock(void)
-{
-    /* add your code here */
-    ezos_mutex_lock(file_w_mutex);
-}
-
-/**
- * file log unlock
- */
-void elog_file_port_unlock(void)
-{
-    /* add your code here */
-    ezos_mutex_unlock(file_w_mutex);
-}
-
-/**
- * file log deinit
- */
-void elog_file_port_deinit(void)
-{
-    /* add your code here */
-    
-}
+#endif /* _ELOG_FILE_CFG_H_ */

@@ -26,43 +26,40 @@
  * Created on: 2019-01-05
  */
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
-#include <elog_file.h>
-#include <elog_file_cfg.h>
-#include "ezos_file.h"
-#include "ezos_io.h"
-#include "ezos_mem.h"
-#include "ezos_network.h"
-#include "ezos_thread.h"
-#include "ezos_time.h"
+
+#include <file/elog_file.h>
+#include <file/elog_file_cfg.h>
 
 /* initialize OK flag */
 static bool init_ok = false;
-static int g_logfile_fd = -1;
+static FILE *fp = NULL;
+static int fd = -1;
 static ElogFileCfg local_cfg;
 
 ElogErrCode elog_file_init(void)
 {
     ElogErrCode result = ELOG_NO_ERR;
     ElogFileCfg cfg;
+
     if (init_ok)
         goto __exit;
-    do
-    {
-        result = elog_file_port_init();
-        if(ELOG_NO_ERR != result)
-        {
-            break;
-        }
-        cfg.name = ELOG_FILE_NAME;
-        cfg.max_size = ELOG_FILE_MAX_SIZE;
-        cfg.max_rotate = ELOG_FILE_MAX_ROTATE;
 
-        elog_file_config(&cfg);
+    elog_file_port_init();
 
-        init_ok = true;
-    } while (0);
+    cfg.name = ELOG_FILE_NAME;
+    cfg.max_size = ELOG_FILE_MAX_SIZE;
+    cfg.max_rotate = ELOG_FILE_MAX_ROTATE;
 
+    elog_file_config(&cfg);
+
+    init_ok = true;
 __exit:
     return result;
 }
@@ -72,14 +69,15 @@ __exit:
  */
 static bool elog_file_reopen(void)
 {
-    int tmp_fd;
+    FILE *tmp_fp;
 
-    tmp_fd = ezos_open(local_cfg.name, O_RDWR|O_CREAT, S_IRWXU|S_IRWXG|S_IRWXO);
-    if (tmp_fd != -1) {
-        if (g_logfile_fd != -1)
-            ezos_close(g_logfile_fd);
+    tmp_fp = fopen(local_cfg.name, "a+");
+    if (tmp_fp) {
+        if (fp)
+            fclose(fp);
 
-        g_logfile_fd = tmp_fd;
+        fp = tmp_fp;
+        fd = fileno(fp);
         return true;
     }
 
@@ -101,9 +99,9 @@ static void elog_file_rotate(void)
     memcpy(newpath, local_cfg.name, base);
 
     for (n = local_cfg.max_rotate - 1; n >= 0; --n) {
-        ezos_snprintf(oldpath + base, SUFFIX_LEN, n ? ".%d" : "", n);
-        ezos_snprintf(newpath + base, SUFFIX_LEN, ".%d", n);
-        ezos_rename(oldpath, newpath);
+        snprintf(oldpath + base, SUFFIX_LEN, n ? ".%d" : "", n - 1);
+        snprintf(newpath + base, SUFFIX_LEN, ".%d", n);
+        rename(oldpath, newpath);
     }
 }
 
@@ -114,7 +112,7 @@ static bool elog_file_retate_check(void)
 {
     struct stat statbuf;
     statbuf.st_size = 0;
-    if (ezos_stat(local_cfg.name, &statbuf) < 0)
+    if (stat(local_cfg.name, &statbuf) < 0)
         return false;
 
     if (statbuf.st_size > local_cfg.max_size)
@@ -128,14 +126,12 @@ void elog_file_write(const char *log, size_t size)
     ELOG_ASSERT(init_ok);
     ELOG_ASSERT(log);
     struct stat statbuf;
-    int ret;
 
     statbuf.st_size = 0;
-    if(g_logfile_fd == -1)
-        return;
+
     elog_file_port_lock();
 
-    ezos_fstat(g_logfile_fd, &statbuf);
+    fstat(fd, &statbuf);
 
     if (unlikely(statbuf.st_size > local_cfg.max_size)) {
 #if ELOG_FILE_MAX_ROTATE > 0
@@ -153,10 +149,12 @@ void elog_file_write(const char *log, size_t size)
 #endif
     }
 
-    ret = ezos_write(g_logfile_fd, log, size);
-    if(ret < 0){
-        
-    }
+    fwrite(log, size, 1, fp);
+
+#ifdef ELOG_FILE_FLUSH_CAHCE_ENABLE
+    fflush(fp);
+    fsync(fd);
+#endif
 
     elog_file_port_unlock();
 }
@@ -164,15 +162,15 @@ void elog_file_write(const char *log, size_t size)
 void elog_file_deinit(void)
 {
     ELOG_ASSERT(init_ok);
+
     elog_file_port_deinit();
-    if (g_logfile_fd != -1)
-        ezos_close(g_logfile_fd);
+    fclose(fp);
 }
 
 void elog_file_config(ElogFileCfg *cfg)
 {
-    if (g_logfile_fd != -1) {
-        ezos_close(g_logfile_fd);
+    if (fp) {
+        fclose(fp);
     }
 
     elog_file_port_lock();
@@ -181,15 +179,11 @@ void elog_file_config(ElogFileCfg *cfg)
     local_cfg.max_size = cfg->max_size;
     local_cfg.max_rotate = cfg->max_rotate;
 
-    g_logfile_fd = ezos_open(local_cfg.name,  O_RDWR|O_CREAT, S_IRWXU|S_IRWXG|S_IRWXO);
-    if (g_logfile_fd == -1)
-    {
-
-    }
+    fp = fopen(local_cfg.name, "a+");
+    if (fp)
+        fd = fileno(fp);
     else
-    {
-        ezos_lseek(g_logfile_fd, 0, SEEK_END);
-    }
+        fd = -1;
 
     elog_file_port_unlock();
 }
