@@ -24,6 +24,10 @@
  *
  * Function: It is the configure head file for this library.
  * Created on: 2015-07-30
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-11-03     xurongjun    Configuration items adapt to ezos kconfig 
  */
 
 #ifndef _ELOG_CFG_H_

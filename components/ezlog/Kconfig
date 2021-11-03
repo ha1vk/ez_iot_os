@@ -42,7 +42,7 @@ menu "Component ezlog configuration"
 
     choice EZIOT_COMPONENT_EZLOG_NEWLINE_SIGN
         prompt "Output newline sign"
-        default NEWLIB_STDOUT_LINE_ENDING_CRLF
+        default EZIOT_COMPONENT_EZLOG_NEWLINE_SIGN_CRLF
         depends on EZIOT_COMPONENT_EZLOG_ENABLE
 
         help

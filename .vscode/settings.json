@@ -38,6 +38,8 @@
         "mqttclient.h": "c",
         "stdio.h": "c",
         "ezos_gconfig.h": "c",
-        "ezos.h": "c"
+        "ezos.h": "c",
+        "flashdb.h": "c",
+        "fdb_def.h": "c"
     }
 }
