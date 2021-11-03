@@ -16,32 +16,22 @@
  * Change Logs:
  * Date           Author       Notes
  * 2021-10-27     zoujinwei    first version
+ * 2021-11-02     xurongjun    support 
  *******************************************************************************/
 
 #ifndef H_EZOS_LIBC_H_
 #define H_EZOS_LIBC_H_
 
-#if (defined(_WIN32) || defined(_WIN64))
-#  if defined(EZOS_API_EXPORTS)
-#    define EZOS_API __declspec(dllexport)
-#  else
-#    define EZOS_API __declspec(dllimport)
-#  endif
-#  define EZOS_CALL __stdcall
-#elif defined(__linux__)
-#  define EZOS_API
-#  define EZOS_CALL
-#else
-#  define EZOS_API
-#  define EZOS_CALL
-#endif
+#include <stdio.h>
+#include <ezos_def.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdio.h>
-
+EZOS_API int EZOS_CALL ezos_printf(const char *format, ...);
+EZOS_API int EZOS_CALL ezos_sprintf(char *str, const char *format, ...);
+EZOS_API int EZOS_CALL ezos_snprintf(char *str, size_t size, const char *format, ...);
 EZOS_API int EZOS_CALL ezos_memcmp(const void *s1, const void *s2, size_t n);
 EZOS_API void * EZOS_CALL ezos_memcpy(void *dest, const void *src, size_t n);
 EZOS_API char * EZOS_CALL ezos_strcpy(char *dest, const char *src);

@@ -15,7 +15,7 @@
     ###############################################
 
     ###### Add required/dependent components ######
-    list(APPEND ADD_REQUIREMENTS platform)
+    list(APPEND ADD_REQUIREMENTS ezos)
     ###############################################
 
     ############ Add static libs ##################

@@ -38,7 +38,6 @@
         "mqttclient.h": "c",
         "stdio.h": "c",
         "ezos_gconfig.h": "c",
-        "ezos_thread.h": "c",
-        "ezos_time.h": "c"
+        "ezos.h": "c"
     }
 }

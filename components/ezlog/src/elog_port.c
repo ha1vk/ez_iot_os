@@ -105,7 +105,7 @@ const char *elog_port_get_time(void) {
 
     timep = ezos_get_time_stamp(&timep);
     ez_localtime(&timep, &p);
-    
+
     ezos_snprintf(cur_system_time, 18, "%02d-%02d %02d:%02d:%02d", p.tm_mon + 1, p.tm_mday,
             p.tm_hour, p.tm_min, p.tm_sec);
 

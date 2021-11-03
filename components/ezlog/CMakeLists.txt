@@ -1,9 +1,9 @@
-if(CONFIG_EZIOT_COMPONENT_ELOG_ENABLE)
+if(CONFIG_EZIOT_COMPONENT_EZLOG_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
         )
-    # list(APPEND ADD_PRIVATE_INCLUDE "include_private")
+    list(APPEND ADD_PRIVATE_INCLUDE "inc_private")
     ###############################################
 
     ############## Add source files ###############
@@ -16,7 +16,7 @@ if(CONFIG_EZIOT_COMPONENT_ELOG_ENABLE)
 
     ###### Add required/dependent components ######
     # list(APPEND ADD_REQUIREMENTS component1)
-    list(APPEND ADD_REQUIREMENTS platform)
+    list(APPEND ADD_REQUIREMENTS ezos)
     ###############################################
 
     ############ Add static libs ##################

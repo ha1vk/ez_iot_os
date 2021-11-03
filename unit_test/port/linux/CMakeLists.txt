@@ -8,8 +8,9 @@ get_filename_component(ENV_PROJECT_NAME ${ENV_CURRENT_PATH} NAME)
 SET(ENV_UT_PATH ${ENV_CURRENT_PATH}/../..)
 SET(ENV_UTCASE_PATH ${ENV_CURRENT_PATH}/../../case)
 SET(ENV_UTPORT_PATH ${ENV_CURRENT_PATH})
-SET(ENV_CONFIG_PATH ${ENV_EZOS_PATH}/platform/mcu/${ENV_PROJECT_NAME}/config)
-SET(ENV_LIB_PATH ${ENV_EZOS_PATH}/platform/mcu/${ENV_PROJECT_NAME}/build)
+SET(ENV_PLATFORM_PATH ${ENV_EZOS_PATH}/platform)
+SET(ENV_CONFIG_PATH ${ENV_EZOS_PATH}/platform/bsp/${ENV_PROJECT_NAME}/config)
+SET(ENV_LIB_PATH ${ENV_EZOS_PATH}/platform/bsp/${ENV_PROJECT_NAME}/build)
 SET(ENV_COMPONENT_PATH ${ENV_EZOS_PATH}/components)
 
 include(${ENV_CONFIG_PATH}/ezos_gconfig.cmake)
@@ -59,6 +60,20 @@ else()
     message(FATAL_ERROR "The utest component must be enabled!")
 endif()
 
+if(CONFIG_EZIOT_COMPONENT_EZLOG_ENABLE)
+    message(STATUS "CONFIG_EZIOT_COMPONENT_EZLOG_ENABLE")
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_ezlog.c)
+
+    list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/ezlog/inc)
+    list(APPEND UT_INC_DIRS ${ENV_PLATFORM_PATH}/inc)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezos)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezlog)
+
+    list(APPEND UT_DEPENS -lezos)
+    list(APPEND UT_DEPENS -lezlog)
+
+endif()
+
 if(CONFIG_EZIOT_COMPONENT_FLASHDB_ENABLE)
     message(STATUS "CONFIG_EZIOT_COMPONENT_FLASHDB_ENABLE")
     list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_flashdb.c)
@@ -87,5 +102,7 @@ LINK_DIRECTORIES(${UT_DEPEN_DIRS})
 #源文件
 ADD_EXECUTABLE(ut_iotsdk ${UT_SRCS})
 
+list(REVERSE UT_DEPENS)
+message(STATUS "${UT_DEPENS}")
 #链接依赖库
 target_link_libraries(ut_iotsdk ${UT_DEPENS})

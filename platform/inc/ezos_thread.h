@@ -3,20 +3,7 @@
 #ifndef H_EZOS_THREAD_H_
 #define H_EZOS_THREAD_H_
 
-#if (defined(_WIN32) || defined(_WIN64))
-#  if defined(EZOS_API_EXPORTS)
-#    define EZOS_API __declspec(dllexport)
-#  else
-#    define EZOS_API __declspec(dllimport)
-#  endif
-#  define EZOS_CALL __stdcall
-#elif defined(__linux__)
-#  define EZOS_API
-#  define EZOS_CALL
-#else
-#  define EZOS_API
-#  define EZOS_CALL
-#endif
+#include <ezos_def.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,6 +40,7 @@ EZOS_API ez_thread_t EZOS_CALL ezos_thread_create(ez_task_init_parm *taskParam);
  *  \return 	成功返回0 失败返回-1
  */
 EZOS_API int EZOS_CALL ezos_thread_detach(ez_thread_t handle);
+
 /** 
  *  \brief		线程销毁
  *  \method		ezos_thread_destroy

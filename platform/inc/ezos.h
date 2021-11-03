@@ -23,5 +23,6 @@
 #include <ezos_time.h>
 #include <ezos_sem.h>
 #include <ezos_network.h>
+#include <ezos_libc.h>
 
 #endif
