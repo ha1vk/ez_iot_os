@@ -103,8 +103,8 @@ static int erase(long offset, size_t size)
 const struct fal_flash_dev nor_flash0 =
 {
     .name       = "norflash0",
-    .addr       = 0x9000,
-    .len        = 0x4000,
+    .addr       = 0x100000,
+    .len        = 50*1024,
     .blk_size   = FLASH_ERASE_MIN_SIZE,
     .ops        = {init, read, write, erase},
     .write_gran = 1

@@ -21,7 +21,7 @@
 #endif
 
 /* using TSDB (Time series database) feature */
-// #define FDB_USING_TSDB
+#define FDB_USING_TSDB
 
 /* Using file storage mode by POSIX file API, like open/read/write/close */
 #define FDB_USING_FILE_POSIX_MODE
