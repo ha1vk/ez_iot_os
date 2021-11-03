@@ -49,7 +49,7 @@ extern const struct fal_flash_dev nor_flash0;
 #define FAL_PART_TABLE                                                                \
 {                                                                                     \
     {FAL_PART_MAGIC_WORD, "fdb_kvdb1",  NOR_FLASH_DEV_NAME,          0, 16*1024, 0},  \
-    /*{FAL_PART_MAGIC_WORD, "fdb_tsdb1",  NOR_FLASH_DEV_NAME, 16*1024   , 16*1024, 0}, \*/
+    {FAL_PART_MAGIC_WORD, "fdb_tsdb1",  NOR_FLASH_DEV_NAME, 16*1024   , 16*1024, 0}, \
 }
 #endif /* FAL_PART_HAS_TABLE_CFG */
 

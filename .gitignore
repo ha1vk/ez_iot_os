@@ -1,1 +1,2 @@
-platform/mcu/linux/build/*
+platform/bsp/*/build
+unit_test/port/*/build
