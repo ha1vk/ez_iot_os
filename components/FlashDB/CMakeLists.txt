@@ -4,13 +4,37 @@ if(CONFIG_EZIOT_COMPONENT_FLASHDB_ENABLE)
     list(APPEND ADD_INCLUDE "inc"
         )
     # list(APPEND ADD_PRIVATE_INCLUDE "inc_private")
+    if(CONFIG_EZIOT_COMPONENT_FLASHDB_USING_FAL_MODE)
+    list(APPEND ADD_INCLUDE  "port/fal/inc")
+    endif()
+
     ###############################################
 
     ############## Add source files ###############
-    # list(APPEND ADD_SRCS  "src/lib1.c"
-    #     )
+    list(APPEND ADD_SRCS  "src/fdb.c"
+                          "src/fdb_utils.c")
+
+    if(CONFIG_EZIOT_COMPONENT_FLASHDB_USING_KVDB)
+    list(APPEND ADD_SRCS  "src/fdb_kvdb.c")
+    endif()
+
+    if(CONFIG_EZIOT_COMPONENT_FLASHDB_USING_TSDB)
+    list(APPEND ADD_SRCS  "src/fdb_tsdb.c")
+    endif()
+
+    if(CONFIG_EZIOT_COMPONENT_FLASHDB_USING_FAL_MODE)
+    list(APPEND ADD_SRCS  "port/fal/src/fal_flash.c")
+    list(APPEND ADD_SRCS  "port/fal/src/fal_partition.c")
+    list(APPEND ADD_SRCS  "port/fal/src/fal_rtt.c")
+    list(APPEND ADD_SRCS  "port/fal/src/fal.c")
+    endif()
+
+    if(CONFIG_EZIOT_COMPONENT_FLASHDB_USING_FILE_LIBC_MODE OR CONFIG_EZIOT_COMPONENT_FLASHDB_USING_FILE_POSIX_MODE)
+    list(APPEND ADD_SRCS  "src/fdb_file.c")
+    endif()
+
     # aux_source_directory(src ADD_SRCS)  # collect all source file in src dir, will set var ADD_SRCS
-    append_srcs_dir(ADD_SRCS "src")     # append source file in src dir to var ADD_SRCS
+    # append_srcs_dir(ADD_SRCS "src")     # append source file in src dir to var ADD_SRCS
     # list(REMOVE_ITEM COMPONENT_SRCS "src/test.c")
     ###############################################
 

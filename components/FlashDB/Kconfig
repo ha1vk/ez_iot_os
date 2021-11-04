@@ -31,6 +31,24 @@ menu "Component FlashDB configuration"
         bool "Using FAL(Flash Abstraction Layer) storage mode"
     endchoice
 
+    config EZIOT_COMPONENT_FLASHDB_USING_TSDB
+    bool "using TSDB (Time series database) feature"
+    default n
+    depends on EZIOT_COMPONENT_FLASHDB_ENABLE
+
+    choice EZIOT_COMPONENT_FLASHDB_USING_MODE
+        prompt "the flash write granularity"
+        default EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_1BIT
+        depends EZIOT_COMPONENT_FLASHDB_USING_FAL_MODE
+
+    config EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_1BIT
+        bool "1 Bit"
+    config EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_8BIT
+        bool "1 Bit"
+    config EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_32BIT
+        bool "Using FAL(Flash Abstraction Layer) storage mode"
+    endchoice
+
     config EZIOT_COMPONENT_FLASHDB_BIG_ENDIAN
         bool "MCU Endian Configuration, default is Little Endian Order"
         default n
