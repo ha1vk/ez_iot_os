@@ -9,56 +9,48 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
- * 
- * Brief:
- * Time related interface declaration
- * 
- * Change Logs:
- * Date           Author       Notes
- * 2021-10-11     XuRongjun    first version
- *******************************************************************************/
+ *
+ * Contributors:
+ * xurongjun (xurongjun@ezvizlife.com)
+*******************************************************************************/
 
-#ifndef H_EZOS_TIME_H_
-#define H_EZOS_TIME_H_
+#ifndef _EZOS_TIME_H_
+#define _EZOS_TIME_H_
 
-#if (defined(_WIN32) || defined(_WIN64))
-#if defined(EZOS_API_EXPORTS)
-#define EZOS_API __declspec(dllexport)
-#else
-#define EZOS_API __declspec(dllimport)
-#endif
-#define EZOS_CALL __stdcall
-#elif defined(__linux__)
-#define EZOS_API
-#define EZOS_CALL
-#else
-#define EZOS_API
-#define EZOS_CALL
-#endif
-
-#if defined(_WIN32) || defined(_WIN64)
-#include <Windows.h>
-#include <time.h>
-#include <windows.h>
-#include <WinSock2.h>
-#include <winsock.h>
-#define ez_localtime(timep, result) localtime_s(result, timep)
-#else
-#include <time.h>
-#include <sys/time.h>
-#define ez_localtime(timep, result) localtime_r(timep, result)
-#endif
+#include "ezos_def.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+    typedef long int ezos_time_t;
+    typedef long int ezos_suseconds_t;
+
     typedef struct
     {
-        time_t tv_sec;  //秒
-        time_t tv_nsec; //纳秒
+        ezos_time_t tv_sec;  /* Seconds.  */
+        ezos_time_t tv_nsec; /* nanosecond.  */
     } ezos_timespec_t;
+
+    struct ezos_timeval
+    {
+        ezos_time_t tv_sec;       /* Seconds.  */
+        ezos_suseconds_t tv_usec; /* Microseconds.  */
+    } ezos_timeval_t;
+
+    struct ezos_tm
+    {
+        ez_int32_t tm_sec;
+        ez_int32_t tm_min;
+        ez_int32_t tm_hour;
+        ez_int32_t tm_mday;
+        ez_int32_t tm_mon;
+        ez_int32_t tm_year;
+        ez_int32_t tm_wday;
+        ez_int32_t tm_yday;
+        ez_int32_t tm_isdst;
+    };
 
     /**
      * @brief This function will get current time from operating system startup
@@ -66,7 +58,7 @@ extern "C"
      * @param clock if clock non-NULL, the current time will be filled.
      * @return return 0 for success, or -1 for failure 
      */
-    EZOS_API int EZOS_CALL ezos_time_get_clock(ezos_timespec_t *clock);
+    EZOS_API ez_err_t EZOS_CALL ezos_get_clock(ezos_timespec_t *clock);
 
     /**
      * @brief This functions can get the time as well as a timezone.
@@ -74,35 +66,35 @@ extern "C"
      * @param tv The tv argument is a struct timeval.
      * @return return 0 for success, or -1 for failure 
      */
-    EZOS_API int EZOS_CALL ezos_time_gettimeofday(struct timeval *tv);
+    EZOS_API ez_err_t EZOS_CALL ezos_gettimeofday(struct ezos_timeval *tv);
 
     /**
-     * @brief returns the time as the number of seconds since the Epoch, 1970-01-01 00:00:00 +0000 (UTC).
+     * @brief Get current timestamp
      * 
-     * @return On success, the value of time in seconds since the Epoch is returned. 
-     *         On error, ((time_t) -1) is returned, and errno is set to indicate the error. 
+     * @param t put current time in *TIMER if TIMER is not NULL
+     * @return Return the current time
      */
-    EZOS_API time_t EZOS_CALL ezos_get_time_stamp(time_t *__timer);
+    EZOS_API ezos_time_t EZOS_CALL ezos_time(ezos_time_t *t);
 
     /**
      * @brief Return the `struct tm' representation of *TIMER in local time.
      * 
      * @param timep 
      * @param result return the address of the structure pointed to by result. 
-     * @return void
+     * @return ezos_tm*
      */
-    EZOS_API void EZOS_CALL ezos_localtime(const time_t *timep, struct tm *result);
+    EZOS_API struct ezos_tm *EZOS_CALL ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result);
 
     /**
      * @brief This function suspends execution of the calling thread for (at least) microseconds.
      * 
      * @param time_ms suspends time, as millisecond.
-     * @return returns 0 for success, or -1 for failure.
+     * @return ez_void_t.
      */
-    EZOS_API void EZOS_CALL ezos_delay_ms(unsigned int time_ms);
+    EZOS_API ez_void_t EZOS_CALL ezos_delay_ms(ez_ulong_t msecs);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif//H_EZOS_TIME_H_
+#endif

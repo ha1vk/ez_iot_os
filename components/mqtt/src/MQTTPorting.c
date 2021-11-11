@@ -58,7 +58,7 @@ char TimerIsExpired(Timer *assign_timer)
         return (char)1;
     }
 
-    ezos_time_get_clock(&now);
+    ezos_get_clock(&now);
     Platform_Timespec_Sub(&assign_timer->end_time, &now, &res);
     return res.tv_sec < 0 || (res.tv_sec == 0 && res.tv_nsec <= 0);
 }
@@ -72,7 +72,7 @@ void TimerCountdownMS(Timer *assign_timer, unsigned int time_count)
         return;
     }
 
-    ezos_time_get_clock(&now);
+    ezos_get_clock(&now);
     Platform_Timespec_Add(&now, &interval, &assign_timer->end_time);
 }
 
@@ -85,7 +85,7 @@ void TimerCountdown(Timer *assign_timer, unsigned int time_count)
         return;
     }
 
-    ezos_time_get_clock(&now);
+    ezos_get_clock(&now);
     Platform_Timespec_Add(&now, &interval, &assign_timer->end_time);
 }
 
@@ -97,7 +97,7 @@ int TimerLeftMS(Timer *assign_timer)
         return 0;
     }
 
-    ezos_time_get_clock(&now);
+    ezos_get_clock(&now);
     Platform_Timespec_Sub(&assign_timer->end_time, &now, &res);
     return (res.tv_sec < 0) ? 0 : res.tv_sec * TIMESPEC_THOUSAND + res.tv_nsec / TIMESPEC_MILLION;
 }

@@ -100,11 +100,11 @@ void elog_port_output_unlock(void) {
  */
 const char *elog_port_get_time(void) {
     static char cur_system_time[24] = { 0 };
-    time_t timep;
-    struct tm p;
+    ezos_time_t timep;
+    struct ezos_tm p;
 
-    timep = ezos_get_time_stamp(&timep);
-    ez_localtime(&timep, &p);
+    timep = ezos_time(&timep);
+    ezos_localtime(&timep, &p);
 
     ezos_snprintf(cur_system_time, 18, "%02d-%02d %02d:%02d:%02d", p.tm_mon + 1, p.tm_mday,
             p.tm_hour, p.tm_min, p.tm_sec);

@@ -24,5 +24,7 @@
 #include <ezos_sem.h>
 #include <ezos_network.h>
 #include <ezos_libc.h>
+#include <ezos_kv.h>
+#include <ezos_mem.h> 
 
 #endif

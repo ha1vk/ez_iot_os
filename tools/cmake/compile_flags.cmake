@@ -5,7 +5,8 @@
 # @date 2021-09-29
 
 ########## set C flags #########
-set(CMAKE_C_FLAGS -Wall)
+#TODO add private
+set(CMAKE_C_FLAGS -Wall -Wno-pointer-sign)
 ################################
 
 
@@ -13,8 +14,7 @@ set(CMAKE_C_FLAGS -Wall)
 set(CMAKE_CXX_FLAGS -Wall)
 ################################
 
-set(LINK_FLAGS -Wl,-EL
-            )
+set(LINK_FLAGS -Wl,-EL)
 set(CMAKE_C_LINK_FLAGS ${CMAKE_C_LINK_FLAGS}
                         ${LINK_FLAGS}
                         )

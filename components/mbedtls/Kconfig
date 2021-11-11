@@ -1,5 +1,5 @@
 menu "component mbedtls configuration"
-    config EZIOT_COMPONENT_MBEDTLS_ENABLED
+    config EZIOT_COMPONENT_MBEDTLS_ENABLE
         bool "Enable mbedtls"
         default y
 endmenu

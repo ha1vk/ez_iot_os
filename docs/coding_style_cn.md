@@ -70,14 +70,14 @@ ezxml.h
 webclient.h
 
 萤石业务组件：
-ez_iot_err.h
-ez_iot_core.h
-ez_iot_link.h
-ez_iot_bind.h
-ez_iot_shadow.h
-ez_iot_tsl.h
-ez_iot_ota.h
-ez_iot_hub.h
+eziot_err.h
+eziot_core.h
+eziot_link.h
+eziot_bind.h
+eziot_shadow.h
+eziot_tsl.h
+eziot_ota.h
+eziot_hub.h
 
 跨平台文件：
 ezos_system.h
@@ -135,7 +135,7 @@ static uint8_t g_mtu = HAL_MTU_MAX;
 - FUNC 组件内可配置的功能项
 
 ```
-#define CONFIG_EZIOT_CORE_ENABLED 1
+#define CONFIG_EZIOT_CORE_ENABLE 1
 #define CONFIG_EZIOT_CORE_MQTT_TASK_PRIORITY 10
 #define CONFIG_EZIOT_CORE_MQTT_TASK_STACK 6144
 #define CONFIG_EZIOT_LINK_ENABLED 1
@@ -143,7 +143,7 @@ static uint8_t g_mtu = HAL_MTU_MAX;
 #define CONFIG_EZIOT_EXT_MODEL_ENABLED 1
 #define CONFIG_EZIOT_EXT_OTA_ENABLED 1
 #define CONFIG_EZIOT_COMPONENT_CJSON_ENABLE 1
-#define CONFIG_EZIOT_COMPONENT_MBEDTLS_ENABLED 1
+#define CONFIG_EZIOT_COMPONENT_MBEDTLS_ENABLE 1
 #define CONFIG_EZIOT_COMPONENT_MQTT_ENABLE 1
 #define CONFIG_EZIOT_COMPONENT_UTEST_ENABLE 1
 #define CONFIG_EZIOT_COMPONENT_EZXML_ENABLE 1

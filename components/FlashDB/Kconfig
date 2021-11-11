@@ -36,10 +36,10 @@ menu "Component FlashDB configuration"
     default n
     depends on EZIOT_COMPONENT_FLASHDB_ENABLE
 
-    choice EZIOT_COMPONENT_FLASHDB_USING_MODE
+    choice EZIOT_COMPONENT_FLASHDB_WRITE_GRAN
         prompt "the flash write granularity"
         default EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_1BIT
-        depends EZIOT_COMPONENT_FLASHDB_USING_FAL_MODE
+        depends on EZIOT_COMPONENT_FLASHDB_USING_FAL_MODE
 
     config EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_1BIT
         bool "1 Bit"
@@ -54,7 +54,7 @@ menu "Component FlashDB configuration"
         default n
         depends on EZIOT_COMPONENT_FLASHDB_ENABLE
 
-    config CONFIG_EZIOT_COMPONENT_FLASHDB_DEBUG_ENABLE
+    config EZIOT_COMPONENT_FLASHDB_DEBUG_ENABLE
         bool "print debug information"
         default n
         depends on EZIOT_COMPONENT_FLASHDB_ENABLE

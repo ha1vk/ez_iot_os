@@ -49,6 +49,12 @@ typedef unsigned int    EZ_UINT;
 typedef long            EZ_LONG;
 typedef unsigned long   EZ_ULONG;
 
+#if defined(ARCH_CPU_64BIT) || defined(_WIN64)
+typedef long unsigned int EZ_SIZE;
+#else
+typedef unsigned int      EZ_SIZE;
+#endif
+
 typedef int         EZ_BOOL;
 typedef int         EZ_ERR;
 #define EZ_TRUE     1
@@ -82,6 +88,7 @@ typedef EZ_INT      ez_int_t;
 typedef EZ_UINT     ez_uint_t;
 typedef EZ_LONG     ez_long_t;
 typedef EZ_ULONG    ez_ulong_t;
+typedef EZ_SIZE     ez_size_t;
 
 typedef EZ_BOOL     ez_bool_t;
 typedef EZ_ERR      ez_err_t;

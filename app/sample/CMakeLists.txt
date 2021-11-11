@@ -25,7 +25,6 @@ SET(lib_ez_platform  -lez_os_platform)
 SET(lib_ez_components   -lez_iot_components)
 SET(lib_rt -lpthread -lm -lrt)
 
-
 if(TEST_BASE_ENABLE)
     message(STATUS "TEST_BASE_ENABLE")
     #SET(test_base_src base_sample.c)

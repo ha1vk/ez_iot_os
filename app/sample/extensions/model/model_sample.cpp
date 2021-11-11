@@ -20,7 +20,7 @@
 #include "ez_model_def.h"
 #include "ez_model.h"
 #include "ez_sdk_api_struct.h"
-#include "base_typedef.h"
+
 #include "model_sample.h"
 #include "ezos_file.h"
 #include "ezos_io.h"

@@ -15,7 +15,7 @@
 #include <dirent.h>
 #include <string>
 #include <unistd.h>
-#include "base_typedef.h"
+
 #include "inireader.h"
 #include "ez_sdk_api_struct.h"
 #include "ez_sdk_log.h"
@@ -200,7 +200,7 @@ void key_value_load_callback(ez_key_type_e type, unsigned char* keyvalue, EZDEV_
 }
 EZDEV_SDK_INT32 key_value_save_callback(ez_key_type_e valuetype, unsigned char* keyvalue, EZDEV_SDK_UINT32 keyvalue_size)
 {
-	EZDEV_SDK_INT32 ezRv = ezdev_sdk_kernel_succ;
+	EZDEV_SDK_INT32 ezRv = EZ_KERNEL_SUCC;
 
 	switch(valuetype)
 	{
@@ -229,7 +229,7 @@ EZDEV_SDK_INT32 key_value_save_callback(ez_key_type_e valuetype, unsigned char* 
 
 EZDEV_SDK_INT32 curing_data_load_cb(ez_data_type_e datatype, unsigned char* data, EZDEV_SDK_UINT32 *data_maxsize)
 {
-	EZDEV_SDK_INT32 ezRv = ezdev_sdk_kernel_succ;
+	EZDEV_SDK_INT32 ezRv = EZ_KERNEL_SUCC;
 	if(datatype >= type_count)
 	{
 		ezRv = ezdev_sdk_kernel_params_invalid;
@@ -245,7 +245,7 @@ EZDEV_SDK_INT32 curing_data_load_cb(ez_data_type_e datatype, unsigned char* data
 
 EZDEV_SDK_INT32 curing_data_save_cb(ez_data_type_e datatype, unsigned char* data, EZDEV_SDK_UINT32 data_size)
 {
-	EZDEV_SDK_INT32 ezRv = ezdev_sdk_kernel_succ;
+	EZDEV_SDK_INT32 ezRv = EZ_KERNEL_SUCC;
 
 	if(datatype >= type_count)
 	{
@@ -269,7 +269,7 @@ int main(void)
     CIniReader iniReader;
     ez_init_info_t init_info;
 	ez_server_info_t  server;
-	EZDEV_SDK_INT32 sdk_err = ezdev_sdk_kernel_succ;
+	EZDEV_SDK_INT32 sdk_err = EZ_KERNEL_SUCC;
 
     do
     {
@@ -336,7 +336,7 @@ int main(void)
 			if (!strcmp(message, "start\n"))
 			{
 				sdk_err = ez_sdk_init(&server, &init_info, 1);
-				if (ezdev_sdk_kernel_succ != sdk_err)
+				if (EZ_KERNEL_SUCC != sdk_err)
 				{
 					ez_log_e(TAG_APP,"ez_sdk_init failed, code: 0x%08x\n", sdk_err);
 					break;

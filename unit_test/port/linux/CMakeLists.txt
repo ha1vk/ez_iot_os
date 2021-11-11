@@ -12,6 +12,7 @@ SET(ENV_PLATFORM_PATH ${ENV_EZOS_PATH}/platform)
 SET(ENV_CONFIG_PATH ${ENV_EZOS_PATH}/platform/bsp/${ENV_PROJECT_NAME}/config)
 SET(ENV_LIB_PATH ${ENV_EZOS_PATH}/platform/bsp/${ENV_PROJECT_NAME}/build)
 SET(ENV_COMPONENT_PATH ${ENV_EZOS_PATH}/components)
+SET(ENV_EZIOT_PATH ${ENV_EZOS_PATH}/eziot)
 
 include(${ENV_CONFIG_PATH}/ezos_gconfig.cmake)
 ###############################################
@@ -75,17 +76,38 @@ if(CONFIG_EZIOT_COMPONENT_EZLOG_ENABLE)
 
 endif()
 
+if(CONFIG_EZIOT_CORE_ENABLE)
+
+    message(STATUS "CONFIG_EZIOT_CORE_ENABLE")
+
+    list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/core/inc)
+    #TODO add ut_online
+
+    if(CONFIG_EZIOT_OS_KV_ENABLE)
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_ezos_kv.c)
+    endif()
+
+    list(APPEND UT_DEPENS -lezos)
+    list(APPEND UT_DEPENS -lezlog)
+    list(APPEND UT_DEPENS -lcJSON)
+    list(APPEND UT_DEPENS -lmqtt)
+    list(APPEND UT_DEPENS -lezlog)
+    list(APPEND UT_DEPENS -lezxml)
+    list(APPEND UT_DEPENS -lmbedtls)
+
+endif()
+
+
 if(CONFIG_EZIOT_COMPONENT_FLASHDB_ENABLE)
     message(STATUS "CONFIG_EZIOT_COMPONENT_FLASHDB_ENABLE")
-    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_flashdb.c)
-    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/kv_imp.c)
+    list(APPEND UT_SRCS ${ENV_UTPORT_PATH}/kv_imp.c)
 
+    list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/FlashDB/inc)
     list(APPEND UT_INC_DIRS ${ENV_UTPORT_PATH})
-    list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/utest/inc)
-    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/flashdb)
 
-    list(APPEND UT_DEPENS -lflashdb)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/FlashDB)
 
+    list(APPEND UT_DEPENS -lFlashDB)
     list(APPEND UT_DEFINITIONS -DUTEST_TC_USE_CONSTRUCTOR)
 endif()
 

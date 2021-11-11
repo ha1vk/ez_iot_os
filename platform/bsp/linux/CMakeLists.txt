@@ -14,6 +14,5 @@ get_filename_component(project_dir_name ${parent_dir} NAME)
 
 set(PROJECT_NAME ${project_dir_name})
 
-message("-- PROJECT_NAME:${PROJECT_NAME}")
 do_lib_building(${PROJECT_NAME})
 ###############################################

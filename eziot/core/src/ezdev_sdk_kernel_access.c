@@ -10,6 +10,9 @@
 * and the Eclipse Distribution License is available at
 *   http://www.eclipse.org/org/documents/edl-v10.php.
 *******************************************************************************/
+
+#include <ezos.h>
+#include <ezlog.h>
 #include "ezdev_sdk_kernel_access.h"
 #include "mkernel_internal_error.h"
 #include "sdk_kernel_def.h"
@@ -17,35 +20,35 @@
 #include "das_transport.h"
 #include "ezdev_sdk_kernel_risk_control.h"
 #include "ezdev_sdk_kernel_event.h"
-#include "ezdev_sdk_kernel.h"
+#include "ezdev_sdk_kernel_struct.h"
+#include "sdk_kernel_def.h"
 #include "utils.h"
 #include "ezxml.h"
-#include "ase_support.h"
-#include "ezos_mem.h"
+#include "aes_support.h"
 
 LBS_TRANSPORT_INTERFACE
 DAS_TRANSPORT_INTERFACE
 EZDEV_SDK_KERNEL_RISK_CONTROL_INTERFACE
 EZDEV_SDK_KERNEL_EVENT_INTERFACE
-ASE_SUPPORT_INTERFACE
+AES_SUPPORT_INTERFACE
 
-extern ezdev_sdk_kernel g_ezdev_sdk_kernel;
+ezdev_sdk_kernel g_ezdev_sdk_kernel;
 
 static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel *sdk_kernel, EZDEV_SDK_UINT8 nUpper)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
     int type = 0;
-    if (strcmp("", (const char *)sdk_kernel->dev_id) == 0)
+    if (ezos_strcmp("", (const char *)sdk_kernel->dev_id) == 0)
     {
-        ezdev_sdk_kernel_log_info(0, 0, "dev_id is empty\n");
+        ezlog_i(TAG_CORE, "dev_id is empty");
         sdk_error = lbs_redirect_createdevid_with_auth(sdk_kernel, nUpper);
         type = 0;
     }
     else
     {
-        if (strcmp("", (const char *)sdk_kernel->master_key) == 0)
+        if (ezos_strcmp("", (const char *)sdk_kernel->master_key) == 0)
         {
-            ezdev_sdk_kernel_log_info(0, 0, "masterkey is empty\n");
+            ezlog_i(TAG_CORE, "masterkey is empty");
             sdk_error = lbs_redirect_with_auth(sdk_kernel, nUpper);
             type = 1;
         }
@@ -56,23 +59,23 @@ static mkernel_internal_error cnt_state_lbs_redirect(ezdev_sdk_kernel *sdk_kerne
         }
     }
 
-    ezdev_sdk_kernel_log_info(sdk_error, 0, "cnt_state_lbs_redirect result:%d, type:%d", sdk_error, type);
+    ezlog_i(TAG_CORE, "cnt_state_lbs_redirect result:%d, type:%d", sdk_error, type);
 
     if (sdk_error == mkernel_internal_platform_devid_inconformity)
     {
-        ezdev_sdk_kernel_log_info(0, 0, "memset dev_id in memory\n");
-        memset(sdk_kernel->dev_id, 0, ezdev_sdk_devid_len);
+        ezlog_i(TAG_CORE, "memset dev_id in memory");
+        ezos_memset(sdk_kernel->dev_id, 0, ezdev_sdk_devid_len);
     }
 
     if (sdk_error == mkernel_internal_platform_masterkey_invalid)
     {
-        ezdev_sdk_kernel_log_info(0, 0, "memset masterkey in memory\n");
-        memset(sdk_kernel->master_key, 0, ezdev_sdk_masterkey_len);
+        ezlog_i(TAG_CORE, "memset masterkey in memory");
+        ezos_memset(sdk_kernel->master_key, 0, ezdev_sdk_masterkey_len);
     }
     if (sdk_error == mkernel_internal_platform_lbs_signcheck_error && nUpper != 0)
     {
         sdk_error = cnt_state_lbs_redirect(sdk_kernel, 0);
-        ezdev_sdk_kernel_log_info(sdk_error, 0, "lbs return :%d, and nUpper != 0", sdk_error);
+        ezlog_i(TAG_CORE, "lbs return :%d, and nUpper != 0", sdk_error);
     }
     return sdk_error;
 }
@@ -88,11 +91,6 @@ static mkernel_internal_error cnt_state_das_reged(ezdev_sdk_kernel *sdk_kernel)
 static mkernel_internal_error cnt_state_das_fast_reg(ezdev_sdk_kernel *sdk_kernel)
 {
     return das_light_reg_v2(sdk_kernel);
-}
-
-static mkernel_internal_error cnt_state_das_fast_reg_v3(ezdev_sdk_kernel *sdk_kernel)
-{
-    return das_light_reg_v3(sdk_kernel);
 }
 
 static mkernel_internal_error cnt_state_das_work(ezdev_sdk_kernel *sdk_kernel)
@@ -128,7 +126,7 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel *sdk_kernel)
     }
 
     ezcore_time_countdown(&sdk_kernel->cnt_state_timer, 0);
-    ezdev_sdk_kernel_log_trace(0, 0, "cnt_state_lbs_redirect, times:%d \n", sdk_kernel->lbs_redirect_times);
+    ezlog_v(TAG_CORE, "cnt_state_lbs_redirect, times:%d", sdk_kernel->lbs_redirect_times);
     sdk_error = cnt_state_lbs_redirect(sdk_kernel, 1);
 
     if (sdk_error == mkernel_internal_succ)
@@ -139,51 +137,12 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel *sdk_kernel)
     }
     else
     {
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_lbs_redirect");
+        ezlog_e(TAG_CORE, "broadcast_runtime_err, cnt_state_lbs_redirect, code:%d", sdk_error);
         broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
         if (mkernel_internal_net_connect_error == sdk_error || mkernel_internal_net_gethostbyname_error == sdk_error || mkernel_internal_platform_lbs_auth_type_need_rematch == sdk_error)
         {
             sdk_kernel->lbs_redirect_times = 1;
         }
-        // else if (mkernel_internal_platform_lbs_sign_check_fail == sdk_error && !sdk_kernel->secretkey_applied)
-        // {
-        //     EZDEV_SDK_UINT16 _interval = 30;
-        //     EZDEV_SDK_UINT32 _duration = 3600 * 24;
-
-        //     sdk_error = cnt_state_lbs_apply_serectkey(sdk_kernel, &_interval, &_duration);
-        //     ezdev_sdk_kernel_log_info(sdk_error, 0, "apply_serectkey lbs return :%d, _interval:%d, _duration:%d", sdk_error, _interval, _duration);
-        //     if (mkernel_internal_succ == sdk_error)
-        //     {
-        //         sdk_kernel->entr_state = sdk_entrance_normal;
-        //         sdk_kernel->cnt_state = sdk_cnt_unredirect;
-        //         sdk_kernel->lbs_redirect_times = 0;
-        //     }
-        //     else
-        //     {
-        //         ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_lbs_apply_serectkey");
-        //         broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-        //         if (mkernel_internal_platform_secretkey_no_user == sdk_error)
-        //         {
-        //             ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_invaild_authcode");
-        //             broadcast_user_event(sdk_kernel_event_invaild_authcode, NULL, 0);
-        //         }
-
-        //         if (EZDEV_SDK_TRUE == sdk_kernel->secretkey_applied)
-        //         {
-        //             sdk_kernel->entr_state = sdk_entrance_normal;
-        //             sdk_kernel->cnt_state = sdk_cnt_unredirect;
-        //             sdk_kernel->lbs_redirect_times = 0;
-        //         }
-        //         else
-        //         {
-        //             sdk_kernel->entr_state = sdk_entrance_authcode_invalid;
-        //             sdk_kernel->cnt_state = sdk_cnt_unredirect;
-        //             sdk_kernel->lbs_redirect_times += _interval;
-        //             sdk_kernel->secretkey_interval = _interval;
-        //             sdk_kernel->secretkey_duration = _duration;
-        //         }
-        //     }
-        // }
         else
         {
             if (++sdk_kernel->lbs_redirect_times >= 60)
@@ -204,7 +163,7 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel *sdk_kernel)
     }
 
     ezcore_time_countdown(&sdk_kernel->cnt_state_timer, 0);
-    ezdev_sdk_kernel_log_trace(0, 0, "cnt_state_das_reged, times:%d \n", sdk_kernel->das_retry_times);
+    ezlog_v(TAG_CORE, "cnt_state_das_reged, times:%d", sdk_kernel->das_retry_times);
 
     sdk_error = cnt_state_das_reged(sdk_kernel);
     if (sdk_error == mkernel_internal_mqtt_session_exist)
@@ -219,34 +178,31 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel *sdk_kernel)
         sdk_kernel->das_retry_times = 0;
         if (sdk_kernel->entr_state == sdk_entrance_switchover)
         {
-            sdk_switchover_context context = {0};
+            ez_kernel_switchover_context_t context = {0};
             context.das_udp_port = sdk_kernel->redirect_das_info.das_udp_port;
-            memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
-            memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
-            memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
-            memcpy(context.lbs_domain, sdk_kernel->server_info.server_name, ezdev_sdk_ip_max_len);
-            ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_switchover");
-            broadcast_user_event(sdk_kernel_event_switchover, (void *)&context, sizeof(context));
+            ezos_memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
+            ezos_memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
+            ezos_memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
+            ezos_memcpy(context.lbs_domain, sdk_kernel->server_info.server_name, ezdev_sdk_ip_max_len);
+            broadcast_user_event(SDK_KERNEL_EVENT_SWITCHOVER, (void *)&context, sizeof(context));
             sdk_kernel->entr_state = sdk_entrance_normal;
         }
         else
         {
-            sdk_sessionkey_context context = {0};
+            ez_kernel_sessionkey_context_t context = {0};
             context.das_udp_port = sdk_kernel->redirect_das_info.das_udp_port;
             context.das_port = sdk_kernel->redirect_das_info.das_port;
             context.das_socket = ezdev_sdk_kernel_get_das_socket(sdk_kernel);
-            memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
-            memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
-            memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
-            memcpy(context.das_domain, sdk_kernel->redirect_das_info.das_domain, ezdev_sdk_ip_max_len);
-            memcpy(context.das_serverid, sdk_kernel->redirect_das_info.das_serverid, ezdev_sdk_ip_max_len);
-            ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_online");
-            broadcast_user_event(sdk_kernel_event_online, (void *)&context, sizeof(context));
+            ezos_memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
+            ezos_memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
+            ezos_memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
+            ezos_memcpy(context.das_domain, sdk_kernel->redirect_das_info.das_domain, ezdev_sdk_ip_max_len);
+            ezos_memcpy(context.das_serverid, sdk_kernel->redirect_das_info.das_serverid, ezdev_sdk_ip_max_len);
+            broadcast_user_event(SDK_KERNEL_EVENT_ONLINE, (void *)&context, sizeof(context));
         }
     }
     else
     {
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_state_das_reged");
         broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
         if (sdk_kernel->das_retry_times++ >= 5)
         {
@@ -267,7 +223,7 @@ static mkernel_internal_error cnt_das_work_do(ezdev_sdk_kernel *sdk_kernel)
     if (mkernel_internal_succ != sdk_error &&
         mkernel_internal_queue_empty != sdk_error)
     {
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_das_work_do");
+        ezlog_e(TAG_CORE, "broadcast_runtime_err, cnt_das_work_do, code:%d", sdk_error);
         broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
 
         if (sdk_error == mkernel_internal_das_need_reconnect)
@@ -289,7 +245,7 @@ static mkernel_internal_error cnt_das_retry_do(ezdev_sdk_kernel *sdk_kernel)
     }
 
     ezcore_time_countdown(&sdk_kernel->cnt_state_timer, 0);
-    ezdev_sdk_kernel_log_trace(0, 0, "cnt_state_das_retry, times:%d \n", sdk_kernel->das_retry_times);
+    ezlog_v(TAG_CORE, "cnt_state_das_retry, times:%d", sdk_kernel->das_retry_times);
 
     sdk_error = cnt_state_das_retry(sdk_kernel);
     if (sdk_error == mkernel_internal_succ)
@@ -301,17 +257,17 @@ static mkernel_internal_error cnt_das_retry_do(ezdev_sdk_kernel *sdk_kernel)
     }
     else
     {
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_das_retry_do");
+        ezlog_e(TAG_CORE, "broadcast_runtime_err, cnt_das_retry_do, code:%d", sdk_error);
         broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
         if (sdk_kernel->das_retry_times++ >= 3)
         {
-            sdk_offline_context context = {0};
+            ez_kernel_offline_context_t context = {0};
 
             context.last_error = sdk_error;
-            memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
-            memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
-            ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_break");
-            broadcast_user_event(sdk_kernel_event_break, (void *)&context, sizeof(context));
+            ezos_memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
+            ezos_memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
+            ezlog_e(TAG_CORE, "broadcast_user_event, sdk_kernel_event_break, code:%d", sdk_error);
+            broadcast_user_event(SDK_KERNEL_EVENT_BREAK, (void *)&context, sizeof(context));
 
             sdk_kernel->cnt_state = sdk_cnt_unredirect;
             sdk_kernel->lbs_redirect_times = 0;
@@ -322,98 +278,15 @@ static mkernel_internal_error cnt_das_retry_do(ezdev_sdk_kernel *sdk_kernel)
     return sdk_error;
 }
 
-static mkernel_internal_error cnt_das_reg_fast_do(ezdev_sdk_kernel *sdk_kernel)
+mkernel_internal_error access_stop_yield(ezdev_sdk_kernel *sdk_kernel)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
-    int iRetry_fastReg = 0;
-    sdk_sessionkey_context context = {0};
-
-    for (iRetry_fastReg = 0; iRetry_fastReg < 3; iRetry_fastReg++)
-    {
-        sdk_error = cnt_state_das_fast_reg(sdk_kernel);
-        ezdev_sdk_kernel_log_info(sdk_error, 0, "fast reg");
-        if (sdk_error == mkernel_internal_succ)
-        {
-            break;
-        }
-    }
-
-    if (sdk_error == mkernel_internal_succ)
-    {
-        sdk_kernel->cnt_state = sdk_cnt_das_reged;
-        sdk_kernel->lbs_redirect_times = 0;
-        sdk_kernel->das_retry_times = 0;
-
-        context.das_udp_port = sdk_kernel->redirect_das_info.das_udp_port;
-        context.das_port = sdk_kernel->redirect_das_info.das_port;
-        context.das_socket = ezdev_sdk_kernel_get_das_socket(sdk_kernel);
-        memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
-        memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
-        memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
-        memcpy(context.das_domain, sdk_kernel->redirect_das_info.das_domain, ezdev_sdk_ip_max_len);
-        memcpy(context.das_serverid, sdk_kernel->redirect_das_info.das_serverid, ezdev_sdk_ip_max_len);
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_fast_reg_online");
-        broadcast_user_event(sdk_kernel_event_fast_reg_online, (void *)&context, sizeof(context));
-    }
-    else
-    {
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_das_reg_fast_do");
-        broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-        sdk_kernel->cnt_state = sdk_cnt_unredirect;
-        sdk_kernel->lbs_redirect_times = 0;
-        sdk_kernel->das_retry_times = 0;
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "kernel fast reg error need redirect");
-    }
-
+    sdk_error = das_unreg(sdk_kernel);
+    sdk_kernel->cnt_state = sdk_cnt_unredirect;
     return sdk_error;
 }
 
-static mkernel_internal_error cnt_das_reg_v3_fast_do(ezdev_sdk_kernel *sdk_kernel)
-{
-    mkernel_internal_error sdk_error = mkernel_internal_succ;
-    int iRetry_fastReg = 0;
-    sdk_sessionkey_context context = {0};
-
-    for (iRetry_fastReg = 0; iRetry_fastReg < 3; iRetry_fastReg++)
-    {
-        sdk_error = cnt_state_das_fast_reg_v3(sdk_kernel);
-        ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "RF fast reconnect:  cnt_state_das_fast_reg_v3 !!!");
-        if (sdk_error == mkernel_internal_succ)
-        {
-            break;
-        }
-    }
-
-    if (sdk_error == mkernel_internal_succ)
-    {
-        sdk_kernel->cnt_state = sdk_cnt_das_reged;
-        sdk_kernel->lbs_redirect_times = 0;
-        sdk_kernel->das_retry_times = 0;
-
-        context.das_udp_port = sdk_kernel->redirect_das_info.das_udp_port;
-        context.das_port = sdk_kernel->redirect_das_info.das_port;
-        context.das_socket = ezdev_sdk_kernel_get_das_socket(sdk_kernel);
-        memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
-        memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
-        memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
-        memcpy(context.das_domain, sdk_kernel->redirect_das_info.das_domain, ezdev_sdk_ip_max_len);
-        memcpy(context.das_serverid, sdk_kernel->redirect_das_info.das_serverid, ezdev_sdk_ip_max_len);
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_fast_reg_v3_online");
-        broadcast_user_event(sdk_kernel_event_fast_reg_online, (void *)&context, sizeof(context));
-    }
-    else
-    {
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_runtime_err, cnt_das_reg_v3_fast_do");
-        broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-        sdk_kernel->cnt_state = sdk_cnt_unredirect;
-        sdk_kernel->lbs_redirect_times = 0;
-        sdk_kernel->das_retry_times = 0;
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "kernel fast reg_v3 error need redirect");
-    }
-
-    return sdk_error;
-}
-static mkernel_internal_error cnt_state_yield(ezdev_sdk_kernel *sdk_kernel)
+mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
 
@@ -444,17 +317,6 @@ static mkernel_internal_error cnt_state_yield(ezdev_sdk_kernel *sdk_kernel)
         sdk_error = cnt_das_retry_do(sdk_kernel);
         break;
     }
-    case sdk_cnt_das_fast_reg:
-    {
-        sdk_error = cnt_das_reg_fast_do(sdk_kernel);
-        break;
-    }
-    case sdk_cnt_das_fast_reg_v3:
-    {
-        sdk_error = cnt_das_reg_v3_fast_do(sdk_kernel);
-        ezdev_sdk_kernel_log_debug(sdk_error, sdk_error, "RF fast reconnect, cnt_das_reg_v3_fast_do!!!!");
-        break;
-    }
     default:
     {
         sdk_error = mkernel_internal_internal_err;
@@ -464,37 +326,24 @@ static mkernel_internal_error cnt_state_yield(ezdev_sdk_kernel *sdk_kernel)
     if (mkernel_internal_mqtt_blacklist == sdk_error)
     {
         add_access_risk_control(sdk_kernel);
-        ezdev_sdk_kernel_log_info(sdk_error, sdk_error, "as server return the error, add access risk control");
+        ezlog_a(TAG_CORE, "access risk control, code:%d", sdk_error);
     }
     else if (mkernel_internal_mqtt_redirect == sdk_error)
     {
-        sdk_offline_context context = {0};
+        ez_kernel_offline_context_t context = {0};
         context.last_error = sdk_error;
-        memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
-        memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
-        ezdev_sdk_kernel_log_error(sdk_error, 0, "broadcast_user_event, sdk_kernel_event_break");
-        broadcast_user_event(sdk_kernel_event_break, (void *)&context, sizeof(context));
+        ezos_memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
+        ezos_memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
+        ezlog_e(TAG_CORE, "broadcast_user_event, sdk_kernel_event_break, code:%d", sdk_error);
+        broadcast_user_event(SDK_KERNEL_EVENT_BREAK, (void *)&context, sizeof(context));
 
         sdk_kernel->cnt_state = sdk_cnt_unredirect;
         sdk_kernel->lbs_redirect_times = 0;
         sdk_kernel->das_retry_times = 0;
-        ezdev_sdk_kernel_log_info(sdk_error, sdk_error, "as server return the error, dev go to lbs redirect ");
+        ezlog_a(TAG_CORE, "dev go to lbs redirect, code:%d", sdk_error);
     }
 
     return sdk_error;
-}
-
-mkernel_internal_error stop_yield(ezdev_sdk_kernel *sdk_kernel)
-{
-    mkernel_internal_error sdk_error = mkernel_internal_succ;
-    sdk_error = das_unreg(sdk_kernel);
-    sdk_kernel->cnt_state = sdk_cnt_unredirect;
-    return sdk_error;
-}
-
-mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel)
-{
-    return cnt_state_yield(sdk_kernel);
 }
 
 mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg *pubmsg)
@@ -503,7 +352,7 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
     ezdev_sdk_kernel_pubmsg_exchange *new_pubmsg_exchange = NULL;
     mkernel_internal_error kernel_internal_error = mkernel_internal_succ;
 
-    ezdev_sdk_kernel_log_trace(0, 0, "ezdev_sdk_kernel_inner_send: domain:%d ,cmd:%d, seq:%d,len:%d, string:%s", pubmsg->msg_domain_id, pubmsg->msg_command_id, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
+    ezlog_v(TAG_CORE, "ezdev_sdk_kernel_inner_send: domain:%d ,cmd:%d, seq:%d,len:%d, string:%s", pubmsg->msg_domain_id, pubmsg->msg_command_id, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
 
     if (pubmsg->msg_body == NULL || pubmsg->msg_body_len == 0)
     {
@@ -521,8 +370,8 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
         return mkernel_internal_malloc_error;
     }
 
-    memset(new_pubmsg_exchange, 0, sizeof(ezdev_sdk_kernel_pubmsg_exchange));
-    strncpy(new_pubmsg_exchange->msg_conntext.command_ver, pubmsg->command_ver, version_max_len - 1);
+    ezos_memset(new_pubmsg_exchange, 0, sizeof(ezdev_sdk_kernel_pubmsg_exchange));
+    ezos_strncpy(new_pubmsg_exchange->msg_conntext.command_ver, pubmsg->command_ver, version_max_len - 1);
     new_pubmsg_exchange->msg_conntext.msg_response = pubmsg->msg_response;
     new_pubmsg_exchange->msg_conntext.msg_qos = pubmsg->msg_qos;
     new_pubmsg_exchange->msg_conntext.msg_seq = pubmsg->msg_seq;
@@ -536,18 +385,18 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
         ezos_free(new_pubmsg_exchange);
         new_pubmsg_exchange = NULL;
 
-        ezdev_sdk_kernel_log_error(mkernel_internal_malloc_error, mkernel_internal_malloc_error, "mkernel_internal malloc input_length_padding:%d error", input_length_padding);
+        ezlog_e(TAG_CORE, "mkernel_internal malloc len:%d, code:%d", input_length_padding, mkernel_internal_malloc_error);
         return mkernel_internal_malloc_error;
     }
-    memset(new_pubmsg_exchange->msg_conntext.msg_body, 0, input_length_padding);
+    ezos_memset(new_pubmsg_exchange->msg_conntext.msg_body, 0, input_length_padding);
     new_pubmsg_exchange->msg_conntext.msg_body_len = input_length_padding;
-    memcpy(new_pubmsg_exchange->msg_conntext.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
+    ezos_memcpy(new_pubmsg_exchange->msg_conntext.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
 
     buf_padding(new_pubmsg_exchange->msg_conntext.msg_body, input_length_padding, pubmsg->msg_body_len);
 
     new_pubmsg_exchange->max_send_count = 1;
     kernel_internal_error = das_send_pubmsg_async(&g_ezdev_sdk_kernel, new_pubmsg_exchange);
-    ezdev_sdk_kernel_log_info(0, 0, "das_send_pubmsg_async offline msg send ,error code:%d", kernel_internal_error);
+    ezlog_i(TAG_CORE, "das_send_pubmsg_async offline msg send ,error code:%d", kernel_internal_error);
     if (kernel_internal_error != mkernel_internal_succ)
     {
         if (new_pubmsg_exchange != NULL)
@@ -564,53 +413,4 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
     }
 
     return kernel_internal_error;
-}
-
-mkernel_internal_error send_offline_msg_to_platform(EZDEV_SDK_UINT32 seq)
-{
-
-    ezxml_t req;
-    ezdev_sdk_kernel_pubmsg pubmsg;
-    unsigned char *msg_body_offline;
-    mkernel_internal_error sdk_error = mkernel_internal_succ;
-
-    req = ezxml_new("Request");
-    if (NULL == req)
-    {
-        return mkernel_internal_malloc_error;
-    }
-    ezxml_add_child(req, "DevSerial", 1);
-    ezxml_set_txt(req->child, ez_sdk_getdevinfo_bykey("dev_subserial"));
-    ezxml_add_child(req, "Authorization", 2);
-
-    msg_body_offline = (unsigned char *)ezxml_toxml(req);
-
-    ezdev_sdk_kernel_log_info(0, 0, "Device offline msg cmd seq:%d", seq);
-
-    memset(&pubmsg, 0, sizeof(ezdev_sdk_kernel_pubmsg));
-
-    pubmsg.msg_response = 0;
-    pubmsg.msg_qos = QOS_T1;
-    pubmsg.msg_seq = seq;
-
-    pubmsg.msg_body = msg_body_offline;
-    pubmsg.msg_body_len = strlen((const char *)msg_body_offline);
-
-    pubmsg.msg_domain_id = ezdev_sdk_domain_id;
-    pubmsg.msg_command_id = ezdev_sdk_offline_cmd_id;
-
-    strncpy(pubmsg.command_ver, ezdev_sdk_cmd_version, version_max_len - 1);
-
-    sdk_error = ezdev_sdk_kernel_inner_send(&pubmsg);
-
-    if (mkernel_internal_succ != sdk_error)
-    {
-        ezdev_sdk_kernel_log_info(sdk_error, sdk_error, "sdk_kernel_inner_send offline msg failed,error code:%d", sdk_error);
-    }
-
-    ezos_free(msg_body_offline);
-    msg_body_offline = NULL;
-    ezxml_free(req);
-
-    return sdk_error;
 }

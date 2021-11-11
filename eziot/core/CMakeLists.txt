@@ -1,26 +1,34 @@
-if(CONFIG_EZIOT_CORE_ENABLED)
+if(CONFIG_EZIOT_CORE_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
         )
     list(APPEND ADD_PRIVATE_INCLUDE "inc_private")
+    list(APPEND ADD_PRIVATE_INCLUDE "src/dispatcher")
+    list(APPEND ADD_PRIVATE_INCLUDE "src/support")
+    list(APPEND ADD_PRIVATE_INCLUDE "src/access")
+    list(APPEND ADD_PRIVATE_INCLUDE "src")
     ###############################################
 
     ############## Add source files ###############
     # list(APPEND ADD_SRCS  "src/lib1.c"
         # )
     # aux_source_directory(src ADD_SRCS)  # collect all source file in src dir, will set var ADD_SRCS
-    append_srcs_dir(ADD_SRCS "src")     # append source file in src dir to var ADD_SRCS
+    # append_srcs_dir(ADD_SRCS "src")     # append source file in src dir to var ADD_SRCS
+    append_srcs_dir(ADD_SRCS "src/interface")     # append source file in src dir to var ADD_SRCS
+    append_srcs_dir(ADD_SRCS "src/support")     # append source file in src dir to var ADD_SRCS
+    append_srcs_dir(ADD_SRCS "src/dispatcher")     # append source file in src dir to var ADD_SRCS
+    append_srcs_dir(ADD_SRCS "src/access")     # append source file in src dir to var ADD_SRCS
+    append_srcs_dir(ADD_SRCS "src")
     # list(REMOVE_ITEM COMPONENT_SRCS "src/test.c")
     ###############################################
 
     ###### Add required/dependent components ######
-    list(APPEND ADD_REQUIREMENTS src)
     list(APPEND ADD_REQUIREMENTS cJSON)
     list(APPEND ADD_REQUIREMENTS mqtt)
     list(APPEND ADD_REQUIREMENTS mbedtls)
-    list(APPEND ADD_REQUIREMENTS xml)
-	list(APPEND ADD_REQUIREMENTS logger)
+    list(APPEND ADD_REQUIREMENTS ezxml)
+    list(APPEND ADD_REQUIREMENTS ezlog)
     ###############################################
 
     ############ Add static libs ##################
@@ -49,7 +57,7 @@ if(CONFIG_EZIOT_CORE_ENABLED)
 
     ############ Add static libs ##################
     #### Update parent's variables like CMAKE_C_LINK_FLAGS
-    # set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group libmaix/libtest.a -ltest2 -Wl,--end-group" PARENT_SCOPE)
+    set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group libmaix/libtest.a -ltest2 -Wl,--end-group" PARENT_SCOPE)
     ###############################################
 
     # register component, DYNAMIC or SHARED flags will make component compiled to dynamic(shared) lib

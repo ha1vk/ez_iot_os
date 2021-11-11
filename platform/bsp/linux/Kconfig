@@ -1,0 +1,3 @@
+config EZIOT_OS_KV_ENABLE
+    bool "Enable ez-iot os interface kv"
+    default y

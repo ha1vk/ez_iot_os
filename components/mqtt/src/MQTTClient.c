@@ -125,7 +125,6 @@ static int readPacket(MQTTClient *c, Timer *timer)
 
     if (rem_len + len > c->readbuf_size)
     {
-        ezdev_sdk_kernel_log_error(15, 0, "rev packet size range, rem_len = %d, buf size = %d\n", rem_len, c->readbuf_size);
         rc = BUFFER_OVERFLOW;
         goto exit;
     }
@@ -133,7 +132,6 @@ static int readPacket(MQTTClient *c, Timer *timer)
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
     if (rem_len > 0 && (c->ipstack->mqttread(c->ipstack, c->readbuf + len, rem_len, c->command_timeout_ms/*TimerLeftMS(timer)*/ != rem_len)))
     {
-        ezdev_sdk_kernel_log_error(15, 0, "rev rem packet, rem_len = %d\n", rem_len);
         rc = FAILURE;
         goto exit;
     }
@@ -155,7 +153,6 @@ static char isTopicMatched(char *topicFilter, MQTTString *topicName)
 
     if (NULL == curf || NULL == curn)
     {
-        ezdev_sdk_kernel_log_error(0, 0, "nonono!!!!!, curf:%08x, curn:%08x", curf, curn);
         return 0;
     }
 
@@ -227,7 +224,6 @@ int keepalive(MQTTClient *c)
     {
         //         if (!c->ping_outstanding)
         //         {
-        ezdev_sdk_kernel_log_debug(0, 0, "send keepalive packet. interval = %ds", c->keepAliveInterval);
         TimerInit(&timer);
         TimerCountdownMS(&timer, 1000);
         len = MQTTSerialize_pingreq(c->buf, c->buf_size);
@@ -251,7 +247,7 @@ int cycle(MQTTClient *c, Timer *timer)
     if (packet_type == CONNACK || packet_type == PUBACK || packet_type == SUBACK ||
         packet_type == PUBLISH || packet_type == PUBREC || packet_type == PUBCOMP || packet_type == PINGRESP)
     {
-        ezdev_sdk_kernel_log_debug(0, 0, "recv packet, type:%d, keepalive timer clear", packet_type);
+        ezos_printf("mqtt, recv packet, type:%d, keepalive timer clear", packet_type);
         TimerCountdown(&c->connect_timer, 0);
     }
 
@@ -260,12 +256,11 @@ int cycle(MQTTClient *c, Timer *timer)
     default:
         /* no more data to read, unrecoverable. Or read packet fails due to unexpected network error */
         rc = packet_type;
-        ezdev_sdk_kernel_log_error(0, 0, "readPacket, code:%d", rc);
+        ezos_printf("mqtt, readPacket error , code:%d", rc);
         goto exit;
 
     case 0:
         /* timed out reading packet */
-        ezdev_sdk_kernel_log_trace(0, 0, "timed out reading packet");
         break;
     case CONNACK:
     case PUBACK:

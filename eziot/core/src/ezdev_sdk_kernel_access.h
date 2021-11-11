@@ -14,11 +14,8 @@
 #ifndef H_EZDEV_SDK_KERNEL_ACCESS_H_
 #define H_EZDEV_SDK_KERNEL_ACCESS_H_
 
-#define EZDEV_SDK_KERNEL_ACCESS_INTERFACE  \
-	extern mkernel_internal_error stop_yield(ezdev_sdk_kernel* sdk_kernel); \
-	extern mkernel_internal_error access_server_yield(ezdev_sdk_kernel* sdk_kernel);\
-    extern mkernel_internal_error stop_das_logout(ezdev_sdk_kernel* sdk_kernel); \
-    extern mkernel_internal_error stop_recieve_send_msg(ezdev_sdk_kernel* sdk_kernel); \
-    extern mkernel_internal_error send_offline_msg_to_platform(EZDEV_SDK_UINT32 seq);
+#define EZDEV_SDK_KERNEL_ACCESS_INTERFACE                                            \
+    extern mkernel_internal_error access_stop_yield(ezdev_sdk_kernel *sdk_kernel);   \
+    extern mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel);
 
 #endif //H_EZDEV_SDK_KERNEL_ACCESS_H_

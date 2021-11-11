@@ -34,11 +34,14 @@ EZOS_API int EZOS_CALL ezos_sprintf(char *str, const char *format, ...);
 EZOS_API int EZOS_CALL ezos_snprintf(char *str, size_t size, const char *format, ...);
 EZOS_API int EZOS_CALL ezos_memcmp(const void *s1, const void *s2, size_t n);
 EZOS_API void * EZOS_CALL ezos_memcpy(void *dest, const void *src, size_t n);
+EZOS_API void * EZOS_CALL ezos_memset(void *s, int c, size_t n);
+EZOS_API void * EZOS_CALL ezos_memmove(void *dest, const void *src, size_t n);
 EZOS_API char * EZOS_CALL ezos_strcpy(char *dest, const char *src);
 EZOS_API char * EZOS_CALL ezos_strncpy(char *dest, const char *src, size_t n);
 EZOS_API int EZOS_CALL ezos_strcmp(const char *s1, const char *s2);
 EZOS_API int EZOS_CALL ezos_strncmp(const char *s1, const char *s2, size_t n);
 EZOS_API char * EZOS_CALL ezos_strstr(const char *haystack, const char *needle);
+EZOS_API char * EZOS_CALL ezos_strrchr(const char *s, int c);
 EZOS_API size_t EZOS_CALL ezos_strlen(const char *s);
 
 #ifdef __cplusplus

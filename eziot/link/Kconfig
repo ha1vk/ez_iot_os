@@ -1,6 +1,0 @@
-menu "ez-iot link configuration"
-    config EZIOT_LINK_ENABLED
-        bool "Enable ez-iot link"
-        default y
-endmenu
-

@@ -23,27 +23,28 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-EZOS_API int EZOS_CALL ezos_get_clock_time(ezos_timespec_t *clock)
+EZOS_API ez_err_t EZOS_CALL ezos_get_clock(ezos_timespec_t *clock)
 {
     return clock_gettime(CLOCK_MONOTONIC, (struct timespec *)clock);
 }
 
-EZOS_API int EZOS_CALL ezos_gettimeofday(struct timeval *tv)
+EZOS_API ez_err_t EZOS_CALL ezos_gettimeofday(struct ezos_timeval *tv)
 {
     return gettimeofday(tv, NULL);
 }
 
-EZOS_API time_t EZOS_CALL ezos_get_time_stamp(time_t *__timer)
+EZOS_API time_t EZOS_CALL ezos_time(ezos_time_t *__timer)
 {
     return time(__timer);
 }
 
-EZOS_API int EZOS_CALL ezos_set_time_stamp(time_t *__timer)
+EZOS_API struct ezos_tm *EZOS_CALL ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result)
 {
-    return 0;
+    //TODO
+    return result;
 }
 
-EZOS_API void EZOS_CALL ezos_delay_ms(unsigned int time_ms)
+EZOS_API void EZOS_CALL ezos_delay_ms(ez_ulong_t time_ms)
 {
     usleep((int)(time_ms * 1000));
 }
