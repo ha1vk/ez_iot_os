@@ -13,7 +13,7 @@
 #include "flashdb.h"
 #include <string.h>
 #include "ut_config.h"
-#include "ez_iot.h"
+#include "ez_iot_core.h"
 #include "ez_iot_hub.h"
 #include "ez_iot_log.h"
 #include "ez_hal/hal_thread.h"

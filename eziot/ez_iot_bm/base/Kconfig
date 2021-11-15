@@ -1,0 +1,7 @@
+menu "ez-iot base configuration"
+    config EZIOT_BASE_ENABLE
+        bool "Enable ez-iot base"
+        default y
+
+endmenu
+

@@ -1,5 +1,0 @@
-menu "ez-iot extension bind configuration"
-    config EZIOT_EXT_BIND_ENABLED
-        bool "Enable ez-iot extension bind"
-        default y
-endmenu

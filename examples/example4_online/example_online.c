@@ -1,4 +1,4 @@
-#include "ez_iot.h"
+#include "ez_iot_core.h"
 #include "ez_iot_log.h"
 
 #ifdef RT_THREAD

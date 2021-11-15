@@ -1,0 +1,7 @@
+menu "ez-iot TSL(Thing Specification Language) configuration"
+    config EZIOT_TSL_ENABLE
+        bool "Enable ez-iot TSL"
+        default y
+
+endmenu
+

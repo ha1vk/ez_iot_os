@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ut_config.h"
-#include "ez_iot.h"
+#include "ez_iot_core.h"
 #include "ez_iot_log.h"
 #include "ez_iot_ap.h"
 #include "ez_iot_errno.h"
@@ -22,7 +22,7 @@ const char *TAG_UT_AP = "UT_AP";
 
 static void wifi_cb(ez_iot_ap_wifi_info_t *wifi_info)
 {
-/** 由上层处理，根据错误码做上册业务处理 */
+/** 锟斤拷锟较层处锟斤拷锟斤拷锟斤拷锟捷达拷锟斤拷锟斤拷锟斤拷锟较诧拷业锟斤拷锟斤拷 */
 /** 
     example code:
 
@@ -55,9 +55,9 @@ static void wifi_cb(ez_iot_ap_wifi_info_t *wifi_info)
 }
 
 /**
- * 启动ap配网
- * ap热点无密码
- * 支持ap_sta共存
+ * 锟斤拷锟斤拷ap锟斤拷锟斤拷
+ * ap锟饺碉拷锟斤拷锟斤拷锟斤拷
+ * 支锟斤拷ap_sta锟斤拷锟斤拷
  */
 void example_ap_init_open_apsta()
 {
@@ -73,9 +73,9 @@ void example_ap_init_open_apsta()
 }
 
 /**
- * 启动ap配网
- * ap热点有密码
- * 支持ap_sta共存
+ * 锟斤拷锟斤拷ap锟斤拷锟斤拷
+ * ap锟饺碉拷锟斤拷锟斤拷锟斤拷
+ * 支锟斤拷ap_sta锟斤拷锟斤拷
  */
 void example_ap_init_auth_apsta()
 {

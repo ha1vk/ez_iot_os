@@ -34,7 +34,7 @@
     #### Just for this component, won't affect other 
     #### modules, including component that depend 
     #### on this component
-    list(APPEND ADD_DEFINITIONS_PRIVATE)
+    # list(APPEND ADD_DEFINITIONS_PRIVATE)
 
     #### Add compile option for this component
     #### and components denpend on this component
