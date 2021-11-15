@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-EZOS_API int EZOS_CALL ezos_printf(const char *format, ...)
+EZOS_API int ezos_printf(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -33,7 +33,7 @@ EZOS_API int EZOS_CALL ezos_printf(const char *format, ...)
     return rv;
 }
 
-EZOS_API int EZOS_CALL ezos_sprintf(char *str, const char *format, ...)
+EZOS_API int ezos_sprintf(char *str, const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -43,7 +43,7 @@ EZOS_API int EZOS_CALL ezos_sprintf(char *str, const char *format, ...)
     return rv;
 }
 
-EZOS_API int EZOS_CALL ezos_snprintf(char *str, size_t size, const char *format, ...)
+EZOS_API int ezos_snprintf(char *str, size_t size, const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -53,7 +53,7 @@ EZOS_API int EZOS_CALL ezos_snprintf(char *str, size_t size, const char *format,
     return rv;
 }
 
-EZOS_API int EZOS_CALL ezos_memcmp(const void *s1, const void *s2, size_t n)
+EZOS_API int ezos_memcmp(const void *s1, const void *s2, size_t n)
 {
     return memcmp(s1, s2, n);
 }
@@ -73,12 +73,12 @@ EZOS_API char *EZOS_CALL ezos_strncpy(char *dest, const char *src, size_t n)
     return strncpy(dest, src, n);
 }
 
-EZOS_API int EZOS_CALL ezos_strcmp(const char *s1, const char *s2)
+EZOS_API int ezos_strcmp(const char *s1, const char *s2)
 {
     return strcmp(s1, s2);
 }
 
-EZOS_API int EZOS_CALL ezos_strncmp(const char *s1, const char *s2, size_t n)
+EZOS_API int ezos_strncmp(const char *s1, const char *s2, size_t n)
 {
     return strncmp(s1, s2, n);
 }
@@ -88,7 +88,7 @@ EZOS_API char *EZOS_CALL ezos_strstr(const char *haystack, const char *needle)
     return strstr(haystack, needle);
 }
 
-EZOS_API size_t EZOS_CALL ezos_strlen(const char *s)
+EZOS_API size_t ezos_strlen(const char *s)
 {
     return strlen(s);
 }

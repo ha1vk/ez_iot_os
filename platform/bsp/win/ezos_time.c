@@ -29,7 +29,7 @@ const uint64_t usecs_per_msec = 1000;       ///> 毫秒单位
 const uint64_t nsecs_per_usec = 1000;       ///> 微妙单位
 const uint64_t usecs_per_sec  = 1000000;    ///> 秒单位
 
-EZOS_API int EZOS_CALL ez_get_clock_time(ez_timespec *clock)
+EZOS_API int ez_get_clock_time(ez_timespec *clock)
 {
 	SYSTEMTIME wtm;
 	GetLocalTime(&wtm);
@@ -58,7 +58,7 @@ EZOS_API int EZOS_CALL ez_get_clock_time(ez_timespec *clock)
     //return 0;
 }
 
-EZOS_API int EZOS_CALL ez_gettimeofday(struct timeval *tv)
+EZOS_API int ez_gettimeofday(struct timeval *tv)
 {
 	SYSTEMTIME wtm;
 	GetLocalTime(&wtm);
@@ -69,18 +69,18 @@ EZOS_API int EZOS_CALL ez_gettimeofday(struct timeval *tv)
 	//return 0;//gettimeofday(tv, NULL);
 }
 
-EZOS_API time_t EZOS_CALL ez_get_time_stamp(time_t *__timer)
+EZOS_API time_t ez_get_time_stamp(time_t *__timer)
 {
 	return time(__timer);
 }
 
-EZOS_API int EZOS_CALL ez_set_time_stamp(time_t *__timer)
+EZOS_API int ez_set_time_stamp(time_t *__timer)
 {
 	return 0;
 }
 
 
-EZOS_API void EZOS_CALL ezos_delay_ms(unsigned int time_ms)
+EZOS_API void ezos_delay_ms(unsigned int time_ms)
 {
 	Sleep(time_ms);
 }

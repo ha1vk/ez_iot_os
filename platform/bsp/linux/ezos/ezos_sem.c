@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-EZOS_API ez_sem_t EZOS_CALL ezos_sem_create(void)
+EZOS_API ez_sem_t ezos_sem_create(void)
 {
     sem_t *semaphore = NULL;
     semaphore = (sem_t *)malloc(sizeof(sem_t));
@@ -39,7 +39,7 @@ EZOS_API ez_sem_t EZOS_CALL ezos_sem_create(void)
     return (ez_sem_t)semaphore;
 }
 
-EZOS_API int EZOS_CALL ezos_sem_destory(ez_sem_t sem)
+EZOS_API int ezos_sem_destory(ez_sem_t sem)
 {
     sem_t *semaphore = (sem_t *)sem;
 
@@ -56,7 +56,7 @@ EZOS_API int EZOS_CALL ezos_sem_destory(ez_sem_t sem)
     return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_sem_wait(ez_sem_t sem, int timewait_ms)
+EZOS_API int ezos_sem_wait(ez_sem_t sem, int timewait_ms)
 {
     struct timespec time;
     sem_t *semaphore = (sem_t *)sem;
@@ -72,7 +72,7 @@ EZOS_API int EZOS_CALL ezos_sem_wait(ez_sem_t sem, int timewait_ms)
     return sem_timedwait(semaphore, &time);
 }
 
-EZOS_API int EZOS_CALL ezos_sem_post(ez_sem_t sem)
+EZOS_API int ezos_sem_post(ez_sem_t sem)
 {
     sem_t *semaphore = (sem_t *)sem;
 	if (semaphore == NULL){

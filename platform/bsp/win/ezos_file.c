@@ -44,7 +44,7 @@ typedef struct {
 
 static vfs_file_t g_files[VFS_MAX_FILE_NUM];
 
-EZOS_API DIR * EZOS_CALL ez_opendir(const char *name)
+EZOS_API DIR * ez_opendir(const char *name)
 {
     DIR *dir;
     WIN32_FIND_DATA FindData;
@@ -74,7 +74,7 @@ EZOS_API DIR * EZOS_CALL ez_opendir(const char *name)
     return dir;
 }
 
-EZOS_API struct dirent * EZOS_CALL ez_readdir(DIR *dir)
+EZOS_API struct dirent * ez_readdir(DIR *dir)
 {
     int i;
 
@@ -115,7 +115,7 @@ EZOS_API struct dirent * EZOS_CALL ez_readdir(DIR *dir)
     return dirent;
 }
 
-EZOS_API int EZOS_CALL ez_closedir(DIR *dir)
+EZOS_API int ez_closedir(DIR *dir)
 {
     if (!dir) return -1;
     dir->dd_handle = 0;
@@ -123,7 +123,7 @@ EZOS_API int EZOS_CALL ez_closedir(DIR *dir)
     return 0;
 }
 
-EZOS_API int EZOS_CALL ez_open(const char *name, int flags, ...)
+EZOS_API int ez_open(const char *name, int flags, ...)
 {
 	FILE *tmp_fp;
 	char mode[3];
@@ -206,7 +206,7 @@ EZOS_API int EZOS_CALL ez_open(const char *name, int flags, ...)
 	return fd;
 }
 
-EZOS_API int EZOS_CALL ez_close(int fd)
+EZOS_API int ez_close(int fd)
 {
 	int i;
 	int ret = -1;

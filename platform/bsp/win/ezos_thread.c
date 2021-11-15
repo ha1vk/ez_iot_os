@@ -32,7 +32,7 @@ struct targ
     void *arg;
 };
 
-static unsigned int EZOS_CALL sdk_thread_fun(void *aArg)
+static unsigned int sdk_thread_fun(void *aArg)
 {
 	struct targ *hd = (struct targ *)aArg;
 	if ((hd != NULL) && (hd->fn != NULL))
@@ -44,7 +44,7 @@ static unsigned int EZOS_CALL sdk_thread_fun(void *aArg)
 	return 0;
 }
 
-EZOS_API ez_thread_t EZOS_CALL ezos_thread_create(ez_task_init_parm *taskParam)
+EZOS_API ez_thread_t ezos_thread_create(ez_task_init_parm *taskParam)
 {
 	struct targ *targ = NULL;
 	unsigned int threadID = 0;
@@ -90,7 +90,7 @@ EZOS_API ez_thread_t EZOS_CALL ezos_thread_create(ez_task_init_parm *taskParam)
 	return handle;
 }
 
-EZOS_API int EZOS_CALL ezos_thread_detach(ez_thread_t handle)
+EZOS_API int ezos_thread_detach(ez_thread_t handle)
 {
 	HANDLE hd = (HANDLE)handle;
 	if (hd == NULL)
@@ -104,7 +104,7 @@ EZOS_API int EZOS_CALL ezos_thread_detach(ez_thread_t handle)
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_thread_destroy(ez_thread_t handle)
+EZOS_API int ezos_thread_destroy(ez_thread_t handle)
 {
 	HANDLE hd = (HANDLE)handle;
 	if (hd == NULL)
@@ -121,12 +121,12 @@ EZOS_API int EZOS_CALL ezos_thread_destroy(ez_thread_t handle)
     return 0;
 }
 
-EZOS_API unsigned int EZOS_CALL ezos_thread_self()
+EZOS_API unsigned int ezos_thread_self()
 {
 	return (int)GetCurrentThreadId();
 }
 
-EZOS_API ez_mutex_t EZOS_CALL ezos_mutex_create(void)
+EZOS_API ez_mutex_t ezos_mutex_create(void)
 {
 	CRITICAL_SECTION* mtx = NULL;
 	mtx = (CRITICAL_SECTION*)malloc(sizeof(CRITICAL_SECTION));
@@ -137,7 +137,7 @@ EZOS_API ez_mutex_t EZOS_CALL ezos_mutex_create(void)
 	return (ez_mutex_t)mtx;
 }
 
-EZOS_API int EZOS_CALL ezos_mutex_destory(ez_mutex_t mutex)
+EZOS_API int ezos_mutex_destory(ez_mutex_t mutex)
 {
 	CRITICAL_SECTION* mtx = (CRITICAL_SECTION*)mutex;
 	if (mtx == NULL){
@@ -150,7 +150,7 @@ EZOS_API int EZOS_CALL ezos_mutex_destory(ez_mutex_t mutex)
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_mutex_lock(ez_mutex_t mutex)
+EZOS_API int ezos_mutex_lock(ez_mutex_t mutex)
 {
 	CRITICAL_SECTION* mtx = (CRITICAL_SECTION*)mutex;
 	if (mtx == NULL){
@@ -161,7 +161,7 @@ EZOS_API int EZOS_CALL ezos_mutex_lock(ez_mutex_t mutex)
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_mutex_unlock(ez_mutex_t mutex)
+EZOS_API int ezos_mutex_unlock(ez_mutex_t mutex)
 {
 	CRITICAL_SECTION* mtx = (CRITICAL_SECTION*)mutex;
 	if (mtx == NULL){

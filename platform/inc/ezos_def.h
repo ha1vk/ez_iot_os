@@ -13,6 +13,7 @@
  * Contributors:
  * yangjianglin (yangjianglin@ezvizlife.com)
 *******************************************************************************/
+
 #ifndef _EZOS_DEF_H_
 #define _EZOS_DEF_H_
 
@@ -22,7 +23,7 @@
     #else
     #define EZOS_API __declspec(dllimport)
     #endif
-    #define EZOS_CALL __stdcall
+    #define EZOS_CALL__stdcall
 #else
     #define EZOS_API
     #define EZOS_CALL

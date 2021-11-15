@@ -80,7 +80,7 @@ int ota_event_notify(ota_res_t* pres, ota_event_e event, void *data, int len)
 
 int  ota_sample_start()
 {
-    ez_err_e rev = ez_errno_succ;
+    ez_core_err_e rev = ez_errno_succ;
     ota_init_t init_info;
     ez_log_d(TAG_APP,"-------------ota_sample_start----------\n");
     memset(&init_info, 0, sizeof(ota_init_t));
@@ -96,7 +96,7 @@ int  ota_sample_start()
 
 int  ota_sample_module_info_report()
 {
-    ez_err_e ret = ez_errno_succ;
+    ez_core_err_e ret = ez_errno_succ;
     char pmodule[64]={0};
     char fw_ver[64]={0};
 
@@ -262,7 +262,7 @@ int ota_sample_download_file(ota_upgrade_info_t* pupgrade_info)
 
 int ota_sample_status_report(int status)
 {
-    ez_err_e err= ez_errno_succ;
+    ez_core_err_e err= ez_errno_succ;
     ota_res_t res;
     memset(&res ,0, sizeof(ota_res_t));
     char pmodule [128]= {0};

@@ -82,7 +82,7 @@ static int32_t ez_recv_event_cb(ez_iot_event_t event_type, void *data, int len)
 
 void example_event_report_null()
 {
-    ez_err_e rv = ez_errno_succ;
+    ez_core_err_e rv = ez_errno_succ;
     tsl_devinfo_t tsl_devinfo = {(int8_t *)ez_cloud_get_sn(), (int8_t *)ez_cloud_get_type(), (int8_t *)ez_cloud_get_ver()};
 
     /**
@@ -102,7 +102,7 @@ void example_event_report_null()
 
 void example_event_report_obj()
 {
-    ez_err_e rv = ez_errno_succ;
+    ez_core_err_e rv = ez_errno_succ;
 
     tsl_devinfo_t tsl_devinfo = {(int8_t *)ez_cloud_get_sn(), (int8_t *)ez_cloud_get_type(), (int8_t *)ez_cloud_get_ver()};
 

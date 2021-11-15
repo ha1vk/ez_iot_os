@@ -55,7 +55,7 @@ static void *sdk_thread_fun(void *aArg)
     return NULL;
 }
 
-EZOS_API ez_err_t EZOS_CALL ezos_thread_create(ez_thread_t *const handle, const ez_char_t *name, ez_thread_func_t thread_fun,
+EZOS_API ez_err_t ezos_thread_create(ez_thread_t *const handle, const ez_char_t *name, ez_thread_func_t thread_fun,
                                                const ez_void_t *param, ez_uint32_t stack_size, ez_uint32_t priority)
 {
     // pthread_t *pt;
@@ -131,7 +131,7 @@ EZOS_API ez_err_t EZOS_CALL ezos_thread_create(ez_thread_t *const handle, const 
     return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_thread_detach(ez_thread_t handle)
+EZOS_API int ezos_thread_detach(ez_thread_t handle)
 {
     pthread_t *pt = (pthread_t *)handle;
     if (pt == NULL)
@@ -145,7 +145,7 @@ EZOS_API int EZOS_CALL ezos_thread_detach(ez_thread_t handle)
     return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_thread_destroy(ez_thread_t handle)
+EZOS_API int ezos_thread_destroy(ez_thread_t handle)
 {
     pthread_t *pt = (pthread_t *)handle;
     if (pt == NULL)
@@ -159,12 +159,12 @@ EZOS_API int EZOS_CALL ezos_thread_destroy(ez_thread_t handle)
     return 0;
 }
 
-EZOS_API ez_int32_t EZOS_CALL ezos_thread_self()
+EZOS_API ez_int32_t ezos_thread_self()
 {
     return pthread_self();
 }
 
-EZOS_API ez_mutex_t EZOS_CALL ezos_mutex_create(void)
+EZOS_API ez_mutex_t ezos_mutex_create(void)
 {
     pthread_mutex_t *mtx = NULL;
     mtx = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
@@ -178,7 +178,7 @@ EZOS_API ez_mutex_t EZOS_CALL ezos_mutex_create(void)
     return (ez_mutex_t)mtx;
 }
 
-EZOS_API int EZOS_CALL ezos_mutex_destory(ez_mutex_t mutex)
+EZOS_API int ezos_mutex_destory(ez_mutex_t mutex)
 {
     pthread_mutex_t *mtx = (pthread_mutex_t *)mutex;
     if (mtx == NULL)
@@ -192,7 +192,7 @@ EZOS_API int EZOS_CALL ezos_mutex_destory(ez_mutex_t mutex)
     return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_mutex_lock(ez_mutex_t mutex)
+EZOS_API int ezos_mutex_lock(ez_mutex_t mutex)
 {
     pthread_mutex_t *mtx = (pthread_mutex_t *)mutex;
     if (mtx == NULL)
@@ -204,7 +204,7 @@ EZOS_API int EZOS_CALL ezos_mutex_lock(ez_mutex_t mutex)
     return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_mutex_unlock(ez_mutex_t mutex)
+EZOS_API int ezos_mutex_unlock(ez_mutex_t mutex)
 {
     pthread_mutex_t *mtx = (pthread_mutex_t *)mutex;
     if (mtx == NULL)

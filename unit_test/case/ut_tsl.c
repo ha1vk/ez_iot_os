@@ -154,7 +154,7 @@ void ut_tsl_errcode()
 
 void ut_tsl_prop_report_bool()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"attr_test", .key = (int8_t *)"attr_r_bool"};
@@ -182,7 +182,7 @@ void ut_tsl_prop_report_bool()
 
 void ut_tsl_prop_report_int()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"attr_test", .key = (int8_t *)"attr_r_int"};
@@ -210,7 +210,7 @@ void ut_tsl_prop_report_int()
 
 void ut_tsl_prop_report_float()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"attr_test", .key = (int8_t *)"attr_r_num"};
@@ -238,7 +238,7 @@ void ut_tsl_prop_report_float()
 
 void ut_tsl_prop_report_str()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"attr_test", .key = (int8_t *)"attr_r_str"};
@@ -266,7 +266,7 @@ void ut_tsl_prop_report_str()
 
 void ut_tsl_prop_report_jobj()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"attr_test", .key = (int8_t *)"attr_r_obj"};
@@ -294,7 +294,7 @@ void ut_tsl_prop_report_jobj()
 
 void ut_tsl_prop_report_jarr()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"attr_test", .key = (int8_t *)"attr_r_array"};
@@ -322,7 +322,7 @@ void ut_tsl_prop_report_jarr()
 
 void ut_tsl_event_report_null()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"event_test", .key = (int8_t *)"event_null"};
@@ -351,7 +351,7 @@ const char *js_rep = "{\"ext\":{\"psd\":\"consequat sit in\"},\"basic\":{\"dateT
 
 void ut_tsl_event_report_obj()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"event_test", .key = (int8_t *)"event_ext"};
@@ -379,7 +379,7 @@ void ut_tsl_event_report_obj()
 
 void ut_tsl_event_report_obj2()
 {
-  ez_err_e rv = ez_errno_succ;
+  ez_core_err_e rv = ez_errno_succ;
   tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
   tsl_devinfo_t tsl_devinfo = {(int8_t *)EZ_IOT_DEV_UUID, (int8_t *)EZ_IOT_DEV_PRODUCT_KEY, (int8_t *)EZ_IOT_DEV_FWVER};
   tsl_key_info_t tsl_keyinfo = {.domain = (int8_t *)"event_test", .key = (int8_t *)"event_notify"};

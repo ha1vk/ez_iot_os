@@ -38,7 +38,7 @@ extern "C"
      * @param kernel_event_notice_cb 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info,
+    EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info,
                                                const ez_byte_t *devid, sdk_kernel_event_notice kernel_event_notice_cb);
 
     /**
@@ -46,51 +46,35 @@ extern "C"
      * 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_start();
+    EZOS_API ez_err_t ez_kernel_start();
 
     /**
      * @brief 
      * 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_stop();
+    EZOS_API ez_err_t ez_kernel_stop();
 
     /**
      * @brief 
      * 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_fini();
+    EZOS_API ez_err_t ez_kernel_fini();
 
     /**
      * @brief 
      * 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_yield();
+    EZOS_API ez_err_t ez_kernel_yield();
 
     /**
      * @brief 
      * 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_yield_user();
-
-    /**
-     * @brief 
-     * 
-     * @param external_extend 
-     * @return EZOS_API 
-     */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_extend_load(const ez_kernel_extend_t *external_extend);
-
-    /**
-     * @brief 
-     * 
-     * @param pubmsg 
-     * @return EZOS_API 
-     */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_send(ez_kernel_pubmsg_t *pubmsg);
+    EZOS_API ez_err_t ez_kernel_yield_user();
 
     /**
      * @brief 
@@ -98,7 +82,7 @@ extern "C"
      * @param external_extend 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_extend_load_v3(const ez_kernel_extend_v3_t *external_extend);
+    EZOS_API ez_err_t ez_kernel_extend_load(const ez_kernel_extend_t *external_extend);
 
     /**
      * @brief 
@@ -106,7 +90,23 @@ extern "C"
      * @param pubmsg 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg);
+    EZOS_API ez_err_t ez_kernel_send(ez_kernel_pubmsg_t *pubmsg);
+
+    /**
+     * @brief 
+     * 
+     * @param external_extend 
+     * @return EZOS_API 
+     */
+    EZOS_API ez_err_t ez_kernel_extend_load_v3(const ez_kernel_extend_v3_t *external_extend);
+
+    /**
+     * @brief 
+     * 
+     * @param pubmsg 
+     * @return EZOS_API 
+     */
+    EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg);
 
     /**
      * @brief 

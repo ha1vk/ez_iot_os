@@ -176,19 +176,19 @@ typedef struct
 
 typedef enum ez_err
 {
-    EZ_ERR_SUCC = 0x00,          ///< Success
-    EZ_ERR_NOT_INIT = 0x01,      ///< The sdk core module is not initialized
-    EZ_ERR_NOT_READY = 0x02,     ///< The sdk core module is not started
-    EZ_ERR_PARAM_INVALID = 0x03, ///< The input parameters is illegal, it may be that some parameters can not be null or out of range
-    EZ_ERR_GENERAL = 0x04,       ///< Unknown error
-    EZ_ERR_MEMORY = 0x05,        ///< Out of memory
-    EZ_ERR_STORAGE = 0x06,       ///< An error occurred when flash I/O
-    EZ_ERR_DEVID = 0x07,         ///< Devid MUST be set before the sdk init
-    EZ_ERR_OUT_RANGE = 0x08,     ///< The param is out of the valid range
-    EZ_ERR_NO_EXTEND = 0x09,     ///< The expansion module is not registered
-    EZ_ERR_RISK_CRTL = 0x0a,     ///< The device has been blacklisted
-    EZ_ERR_NET = 0x0b,           ///<
-    EZ_ERR_AUTH = 0x0c,          ///<
-} ez_err_e;
+    EZ_CORE_ERR_SUCC = 0x00,          ///< Success
+    EZ_CORE_ERR_NOT_INIT = 0x01,      ///< The sdk core module is not initialized
+    EZ_CORE_ERR_NOT_READY = 0x02,     ///< The sdk core module is not started
+    EZ_CORE_ERR_PARAM_INVALID = 0x03, ///< The input parameters is illegal, it may be that some parameters can not be null or out of range
+    EZ_CORE_ERR_GENERAL = 0x04,       ///< Unknown error
+    EZ_CORE_ERR_MEMORY = 0x05,        ///< Out of memory
+    EZ_CORE_ERR_STORAGE = 0x06,       ///< An error occurred when flash I/O
+    EZ_CORE_ERR_DEVID = 0x07,         ///< Devid MUST be set before the sdk init
+    EZ_CORE_ERR_OUT_RANGE = 0x08,     ///< The param is out of the valid range
+    EZ_CORE_ERR_NO_EXTEND = 0x09,     ///< The expansion module is not registered
+    EZ_CORE_ERR_RISK_CRTL = 0x0a,     ///< The device has been blacklisted
+    EZ_CORE_ERR_NET = 0x0b,           ///<
+    EZ_CORE_ERR_AUTH = 0x0c,          ///<
+} ez_core_err_e;
 
 #endif

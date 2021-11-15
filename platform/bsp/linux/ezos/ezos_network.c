@@ -25,32 +25,32 @@
 #include <unistd.h>
 
 
-EZOS_API int EZOS_CALL ezos_socket(int domain, int type, int protocol)
+EZOS_API int ezos_socket(int domain, int type, int protocol)
 {
 	return socket(domain, type, protocol);
 }
 
-EZOS_API int EZOS_CALL ezos_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+EZOS_API int ezos_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	return connect(sockfd, addr, addrlen);
 }
 
-EZOS_API int EZOS_CALL ezos_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+EZOS_API int ezos_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	return bind(sockfd, addr, addrlen);
 }
 
-EZOS_API ssize_t EZOS_CALL ezos_recv(int sockfd, void *buf, size_t len, int flags)
+EZOS_API ssize_t ezos_recv(int sockfd, void *buf, size_t len, int flags)
 {
 	return recv(sockfd, buf, len, flags);
 }
 
-EZOS_API ssize_t EZOS_CALL ezos_send(int sockfd, const void *buf, size_t len, int flags)
+EZOS_API ssize_t ezos_send(int sockfd, const void *buf, size_t len, int flags)
 {
 	return send(sockfd, buf, len, flags);
 }
 
-EZOS_API int EZOS_CALL ezos_socket_setnonblock(int socket_fd)
+EZOS_API int ezos_socket_setnonblock(int socket_fd)
 {
 	int flag = fcntl(socket_fd, F_GETFL);
 	if (flag == -1){
@@ -62,7 +62,7 @@ EZOS_API int EZOS_CALL ezos_socket_setnonblock(int socket_fd)
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_socket_setblock(int socket_fd)
+EZOS_API int ezos_socket_setblock(int socket_fd)
 {
 	int flag;
 	flag = fcntl(socket_fd, F_GETFL);
@@ -78,13 +78,13 @@ EZOS_API int EZOS_CALL ezos_socket_setblock(int socket_fd)
 	return 0;
 }
 
-EZOS_API struct hostent* EZOS_CALL ezos_gethostbyname(const char* host)
+EZOS_API struct hostent* ezos_gethostbyname(const char* host)
 {
     return gethostbyname(host);
 }
 
 
-EZOS_API int EZOS_CALL ezos_socket_poll(int socket_fd, POLL_TYPE type, int timeout)
+EZOS_API int ezos_socket_poll(int socket_fd, POLL_TYPE type, int timeout)
 {
 	struct pollfd poll_fd;
 	int nfds = 0;

@@ -1,7 +1,27 @@
 ﻿
 
-#ifndef H_EZOS_THREAD_H_
-#define H_EZOS_THREAD_H_
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ * Contributors:
+ * xurongjun (xurongjun@ezvizlife.com)
+ * 
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-11-15     xurongjun    first version
+*******************************************************************************/
+
+#ifndef _EZOS_THREAD_H_
+#define _EZOS_THREAD_H_
 
 #include <ezos_def.h>
 
@@ -25,8 +45,8 @@ extern "C"
      * @param priority the size of thread stack
      * @return 0 for success, -1 for failure 
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_thread_create(ez_thread_t *const handle, const ez_char_t *name, ez_thread_func_t thread_fun,
-                                                   const ez_void_t *param, ez_uint32_t stack_size, ez_uint32_t priority);
+    EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_thread_func_t thread_fun,
+                                    const void *param, unsigned int stack_size, unsigned int priority);
 
     /**
      * @brief The function waits for the thread specified by handle to terminate.  If that thread has
@@ -35,21 +55,21 @@ extern "C"
      * @param handle thread handle
      * @return 0 for success, -1 for failure 
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_thread_destroy(ez_thread_t handle);
+    EZOS_API int ezos_thread_destroy(ez_thread_t handle);
 
     /** 
      * @brief  Get the unique ID of the calling thread
      * 
      * @return returning the calling thread's ID
      */
-    EZOS_API ez_int32_t EZOS_CALL ezos_thread_self(ez_void_t);
+    EZOS_API int ezos_thread_self(void);
 
     /**
      * @brief 
      * 
      * @return non-null for success, null for failure
      */
-    EZOS_API ez_mutex_t EZOS_CALL ezos_mutex_create(void);
+    EZOS_API ez_mutex_t ezos_mutex_create(void);
 
     /**
      * @brief 
@@ -57,7 +77,7 @@ extern "C"
      * @param mutex 
      * @return 0 for success, -1 for failure
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_mutex_destory(ez_mutex_t mutex);
+    EZOS_API int ezos_mutex_destory(ez_mutex_t mutex);
 
     /**
      * @brief 
@@ -65,7 +85,7 @@ extern "C"
      * @param mutex 
      * @return 0 for success, -1 for failure
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_mutex_lock(ez_mutex_t mutex);
+    EZOS_API int ezos_mutex_lock(ez_mutex_t mutex);
 
     /**
      * @brief 
@@ -73,7 +93,7 @@ extern "C"
      * @param mutex 
      * @return 0 for success, -1 for failure
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_mutex_unlock(ez_mutex_t mutex);
+    EZOS_API int ezos_mutex_unlock(ez_mutex_t mutex);
 
 #ifdef __cplusplus
 }

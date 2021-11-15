@@ -18,7 +18,7 @@
      *  @param[in]  support_apsta：是否支持ap、sta共存模式
      *  @return     成功：ez_errno_succ，失败：other
      */
-    ez_err_e ez_iot_ap_init(ez_iot_ap_dev_info_t *dev_info, wifi_info_cb cb, int timeout, bool support_apsta);
+    ez_core_err_e ez_iot_ap_init(ez_iot_ap_dev_info_t *dev_info, wifi_info_cb cb, int timeout, bool support_apsta);
     /**
      *  @fn     AP模块反初始化，包括停掉httpserver和ap模块，一般情况下不需要调用
      *          配网成功或超时之后，会自动释放httpserver相关资源

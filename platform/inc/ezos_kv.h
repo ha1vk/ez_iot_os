@@ -47,15 +47,15 @@ extern "C"
 
     typedef struct
     {
-        ez_char_t *key;
-        ez_void_t *value;
-        ez_size_t value_len;
+        char *key;
+        void *value;
+        size_t value_len;
     } ez_kv_default_node_t;
 
     typedef struct
     {
         ez_kv_default_node_t *kvs;
-        ez_size_t num;
+        size_t num;
     } ez_kv_default_t;
 
     /**
@@ -64,7 +64,7 @@ extern "C"
      * @param default_kv the default KV
      * @return ez_err_t
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_kv_init(const ez_kv_default_t *default_kv);
+    EZOS_API ez_err_t ezos_kv_init(const ez_kv_default_t *default_kv);
 
     /**
      * Set a raw KV. If it value is NULL, delete it.
@@ -75,7 +75,7 @@ extern "C"
      * @param length KV value size
      * @return ez_err_t
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_kv_raw_set(const ez_int8_t *key, ez_int8_t *value, ez_int32_t length);
+    EZOS_API ez_err_t ezos_kv_raw_set(const char *key, char *value, unsigned int length);
 
     /**
      * Get a raw KV value by key name.
@@ -85,7 +85,7 @@ extern "C"
      * @param length KV value length.If it value is NULL, get the length and return 0(success).
      * @return ez_err_t
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_kv_raw_get(const ez_int8_t *key, ez_int8_t *value, ez_int32_t *length);
+    EZOS_API ez_err_t ezos_kv_raw_get(const char *key, char *value, unsigned int *length);
 
     /**
      * Delete an KV.
@@ -93,7 +93,7 @@ extern "C"
      * @param key KV name
      * @return ez_err_t
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_kv_del(const ez_int8_t *key);
+    EZOS_API ez_err_t ezos_kv_del(const char *key);
 
     /**
      * @brief 
@@ -101,31 +101,31 @@ extern "C"
      * @param key_prefix 
      * @return EZOS_API 
      */
-    EZOS_API ez_err_t EZOS_CALL ez_kv_del_by_prefix(const ez_int8_t *key_prefix);
+    EZOS_API ez_err_t ez_kv_del_by_prefix(const char *key_prefix);
 
     /**
      * Print all KV.
      */
-    EZOS_API void EZOS_CALL ezos_kv_print();
+    EZOS_API void ezos_kv_print();
 
     /**
      * The KV database finalization.
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_kv_deinit();
+    EZOS_API ez_err_t ezos_kv_deinit();
 
     typedef struct
     {
         /* encapsulated member functions */
         ez_err_t (*ezos_kv_init)(ez_kv_default_t default_kv);
-        ez_err_t (*ezos_kv_raw_set)(const ez_int8_t *key, ez_int8_t *value, ez_int32_t length);
-        ez_err_t (*ezos_kv_raw_get)(const ez_int8_t *key, ez_int8_t *value, ez_int32_t *length);
-        ez_err_t (*ezos_kv_del)(const ez_int8_t *key);
-        ez_err_t (*ezos_kv_del_by_prefix)(const ez_int8_t *key_prefix);
-        ez_err_t (*ezos_kv_print)(ez_void_t);
-        ez_err_t (*ezos_kv_deinit)(ez_void_t);
+        ez_err_t (*ezos_kv_raw_set)(const char *key, char *value, unsigned int length);
+        ez_err_t (*ezos_kv_raw_get)(const char *key, char *value, unsigned int *length);
+        ez_err_t (*ezos_kv_del)(const char *key);
+        ez_err_t (*ezos_kv_del_by_prefix)(const char *key_prefix);
+        ez_err_t (*ezos_kv_print)(void);
+        ez_err_t (*ezos_kv_deinit)(void);
     } ez_kv_func_t;
 
-    EZOS_API ez_void_t EZOS_CALL ezos_kv_callback_set(ez_kv_func_t *pfuncs);
+    EZOS_API void ezos_kv_callback_set(ez_kv_func_t *pfuncs);
 
 #ifdef __cplusplus
 }

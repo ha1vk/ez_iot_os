@@ -29,26 +29,26 @@
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "ws2_32.lib")
 
-EZOS_API int EZOS_CALL ezos_socket_setnonblock(int socket_fd)
+EZOS_API int ezos_socket_setnonblock(int socket_fd)
 {
 	int arg = 1;
 	ioctlsocket(socket_fd, FIONBIO, &arg);
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_socket_setblock(int socket_fd)
+EZOS_API int ezos_socket_setblock(int socket_fd)
  {
 	int arg = 0;
 	ioctlsocket(socket_fd, FIONBIO, &arg);
 	return 0;
  }
 
-EZOS_API struct hostent* EZOS_CALL ezos_gethostbyname(const char* host)
+EZOS_API struct hostent* ezos_gethostbyname(const char* host)
 {
     return gethostbyname(host);
 }
 
-EZOS_API int EZOS_CALL ezos_socket_poll(int socket_fd, POLL_TYPE type, int timeout)
+EZOS_API int ezos_socket_poll(int socket_fd, POLL_TYPE type, int timeout)
 {
 	int return_value = -1;
     fd_set cnt_fdset;
@@ -91,7 +91,7 @@ EZOS_API int EZOS_CALL ezos_socket_poll(int socket_fd, POLL_TYPE type, int timeo
 	return return_value;
 }
 
-EZOS_API int EZOS_CALL ez_setsockopt(int socket_fd, int level, int optname, const void *optval, socklen_t optlen)
+EZOS_API int ez_setsockopt(int socket_fd, int level, int optname, const void *optval, socklen_t optlen)
 {
 	int value_int;
 
@@ -107,7 +107,7 @@ EZOS_API int EZOS_CALL ez_setsockopt(int socket_fd, int level, int optname, cons
 		return setsockopt(socket_fd, level, optname, optval, optlen);
 }
 
-EZOS_API int EZOS_CALL ez_getsockopt(int socket_fd, int level, int optname, void *optval, socklen_t optlen)
+EZOS_API int ez_getsockopt(int socket_fd, int level, int optname, void *optval, socklen_t optlen)
 {
 	int value_int;
 	int ret;
@@ -126,7 +126,7 @@ EZOS_API int EZOS_CALL ez_getsockopt(int socket_fd, int level, int optname, void
 		return getsockopt(socket_fd, level, optname, optval, optlen);
 }
 
-EZOS_API int EZOS_CALL ezos_dev_ping(const char *dest, unsigned int c, unsigned int packetLen, struct ping_result *res)
+EZOS_API int ezos_dev_ping(const char *dest, unsigned int c, unsigned int packetLen, struct ping_result *res)
 {
 	char cmd[256] = { 0 };
 	char line[512] = { 0 };
@@ -187,27 +187,27 @@ EZOS_API int EZOS_CALL ezos_dev_ping(const char *dest, unsigned int c, unsigned 
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_bind_network(int socket_fd, const char *interface_name)
+EZOS_API int ezos_bind_network(int socket_fd, const char *interface_name)
 {
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_get_interface_mask(const char* ifname, struct in_addr* mask)
+EZOS_API int ezos_get_interface_mask(const char* ifname, struct in_addr* mask)
 {
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_get_interface_ip(const char* ifname, struct in_addr* ip)
+EZOS_API int ezos_get_interface_ip(const char* ifname, struct in_addr* ip)
 {
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_get_all_interface(char* ifname_list[], int* count)
+EZOS_API int ezos_get_all_interface(char* ifname_list[], int* count)
 {
 	return 0;
 }
 
-EZOS_API int EZOS_CALL ezos_get_active_interface(char* if_name)
+EZOS_API int ezos_get_active_interface(char* if_name)
 {
 	return 0;
 }

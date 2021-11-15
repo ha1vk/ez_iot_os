@@ -17,7 +17,7 @@
 #ifndef _EZOS_TIME_H_
 #define _EZOS_TIME_H_
 
-#include "ezos_def.h"
+#include <ezos_def.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -58,7 +58,7 @@ extern "C"
      * @param clock if clock non-NULL, the current time will be filled.
      * @return return 0 for success, or -1 for failure 
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_get_clock(ezos_timespec_t *clock);
+    EZOS_API ez_err_t ezos_get_clock(ezos_timespec_t *clock);
 
     /**
      * @brief This functions can get the time as well as a timezone.
@@ -66,7 +66,7 @@ extern "C"
      * @param tv The tv argument is a struct timeval.
      * @return return 0 for success, or -1 for failure 
      */
-    EZOS_API ez_err_t EZOS_CALL ezos_gettimeofday(struct ezos_timeval *tv);
+    EZOS_API ez_err_t ezos_gettimeofday(struct ezos_timeval *tv);
 
     /**
      * @brief Get current timestamp
@@ -74,7 +74,7 @@ extern "C"
      * @param t put current time in *TIMER if TIMER is not NULL
      * @return Return the current time
      */
-    EZOS_API ezos_time_t EZOS_CALL ezos_time(ezos_time_t *t);
+    EZOS_API ezos_time_t ezos_time(ezos_time_t *t);
 
     /**
      * @brief Return the `struct tm' representation of *TIMER in local time.
@@ -91,7 +91,7 @@ extern "C"
      * @param time_ms suspends time, as millisecond.
      * @return ez_void_t.
      */
-    EZOS_API ez_void_t EZOS_CALL ezos_delay_ms(ez_ulong_t msecs);
+    EZOS_API ez_void_t ezos_delay_ms(ez_ulong_t msecs);
 
 #ifdef __cplusplus
 }

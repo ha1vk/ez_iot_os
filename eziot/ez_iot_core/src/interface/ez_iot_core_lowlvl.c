@@ -29,12 +29,12 @@ static EZDEV_SDK_UINT32 genaral_seq()
     return seq;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info,
+EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info,
                                            const ez_byte_t *devid, sdk_kernel_event_notice kernel_event_notice_cb)
 
 {
     FUNC_IN();
-    ez_err_t rv = EZ_ERR_SUCC;
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
 
     if (sdk_idle0 != g_ezdev_sdk_kernel.my_state)
     {
@@ -69,7 +69,7 @@ EZOS_API ez_err_t EZOS_CALL ez_kernel_init(const ez_server_info_t *psrv_info, co
 
     ezos_strncpy((char *)g_ezdev_sdk_kernel.dev_id, (char *)devid, sizeof(g_ezdev_sdk_kernel.dev_id));
     ez_int32_t key_len = sizeof(g_ezdev_sdk_kernel.master_key);
-    CHECK_COND_DONE(!ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_MASTERKEY, g_ezdev_sdk_kernel.master_key, &key_len), EZ_ERR_STORAGE);
+    CHECK_COND_DONE(!ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_MASTERKEY, g_ezdev_sdk_kernel.master_key, &key_len), EZ_CORE_ERR_STORAGE);
 
     /* 初始化链接状态 */
     g_ezdev_sdk_kernel.lbs_redirect_times = 0;
@@ -96,13 +96,13 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_start()
+EZOS_API ez_err_t ez_kernel_start()
 {
     FUNC_IN();
-    ez_err_t rv = EZ_ERR_SUCC;
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
 
-    CHECK_COND_DONE(sdk_idle0 == g_ezdev_sdk_kernel.my_state, EZ_ERR_NOT_INIT);
-    CHECK_COND_DONE(sdk_start == g_ezdev_sdk_kernel.my_state, EZ_ERR_GENERAL);
+    CHECK_COND_DONE(sdk_idle0 == g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_INIT);
+    CHECK_COND_DONE(sdk_start == g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_GENERAL);
 
     g_ezdev_sdk_kernel.my_state = sdk_start;
     broadcast_user_start();
@@ -113,14 +113,14 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_stop()
+EZOS_API ez_err_t ez_kernel_stop()
 {
     FUNC_IN();
-    ez_err_t rv = EZ_ERR_SUCC;
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
 
-    CHECK_COND_DONE(sdk_idle0 == g_ezdev_sdk_kernel.my_state, EZ_ERR_NOT_INIT);
-    CHECK_COND_DONE(sdk_idle == g_ezdev_sdk_kernel.my_state, EZ_ERR_NOT_READY);
-    CHECK_COND_DONE(sdk_stop == g_ezdev_sdk_kernel.my_state, EZ_ERR_GENERAL);
+    CHECK_COND_DONE(sdk_idle0 == g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_INIT);
+    CHECK_COND_DONE(sdk_idle == g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_READY);
+    CHECK_COND_DONE(sdk_stop == g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_GENERAL);
 
     g_ezdev_sdk_kernel.my_state = sdk_stop;
     access_stop_yield(&g_ezdev_sdk_kernel);
@@ -131,13 +131,13 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_fini()
+EZOS_API ez_err_t ez_kernel_fini()
 {
     FUNC_IN();
-    ez_err_t rv = EZ_ERR_SUCC;
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
 
-    CHECK_COND_DONE(sdk_idle0 == g_ezdev_sdk_kernel.my_state, EZ_ERR_NOT_INIT);
-    CHECK_COND_DONE(sdk_start == g_ezdev_sdk_kernel.my_state, EZ_ERR_GENERAL);
+    CHECK_COND_DONE(sdk_idle0 == g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_INIT);
+    CHECK_COND_DONE(sdk_start == g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_GENERAL);
 
     das_object_fini(&g_ezdev_sdk_kernel);
     extend_fini();
@@ -155,10 +155,10 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_yield()
+EZOS_API ez_err_t ez_kernel_yield()
 {
-    ez_err_t rv = EZ_ERR_SUCC;
-    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_ERR_NOT_READY);
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
+    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_READY);
     rv = mkiE2ezE(access_server_yield(&g_ezdev_sdk_kernel));
 
     ezlog_v(TAG_CORE, "yield rv:%d", rv);
@@ -166,10 +166,10 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_yield_user()
+EZOS_API ez_err_t ez_kernel_yield_user()
 {
-    ez_err_t rv = EZ_ERR_SUCC;
-    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_ERR_NOT_READY);
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
+    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_READY);
     rv = mkiE2ezE(extend_yield(&g_ezdev_sdk_kernel));
 
     ezlog_v(TAG_CORE, "yield_user rv:%d", rv);
@@ -177,22 +177,22 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_extend_load(const ez_kernel_extend_t *external_extend)
+EZOS_API ez_err_t ez_kernel_extend_load(const ez_kernel_extend_t *external_extend)
 {
     FUNC_IN();
-    ez_err_t rv = EZ_ERR_SUCC;
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
 
     if (sdk_idle != g_ezdev_sdk_kernel.my_state && sdk_start != g_ezdev_sdk_kernel.my_state)
     {
-        rv = EZ_ERR_NOT_INIT;
+        rv = EZ_CORE_ERR_NOT_INIT;
         goto done;
     }
 
-    CHECK_COND_DONE(!external_extend, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_data_route, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_start, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_stop, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!extend_load(external_extend), EZ_ERR_GENERAL);
+    CHECK_COND_DONE(!external_extend, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_data_route, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_start, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_stop, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!extend_load(external_extend), EZ_CORE_ERR_GENERAL);
 
 done:
     FUNC_OUT();
@@ -200,30 +200,30 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
+EZOS_API ez_err_t ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
 {
     FUNC_IN();
 
     ezdev_sdk_kernel_pubmsg_exchange *new_pubmsg_exchange = NULL;
-    ez_err_t rv = EZ_ERR_SUCC;
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
     char cRiskResult = 0;
 
-    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_ERR_NOT_INIT);
-    CHECK_COND_DONE(!pubmsg, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!pubmsg->msg_body, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!pubmsg->msg_body_len, EZ_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_INIT);
+    CHECK_COND_DONE(!pubmsg, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!pubmsg->msg_body, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!pubmsg->msg_body_len, EZ_CORE_ERR_PARAM_INVALID);
 
     ezlog_i(TAG_CORE, "domain:%d ,cmd:%d, seq:%d, len:%d, data:%s", pubmsg->msg_domain_id,
             pubmsg->msg_command_id, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
 
-    CHECK_COND_DONE(pubmsg->msg_body_len > ezdev_sdk_send_buf_max, EZ_ERR_OUT_RANGE);
+    CHECK_COND_DONE(pubmsg->msg_body_len > ezdev_sdk_send_buf_max, EZ_CORE_ERR_OUT_RANGE);
 
     cRiskResult = check_cmd_risk_control(&g_ezdev_sdk_kernel, pubmsg->msg_domain_id, pubmsg->msg_command_id);
-    CHECK_COND_DONE(1 == cRiskResult, EZ_ERR_NO_EXTEND);
-    CHECK_COND_DONE((2 == cRiskResult || 3 == cRiskResult), EZ_ERR_RISK_CRTL);
+    CHECK_COND_DONE(1 == cRiskResult, EZ_CORE_ERR_NO_EXTEND);
+    CHECK_COND_DONE((2 == cRiskResult || 3 == cRiskResult), EZ_CORE_ERR_RISK_CRTL);
 
     new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange *)ezos_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange));
-    CHECK_COND_DONE(!new_pubmsg_exchange, EZ_ERR_MEMORY);
+    CHECK_COND_DONE(!new_pubmsg_exchange, EZ_CORE_ERR_MEMORY);
 
     ezos_memset(new_pubmsg_exchange, 0, sizeof(ezdev_sdk_kernel_pubmsg_exchange));
     ezos_strncpy(new_pubmsg_exchange->msg_conntext.command_ver, pubmsg->command_ver, version_max_len - 1);
@@ -234,7 +234,7 @@ EZOS_API ez_err_t EZOS_CALL ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
     new_pubmsg_exchange->msg_conntext.msg_command_id = pubmsg->msg_command_id;
 
     new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char *)ezos_malloc(pubmsg->msg_body_len);
-    CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext.msg_body, EZ_ERR_MEMORY);
+    CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext.msg_body, EZ_CORE_ERR_MEMORY);
 
     ezos_memset(new_pubmsg_exchange->msg_conntext.msg_body, 0, pubmsg->msg_body_len);
     new_pubmsg_exchange->msg_conntext.msg_body_len = pubmsg->msg_body_len;
@@ -250,16 +250,16 @@ EZOS_API ez_err_t EZOS_CALL ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
     if (NULL != pubmsg->externel_ctx && 0 != pubmsg->externel_ctx_len)
     {
         new_pubmsg_exchange->msg_conntext.externel_ctx = (unsigned char *)ezos_malloc(pubmsg->externel_ctx_len);
-        CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext.externel_ctx, EZ_ERR_MEMORY);
+        CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext.externel_ctx, EZ_CORE_ERR_MEMORY);
 
         ezos_memcpy(new_pubmsg_exchange->msg_conntext.externel_ctx, pubmsg->externel_ctx, pubmsg->externel_ctx_len);
         new_pubmsg_exchange->msg_conntext.externel_ctx_len = pubmsg->externel_ctx_len;
     }
 
-    CHECK_COND_DONE(das_send_pubmsg_async(&g_ezdev_sdk_kernel, new_pubmsg_exchange), EZ_ERR_MEMORY);
+    CHECK_COND_DONE(das_send_pubmsg_async(&g_ezdev_sdk_kernel, new_pubmsg_exchange), EZ_CORE_ERR_MEMORY);
 done:
 
-    if (rv != EZ_ERR_SUCC && NULL != new_pubmsg_exchange)
+    if (rv != EZ_CORE_ERR_SUCC && NULL != new_pubmsg_exchange)
     {
         if (NULL != new_pubmsg_exchange->msg_conntext.msg_body)
         {
@@ -278,22 +278,22 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_extend_load_v3(const ez_kernel_extend_v3_t *external_extend)
+EZOS_API ez_err_t ez_kernel_extend_load_v3(const ez_kernel_extend_v3_t *external_extend)
 {
     FUNC_IN();
-    ez_err_t rv = EZ_ERR_SUCC;
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
 
     if (sdk_idle != g_ezdev_sdk_kernel.my_state && sdk_start != g_ezdev_sdk_kernel.my_state)
     {
-        rv = EZ_ERR_NOT_INIT;
+        rv = EZ_CORE_ERR_NOT_INIT;
         goto done;
     }
 
-    CHECK_COND_DONE(!external_extend, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!external_extend->ez_kernel_data_route, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!external_extend->ez_kernel_event_route, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!ezos_strlen(external_extend->module), EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!extend_load_v3(external_extend), EZ_ERR_GENERAL);
+    CHECK_COND_DONE(!external_extend, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!external_extend->ez_kernel_data_route, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!external_extend->ez_kernel_event_route, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!ezos_strlen(external_extend->module), EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!extend_load_v3(external_extend), EZ_CORE_ERR_GENERAL);
     g_ezdev_sdk_kernel.v3_reg_status = sdk_v3_reged;
 
 done:
@@ -302,25 +302,25 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t EZOS_CALL ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
+EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
 {
     FUNC_IN();
 
     ezdev_sdk_kernel_pubmsg_exchange_v3 *new_pubmsg_exchange = NULL;
-    ez_err_t rv = EZ_ERR_SUCC;
+    ez_err_t rv = EZ_CORE_ERR_SUCC;
 
-    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_ERR_NOT_INIT);
-    CHECK_COND_DONE(!pubmsg, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!pubmsg->msg_body, EZ_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!pubmsg->msg_body_len, EZ_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_INIT);
+    CHECK_COND_DONE(!pubmsg, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!pubmsg->msg_body, EZ_CORE_ERR_PARAM_INVALID);
+    CHECK_COND_DONE(!pubmsg->msg_body_len, EZ_CORE_ERR_PARAM_INVALID);
 
     ezlog_i(TAG_CORE, "module:%s, resource_type:%s,msg_type:%s, method:%s, ext_msg:%s, seq:%d, len:%d, string:%s\n", pubmsg->module,
             pubmsg->resource_type, pubmsg->msg_type, pubmsg->method, pubmsg->ext_msg, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
 
-    CHECK_COND_DONE(pubmsg->msg_body_len > ezdev_sdk_send_buf_max, EZ_ERR_OUT_RANGE);
+    CHECK_COND_DONE(pubmsg->msg_body_len > ezdev_sdk_send_buf_max, EZ_CORE_ERR_OUT_RANGE);
 
     new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange_v3 *)ezos_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange_v3));
-    CHECK_COND_DONE(!new_pubmsg_exchange, EZ_ERR_MEMORY);
+    CHECK_COND_DONE(!new_pubmsg_exchange, EZ_CORE_ERR_MEMORY);
 
     ezos_memset(new_pubmsg_exchange, 0, sizeof(ezdev_sdk_kernel_pubmsg_exchange_v3));
     new_pubmsg_exchange->msg_conntext_v3.msg_qos = pubmsg->msg_qos;
@@ -339,7 +339,7 @@ EZOS_API ez_err_t EZOS_CALL ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
     }
 
     new_pubmsg_exchange->msg_conntext_v3.msg_body = (unsigned char *)ezos_malloc(pubmsg->msg_body_len);
-    CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext_v3.msg_body, EZ_ERR_MEMORY);
+    CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext_v3.msg_body, EZ_CORE_ERR_MEMORY);
 
     ezos_memset(new_pubmsg_exchange->msg_conntext_v3.msg_body, 0, pubmsg->msg_body_len);
     new_pubmsg_exchange->msg_conntext_v3.msg_body_len = pubmsg->msg_body_len;
@@ -347,10 +347,10 @@ EZOS_API ez_err_t EZOS_CALL ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
     new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count;
     new_pubmsg_exchange->msg_conntext_v3.msg_seq = pubmsg->msg_seq;
 
-    CHECK_COND_DONE(das_send_pubmsg_async_v3(&g_ezdev_sdk_kernel, new_pubmsg_exchange), EZ_ERR_MEMORY);
+    CHECK_COND_DONE(das_send_pubmsg_async_v3(&g_ezdev_sdk_kernel, new_pubmsg_exchange), EZ_CORE_ERR_MEMORY);
 done:
 
-    if (rv != EZ_ERR_SUCC && NULL != new_pubmsg_exchange)
+    if (rv != EZ_CORE_ERR_SUCC && NULL != new_pubmsg_exchange)
     {
         if (NULL != new_pubmsg_exchange->msg_conntext_v3.msg_body)
         {

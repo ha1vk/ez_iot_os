@@ -63,31 +63,31 @@ unsigned int mkiE2ezE(unsigned int mkernel_err)
     switch (mkernel_err)
     {
     case mkernel_internal_succ:
-        rv = EZ_ERR_SUCC;
+        rv = EZ_CORE_ERR_SUCC;
         break;
     case mkernel_internal_no_start:
     case mkernel_internal_haven_stop:
     case mkernel_internal_invald_call:
-        rv = EZ_ERR_NOT_READY;
+        rv = EZ_CORE_ERR_NOT_READY;
         break;
     case mkernel_internal_input_param_invalid:
-        rv = EZ_ERR_PARAM_INVALID;
+        rv = EZ_CORE_ERR_PARAM_INVALID;
         break;
     case mkernel_internal_call_mqtt_buffer_too_short:
-        rv = EZ_ERR_OUT_RANGE;
+        rv = EZ_CORE_ERR_OUT_RANGE;
         break;
     case mkernel_internal_mem_lack:
     case mkernel_internal_malloc_error:
     case mkernel_internal_queue_full:
     case mkernel_internal_extend_full:
-        rv = EZ_ERR_MEMORY;
+        rv = EZ_CORE_ERR_MEMORY;
         break;
     case mkernel_internal_extend_no_find:
-        rv = EZ_ERR_NO_EXTEND;
+        rv = EZ_CORE_ERR_NO_EXTEND;
         break;
     case mkernel_internal_value_load_err:
     case mkernel_internal_value_save_err:
-        rv = EZ_ERR_STORAGE;
+        rv = EZ_CORE_ERR_STORAGE;
         break;
     case mkernel_internal_create_sock_error:
     case mkernel_internal_net_poll_err:
@@ -109,7 +109,7 @@ unsigned int mkiE2ezE(unsigned int mkernel_err)
     case mkernel_internal_rev_invalid_packet:
     case mkernel_internal_call_mqtt_sub_error:
     case mkernel_internal_call_mqtt_pub_error:
-        rv = EZ_ERR_NET;
+        rv = EZ_CORE_ERR_NET;
         break;
     case mkernel_internal_platform_lbs_signcheck_error:
     case mkernel_internal_platform_lbs_order_error:
@@ -131,13 +131,13 @@ unsigned int mkiE2ezE(unsigned int mkernel_err)
     case mkernel_internal_platform_secretkey_no_user:
     case mkernel_internal_platform_secretkey_serial_not_exist:
     case mkernel_internal_platform_secretkey_again:
-        rv = EZ_ERR_AUTH;
+        rv = EZ_CORE_ERR_AUTH;
         break;
     case mkernel_internal_mqtt_blacklist:
-        rv = EZ_ERR_RISK_CRTL;
+        rv = EZ_CORE_ERR_RISK_CRTL;
         break;
     default:
-        rv = EZ_ERR_GENERAL;
+        rv = EZ_CORE_ERR_GENERAL;
         break;
     }
 
