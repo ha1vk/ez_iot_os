@@ -38,7 +38,7 @@ EZOS_API time_t ezos_time(ezos_time_t *__timer)
     return time(__timer);
 }
 
-EZOS_API struct ezos_tm *EZOS_CALL ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result)
+EZOS_API struct ezos_tm * ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result)
 {
     //TODO
     return result;

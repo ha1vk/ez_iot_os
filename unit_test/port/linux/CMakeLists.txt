@@ -32,9 +32,11 @@ else()
 endif()
 ###############################################
 
+set(CMAKE_BUILD_TYPE "Debug")
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall -Wno-unused-variable")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wno-unused-variable  -std=c++11")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wno-unused-variable -std=c++11")
 else()
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-variable")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-unused-variable")
@@ -76,22 +78,31 @@ if(CONFIG_EZIOT_COMPONENT_EZLOG_ENABLE)
 
 endif()
 
+if(CONFIG_EZOS_KV_ENABLE)
+
+    message(STATUS "CONFIG_EZOS_KV_ENABLE")
+
+    list(APPEND UT_INC_DIRS ${ENV_PLATFORM_PATH}/inc)
+    list(APPEND UT_INC_DIRS ${ENV_UTPORT_PATH})
+
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_ezos_kv.c)
+    list(APPEND UT_SRCS ${ENV_UTPORT_PATH}/kv_imp.c)
+
+    list(APPEND UT_DEPENS -lezos)
+
+endif()
+
 if(CONFIG_EZIOT_CORE_ENABLE)
 
     message(STATUS "CONFIG_EZIOT_CORE_ENABLE")
 
-    list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/core/inc)
+    list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_core/inc)
     #TODO add ut_online
-
-    if(CONFIG_EZIOT_OS_KV_ENABLE)
-    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_ezos_kv.c)
-    endif()
 
     list(APPEND UT_DEPENS -lezos)
     list(APPEND UT_DEPENS -lezlog)
     list(APPEND UT_DEPENS -lcJSON)
     list(APPEND UT_DEPENS -lmqtt)
-    list(APPEND UT_DEPENS -lezlog)
     list(APPEND UT_DEPENS -lezxml)
     list(APPEND UT_DEPENS -lmbedtls)
 

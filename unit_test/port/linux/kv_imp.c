@@ -1,26 +1,45 @@
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * 
+ * Contributors:
+ * XuRongjun (xurongjun@ezvizlife.com) - Implementation of ezos kv interface, adapted to kvdb library by file mode.
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-11-16     xurongjun    first version 
+ *******************************************************************************/
+
 #include "kv_imp.h"
 #include <ezos.h>
 #include <flashdb.h>
 
 static ez_mutex_t m_kv_mutex = NULL;
-
-void kv_lock(fdb_db_t db)
-{
-    ezos_mutex_lock(&m_kv_mutex);
-}
-
-void kv_unlock(fdb_db_t db)
-{
-    ezos_mutex_unlock(&m_kv_mutex);
-}
-
 static struct fdb_kvdb ez_kvdb;
 #define EZ_KVDB_NAME "ez_kvdb"
 #define EZ_KVDB_PART_NAME "cache"
 #define EZ_KVDB_MAX_SIZE 1024 * 32
 #define EZ_KVDB_SEC_SIZE 1024 * 16
 
-int kv_init(const void **default_kv)
+void kv_lock(fdb_db_t db)
+{
+    ezos_mutex_lock(m_kv_mutex);
+}
+
+void kv_unlock(fdb_db_t db)
+{
+    ezos_mutex_unlock(m_kv_mutex);
+}
+
+int kv_init(const void *default_kv)
 {
     /**
      * @brief For single product devices, 16k is recommended, and for gateway devices,
@@ -48,18 +67,18 @@ int kv_init(const void **default_kv)
     return rv;
 }
 
-int kv_raw_set(const char **key, char *value, unsigned int length)
+int kv_raw_set(const char *key, const void *value, size_t length)
 {
     struct fdb_blob blob;
 
-    return fdb_kv_set_blob(&ez_kvdb, (const char *)key, fdb_blob_make(&blob, value, length));
+    return fdb_kv_set_blob(&ez_kvdb, key, fdb_blob_make(&blob, value, length));
 }
 
-int kv_raw_get(const char *key, char *value, unsigned int *length)
+int kv_raw_get(const char *key, void *value, size_t *length)
 {
     struct fdb_blob blob;
 
-    size_t read_len = fdb_kv_get_blob(&ez_kvdb, (const char *)key, fdb_blob_make(&blob, value, *length));
+    size_t read_len = fdb_kv_get_blob(&ez_kvdb, key, fdb_blob_make(&blob, value, *length));
     if (read_len < 0)
     {
         return EZ_KV_ERR_READ;
@@ -80,7 +99,7 @@ int kv_del(const char *key)
     return fdb_kv_del(&ez_kvdb, (const char *)key);
 }
 
-int kv_del_by_prefix(const unsigned char *key_prefix)
+int kv_del_by_prefix(const char *key_prefix)
 {
     //TODO
     return EZ_KV_ERR_SUCC;

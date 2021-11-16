@@ -364,7 +364,7 @@ done:
     return rv;
 }
 
-EZOS_API const ez_char_t *EZOS_CALL ez_kernel_getdevinfo_bykey(const ez_char_t *key)
+EZOS_API const ez_char_t * ez_kernel_getdevinfo_bykey(const ez_char_t *key)
 {
     static const ez_char_t *g_default_value = "invalidkey";
 

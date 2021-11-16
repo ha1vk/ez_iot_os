@@ -83,7 +83,7 @@ extern "C"
      * @param result return the address of the structure pointed to by result. 
      * @return ezos_tm*
      */
-    EZOS_API struct ezos_tm *EZOS_CALL ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result);
+    EZOS_API struct ezos_tm * ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result);
 
     /**
      * @brief This function suspends execution of the calling thread for (at least) microseconds.

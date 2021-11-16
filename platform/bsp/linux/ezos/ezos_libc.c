@@ -58,17 +58,22 @@ EZOS_API int ezos_memcmp(const void *s1, const void *s2, size_t n)
     return memcmp(s1, s2, n);
 }
 
-EZOS_API void *EZOS_CALL ezos_memcpy(void *dest, const void *src, size_t n)
+EZOS_API void *ezos_memset(void *s, int c, size_t n)
+{
+    return memset(s, c, n);
+}
+
+EZOS_API void * ezos_memcpy(void *dest, const void *src, size_t n)
 {
     return memcpy(dest, src, n);
 }
 
-EZOS_API char *EZOS_CALL ezos_strcpy(char *dest, const char *src)
+EZOS_API char * ezos_strcpy(char *dest, const char *src)
 {
     return strcpy(dest, src);
 }
 
-EZOS_API char *EZOS_CALL ezos_strncpy(char *dest, const char *src, size_t n)
+EZOS_API char * ezos_strncpy(char *dest, const char *src, size_t n)
 {
     return strncpy(dest, src, n);
 }
@@ -83,7 +88,7 @@ EZOS_API int ezos_strncmp(const char *s1, const char *s2, size_t n)
     return strncmp(s1, s2, n);
 }
 
-EZOS_API char *EZOS_CALL ezos_strstr(const char *haystack, const char *needle)
+EZOS_API char * ezos_strstr(const char *haystack, const char *needle)
 {
     return strstr(haystack, needle);
 }

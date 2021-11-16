@@ -18,7 +18,7 @@
  * 2021-10-27     zoujinwei    first version
  *******************************************************************************/
 
-#include "ezos_network.h"
+#include "ezos_socket.h"
 #include <time.h>
 #include <stdio.h>
 #include <string.h>

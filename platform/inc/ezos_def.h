@@ -23,7 +23,7 @@
     #else
     #define EZOS_API __declspec(dllimport)
     #endif
-    #define EZOS_CALL__stdcall
+    #define EZOS_CALL __stdcall
 #else
     #define EZOS_API
     #define EZOS_CALL

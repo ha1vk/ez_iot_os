@@ -114,7 +114,7 @@ extern "C"
      * @param key 
      * @return EZOS_API const* 
      */
-    EZOS_API const ez_char_t *EZOS_CALL ez_kernel_getdevinfo_bykey(const ez_char_t *key);
+    EZOS_API const ez_char_t * ez_kernel_getdevinfo_bykey(const ez_char_t *key);
 
 #ifdef __cplusplus
 }

@@ -1,31 +1,15 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "D:/Program Files/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++",
-                "D:/Program Files/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/x86_64-w64-mingw32",
-                "D:/Program Files/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/tr1",
-                "D:/Program Files/mingw64/include",
-                "D:/Program Files/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include"
+                "${workspaceFolder}/**"
             ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
-            ],
-            "browse": {
-                "path": [
-                    "${workspaceRoot}",
-                    "D:/Program Files/mingw64/lib",
-                    "D:/Program Files/mingw64/include"
-                ]
-            },
-            "compilerPath": "C:\\MinGW\\bin\\gcc.exe",
-            "cStandard": "gnu11",
-            "cppStandard": "gnu++14",
-            "intelliSenseMode": "windows-gcc-x86"
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
         }
     ],
     "version": 4

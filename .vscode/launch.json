@@ -5,21 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) launch",
+            "name": "ut_iotsdk",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/${fileBasenameNoExtension}.exe",
+            "program": "${workspaceFolder}/unit_test/port/linux/build/ut_iotsdk",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
-            "preLaunchTask": "gcc",
+            "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "D:\\Program Files\\mingw64\\bin\\gdb.exe",
+            "preLaunchTask": "",
             "setupCommands": [
                 {
-                    "description": "为 gdb 启用整齐打印",
+                    "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
