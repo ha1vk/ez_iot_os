@@ -153,7 +153,7 @@ static mkernel_internal_error bus_handle_dev_risk(ezdev_sdk_kernel *sdk_kernel, 
 
         if (NULL != json_domain->string)
         {
-            domain_id = atoi(json_domain->string);
+            domain_id = ezos_atoi(json_domain->string);
         }
 
         domain_cmd_size = cJSON_GetArraySize(json_domain);

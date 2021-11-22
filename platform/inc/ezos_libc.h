@@ -33,6 +33,7 @@ extern "C"
     EZOS_API int ezos_printf(const char *format, ...);
     EZOS_API int ezos_sprintf(char *str, const char *format, ...);
     EZOS_API int ezos_snprintf(char *str, size_t size, const char *format, ...);
+    EZOS_API int ezos_sscanf(const char *str, const char *format, ...);
 
     EZOS_API int ezos_memcmp(const void *s1, const void *s2, size_t n);
     EZOS_API void *ezos_memset(void *s, int c, size_t n);

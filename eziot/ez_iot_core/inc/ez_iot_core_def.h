@@ -174,6 +174,7 @@ typedef struct
     ez_char_t ext_msg[ezdev_sdk_ext_msg_len];             ///< 扩展内容，例如"model"中的 "domainid/identifier"字段
 } ez_kernel_pubmsg_v3_t;
 
+
 typedef enum ez_err
 {
     EZ_CORE_ERR_SUCC = 0x00,          ///< Success

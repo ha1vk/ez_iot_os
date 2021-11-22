@@ -1,0 +1,5 @@
+menu "Component ezlist configuration"
+    config EZIOT_COMPONENT_EZLIST_ENABLE
+        bool "Enable ezlist component"
+        default y
+endmenu

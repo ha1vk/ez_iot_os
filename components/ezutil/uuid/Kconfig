@@ -1,0 +1,3 @@
+config EZIOT_COMPONENT_EZUTIL_UUID_ENABLE
+    bool "Enable uuid module"
+    default y

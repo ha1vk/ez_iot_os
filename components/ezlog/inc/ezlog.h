@@ -59,7 +59,7 @@ extern "C"
     extern ez_void_t elog_output(ez_uint8_t level, const ez_char_t *tag, const ez_char_t *file, const ez_char_t *func,
                                  const ez_long_t line, const ez_char_t *format, ...);
 
-    extern void elog_hexdump(const char *name, uint8_t width, uint8_t *buf, uint16_t size);
+    extern void elog_hexdump(const char *name, ez_uint8_t width, ez_uint8_t *buf, ez_uint16_t size);
 
     #define ezlog_a(tag, ...) elog_output(EZ_ELOG_LVL_ASSERT, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
     #define ezlog_e(tag, ...) elog_output(EZ_ELOG_LVL_ERROR, tag, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)

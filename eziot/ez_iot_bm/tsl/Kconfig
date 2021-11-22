@@ -1,7 +1,37 @@
 menu "ez-iot TSL(Thing Specification Language) configuration"
     config EZIOT_TSL_ENABLE
-        bool "Enable ez-iot TSL"
+        bool "Enable ez-iot TSL business module"
         default y
+        #select EZIOT_CORE_ENABLE
+
+    config EZIOT_TSL_SHADOW_SUPPORT
+        bool "Use device shadow to synchronize property"
+        default y
+        depends on EZIOT_TSL_ENABLE
+        select EZIOT_SHADOW_ENABLE
+
+    choice EZIOT_TSL_LEGALITY_CHECK_LEVEL
+        prompt "Functional legality check level"
+        default EZIOT_TSL_LEGALITY_CHECK_WEAK
+        depends on EZIOT_TSL_ENABLE
+
+    config EZIOT_TSL_LEGALITY_CHECK_NONE
+        bool "NONE"
+    config EZIOT_TSL_LEGALITY_CHECK_WEAK
+        bool "WEAK"
+    config EZIOT_TSL_LEGALITY_CHECK_STRONG
+        bool "STRONG"
+    endchoice
+
+    config EZIOT_TSL_DOWNLOAD_TASK_PRIORITY
+        int "priority of schema download task"
+        range 0 255
+        default 5
+        depends on EZIOT_TSL_ENABLE
+
+    config EZIOT_TSL_DOWNLOAD_STACK_SIZE
+        int "Stack size of schema download task"
+        default 16384
+        depends on EZIOT_TSL_ENABLE
 
 endmenu
-

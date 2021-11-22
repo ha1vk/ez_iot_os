@@ -1,2 +1,4 @@
 platform/bsp/*/build
 unit_test/port/*/build
+build.sh
+rebuild.sh

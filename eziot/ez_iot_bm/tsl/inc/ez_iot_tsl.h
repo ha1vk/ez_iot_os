@@ -11,7 +11,7 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  * 
  * Contributors:
- * XuRongjun (xurongjun@ezvizlife.com)
+ * XuRongjun (xurongjun@ezvizlife.com) - TSL(Thing Specification Language) user interface declaration 
  *
  * Change Logs:
  * Date           Author       Notes
@@ -32,16 +32,22 @@ extern "C"
 
     typedef enum
     {
-        EZ_TSL_ERR_SUCC = 0x00,                              ///< Success
-        EZ_TSL_ERR_NOT_INIT = TSL_MODULE_ERRNO_BASE + 0x01,  ///< The module is not initialized
+        EZ_TSL_ERR_SUCC = 0x00,                                      ///< Success
+        EZ_TSL_ERR_NOT_INIT = TSL_MODULE_ERRNO_BASE + 0x01,          ///< The tsl module is not initialized
+        EZ_TSL_ERR_NOT_READY = TSL_MODULE_ERRNO_BASE + 0x02,         ///< The sdk core module is not started
+        EZ_TSL_ERR_PARAM_INVALID = TSL_MODULE_ERRNO_BASE + 0x03,     ///< The input parameters is illegal, it may be that some parameters can not be null or out of range
+        EZ_TSL_ERR_GENERAL = TSL_MODULE_ERRNO_BASE + 0x04,           ///< Unknown error
+        EZ_TSL_ERR_MEMORY = TSL_MODULE_ERRNO_BASE + 0x05,            ///< Out of memory
+        EZ_TSL_ERR_DEV_NOT_FOUND = TSL_MODULE_ERRNO_BASE + 0x06,     ///< Can't find the device, need to register first
+        EZ_TSL_ERR_RSCTYPE_NOT_FOUND = TSL_MODULE_ERRNO_BASE + 0x07, ///< The rsc_type is illegal, is not defined in the profile
+        EZ_TSL_ERR_INDEX_NOT_FOUND = TSL_MODULE_ERRNO_BASE + 0x08,   ///< The local index is illegal, is not defined in the profile
+        EZ_TSL_ERR_DOMAIN_NOT_FOUND = TSL_MODULE_ERRNO_BASE + 0x09,  ///< The domain is illegal, is not defined in the profile
+        EZ_TSL_ERR_KEY_NOT_FOUND = TSL_MODULE_ERRNO_BASE + 0x0a,     ///< The Key is illegal, is not defined in the profile
+        EZ_TSL_ERR_VALUE_TYPE = TSL_MODULE_ERRNO_BASE + 0x0b,        ///< The type of the value does not match the definition
+        EZ_TSL_ERR_VALUE_ILLEGAL = TSL_MODULE_ERRNO_BASE + 0x0c,     ///< The value out of the defined range
+        EZ_TSL_ERR_PROFILE_LOADING = TSL_MODULE_ERRNO_BASE + 0x0d,   ///< The device profile is loading
+        EZ_TSL_ERR_STORAGE = TSL_MODULE_ERRNO_BASE + 0x0e,           ///< An error occurred when flash I/O
     } ez_tsl_err_e;
-
-    typedef enum
-    {
-        EZ_TSL_PROPERTY, ///< 属性,↓
-        EZ_TSL_ACTION,   ///< 操作,↓
-        EZ_TSL_EVENT,    ///< 事件,
-    } ez_tsl_type_e;
 
     typedef enum
     {
@@ -58,9 +64,9 @@ extern "C"
 
     typedef struct
     {
-        ez_int8_t *domain; ///< 功能点所属于的领域。如key=switch，其在视频领域表示关闭摄像头，照明领域表示关闭灯光。
-        ez_int8_t *key;    ///< 功能点键值
-    } ez_tsl_key_info_t;
+        ez_char_t *domain; ///< 功能点所属于的领域。如key=switch，其在视频领域表示关闭摄像头，照明领域表示关闭灯光。
+        ez_char_t *key;    ///< 功能点键值
+    } ez_tsl_key_t;
 
     typedef struct
     {
@@ -71,28 +77,28 @@ extern "C"
             ez_bool_t value_bool;
             ez_int_t value_int;
             ez_int64_t value_double;
-            ez_void_t  *value; /* 复杂类型的数据 */
+            ez_void_t *value; /* 复杂类型的数据 */
         };
     } ez_tsl_value_t;
 
     typedef struct
     {
-        ez_int8_t *key;
+        ez_char_t *key;
         ez_tsl_value_t value;
     } ez_tsl_param_t;
 
     typedef struct
     {
-        ez_int8_t *dev_subserial;       ///< 序列号, 必填, max 72字节
-        ez_int8_t *dev_type;            ///< 型号, 必填, max 64字节
-        ez_int8_t *dev_firmwareversion; ///< 版本号, 必填, max 64字节
+        ez_char_t *dev_subserial;       ///< 序列号, 必填, max 72字节
+        ez_char_t *dev_type;            ///< 型号, 必填, max 64字节
+        ez_char_t *dev_firmwareversion; ///< 版本号, 必填, max 64字节
     } ez_tsl_devinfo_t;
 
     typedef struct
     {
-        ez_int8_t *res_type;    ///< 通道类型（按键通道类型或者报警通道类型）
-        ez_int8_t *local_index; ///< 通道号
-    } ez_tsl_rsc_info_t;
+        ez_char_t *res_type;    ///< 通道类型（按键通道类型或者报警通道类型）
+        ez_char_t *local_index; ///< 通道号
+    } ez_tsl_rsc_t;
 
     typedef struct
     {
@@ -106,8 +112,8 @@ extern "C"
         * @param value_out 操作出参，所申请内存由内部释放
         * @return ez_int32_t 0表示成功，-1表示失败
         */
-        ez_int32_t (*action2dev)(const ez_int8_t *sn, const ez_tsl_rsc_info_t *rsc_info, const ez_tsl_key_info_t *key_info,
-                              const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out);
+        ez_int32_t (*action2dev)(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info,
+                                 const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out);
 
         /**
         * @brief 获取属性向平台上报
@@ -118,7 +124,7 @@ extern "C"
         * @param value_out 属性数据
         * @return ez_int32_t 0表示成功，-1表示失败
         */
-        ez_int32_t (*property2cloud)(const ez_int8_t *sn, const ez_tsl_rsc_info_t *rsc_info, const ez_tsl_key_info_t *key_info, ez_tsl_value_t *value_out);
+        ez_int32_t (*property2cloud)(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out);
 
         /**
         * @brief 平台属性下发
@@ -129,7 +135,7 @@ extern "C"
         * @param value 属性数据
         * @return ez_int32_t 0表示成功，-1表示失败
         */
-        ez_int32_t (*property2dev)(const ez_int8_t *sn, const ez_tsl_rsc_info_t *rsc_info, const ez_tsl_key_info_t *key_info, const ez_tsl_value_t *value);
+        ez_int32_t (*property2dev)(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value);
 
     } ez_tsl_things_callbacks_t;
 
@@ -139,7 +145,7 @@ extern "C"
     * @param pdata_cbs 
     * @return ez_tsl_err_e 
     */
-    EZOS_API ez_err_t ez_iot_tsl_init(tsl_things_callbacks_t *ptsl_cbs);
+    EZOS_API ez_err_t ez_iot_tsl_init(ez_tsl_things_callbacks_t *ptsl_cbs);
 
     /**
     * @brief 向平台上报一条属性
@@ -150,7 +156,7 @@ extern "C"
     * @param value 属性数据
     * @return ez_tsl_err_e 
     */
-    EZOS_API ez_err_t ez_iot_tsl_property_report(const ez_int8_t *sn, const ez_tsl_rsc_info_t *rsc_info, const ez_tsl_key_info_t *key_info, const ez_tsl_value_t *value);
+    EZOS_API ez_err_t ez_iot_tsl_property_report(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value);
 
     /**
     * @brief 向平台上报一个事件
@@ -161,25 +167,14 @@ extern "C"
     * @param value 事件数据，一般为根据物模型组好的json报文
     * @return ez_tsl_err_e 
     */
-    EZOS_API ez_err_t ez_iot_tsl_event_report(const ez_int8_t *sn, const ez_tsl_rsc_info_t *rsc_info, const ez_tsl_key_info_t *key_info, const ez_tsl_value_t *value);
+    EZOS_API ez_err_t ez_iot_tsl_event_report(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value);
 
     /**
     * @brief tsl反初始化
     * 
     * @return ez_tsl_err_e 
     */
-    EZOS_API ez_err_t ez_iot_tsl_deinit(ez_void_t );
-
-    /**
-     * @brief 
-     * 
-     * @param key 
-     * @param type 
-     * @param dev_info 
-     * @param value 
-     * @return ez_tsl_err_e 
-     */
-    EZOS_API ez_err_t ez_iot_tsl_check_value_legal(const char *key, ez_int_t type, const ez_tsl_devinfo_t *dev_info, ez_tsl_value_t *value);
+    EZOS_API ez_err_t ez_iot_tsl_deinit(ez_void_t);
 
 #ifdef __cplusplus
 }

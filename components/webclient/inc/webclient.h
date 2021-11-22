@@ -17,7 +17,6 @@
 #ifndef __WEBCLIENT_H__
 #define __WEBCLIENT_H__
 
-
 #include "define.h"
 
 #if defined(WEBCLIENT_USING_MBED_TLS) || defined(WEBCLIENT_USING_SAL_TLS)

@@ -3,7 +3,7 @@ if(CONFIG_EZIOT_TSL_ENABLE)
     ################# Add include #################
     list(APPEND ADD_INCLUDE "${module_name}/inc"
         )
-    # list(APPEND ADD_PRIVATE_INCLUDE "${module_name}/inc_private")
+    list(APPEND ADD_PRIVATE_INCLUDE "${module_name}/inc_private")
     ###############################################
 
     ############## Add source files ###############
@@ -17,10 +17,11 @@ if(CONFIG_EZIOT_TSL_ENABLE)
 
     ###### Add required/dependent components ######
     list(APPEND ADD_REQUIREMENTS cJSON)
-    list(APPEND ADD_REQUIREMENTS mqtt)
-    list(APPEND ADD_REQUIREMENTS mbedtls)
-    list(APPEND ADD_REQUIREMENTS ezxml)
+    list(APPEND ADD_REQUIREMENTS webclient)
+    list(APPEND ADD_REQUIREMENTS ezos)
     list(APPEND ADD_REQUIREMENTS ezlog)
+    list(APPEND ADD_REQUIREMENTS ezlist)
+    list(APPEND ADD_REQUIREMENTS ezutil)
     list(APPEND ADD_REQUIREMENTS ez_iot_core)
     ###############################################
 

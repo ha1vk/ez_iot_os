@@ -28,9 +28,9 @@ EZOS_API ez_err_t ezos_get_clock(ezos_timespec_t *clock)
     return clock_gettime(CLOCK_MONOTONIC, (struct timespec *)clock);
 }
 
-EZOS_API ez_err_t ezos_gettimeofday(struct ezos_timeval *tv)
+EZOS_API int ezos_gettimeofday(struct ezos_timeval *tv, struct ezos_timezone *tz)
 {
-    return gettimeofday(tv, NULL);
+    return gettimeofday(tv, tz);
 }
 
 EZOS_API time_t ezos_time(ezos_time_t *__timer)

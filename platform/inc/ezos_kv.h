@@ -102,7 +102,7 @@ extern "C"
      * @param key_prefix 
      * @return EZOS_API 
      */
-    EZOS_API int ez_kv_del_by_prefix(const char *key_prefix);
+    EZOS_API int ezos_kv_del_by_prefix(const char *key_prefix);
 
     /**
      * Print all KV.

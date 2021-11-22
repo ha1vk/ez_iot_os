@@ -22,6 +22,7 @@
 #define _EZ_KERNEL_LOWLVL_H_
 
 #include <ezos.h>
+#include "ez_iot_core.h"
 #include "ez_iot_core_def.h"
 
 #ifdef __cplusplus

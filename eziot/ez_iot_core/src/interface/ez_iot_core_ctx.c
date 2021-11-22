@@ -47,7 +47,7 @@ ez_void_t ez_iot_event_adapt(ez_kernel_event_t *ptr_event)
 
 ez_int32_t ez_kernel_value_save(sdk_keyvalue_type valuetype, ez_int8_t *keyvalue, ez_int32_t keyvalue_size)
 {
-    int32_t rv = -1;
+    ez_int32_t rv = -1;
 
     if (valuetype == sdk_keyvalue_devid)
     {

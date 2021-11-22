@@ -77,7 +77,7 @@ extern "C"
      * @param mutex 
      * @return 0 for success, -1 for failure
      */
-    EZOS_API int ezos_mutex_destory(ez_mutex_t mutex);
+    EZOS_API int ezos_mutex_destroy(ez_mutex_t mutex);
 
     /**
      * @brief 

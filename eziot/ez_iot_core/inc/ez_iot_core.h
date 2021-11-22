@@ -61,7 +61,7 @@ extern "C"
         EZ_CMD_KVIMPL_SET, ///< 设置KV 实现函数，arg(ez_kv_func_t*)
     } ez_cmd_e;
 
-    typedef int32_t (*ez_event_notice)(ez_event_e event_type, ez_void_t *data, ez_int32_t len);
+    typedef ez_int32_t (*ez_event_notice)(ez_event_e event_type, ez_void_t *data, ez_int32_t len);
 
     /**
      * @brief 
@@ -71,28 +71,28 @@ extern "C"
      * @param pfunc 
      * @return 参考 ez_core_err_e 
      */
-    EZOS_API ez_err_t ez_iot_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info, const ez_event_notice pfunc);
+    EZOS_API ez_err_t ez_iot_core_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info, const ez_event_notice pfunc);
 
     /**
      * @brief 开始接入云端
      * 
      * @return 参考 ez_core_err_e
      */
-    EZOS_API ez_err_t ez_iot_start(ez_void_t);
+    EZOS_API ez_err_t ez_iot_core_start(ez_void_t);
 
     /**
      * @brief 停止接入云端
      * 
      * @return 参考 ez_core_err_e
      */
-    EZOS_API ez_err_t ez_iot_stop(ez_void_t);
+    EZOS_API ez_err_t ez_iot_core_stop(ez_void_t);
 
     /**
      * @brief 
      * 
      * @return 参考 ez_core_err_e
      */
-    EZOS_API ez_void_t ez_iot_deinit(ez_void_t);
+    EZOS_API ez_void_t ez_iot_core_deinit(ez_void_t);
 
     /**
      * @brief 
@@ -101,7 +101,7 @@ extern "C"
      * @param arg 
      * @return 参考 ez_core_err_e
      */
-    EZOS_API ez_err_t ez_iot_attr_ctrl(ez_cmd_e cmd, ez_void_t *arg);
+    EZOS_API ez_err_t ez_iot_core_ctrl(ez_cmd_e cmd, ez_void_t *arg);
 
 #ifdef __cplusplus
 }

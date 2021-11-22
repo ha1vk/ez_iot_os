@@ -68,7 +68,7 @@ EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev
     ezos_strncpy(g_ezdev_sdk_kernel.dev_info.dev_mac, (char *)pdev_info->dev_mac, sizeof(g_ezdev_sdk_kernel.dev_info.dev_mac) - 1);
 
     ezos_strncpy((char *)g_ezdev_sdk_kernel.dev_id, (char *)devid, sizeof(g_ezdev_sdk_kernel.dev_id));
-    ez_int32_t key_len = sizeof(g_ezdev_sdk_kernel.master_key);
+    size_t key_len = sizeof(g_ezdev_sdk_kernel.master_key);
     CHECK_COND_DONE(!ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_MASTERKEY, g_ezdev_sdk_kernel.master_key, &key_len), EZ_CORE_ERR_STORAGE);
 
     /* 初始化链接状态 */
@@ -144,7 +144,7 @@ EZOS_API ez_err_t ez_kernel_fini()
 
     if (g_mutex_lock)
     {
-        ezos_mutex_destory(g_mutex_lock);
+        ezos_mutex_destroy(g_mutex_lock);
         g_mutex_lock = NULL;
     }
 
@@ -293,7 +293,10 @@ EZOS_API ez_err_t ez_kernel_extend_load_v3(const ez_kernel_extend_v3_t *external
     CHECK_COND_DONE(!external_extend->ez_kernel_data_route, EZ_CORE_ERR_PARAM_INVALID);
     CHECK_COND_DONE(!external_extend->ez_kernel_event_route, EZ_CORE_ERR_PARAM_INVALID);
     CHECK_COND_DONE(!ezos_strlen(external_extend->module), EZ_CORE_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!extend_load_v3(external_extend), EZ_CORE_ERR_GENERAL);
+
+    rv = extend_load_v3(external_extend);
+    CHECK_COND_DONE(mkernel_internal_extend_full == rv, EZ_CORE_ERR_MEMORY);
+    CHECK_COND_DONE(!rv, EZ_CORE_ERR_GENERAL);
     g_ezdev_sdk_kernel.v3_reg_status = sdk_v3_reged;
 
 done:

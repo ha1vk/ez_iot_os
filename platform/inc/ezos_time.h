@@ -41,15 +41,21 @@ extern "C"
 
     struct ezos_tm
     {
-        ez_int32_t tm_sec;
-        ez_int32_t tm_min;
-        ez_int32_t tm_hour;
-        ez_int32_t tm_mday;
-        ez_int32_t tm_mon;
-        ez_int32_t tm_year;
-        ez_int32_t tm_wday;
-        ez_int32_t tm_yday;
-        ez_int32_t tm_isdst;
+        int tm_sec;
+        int tm_min;
+        int tm_hour;
+        int tm_mday;
+        int tm_mon;
+        int tm_year;
+        int tm_wday;
+        int tm_yday;
+        int tm_isdst;
+    };
+
+    struct ezos_timezone
+    {
+        int tz_minuteswest; /* minutes west of Greenwich */
+        int tz_dsttime;     /* type of DST correction */
     };
 
     /**
@@ -58,7 +64,7 @@ extern "C"
      * @param clock if clock non-NULL, the current time will be filled.
      * @return return 0 for success, or -1 for failure 
      */
-    EZOS_API ez_err_t ezos_get_clock(ezos_timespec_t *clock);
+    EZOS_API int ezos_get_clock(ezos_timespec_t *clock);
 
     /**
      * @brief This functions can get the time as well as a timezone.
@@ -66,7 +72,7 @@ extern "C"
      * @param tv The tv argument is a struct timeval.
      * @return return 0 for success, or -1 for failure 
      */
-    EZOS_API ez_err_t ezos_gettimeofday(struct ezos_timeval *tv);
+    EZOS_API int ezos_gettimeofday(struct ezos_timeval *tv, struct ezos_timezone *tz);
 
     /**
      * @brief Get current timestamp
@@ -83,15 +89,15 @@ extern "C"
      * @param result return the address of the structure pointed to by result. 
      * @return ezos_tm*
      */
-    EZOS_API struct ezos_tm * ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result);
+    EZOS_API struct ezos_tm *ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result);
 
     /**
      * @brief This function suspends execution of the calling thread for (at least) microseconds.
      * 
      * @param time_ms suspends time, as millisecond.
-     * @return ez_void_t.
+     * @return void.
      */
-    EZOS_API ez_void_t ezos_delay_ms(ez_ulong_t msecs);
+    EZOS_API void ezos_delay_ms(ez_ulong_t msecs);
 
 #ifdef __cplusplus
 }

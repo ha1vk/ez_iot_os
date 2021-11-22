@@ -55,8 +55,8 @@ static void *sdk_thread_fun(void *aArg)
     return NULL;
 }
 
-EZOS_API ez_err_t ezos_thread_create(ez_thread_t *const handle, const ez_char_t *name, ez_thread_func_t thread_fun,
-                                               const ez_void_t *param, ez_uint32_t stack_size, ez_uint32_t priority)
+EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_thread_func_t thread_fun,
+                                const void *param, unsigned int stack_size, unsigned int priority)
 {
     // pthread_t *pt;
     // pthread_attr_t attr;
@@ -128,24 +128,10 @@ EZOS_API ez_err_t ezos_thread_create(ez_thread_t *const handle, const ez_char_t 
     // pthread_attr_destroy(&attr);
     // pthread_mutex_unlock(g_create_thread_mutex);
     // return pt;
-    return 0;
+    // return 0;
 }
 
-EZOS_API int ezos_thread_detach(ez_thread_t handle)
-{
-    pthread_t *pt = (pthread_t *)handle;
-    if (pt == NULL)
-    {
-        return -1;
-    }
-
-    pthread_detach(*pt);
-    free(pt);
-    pt = NULL;
-    return 0;
-}
-
-EZOS_API int ezos_thread_destroy(ez_thread_t handle)
+EZOS_API int ezos_thread_destory(ez_thread_t handle)
 {
     pthread_t *pt = (pthread_t *)handle;
     if (pt == NULL)
@@ -178,7 +164,7 @@ EZOS_API ez_mutex_t ezos_mutex_create(void)
     return (ez_mutex_t)mtx;
 }
 
-EZOS_API int ezos_mutex_destory(ez_mutex_t mutex)
+EZOS_API int ezos_mutex_destroy(ez_mutex_t mutex)
 {
     pthread_mutex_t *mtx = (pthread_mutex_t *)mutex;
     if (mtx == NULL)

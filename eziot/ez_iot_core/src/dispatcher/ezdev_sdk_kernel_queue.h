@@ -75,7 +75,7 @@ QUEUE_DEFINE(pubmsg_exchange_v3)
             ezos_free(element);                                        \
         }                                                              \
         ezos_mutex_unlock(g_queue_##MSGTYPE.lock);                     \
-        ezos_mutex_destory(g_queue_##MSGTYPE.lock);                    \
+        ezos_mutex_destroy(g_queue_##MSGTYPE.lock);                    \
         ezos_memset(&g_queue_##MSGTYPE, 0, sizeof(g_queue_##MSGTYPE)); \
     }
 

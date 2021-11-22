@@ -53,6 +53,17 @@ EZOS_API int ezos_snprintf(char *str, size_t size, const char *format, ...)
     return rv;
 }
 
+EZOS_API int ezos_sscanf(const char *str, const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    int rv = ezos_sscanf(str, format, ap);
+    va_end(ap);
+
+    return rv;
+}
+
+
 EZOS_API int ezos_memcmp(const void *s1, const void *s2, size_t n)
 {
     return memcmp(s1, s2, n);

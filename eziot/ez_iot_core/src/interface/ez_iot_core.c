@@ -1,5 +1,5 @@
-#include "ez_iot_core.h"
 #include <ezlog.h>
+#include "ez_iot_core.h"
 #include "ez_iot_core_ctx.h"
 #include "ez_iot_core_lowlvl.h"
 #include "sdk_kernel_def.h"
@@ -24,8 +24,7 @@ static const ez_kv_default_t m_default_kv = {m_kv_default_table, sizeof(m_kv_def
 static void main_thread_func(void *param);
 static void user_thread_func(void *param);
 
-EZOS_API ez_err_t ez_iot_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info,
-                                        const ez_event_notice pfunc)
+EZOS_API ez_err_t ez_iot_core_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info, const ez_event_notice pfunc)
 {
     FUNC_IN();
 
@@ -54,7 +53,7 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t ez_iot_start(ez_void_t)
+EZOS_API ez_err_t ez_iot_core_start(ez_void_t)
 {
     FUNC_IN();
     ez_err_t rv = EZ_CORE_ERR_SUCC;
@@ -95,7 +94,7 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t ez_iot_stop(ez_void_t)
+EZOS_API ez_err_t ez_iot_core_stop(ez_void_t)
 {
     FUNC_IN();
 
@@ -118,7 +117,7 @@ done:
     return rv;
 }
 
-EZOS_API ez_void_t ez_iot_deinit(ez_void_t)
+EZOS_API ez_void_t ez_iot_core_deinit(ez_void_t)
 {
     FUNC_IN();
 
@@ -134,7 +133,7 @@ done:
     FUNC_OUT();
 }
 
-EZOS_API ez_err_t ez_iot_attr_ctrl(ez_cmd_e cmd, ez_void_t *arg)
+EZOS_API ez_err_t ez_iot_core_ctrl(ez_cmd_e cmd, ez_void_t *arg)
 {
     ez_err_t rv = EZ_CORE_ERR_SUCC;
 

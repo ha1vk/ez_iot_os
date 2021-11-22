@@ -82,7 +82,7 @@ extern "C"
         * @param[in] ppram 保留入参
         * @return ez_uint32_t  成功0，失败-1 
         */
-        ez_uint32_t (*business2dev)(const ez_shadow_value_t *pvalue, ez_shadow_business2dev_param_t *ppram);
+        ez_err_t (*business2dev)(const ez_shadow_value_t *pvalue, ez_shadow_business2dev_param_t *ppram);
 
         /**
         * @brief 设备的shadow业务同步给平台
@@ -90,7 +90,7 @@ extern "C"
         * @param[in] ppram 组织报文的入参
         * @return ez_uint32_t  成功0，失败-1 
         */
-        ez_uint32_t (*business2cloud)(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram);
+        ez_err_t (*business2cloud)(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram);
 
     } ez_shadow_business_t;
 
