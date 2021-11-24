@@ -246,14 +246,14 @@ extern "C"
      * 
      * @return void* 互斥量对象句柄，NULL表示失败，!NULL表示成功。
      */
-    void *hal_thread_mutex_create();
+    void *ezos_mutex_create();
 
     /**
      * @brief 销毁互斥量对象
      * 
      * @param[in] ptr_mutex 互斥量对象句柄
      */
-    void hal_thread_mutex_destroy(void *ptr_mutex);
+    void ezos_mutex_destroy(void *ptr_mutex);
 
     /**
      * @brief 上锁
@@ -261,7 +261,7 @@ extern "C"
      * @param[in] ptr_mutex 互斥量对象句柄
      * @return int 0表示成功，-1表示失败。
      */
-    int hal_thread_mutex_lock(void *ptr_mutex);
+    int ezos_mutex_lock(void *ptr_mutex);
 
     /**
      * @brief 解锁
@@ -269,7 +269,7 @@ extern "C"
      * @param[in] ptr_mutex 互斥量对象句柄
      * @return int 0表示成功，-1表示失败。
      */
-    int hal_thread_mutex_unlock(void *ptr_mutex);
+    int ezos_mutex_unlock(void *ptr_mutex);
 
     /**
      * @brief 任务休眠
@@ -923,7 +923,7 @@ int hal_thread_detach(void *handle)
     return 0;
 }
 
-void *hal_thread_mutex_create()
+void *ezos_mutex_create()
 {
     sdk_mutex_platform *ptr_mutex_platform = NULL;
     ptr_mutex_platform = (sdk_mutex_platform *)malloc(sizeof(sdk_mutex_platform));
@@ -937,7 +937,7 @@ void *hal_thread_mutex_create()
     return (void *)ptr_mutex_platform;
 }
 
-void hal_thread_mutex_destroy(void *ptr_mutex)
+void ezos_mutex_destroy(void *ptr_mutex)
 {
     sdk_mutex_platform *ptr_mutex_platform = (sdk_mutex_platform *)ptr_mutex;
     if (ptr_mutex_platform == NULL)
@@ -949,7 +949,7 @@ void hal_thread_mutex_destroy(void *ptr_mutex)
     ptr_mutex_platform = NULL;
 }
 
-int hal_thread_mutex_lock(void *ptr_mutex)
+int ezos_mutex_lock(void *ptr_mutex)
 {
     sdk_mutex_platform *ptr_mutex_platform = (sdk_mutex_platform *)ptr_mutex;
     if (ptr_mutex_platform == NULL)
@@ -961,7 +961,7 @@ int hal_thread_mutex_lock(void *ptr_mutex)
     return 0;
 }
 
-int hal_thread_mutex_unlock(void *ptr_mutex)
+int ezos_mutex_unlock(void *ptr_mutex)
 {
     sdk_mutex_platform *ptr_mutex_platform = (sdk_mutex_platform *)ptr_mutex;
     if (ptr_mutex_platform == NULL)

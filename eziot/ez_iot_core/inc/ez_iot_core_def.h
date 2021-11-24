@@ -79,18 +79,25 @@ typedef struct
 
 typedef struct
 {
-    ez_uint32_t last_error;       ///< 错误码
+    ez_uint32_t last_error;                 ///< 错误码
     ez_char_t das_ip[ezdev_sdk_ip_max_len]; ///< das服务器IP
     ez_char_t lbs_ip[ezdev_sdk_ip_max_len]; ///< lbs服务器IP
 } ez_kernel_offline_context_t;
 
+typedef struct
+{
+    ez_err_t last_error;                              ///< 错误码
+    ez_uint32_t msg_seq;                              ///< 消息
+    ez_char_t module_name[ezdev_sdk_module_name_len]; ///< 模块标识
+} ez_kernel_publish_ack_t;
+
 typedef enum
 {
-    SDK_KERNEL_EVENT_ONLINE,      ///< event_context == sdk_sessionkey_context     设备上线
-    SDK_KERNEL_EVENT_BREAK,       ///< event_context == sdk_offline_context        设备离线
-    SDK_KERNEL_EVENT_SWITCHOVER,  ///< event_context == ez_kernel_switchover_context_t     平台地址发送切换
-    SDK_KERNEL_EVENT_RUNTIME_ERR, ///< event_context == sdk_runtime_err_context    设备SDK运行时错误信息
-    SDK_KERNEL_EVENT_RECONNECT,   ///< event_context == NULL                       重连成功事件回调
+    SDK_KERNEL_EVENT_ONLINE,      ///< event_context(ez_kernel_sessionkey_context_t)    设备上线
+    SDK_KERNEL_EVENT_BREAK,       ///< event_context(ez_kernel_offline_context_t)       设备离线
+    SDK_KERNEL_EVENT_SWITCHOVER,  ///< event_context(ez_kernel_switchover_context_t)    平台地址发送切换
+    SDK_KERNEL_EVENT_RECONNECT,   ///< event_context(NULL)                              重连成功事件回调
+    SDK_KERNEL_EVENT_PUBLISH_ACK, ///< event_context(ez_kernel_publish_ack_t)            上行消息响应
 } ez_kernel_event_e;
 
 typedef struct
@@ -173,7 +180,6 @@ typedef struct
     ez_char_t sub_serial[ezdev_sdk_max_serial_len];       ///< 子设备序列号
     ez_char_t ext_msg[ezdev_sdk_ext_msg_len];             ///< 扩展内容，例如"model"中的 "domainid/identifier"字段
 } ez_kernel_pubmsg_v3_t;
-
 
 typedef enum ez_err
 {

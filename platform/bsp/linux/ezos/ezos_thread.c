@@ -16,8 +16,9 @@
  * Change Logs:
  * Date           Author       Notes
  * 2021-10-27     zoujinwei    first version
+ * 2021-11-24     xurongjun    Redeclare the threaded user interface and implement it
  *******************************************************************************/
-#include <unistd.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,122 +26,98 @@
 #include <pthread.h>
 
 #include "ezos_thread.h"
+#include "ezos_sem.h"
 
-static pthread_mutex_t *g_create_thread_mutex = NULL;
+typedef void *(*task_func)(void *user_data);
 
-struct targ
+#define THREAD_STATE_JOINABLE 0
+#define THREAD_STATE_DETACHED 1
+
+typedef struct
 {
-    char name[64];
-    pthread_t *pthread;
-    void (*fn)(void *);
-    void *arg;
-};
+    pthread_t handle;
+    char name[16];
+    int state;
+    ez_thread_func_t thread_fun;
+    void *user_param;
+} thread_data_t;
 
 static void *sdk_thread_fun(void *aArg)
 {
-    struct targ *hd = (struct targ *)aArg;
-    if (hd == NULL)
+    thread_data_t *pthd = (thread_data_t *)aArg;
+    prctl(PR_SET_NAME, pthd->name);
+
+    pthd->thread_fun(pthd->user_param);
+
+    if (THREAD_STATE_DETACHED == pthd->state)
     {
-        return NULL;
+        free(pthd);
     }
 
-    prctl(PR_SET_NAME, hd->name);
-    printf("start thread:%s\n", hd->name);
-    if (hd->fn)
-        hd->fn(hd->arg);
-
-    free(hd);
-    hd = NULL;
-    printf("exit thread:%s\n", hd->name);
     return NULL;
 }
 
 EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_thread_func_t thread_fun,
                                 const void *param, unsigned int stack_size, unsigned int priority)
 {
-    // pthread_t *pt;
-    // pthread_attr_t attr;
-    // struct targ *targ = NULL;
+    pthread_attr_t thread_attr;
+    struct sched_param thread_sched_param;
 
-    // if (g_create_thread_mutex == NULL)
-    // {
-    //     g_create_thread_mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
-    //     pthread_mutex_init(g_create_thread_mutex, NULL);
-    // }
-
-    // pthread_mutex_lock(g_create_thread_mutex);
-    // if (taskParam == NULL)
-    // {
-    //     printf("taskParam NULL\n");
-    //     pthread_mutex_unlock(g_create_thread_mutex);
-    //     return NULL;
-    // }
-
-    // if (taskParam->task_fun == NULL || strlen(taskParam->task_name) == 0)
-    // {
-    //     printf("taskParam error\n");
-    //     pthread_mutex_unlock(g_create_thread_mutex);
-    //     return NULL;
-    // }
-    // pthread_attr_init(&attr);
-    // if ((taskParam->stackSize > THREAD_STACKSIZE_MIN) && (taskParam->stackSize <= THREAD_STACKSIZE_MAX))
-    // {
-    //     printf("thread stacksize=%d\n", taskParam->stackSize);
-    //     if (0 != pthread_attr_setstacksize(&attr, taskParam->stackSize))
-    //     {
-    //         printf("setstacksize error\n");
-    //         pthread_attr_destroy(&attr);
-    //         pthread_mutex_unlock(g_create_thread_mutex);
-    //         return NULL;
-    //     }
-    // }
-
-    // targ = malloc(sizeof(struct targ));
-    // if (targ == NULL)
-    // {
-    //     pthread_mutex_unlock(g_create_thread_mutex);
-    //     printf("malloc targ error\n");
-    //     return NULL;
-    // }
-    // pt = (pthread_t *)malloc(sizeof(pthread_t));
-    // if (pt == NULL)
-    // {
-    //     free(targ);
-    //     pthread_mutex_unlock(g_create_thread_mutex);
-    //     printf("malloc pthread_t error\n");
-    //     return NULL;
-    // }
-    // memset(targ, 0, sizeof(struct targ));
-    // memcpy(targ->name, taskParam->task_name, strlen(taskParam->task_name));
-    // targ->fn = taskParam->task_fun;
-    // targ->arg = taskParam->task_arg;
-    // targ->pthread = pt;
-    // if (pthread_create(pt, &attr, sdk_thread_fun, (void *)targ) != 0)
-    // {
-    //     free(pt);
-    //     free(targ);
-    //     pthread_attr_destroy(&attr);
-    //     pthread_mutex_unlock(g_create_thread_mutex);
-    //     printf("pthread_create error\n");
-    //     return NULL;
-    // }
-
-    // pthread_attr_destroy(&attr);
-    // pthread_mutex_unlock(g_create_thread_mutex);
-    // return pt;
-    // return 0;
-}
-
-EZOS_API int ezos_thread_destory(ez_thread_t handle)
-{
-    pthread_t *pt = (pthread_t *)handle;
-    if (pt == NULL)
+    thread_data_t *pthd = (thread_data_t *)malloc(sizeof(thread_data_t));
+    if (NULL == pthd)
     {
         return -1;
     }
-    pthread_join(*pt, NULL);
-    free(pt);
-    pt = NULL;
+
+    memset(pthd, 0, sizeof(thread_data_t));
+    pthd->thread_fun = thread_fun;
+    pthd->user_param = (void *)param;
+    strncpy(pthd->name, (char *)name, sizeof(pthd->name) - 1);
+    pthread_attr_init(&thread_attr);
+
+    if (NULL != handle)
+    {
+        pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_JOINABLE);
+        pthd->state = THREAD_STATE_JOINABLE;
+    }
+    else
+    {
+        pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED);
+        pthd->state = THREAD_STATE_JOINABLE;
+    }
+
+    pthread_attr_setstacksize(&thread_attr, stack_size);
+    pthread_attr_setschedpolicy(&thread_attr, SCHED_RR);
+    thread_sched_param.sched_priority = priority;
+    pthread_attr_setschedparam(&thread_attr, &thread_sched_param);
+
+    if (pthread_create(&pthd->handle, &thread_attr, sdk_thread_fun, pthd) != 0)
+    {
+        pthread_attr_destroy(&thread_attr);
+        free(pthd);
+        return -1;
+    }
+
+    if (NULL != handle)
+    {
+        *handle = (ez_thread_t)pthd;
+    }
+
+    pthread_attr_destroy(&thread_attr);
+
+    return 0;
+}
+
+EZOS_API int ezos_thread_destroy(ez_thread_t handle)
+{
+    thread_data_t *pthd = (thread_data_t *)handle;
+    if (NULL == pthd)
+    {
+        return -1;
+    }
+
+    pthread_join(pthd->handle, NULL);
+    free(pthd);
 
     return 0;
 }

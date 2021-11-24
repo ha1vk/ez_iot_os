@@ -105,36 +105,6 @@ typedef struct
 
 typedef struct
 {
-    char *pdev_info;
-    server_info_t server;
-    kernel_das_info *pdas_info;
-    EZDEV_SDK_UINT32 buf_size;
-} sdk_config_t;
-
-typedef enum
-{
-    TAG_ACCESS,     ///< 设备接入萤石云错误    err_ctx == NULL
-    TAG_MSG_ACK,    ///< 设备信令发送回执      err_ctx == sdk_send_msg_ack_context
-    TAG_MSG_ACK_V3, ///< 设备信令发送回执      err_ctx == sdk_send_msg_ack_context_v3
-} err_tag_e;
-
-/** 
- *  \details	err_tag==TAG_ACCESS，	err_code为ezdev_sdk_kernel_succ、ezdev_sdk_kernel_params_invalid、ezdev_sdk_kernel_buffer_too_small、\n
- *										ezdev_sdk_kernel_internal、ezdev_sdk_kernel_value_load、ezdev_sdk_kernel_value_save、ezdev_sdk_kernel_memory、\n
- *										NET_ERROR、LBS_ERROR、SECRETKEY_ERROR、DAS_ERROR
- *
- *	\details	err_tag==TAG_MSG_ACK，	err_code为ezdev_sdk_kernel_succ、ezdev_sdk_kernel_net_transmit、ezdev_sdk_kernel_extend_no_find、\n
- *										ezdev_sdk_kernel_force_domain_risk、ezdev_sdk_kernel_force_cmd_risk
- */
-typedef struct
-{
-    err_tag_e err_tag;     ///< 错误码类型
-    ez_err_t err_code;     ///< 错误码
-    EZDEV_SDK_PTR err_ctx; ///< 错误码上线文
-} sdk_runtime_err_context;
-
-typedef struct
-{
     EZDEV_SDK_UINT32 msg_domain_id;    ///< 领域模块ID
     EZDEV_SDK_UINT32 msg_command_id;   ///< 指令ID
     EZDEV_SDK_UINT32 msg_seq;          ///< 消息seq值

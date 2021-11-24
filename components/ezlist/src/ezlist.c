@@ -663,7 +663,7 @@ void ezlist_unlock(ezlist_t *list) {
  */
 void ezlist_ezos_free(ezlist_t *list) {
     ezlist_clear(list);
-    ezos_mutex_destory(list->mutex);
+    ezos_mutex_destroy(list->mutex);
 
     ezos_free(list);
 }

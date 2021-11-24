@@ -31,7 +31,6 @@ EXTERN_QUEUE_FUN(submsg_v3)
 EXTERN_QUEUE_FUN(pubmsg_exchange_v3)
 EXTERN_QUEUE_BASE_FUN
 
-
 static EZDEV_SDK_UINT16 g_kernel_domains_count = 0;                             ///<	扩展数
 static EZDEV_SDK_UINT16 g_kernel_extend_count = 0;                              ///<	扩展数
 static ezdev_sdk_kernel_domain_info g_kernel_domains[ezdev_sdk_extend_count];   ///<	扩展列表
@@ -81,10 +80,10 @@ ezdev_sdk_kernel_domain_info *extend_get(EZDEV_SDK_UINT32 domain_id)
  *  \param[in] 	domain_id	领域ID
  *  \return		成功返回领域上下文指针 失败返回NULL
  */
-ezdev_sdk_kernel_domain_info_v3 *extend_get_by_extend_id(const char* module)
+ezdev_sdk_kernel_domain_info_v3 *extend_get_by_extend_id(const char *module)
 {
     EZDEV_SDK_UINT16 index = 0;
-    if(NULL == module)
+    if (NULL == module)
     {
         ezlog_e(TAG_CORE, "extend_get input err");
         return NULL;
@@ -119,16 +118,16 @@ static mkernel_internal_error consume_extend_data_v3(ezdev_sdk_kernel *sdk_kerne
     do
     {
         kernel_error = pop_queue_submsg_v3(&ptr_submsg);
-        if(kernel_error == mkernel_internal_queue_empty)
+        if (kernel_error == mkernel_internal_queue_empty)
         {
             break;
         }
-        if(kernel_error != mkernel_internal_succ || ptr_submsg == NULL)
+        if (kernel_error != mkernel_internal_succ || ptr_submsg == NULL)
         {
             ezlog_e(TAG_CORE, "extend_yield pop_queue_submsg v3 error");
             break;
         }
-        if(ezos_strlen(ptr_submsg->module) > 0)
+        if (ezos_strlen(ptr_submsg->module) > 0)
         {
             kernel_extend = extend_get_by_extend_id(ptr_submsg->module);
             if (kernel_extend == NULL)
@@ -136,16 +135,16 @@ static mkernel_internal_error consume_extend_data_v3(ezdev_sdk_kernel *sdk_kerne
                 kernel_error = mkernel_internal_extend_no_find;
                 ezlog_e(TAG_CORE, "no find module %s , seq:%d ", ptr_submsg->module, ptr_submsg->msg_seq);
             }
-            else if(kernel_extend->kernel_extend.ez_kernel_data_route)
+            else if (kernel_extend->kernel_extend.ez_kernel_data_route)
             {
                 ezlog_d(TAG_CORE, "sdk_data_route v3, module:%s,msg_type:%s ,seq:%d", ptr_submsg->module, ptr_submsg->msg_type, ptr_submsg->msg_seq);
                 kernel_extend->kernel_extend.ez_kernel_data_route(ptr_submsg);
             }
         }
-        if(ptr_submsg != NULL)
+        if (ptr_submsg != NULL)
         {
-            ezlog_v(TAG_CORE, "rev msg v3 module:%s, resource_id:%s, resource_type:%s, msg_type:%s, seq:%d, len:%d", ptr_submsg->module, \
-                                      ptr_submsg->resource_id, ptr_submsg->resource_type,  ptr_submsg->msg_type, ptr_submsg->msg_seq, ptr_submsg->buf_len);
+            ezlog_v(TAG_CORE, "rev msg v3 module:%s, resource_id:%s, resource_type:%s, msg_type:%s, seq:%d, len:%d", ptr_submsg->module,
+                    ptr_submsg->resource_id, ptr_submsg->resource_type, ptr_submsg->msg_type, ptr_submsg->msg_seq, ptr_submsg->buf_len);
 
             if (ptr_submsg->buf != NULL)
             {
@@ -295,7 +294,6 @@ static mkernel_internal_error consume_extend_data(ezdev_sdk_kernel *sdk_kernel)
     return kernel_error;
 }*/
 
-
 /** 
  *  \brief		本地消息分发
  *  \method		consume_extend_event
@@ -308,6 +306,7 @@ static mkernel_internal_error consume_extend_event()
     EZDEV_SDK_UINT16 index = 0;
     mkernel_internal_error kernel_error = mkernel_internal_succ;
     ezdev_sdk_kernel_inner_cb_notic *ptr_inner_cb_notic = NULL;
+
     kernel_error = pop_queue_inner_cb_notic(&ptr_inner_cb_notic);
     if (kernel_error == mkernel_internal_queue_empty)
     {
@@ -339,52 +338,37 @@ static mkernel_internal_error consume_extend_event()
     }
     else if (ptr_inner_cb_notic->cb_type == extend_cb_event)
     {
-        sdk_send_msg_ack_context *ptr_ack_ctx = NULL;
-        sdk_send_msg_ack_context_v3 *ptr_ack_ctx_v3 = NULL;
-        if (SDK_KERNEL_EVENT_RUNTIME_ERR == ptr_inner_cb_notic->cb_event.event_type)
-        {
-            sdk_runtime_err_context *rt_err_ctx = (sdk_runtime_err_context *)(ptr_inner_cb_notic->cb_event.event_context);
-            switch(rt_err_ctx->err_tag)
-            {
-                case TAG_MSG_ACK:
-                    {
-                        ptr_ack_ctx = (sdk_send_msg_ack_context *)rt_err_ctx->err_ctx;
-                    }
-                    break;
-                case TAG_MSG_ACK_V3:
-                    {
-                        ptr_ack_ctx_v3 = (sdk_send_msg_ack_context_v3 *)rt_err_ctx->err_ctx;
-                    }
-                    break;  
-                default:
-                    break;   
-            }  
-        }
         for (index = 0; index < ezdev_sdk_extend_count; index++)
         {
-            if(g_kernel_domains[index].kernel_extend.domain_id == 0 || g_kernel_domains[index].kernel_extend.ezdev_sdk_kernel_extend_event == NULL)
+            if (g_kernel_domains[index].kernel_extend.domain_id == 0 || g_kernel_domains[index].kernel_extend.ezdev_sdk_kernel_extend_event == NULL)
                 break;
-            //消息回执只回调给对应的领域
-            if((ptr_ack_ctx && g_kernel_domains[index].kernel_extend.domain_id != ptr_ack_ctx->msg_domain_id)||ptr_ack_ctx_v3)
-                continue;
+
             g_kernel_domains[index].kernel_extend.ezdev_sdk_kernel_extend_event(&ptr_inner_cb_notic->cb_event, g_kernel_domains[index].kernel_extend.pUser);
         }
+
         for (index = 0; index < ezdev_sdk_extend_count; index++)
         {
-            if (ezos_strlen(g_kernel_extend[index].kernel_extend.module) == 0 || 
+            if (ezos_strlen(g_kernel_extend[index].kernel_extend.module) == 0 ||
                 g_kernel_extend[index].kernel_extend.ez_kernel_event_route == NULL)
             {
                 break;
             }
-            if ((ptr_ack_ctx_v3 && (0!=ezos_strcmp(g_kernel_extend[index].kernel_extend.module, ptr_ack_ctx_v3->module)))||ptr_ack_ctx)
-                continue;
+
+            if (SDK_KERNEL_EVENT_PUBLISH_ACK == ptr_inner_cb_notic->cb_event.event_type)
+            {
+                ez_kernel_publish_ack_t *pack_ctx = (ez_kernel_publish_ack_t*)ptr_inner_cb_notic->cb_event.event_context;
+                if (0 == ezos_strcmp(g_kernel_extend[index].kernel_extend.module, pack_ctx->module_name))
+                {
+                    g_kernel_extend[index].kernel_extend.ez_kernel_event_route(&ptr_inner_cb_notic->cb_event);
+                    continue;
+                }
+            }
+
             g_kernel_extend[index].kernel_extend.ez_kernel_event_route(&ptr_inner_cb_notic->cb_event);
         }
+
         //消息回执不需要回调给APP
-        if (NULL == ptr_ack_ctx && NULL == ptr_ack_ctx_v3)
-        {
-            g_kernel_event_notice_cb(&ptr_inner_cb_notic->cb_event);
-        }
+        g_kernel_event_notice_cb(&ptr_inner_cb_notic->cb_event);
     }
 
     destroy_inner_cb_notic(ptr_inner_cb_notic);
@@ -464,7 +448,6 @@ mkernel_internal_error clear_queue_submsg()
     return mkernel_internal_succ;
 }
 
-
 mkernel_internal_error clear_queue_submsg_v3()
 {
     ezdev_sdk_kernel_submsg_v3 *ptr_submsg = NULL;
@@ -541,11 +524,10 @@ mkernel_internal_error extend_load_v3(const ezdev_sdk_kernel_extend_v3 *external
 
     ezos_memcpy(&g_kernel_extend[index].kernel_extend, external_extend_v3, sizeof(ezdev_sdk_kernel_extend_v3));
 
-    ezlog_v(TAG_CORE,"extend_load_v3, model_type: %s", external_extend_v3->module);
+    ezlog_v(TAG_CORE, "extend_load_v3, model_type: %s", external_extend_v3->module);
 
     return mkernel_internal_succ;
 }
-
 
 mkernel_internal_error extend_load(const ezdev_sdk_kernel_extend *external_extend)
 {
@@ -570,7 +552,7 @@ mkernel_internal_error extend_load(const ezdev_sdk_kernel_extend *external_exten
     ezos_memcpy(&g_kernel_domains[index].kernel_extend, external_extend, sizeof(ezdev_sdk_kernel_extend));
     g_kernel_domains[index].domain_risk = sdk_no_risk_control;
 
-    ezlog_v(TAG_CORE,"extend_load %d, name:%s, version:%s", external_extend->domain_id, external_extend->extend_module_name, external_extend->extend_module_version);
+    ezlog_v(TAG_CORE, "extend_load %d, name:%s, version:%s", external_extend->domain_id, external_extend->extend_module_name, external_extend->extend_module_version);
 
     return mkernel_internal_succ;
 }

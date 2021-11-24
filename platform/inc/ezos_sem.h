@@ -35,7 +35,7 @@ extern "C"
      * 
      * @return
      */
-    EZOS_API ez_sem_t ez_sem_create(void);
+    EZOS_API ez_sem_t ezos_sem_create(void);
 
     /**
      * @brief 
@@ -43,7 +43,7 @@ extern "C"
      * @param sem 
      * @return  
      */
-    EZOS_API int ez_sem_destory(ez_sem_t sem);
+    EZOS_API int ezos_sem_destroy(ez_sem_t sem);
 
     /**
      * @brief 
@@ -52,7 +52,7 @@ extern "C"
      * @param timewait_ms 
      * @return  
      */
-    EZOS_API int ez_sem_wait(ez_sem_t sem, int timewait_ms);
+    EZOS_API int ezos_sem_wait(ez_sem_t sem, int timewait_ms);
 
     /**
      * @brief 
@@ -60,7 +60,7 @@ extern "C"
      * @param sem 
      * @return  
      */
-    EZOS_API int ez_sem_post(ez_sem_t sem);
+    EZOS_API int ezos_sem_post(ez_sem_t sem);
 
 #ifdef __cplusplus
 }

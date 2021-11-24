@@ -137,7 +137,7 @@ EZOS_API ez_mutex_t ezos_mutex_create(void)
 	return (ez_mutex_t)mtx;
 }
 
-EZOS_API int ezos_mutex_destory(ez_mutex_t mutex)
+EZOS_API int ezos_mutex_destroy(ez_mutex_t mutex)
 {
 	CRITICAL_SECTION* mtx = (CRITICAL_SECTION*)mutex;
 	if (mtx == NULL){

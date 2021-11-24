@@ -104,48 +104,6 @@ void fini_queue()
 
 void destroy_inner_cb_notic(ezdev_sdk_kernel_inner_cb_notic *ptr_inner_cb_notic)
 {
-    sdk_runtime_err_context *rt_err_ctx = NULL;
-    sdk_send_msg_ack_context *ack_ctx = NULL;
-    sdk_send_msg_ack_context_v3 *ack_ctx_v3 = NULL;
-
-    do
-    {
-        if (NULL == ptr_inner_cb_notic)
-            break;
-
-        if (SDK_KERNEL_EVENT_RUNTIME_ERR != ptr_inner_cb_notic->cb_event.event_type || NULL == ptr_inner_cb_notic->cb_event.event_context)
-            break;
-
-        rt_err_ctx = (sdk_runtime_err_context *)(ptr_inner_cb_notic->cb_event.event_context);
-
-        if (extend_cb_event == ptr_inner_cb_notic->cb_type &&
-            SDK_KERNEL_EVENT_RUNTIME_ERR == ptr_inner_cb_notic->cb_event.event_type)
-        {
-            if (TAG_MSG_ACK == rt_err_ctx->err_tag)
-            {
-                ack_ctx = (sdk_send_msg_ack_context *)rt_err_ctx->err_ctx;
-            }
-            else if (TAG_MSG_ACK_V3 == rt_err_ctx->err_tag)
-            {
-                ack_ctx_v3 = (sdk_send_msg_ack_context_v3 *)rt_err_ctx->err_ctx;
-            }
-        }
-
-        if (NULL != ack_ctx)
-        {
-            if (NULL != ack_ctx->externel_ctx)
-                ezos_free(ack_ctx->externel_ctx);
-
-            ezos_free(ack_ctx);
-        }
-
-        if (NULL != ack_ctx_v3)
-        {
-            ezos_free(ack_ctx_v3);
-        }
-
-    } while (0);
-
     if (NULL != ptr_inner_cb_notic)
     {
         if (NULL != ptr_inner_cb_notic->cb_event.event_context)

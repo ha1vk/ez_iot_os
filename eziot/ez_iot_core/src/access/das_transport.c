@@ -1136,7 +1136,8 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
 {
     ezdev_sdk_kernel_pubmsg_exchange_v3 *ptr_pubmsg_exchange = NULL;
     mkernel_internal_error sdk_error = mkernel_internal_succ;
-    sdk_send_msg_ack_context_v3 context = {0};
+    ez_kernel_publish_ack_t ack_context = {0};
+
     do
     {
         if (mkernel_internal_succ != (sdk_error = pop_queue_pubmsg_exchange_v3(&ptr_pubmsg_exchange)) ||
@@ -1163,21 +1164,11 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
             }
         }
 
-        context.msg_seq = ptr_pubmsg_exchange->msg_conntext_v3.msg_seq;
-        context.msg_qos = ptr_pubmsg_exchange->msg_conntext_v3.msg_qos;
+        ack_context.last_error = mkiE2ezE(sdk_error);
+        ack_context.msg_seq = ptr_pubmsg_exchange->msg_conntext_v3.msg_seq;
+        ezos_strncpy(ack_context.module_name, ptr_pubmsg_exchange->msg_conntext_v3.method, ezdev_sdk_method_len - 1);
+        broadcast_user_event(SDK_KERNEL_EVENT_PUBLISH_ACK, (void*)&ack_context, sizeof(ack_context));
 
-        ezos_strncpy(context.module, ptr_pubmsg_exchange->msg_conntext_v3.module, ezdev_sdk_module_name_len - 1);
-        ezos_strncpy(context.resource_id, ptr_pubmsg_exchange->msg_conntext_v3.resource_id, ezdev_sdk_resource_id_len - 1);
-        ezos_strncpy(context.resource_type, ptr_pubmsg_exchange->msg_conntext_v3.resource_type, ezdev_sdk_resource_type_len - 1);
-        ezos_strncpy(context.method, ptr_pubmsg_exchange->msg_conntext_v3.method, ezdev_sdk_method_len - 1);
-        ezos_strncpy(context.sub_serial, ptr_pubmsg_exchange->msg_conntext_v3.sub_serial, ezdev_sdk_max_serial_len - 1);
-        ezos_strncpy(context.msg_type, ptr_pubmsg_exchange->msg_conntext_v3.msg_type, ezdev_sdk_msg_type_len - 1);
-        ezos_strncpy(context.ext_msg, ptr_pubmsg_exchange->msg_conntext_v3.ext_msg, ezdev_sdk_ext_msg_len - 1);
-
-        if (mkernel_internal_succ != broadcast_runtime_err(TAG_MSG_ACK_V3, mkiE2ezE(sdk_error), &context, sizeof(context)))
-        {
-            ezlog_e(TAG_CORE, "broadcast_runtime_err failed,module:%s ,msg_type:%s", context.module, context.msg_type);
-        }
         if (ptr_pubmsg_exchange->msg_conntext_v3.msg_body)
             ezos_free(ptr_pubmsg_exchange->msg_conntext_v3.msg_body);
 
@@ -1192,7 +1183,7 @@ static mkernel_internal_error send_message_to_das_v2(ezdev_sdk_kernel *sdk_kerne
     char cRiskResult = 0;
     ezdev_sdk_kernel_pubmsg_exchange *ptr_pubmsg_exchange = NULL;
     mkernel_internal_error sdk_error = mkernel_internal_succ;
-    sdk_send_msg_ack_context context = {0};
+
     do
     {
         if (mkernel_internal_succ != (sdk_error = pop_queue_pubmsg_exchange(&ptr_pubmsg_exchange)) ||
@@ -1225,19 +1216,6 @@ static mkernel_internal_error send_message_to_das_v2(ezdev_sdk_kernel *sdk_kerne
                 push_queue_head_pubmsg_exchange(ptr_pubmsg_exchange);
                 return mkernel_internal_das_need_reconnect;
             }
-        }
-        ezlog_d(TAG_CORE, "broadcast_runtime_err, TAG_MSG_ACK");
-        context.msg_domain_id = ptr_pubmsg_exchange->msg_conntext.msg_domain_id;
-        context.msg_command_id = ptr_pubmsg_exchange->msg_conntext.msg_command_id;
-        context.msg_seq = ptr_pubmsg_exchange->msg_conntext.msg_seq;
-        context.msg_qos = ptr_pubmsg_exchange->msg_conntext.msg_qos;
-        context.externel_ctx = ptr_pubmsg_exchange->msg_conntext.externel_ctx;
-        context.externel_ctx_len = ptr_pubmsg_exchange->msg_conntext.externel_ctx_len;
-
-        if (mkernel_internal_succ != broadcast_runtime_err(TAG_MSG_ACK, mkiE2ezE(sdk_error), &context, sizeof(context)))
-        {
-            if (NULL == ptr_pubmsg_exchange->msg_conntext.externel_ctx)
-                ezos_free(ptr_pubmsg_exchange->msg_conntext.externel_ctx);
         }
 
         if (ptr_pubmsg_exchange->msg_conntext.msg_body)

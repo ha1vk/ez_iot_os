@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 
-EZOS_API ez_sem_t ez_sem_create(void)
+EZOS_API ez_sem_t ezos_sem_create(void)
 {
     HANDLE  semaphore = NULL;
     semaphore = CreateSemaphore(NULL, 0, 1, NULL);
@@ -37,7 +37,7 @@ EZOS_API ez_sem_t ez_sem_create(void)
     return (ez_sem_t)semaphore;
 }
 
-EZOS_API int ez_sem_destory(ez_sem_t sem)
+EZOS_API int ezos_sem_destroy(ez_sem_t sem)
 {
     HANDLE  semaphore = (HANDLE )sem;
 
@@ -50,7 +50,7 @@ EZOS_API int ez_sem_destory(ez_sem_t sem)
     return 0;
 }
 
-EZOS_API int ez_sem_wait(ez_sem_t sem, int timewait_ms)
+EZOS_API int ezos_sem_wait(ez_sem_t sem, int timewait_ms)
 {
     HANDLE  semaphore = (HANDLE)sem;
 	if (semaphore == NULL)
@@ -62,7 +62,7 @@ EZOS_API int ez_sem_wait(ez_sem_t sem, int timewait_ms)
     return (WAIT_OBJECT_0 == WaitForSingleObject(semaphore, dwMilliseconds)) ? 0 : -1;
 }
 
-EZOS_API int ez_sem_post(ez_sem_t sem)
+EZOS_API int ezos_sem_post(ez_sem_t sem)
 {
     HANDLE semaphore = (HANDLE)sem;
     if (semaphore == NULL)

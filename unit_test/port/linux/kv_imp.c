@@ -113,7 +113,7 @@ void kv_print(void)
 int kv_deinit(void)
 {
     fdb_kvdb_deinit(&ez_kvdb);
-    ezos_mutex_destory(m_kv_mutex);
+    ezos_mutex_destroy(m_kv_mutex);
 
     return EZ_KV_ERR_SUCC;
 }
