@@ -929,7 +929,7 @@ ez_int32_t shadow_core_cloud_data_in(ez_void_t *shadow_res, ez_uint32_t seq, ez_
         }
         else if (0 == ezos_strcmp("report", business_type))
         {
-            shadow_reply2report(seq, *(int32_t *)payload);
+            shadow_reply2report(seq, *(ez_int32_t *)payload);
         }
         else
         {

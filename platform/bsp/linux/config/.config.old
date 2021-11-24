@@ -41,14 +41,15 @@ CONFIG_EZIOT_OTA_ENABLE=y
 # end of ez-iot ota configuration
 
 #
-# ez-iot TSL(Thing Specification Language) configuration
+# ez-iot shadow configuration
 #
-CONFIG_EZIOT_TSL_ENABLE=y
-# end of ez-iot TSL(Thing Specification Language) configuration
+CONFIG_EZIOT_SHADOW_ENABLE=y
+# end of ez-iot shadow configuration
 
 #
 # ez-iot TSL(Thing Specification Language) configuration
 #
+CONFIG_EZIOT_TSL_ENABLE=y
 # end of ez-iot TSL(Thing Specification Language) configuration
 # end of Ez-iot configuration
 
