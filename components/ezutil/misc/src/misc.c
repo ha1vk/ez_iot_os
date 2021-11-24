@@ -44,12 +44,12 @@ void bin2hexstr(const char *src, int len, int upper, char *dst)
     }
 }
 
-char time_isexpired_bydiff(ezos_timespec_t *assign_timer)
+ez_bool_t time_isexpired(ezos_timespec_t *assign_timer)
 {
     ezos_timespec_t now, res;
     if (NULL == assign_timer)
     {
-        return (char)1;
+        return ez_true;
     }
 
     ezos_get_clock(&now);
@@ -64,17 +64,19 @@ char time_isexpired_bydiff(ezos_timespec_t *assign_timer)
     return res.tv_sec < 0 || (res.tv_sec == 0 && res.tv_nsec <= 0);
 }
 
-void time_countdown(ezos_timespec_t *assign_timer, ezos_time_t time_count)
+ez_void_t time_countdown(ezos_timespec_t *assign_timer, ezos_time_t timeout_ms)
 {
     ezos_timespec_t now;
+    ezos_timespec_t interval = {timeout_ms / TIMESPEC_THOUSAND, (timeout_ms % TIMESPEC_THOUSAND) * TIMESPEC_MILLION};
+
     if (NULL == assign_timer)
     {
         return;
     }
 
     ezos_get_clock(&now);
-    assign_timer->tv_sec = assign_timer->tv_sec + now.tv_sec;
-    assign_timer->tv_nsec = assign_timer->tv_sec + now.tv_nsec;
+    assign_timer->tv_sec = interval.tv_sec + now.tv_sec;
+    assign_timer->tv_nsec = interval.tv_nsec + now.tv_nsec;
 
     if (assign_timer->tv_nsec >= TIMESPEC_BILLION)
     {

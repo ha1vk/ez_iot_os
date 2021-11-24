@@ -34,5 +34,11 @@ menu "ez-iot core configuration"
         default 5
         depends on EZIOT_CORE_MULTI_TASK
 
+    config EZIOT_CORE_MESSAGE_BUFFER_MAX
+        int "ezviz protocol message buffer size"
+        range 256 16384
+        default 16384
+        depends on EZIOT_CORE_ENABLE
+
 endmenu
 

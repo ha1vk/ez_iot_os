@@ -137,8 +137,6 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel *sdk_kernel)
     }
     else
     {
-        ezlog_e(TAG_CORE, "broadcast_runtime_err, cnt_state_lbs_redirect, code:%d", sdk_error);
-        broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
         if (mkernel_internal_net_connect_error == sdk_error || mkernel_internal_net_gethostbyname_error == sdk_error || mkernel_internal_platform_lbs_auth_type_need_rematch == sdk_error)
         {
             sdk_kernel->lbs_redirect_times = 1;
@@ -203,7 +201,6 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel *sdk_kernel)
     }
     else
     {
-        broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
         if (sdk_kernel->das_retry_times++ >= 5)
         {
             sdk_kernel->cnt_state = sdk_cnt_unredirect;
@@ -223,9 +220,7 @@ static mkernel_internal_error cnt_das_work_do(ezdev_sdk_kernel *sdk_kernel)
     if (mkernel_internal_succ != sdk_error &&
         mkernel_internal_queue_empty != sdk_error)
     {
-        ezlog_e(TAG_CORE, "broadcast_runtime_err, cnt_das_work_do, code:%d", sdk_error);
-        broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
-
+        ezlog_e(TAG_CORE, "cnt_das_work_do, code:%d", sdk_error);
         if (sdk_error == mkernel_internal_das_need_reconnect)
         {
             sdk_kernel->cnt_state = sdk_cnt_das_break;
@@ -257,8 +252,6 @@ static mkernel_internal_error cnt_das_retry_do(ezdev_sdk_kernel *sdk_kernel)
     }
     else
     {
-        ezlog_e(TAG_CORE, "broadcast_runtime_err, cnt_das_retry_do, code:%d", sdk_error);
-        broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(sdk_error), NULL, 0);
         if (sdk_kernel->das_retry_times++ >= 3)
         {
             ez_kernel_offline_context_t context = {0};

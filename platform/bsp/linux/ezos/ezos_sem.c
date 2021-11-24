@@ -42,7 +42,7 @@ EZOS_API ez_sem_t ezos_sem_create(void)
     return (ez_sem_t)semaphore;
 }
 
-EZOS_API int ezos_sem_destory(ez_sem_t sem)
+EZOS_API int ezos_sem_destroy(ez_sem_t sem)
 {
     sem_t *semaphore = (sem_t *)sem;
 

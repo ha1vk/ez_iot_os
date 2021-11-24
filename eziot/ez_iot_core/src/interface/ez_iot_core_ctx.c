@@ -34,8 +34,6 @@ ez_void_t ez_iot_event_adapt(ez_kernel_event_t *ptr_event)
         }
         break;
     }
-    case SDK_KERNEL_EVENT_RUNTIME_ERR:
-        break;
     case SDK_KERNEL_EVENT_RECONNECT:
         g_event_notice_func(EZ_EVENT_RECONNECT, NULL, 0);
         break;

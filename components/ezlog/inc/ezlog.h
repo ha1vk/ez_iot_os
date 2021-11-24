@@ -28,14 +28,13 @@
 #define EZ_ELOG_LVL_VERBOSE 5 ///< 不限制打印，每行带有行号，默认不开启。（不允许刷屏）
 
 #define TAG_CORE "T_CORE"
-#define TAG_SHADOW "T_SHADOW"
+#define TAG_SHD "T_SHD"
 #define TAG_AP "T_AP"
 #define TAG_OTA "T_OTA"
 #define TAG_APP "T_APP"
 #define TAG_TIME "T_TIME"
 #define TAG_ATCMD "T_ATCMD"
 #define TAG_BLE "T_BLE"
-#define TAG_REX_UART "T_REX_UART"
 #define TAG_HUB "T_HUB"
 #define TAG_TSL "T_TSL"
 #define TAG_AT "T_AT"

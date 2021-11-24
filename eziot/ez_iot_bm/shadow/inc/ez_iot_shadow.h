@@ -23,24 +23,48 @@
 
 #include <ezos.h>
 
+#define SHD_MODULE_ERRNO_BASE 0x00060000
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+    typedef enum
+    {
+        EZ_SHD_ERR_SUCC = 0x00,                                      ///< Success
+        EZ_SHD_ERR_NOT_INIT = SHD_MODULE_ERRNO_BASE + 0x01,          ///< The shadow module is not initialized
+        EZ_SHD_ERR_NOT_READY = SHD_MODULE_ERRNO_BASE + 0x02,         ///< The sdk core module is not started
+        EZ_SHD_ERR_PARAM_INVALID = SHD_MODULE_ERRNO_BASE + 0x03,     ///< The input parameters is illegal, it may be that some parameters can not be null or out of range
+        EZ_SHD_ERR_GENERAL = SHD_MODULE_ERRNO_BASE + 0x04,           ///< Unknown error
+        EZ_SHD_ERR_MEMORY = SHD_MODULE_ERRNO_BASE + 0x05,            ///< Out of memory
+        EZ_SHD_ERR_DEV_NOT_FOUND = SHD_MODULE_ERRNO_BASE + 0x06,     ///< Can't find the device, need to register first
+        EZ_SHD_ERR_RSCTYPE_NOT_FOUND = SHD_MODULE_ERRNO_BASE + 0x07, ///< The rsc_type is illegal, is not defined in the profile
+        EZ_SHD_ERR_INDEX_NOT_FOUND = SHD_MODULE_ERRNO_BASE + 0x08,   ///< The local index is illegal, is not defined in the profile
+        EZ_SHD_ERR_DOMAIN_NOT_FOUND = SHD_MODULE_ERRNO_BASE + 0x09,  ///< The domain is illegal, is not defined in the profile
+        EZ_SHD_ERR_KEY_NOT_FOUND = SHD_MODULE_ERRNO_BASE + 0x0a,     ///< The Key is illegal, is not defined in the profile
+        EZ_SHD_ERR_STORAGE = SHD_MODULE_ERRNO_BASE + 0x0e,           ///< An error occurred when flash I/O
+    } ez_shadow_err_e;
+
     typedef struct
     {
-        const ez_void_t *pres;    ///< 目标资源(shadow V3)，状态给到哪个设备的哪个通道（无子设备和单通道忽略）。参见ezDevSDK_Shadow_Res_t
-        const ez_int8_t *pdomain; ///< 领域id(shadow V3)
-        const ez_int8_t *pkey;    ///< 属性id(shadow V3)
+        ez_char_t dev_serial[32]; ///< 设备序列号
+        ez_char_t res_type[32];   ///< 通道类型（某种类型通道的集合，视频通道集合或者报警通道集合）
+        ez_int16_t local_index;   ///< 通道号（例如报警通道0或者报警通道1）
+    } ez_shadow_res_t;
+
+    typedef struct
+    {
+        ez_shadow_res_t pres; ///< 目标资源(shadow V3)，状态给到哪个设备的哪个通道（无子设备和单通道忽略）。
+        ez_char_t *pdomain;   ///< 领域id(shadow V3)
+        ez_char_t *pkey;      ///< 属性id(shadow V3)
     } ez_shadow_business2dev_param_t;
 
     typedef struct
     {
-        ez_uint32_t ver;          ///< 版本号，用于shadow的同步
-        const ez_void_t *pres;    ///< 目标资源(shadow V3)，从哪个设备的哪个通道获取状态（无子设备和单通道忽略）。参见ezDevSDK_Shadow_Res_t
-        const ez_int8_t *pdomain; ///< 领域id(shadow V3)
-        const ez_int8_t *pkey;    ///< 属性id(shadow V3)
+        ez_shadow_res_t pres; ///< 目标资源(shadow V3)，从哪个设备的哪个通道获取状态（无子设备和单通道忽略）。
+        ez_char_t *pdomain;   ///< 领域id(shadow V3)
+        ez_char_t *pkey;      ///< 属性id(shadow V3)
     } ez_shadow_business2cloud_param_t;
 
     typedef enum
@@ -52,7 +76,7 @@ extern "C"
         SHD_DATA_TYPE_ARRAY,
         SHD_DATA_TYPE_OBJECT,
 
-        EZ_SHD_DATA_TYPE_MAX,
+        SHD_DATA_TYPE_MAX,
     } ez_shadow_data_type_e;
 
     typedef struct
@@ -71,10 +95,7 @@ extern "C"
 
     typedef struct
     {
-        ez_int8_t key[64];     ///< shadow业务的key
-        ez_uint32_t ver;       ///< shadow业务的版本号
-        ez_uint32_t seq;       ///< 状态发送后的seq
-        ez_int8_t need_report; ///< 是否需要上报标志
+        ez_char_t key[32]; ///< shadow业务的key
 
         /**
         * @brief 平台的shadow业务同步给设备
@@ -92,25 +113,16 @@ extern "C"
         */
         ez_err_t (*business2cloud)(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram);
 
+        // ez_uint32_t ver;       ///< shadow业务的版本号
+        // ez_uint32_t seq;       ///< 状态发送后的seq
+        // ez_int8_t need_report; ///< 是否需要上报标志
     } ez_shadow_business_t;
 
     typedef struct
     {
-        ez_int8_t reset;                ///< 设备重置，清空所有缓存状态
         ez_int16_t num;                 ///< 注册业务的数量
         ez_shadow_business_t *business; ///< 注册的业务
     } ez_shadow_module_t;
-
-    /**
-    * @brief 描述某个资源。设备的某种资源类型集合的某个通道
-    * 
-    */
-    typedef struct
-    {
-        ez_int8_t dev_serial[72]; ///< 设备序列号
-        ez_int8_t res_type[64];   ///< 通道类型（某种类型通道的集合，视频通道集合或者报警通道集合）
-        ez_int16_t local_index;   ///< 通道号（例如报警通道0或者报警通道1）
-    } ez_shadow_res_t;
 
     /**
     * @brief 初始化shadow模块
@@ -127,7 +139,7 @@ extern "C"
     * @param module 领域key列表
     * @return  
     */
-    EZOS_API ez_err_t ez_iot_shadow_register(ez_shadow_res_t *pres, ez_int8_t *domain_id, ez_shadow_module_t *module);
+    EZOS_API ez_err_t ez_iot_shadow_register(ez_shadow_res_t *pres, ez_char_t *domain_id, ez_shadow_module_t *module);
 
     /**
     * @brief key值发生更变，触发上报
@@ -138,7 +150,7 @@ extern "C"
     * @param pvalue 变更的value
     * @return  
     */
-    EZOS_API ez_err_t ez_iot_shadow_push(ez_shadow_res_t *pres, ez_int8_t *domain_id, ez_int8_t *pkey, ez_shadow_value_t *pvalue);
+    EZOS_API ez_err_t ez_iot_shadow_push(ez_shadow_res_t *pres, ez_char_t *domain_id, ez_char_t *pkey, ez_shadow_value_t *pvalue);
 
     /**
     * @brief 反初始化shadow模块

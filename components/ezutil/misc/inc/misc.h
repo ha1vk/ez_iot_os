@@ -25,8 +25,8 @@
 
 void bin2hexstr(const char* src, int len, int upper, char* dst);
 
-char time_isexpired(ezos_timespec_t *assign_timer);
+ez_bool_t time_isexpired(ezos_timespec_t *assign_timer);
 
-void time_countdown(ezos_timespec_t *assign_timer, ezos_time_t time_count);
+ez_void_t time_countdown(ezos_timespec_t *assign_timer, ezos_time_t timeout_ms);
 
 #endif

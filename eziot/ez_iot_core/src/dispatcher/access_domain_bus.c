@@ -178,7 +178,6 @@ static mkernel_internal_error bus_handle_dev_risk(ezdev_sdk_kernel *sdk_kernel, 
 
 static mkernel_internal_error bus_handle_force_offline(ezdev_sdk_kernel *sdk_kernel)
 {
-    broadcast_runtime_err(TAG_ACCESS, mkiE2ezE(mkernel_internal_force_offline), NULL, 0);
     add_access_risk_control(sdk_kernel);
     return mkernel_internal_succ;
 }

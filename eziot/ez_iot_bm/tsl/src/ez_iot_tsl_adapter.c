@@ -394,18 +394,17 @@ done:
 static ez_err_t business2dev_imp(const ez_shadow_value_t *pvalue, ez_shadow_business2dev_param_t *ppram)
 {
     int32_t rv = -1;
-    ez_shadow_res_t *shadow_res = (ez_shadow_res_t *)ppram->pres;
     ez_tsl_value_t tsl_value = {0};
     ez_char_t local_index[8] = {0};
-    ezos_snprintf(local_index, sizeof(local_index), "%d", shadow_res->local_index);
+    ezos_snprintf(local_index, sizeof(local_index), "%d", ppram->pres.local_index);
 
-    ez_tsl_rsc_t rsc_info = {.res_type = shadow_res->res_type, .local_index = local_index};
+    ez_tsl_rsc_t rsc_info = {.res_type = ppram->pres.res_type, .local_index = local_index};
     ez_tsl_key_t key_info = {.domain = (ez_char_t *)ppram->pdomain, .key = (ez_char_t *)ppram->pkey};
     tsl_value.type = pvalue->type;
     tsl_value.size = pvalue->length;
     tsl_value.value_double = pvalue->value_double;
 
-    rv = g_tsl_things_cbs.property2dev(shadow_res->dev_serial, &rsc_info, &key_info, &tsl_value);
+    rv = g_tsl_things_cbs.property2dev(ppram->pres.dev_serial, &rsc_info, &key_info, &tsl_value);
     if (0 != rv)
     {
         ezlog_e(TAG_TSL, "dev process failed.");
@@ -417,16 +416,15 @@ static ez_err_t business2dev_imp(const ez_shadow_value_t *pvalue, ez_shadow_busi
 static ez_err_t business2cloud_imp(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram)
 {
     int32_t rv = -1;
-    ez_shadow_res_t *shadow_res = (ez_shadow_res_t *)ppram->pres;
     ez_tsl_value_t *tsl_value = (ez_tsl_value_t *)pvalue;
     ez_char_t local_index[8] = {0};
-    ezos_snprintf(local_index, sizeof(local_index), "%d", shadow_res->local_index);
+    ezos_snprintf(local_index, sizeof(local_index), "%d", ppram->pres.local_index);
 
-    ez_tsl_rsc_t rsc_info = {.res_type = shadow_res->res_type, .local_index = local_index};
+    ez_tsl_rsc_t rsc_info = {.res_type = ppram->pres.res_type, .local_index = local_index};
     ez_tsl_key_t key_info = {.domain = (ez_char_t *)ppram->pdomain, .key = (ez_char_t *)ppram->pkey};
 
-    ezlog_d(TAG_TSL, "busi to cloud. dev_sn: %s", shadow_res->dev_serial);
-    rv = g_tsl_things_cbs.property2cloud(shadow_res->dev_serial, &rsc_info, &key_info, tsl_value);
+    ezlog_d(TAG_TSL, "busi to cloud. dev_sn: %s", ppram->pres.dev_serial);
+    rv = g_tsl_things_cbs.property2cloud(ppram->pres.dev_serial, &rsc_info, &key_info, tsl_value);
     if (0 != rv)
     {
         ezlog_e(TAG_TSL, "property2cloud failed.");
@@ -480,7 +478,6 @@ static void tsl_adapter_shadow_inst(ez_tsl_devinfo_t *dev_info, ez_iot_tsl_capac
                     shadow_res.local_index = ezos_atoi(capacity->resource[i].index + MAX_LOCAL_INDEX_LENGTH * j);
 
                     shadow_module.num = 1;
-                    shadow_module.reset = 0;
                     shadow_module.business = &shadow_busi;
                     ez_int32_t ret = ez_iot_shadow_register(&shadow_res, capacity->resource[i].domain[k].identifier, &shadow_module);
                     if (0 != ret)
@@ -729,8 +726,8 @@ static void ez_profile_get_thread(void *user_data)
     return;
 }
 
-static ez_void_t domain_event_route(ez_kernel_event_t *ptr_event);
-static void domain_data_route_cb(ez_kernel_submsg_v3_t *psub_msg);
+static ez_void_t iot_core_event_route(ez_kernel_event_t *ptr_event);
+static void tsl_data_route_cb(ez_kernel_submsg_v3_t *psub_msg);
 
 ez_err_t ez_iot_tsl_adapter_init(ez_tsl_things_callbacks_t *things_cbs)
 {
@@ -739,8 +736,8 @@ ez_err_t ez_iot_tsl_adapter_init(ez_tsl_things_callbacks_t *things_cbs)
 
     ezos_memcpy(&g_tsl_things_cbs, things_cbs, sizeof(ez_tsl_things_callbacks_t));
 
-    extend_info.ez_kernel_event_route = domain_event_route;
-    extend_info.ez_kernel_data_route = domain_data_route_cb;
+    extend_info.ez_kernel_event_route = iot_core_event_route;
+    extend_info.ez_kernel_data_route = tsl_data_route_cb;
     ezos_strncpy(extend_info.module, TSL_MODULE_NAME, sizeof(extend_info.module) - 1);
 
     rv = ez_kernel_extend_load_v3(&extend_info);
@@ -1726,12 +1723,12 @@ static void tsl_adapter_dev_update(ez_tsl_devinfo_t *dev_info, dev_stauts_e stat
     break;
     case status_need_update:
     {
-        time_countdown(&dev->timer, 30);
+        time_countdown(&dev->timer, 30 * 1000);
     }
     break;
     case status_query:
     {
-        time_countdown(&dev->timer, 30);
+        time_countdown(&dev->timer, 30 * 1000);
         dev->status = status;
     }
     break;
@@ -1866,7 +1863,7 @@ void devinfo2index(ez_tsl_devinfo_t *dev_info, ez_char_t index[32])
     ezos_snprintf(index, 32, "%s_%s", EZ_TSL_KEY_TSL_PREFIX, base64_output);
 }
 
-static ez_void_t domain_event_route(ez_kernel_event_t *ptr_event)
+static ez_void_t iot_core_event_route(ez_kernel_event_t *ptr_event)
 {
     if (!ptr_event)
     {
@@ -1887,7 +1884,7 @@ static ez_void_t domain_event_route(ez_kernel_event_t *ptr_event)
     }
 }
 
-static void domain_data_route_cb(ez_kernel_submsg_v3_t *psub_msg)
+static void tsl_data_route_cb(ez_kernel_submsg_v3_t *psub_msg)
 {
     if (0 == ezos_strcmp(psub_msg->method, TSL_SERVICE_METHOD_NAME))
     {

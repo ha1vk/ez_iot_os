@@ -204,6 +204,7 @@ ez_err_t ez_iot_tsl_check_value_legal(const char *key, int type, const ez_tsl_de
 #endif
     return 0;
 }
+
 ez_err_t ez_iot_tsl_deinit(void)
 {
     FUNC_IN();

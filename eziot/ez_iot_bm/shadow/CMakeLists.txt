@@ -3,7 +3,7 @@ if(CONFIG_EZIOT_SHADOW_ENABLE)
     ################# Add include #################
     list(APPEND ADD_INCLUDE "${module_name}/inc"
         )
-    # list(APPEND ADD_PRIVATE_INCLUDE "${module_name}/inc_private")
+    list(APPEND ADD_PRIVATE_INCLUDE "${module_name}/inc_private")
     ###############################################
 
     ############## Add source files ###############

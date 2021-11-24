@@ -131,7 +131,7 @@ EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_
     // return 0;
 }
 
-EZOS_API int ezos_thread_destory(ez_thread_t handle)
+EZOS_API int ezos_thread_destroy(ez_thread_t handle)
 {
     pthread_t *pt = (pthread_t *)handle;
     if (pt == NULL)

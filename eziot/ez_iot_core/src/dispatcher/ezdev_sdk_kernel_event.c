@@ -149,30 +149,6 @@ mkernel_internal_error broadcast_user_event(sdk_kernel_event_type event_type, vo
     return rv;
 }
 
-mkernel_internal_error broadcast_runtime_err(err_tag_e err_tag, ez_err_t err_code, void *err_ctx, EZDEV_SDK_UINT32 ctx_size)
-{
-    mkernel_internal_error rv = mkernel_internal_succ;
-    sdk_runtime_err_context rt_err_ctx = {err_tag, err_code, NULL};
-
-    if (NULL != err_ctx)
-    {
-        if (NULL == (rt_err_ctx.err_ctx = (void *)ezos_malloc(ctx_size)))
-        {
-            return mkernel_internal_malloc_error;
-        }
-
-        ezos_memcpy(rt_err_ctx.err_ctx, err_ctx, ctx_size);
-    }
-
-    if (mkernel_internal_succ != (rv = broadcast_user_event(SDK_KERNEL_EVENT_RUNTIME_ERR, &rt_err_ctx, sizeof(rt_err_ctx))))
-    {
-        if (NULL != rt_err_ctx.err_ctx)
-            ezos_free(rt_err_ctx.err_ctx);
-    }
-
-    return rv;
-}
-
 mkernel_internal_error broadcast_user_event_reconnect_success()
 {
     mkernel_internal_error kernel_error = mkernel_internal_succ;
