@@ -3,7 +3,7 @@ if(CONFIG_EZIOT_HUB_ENABLE)
     ################# Add include #################
     list(APPEND ADD_INCLUDE "${module_name}/inc"
         )
-    # list(APPEND ADD_PRIVATE_INCLUDE "${module_name}/inc_private")
+    list(APPEND ADD_PRIVATE_INCLUDE "${module_name}/inc_private")
     ###############################################
 
     ############## Add source files ###############
@@ -50,7 +50,7 @@ if(CONFIG_EZIOT_HUB_ENABLE)
 
     ############ Add static libs ##################
     #### Update parent's variables like CMAKE_C_LINK_FLAGS
-    set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group ${module_name}/libmaix/libtest.a -ltest2 -Wl,--end-group" PARENT_SCOPE)
+    #set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group ${module_name}/libmaix/libtest.a -ltest2 -Wl,--end-group" PARENT_SCOPE)
     ###############################################
 
 endif()
