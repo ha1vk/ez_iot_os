@@ -65,6 +65,9 @@
         "stdlib.h": "c",
         "kv_imp.h": "c",
         "stddef.h": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "ez_iot_base.h": "c",
+        "ez_iot_base_def.h": "c",
+        "ez_iot_base_protocol.h": "c"
     }
 }

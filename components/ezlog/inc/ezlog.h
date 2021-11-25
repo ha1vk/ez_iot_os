@@ -32,6 +32,7 @@
 #define TAG_AP "T_AP"
 #define TAG_OTA "T_OTA"
 #define TAG_APP "T_APP"
+#define TAG_BASE "T_BASE"
 #define TAG_TIME "T_TIME"
 #define TAG_ATCMD "T_ATCMD"
 #define TAG_BLE "T_BLE"
