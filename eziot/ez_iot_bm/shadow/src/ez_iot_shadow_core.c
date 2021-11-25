@@ -831,7 +831,7 @@ ez_err_t shadow_core_module_delete(ez_char_t *sn, ez_char_t *res_type, ez_int16_
     return EZ_SHD_ERR_SUCC;
 }
 
-ez_err_t shadow_core_propertie_changed(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id, int8_t *pkey, ez_void_t *value)
+ez_err_t shadow_core_propertie_changed(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id, ez_char_t *pkey, ez_void_t *value)
 {
     ez_err_t rv = EZ_SHD_ERR_SUCC;
     node_dev_t *pnode_dev;
@@ -905,7 +905,7 @@ ez_err_t shadow_core_propertie_changed(ez_char_t *sn, ez_char_t *res_type, ez_in
     return rv;
 }
 
-int shadow_core_cloud_data_in(ez_void_t *shadow_res, ez_uint32_t seq, int8_t *business_type, int8_t *payload)
+ez_int32_t shadow_core_cloud_data_in(ez_void_t *shadow_res, ez_uint32_t seq, ez_char_t *business_type, ez_char_t *payload)
 {
     ez_int32_t rv = -1;
     ez_shadow_res_t *pshadow_res = (ez_shadow_res_t *)shadow_res;
@@ -929,7 +929,7 @@ int shadow_core_cloud_data_in(ez_void_t *shadow_res, ez_uint32_t seq, int8_t *bu
         }
         else if (0 == ezos_strcmp("report", business_type))
         {
-            shadow_reply2report(seq, *(int32_t *)payload);
+            shadow_reply2report(seq, *(ez_int32_t *)payload);
         }
         else
         {

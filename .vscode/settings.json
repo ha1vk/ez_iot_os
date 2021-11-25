@@ -64,6 +64,7 @@
         "ezos_network.h": "c",
         "stdlib.h": "c",
         "kv_imp.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "typeinfo": "c"
     }
 }

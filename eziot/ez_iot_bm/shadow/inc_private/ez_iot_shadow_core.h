@@ -76,7 +76,7 @@ extern "C"
      * @param pcKey 需要上报的key值
      * @return int 
      */
-    ez_err_t shadow_core_propertie_changed(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id, int8_t *pkey, ez_void_t *value);
+    ez_err_t shadow_core_propertie_changed(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id, ez_char_t *pkey, ez_void_t *value);
 
     /**
      * @brief 云端下发命令入口
@@ -86,7 +86,7 @@ extern "C"
      * @param payload 消息报文体
      * @return int 
      */
-    int shadow_core_cloud_data_in(void *shadow_res, uint32_t seq, int8_t *business_type, int8_t *payload);
+    ez_int32_t shadow_core_cloud_data_in(ez_void_t *shadow_res, ez_uint32_t seq, ez_char_t *business_type, ez_char_t *payload);
 
 #ifdef __cplusplus
 }
