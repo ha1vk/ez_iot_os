@@ -17,11 +17,10 @@ if(CONFIG_EZIOT_OTA_ENABLE)
 
     ###### Add required/dependent components ######
     list(APPEND ADD_REQUIREMENTS cJSON)
-    list(APPEND ADD_REQUIREMENTS mqtt)
-    list(APPEND ADD_REQUIREMENTS mbedtls)
-    list(APPEND ADD_REQUIREMENTS ezxml)
     list(APPEND ADD_REQUIREMENTS ezlog)
     list(APPEND ADD_REQUIREMENTS ez_iot_core)
+    list(APPEND ADD_REQUIREMENTS ezos)
+    list(APPEND ADD_REQUIREMENTS webclient)
     ###############################################
 
     ############ Add static libs ##################

@@ -30,18 +30,17 @@ EZOS_API ez_err_t ezos_get_clock(ezos_timespec_t *clock)
 
 EZOS_API int ezos_gettimeofday(struct ezos_timeval *tv, struct ezos_timezone *tz)
 {
-    return gettimeofday(tv, tz);
+    return gettimeofday((struct timeval *)tv, (struct timezone *)tz);
 }
 
-EZOS_API time_t ezos_time(ezos_time_t *__timer)
+EZOS_API ezos_time_t ezos_time(ezos_time_t *__timer)
 {
-    return time(__timer);
+    return (ezos_time_t)time((time_t *)__timer);
 }
 
 EZOS_API struct ezos_tm * ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result)
 {
-    //TODO
-    return result;
+    return (struct ezos_tm *)localtime_r((time_t *)timep, (struct tm *)result);;
 }
 
 EZOS_API void ezos_delay_ms(ez_ulong_t time_ms)

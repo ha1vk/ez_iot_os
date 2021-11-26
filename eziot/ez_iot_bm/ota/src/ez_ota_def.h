@@ -9,22 +9,22 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- * xurongjun (xurongjun@ezvizlife.com)
-*******************************************************************************/
+* Contributors:
+ *    shenhongyin - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+#ifndef H_EZ_OTA_DEF_H_
+#define H_EZ_OTA_DEF_H_
 
-#ifndef _EZOS_H_
-#define _EZOS_H_
+	
+#define ota_module_name			"ota"	
+#define ota_version		        "V1.0.0"
 
-#include <ezos_gconfig.h>
-#include <ezos_def.h>
-#include <ezos_thread.h>
-#include <ezos_time.h>
-#include <ezos_sem.h>
-#include <ezos_socket.h>
-#include <ezos_libc.h>
-#include <ezos_kv.h>
-#include <ezos_mem.h> 
-#include <ezos_system.h>
+
+#define ota_state_ready    0
+#define ota_state_succ     7
+#define ota_state_failed   8
+
+#define min_report_interval  5*1000
+
 #endif
+

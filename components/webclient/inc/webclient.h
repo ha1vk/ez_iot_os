@@ -12,12 +12,14 @@
  * 2018-01-04     aozima       add ipv6 address support.
  * 2018-07-26     chenyong     modify log information
  * 2018-08-07     chenyong     modify header processing
+ * 2021-11-26     zoujinwei    modify function definition
  */
 
 #ifndef __WEBCLIENT_H__
 #define __WEBCLIENT_H__
 
-#include "define.h"
+
+#include <ezos.h>
 
 #if defined(WEBCLIENT_USING_MBED_TLS) || defined(WEBCLIENT_USING_SAL_TLS)
 #include <tls_client.h>
@@ -28,26 +30,26 @@ extern "C"
 {
 #endif
 
-
+#define EZ_ASSERT(p)    if(NULL == p);
 
 #ifndef web_malloc
-#define web_malloc rt_malloc
+#define web_malloc ezos_malloc
 #endif
 
 #ifndef web_calloc
-#define web_calloc rt_calloc
+#define web_calloc ezos_calloc
 #endif
 
 #ifndef web_realloc
-#define web_realloc rt_realloc
+#define web_realloc ezos_realloc
 #endif
 
 #ifndef web_free
-#define web_free rt_free
+#define web_free ezos_free
 #endif
 
 #ifndef web_strdup
-#define web_strdup rt_strdup
+#define web_strdup ezos_strdup
 #endif
 
 #define WEBCLIENT_SW_VERSION "2.2.0"
@@ -99,7 +101,7 @@ extern "C"
         int content_length;
         size_t content_remainder; /* remainder of content length */
 
-        rt_bool_t is_tls; /* HTTPS connect */
+        ez_bool_t is_tls; /* HTTPS connect */
 #ifdef WEBCLIENT_USING_MBED_TLS
         MbedTLSSession *tls_session; /* mbedtls connect session */
 #endif

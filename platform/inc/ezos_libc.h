@@ -17,6 +17,7 @@
  * Date           Author       Notes
  * 2021-10-27     zoujinwei    first version
  * 2021-11-15     xurongjun    Remove redundant functions
+ * 2021-11-25     zoujinwei    add functions
  *******************************************************************************/
 
 #ifndef H_EZOS_LIBC_H_
@@ -33,6 +34,7 @@ extern "C"
     EZOS_API int ezos_printf(const char *format, ...);
     EZOS_API int ezos_sprintf(char *str, const char *format, ...);
     EZOS_API int ezos_snprintf(char *str, size_t size, const char *format, ...);
+    EZOS_API int ezos_vsnprintf(char *str, size_t size, const char *format, va_list ap);
     EZOS_API int ezos_sscanf(const char *str, const char *format, ...);
 
     EZOS_API int ezos_memcmp(const void *s1, const void *s2, size_t n);
@@ -48,10 +50,14 @@ extern "C"
     EZOS_API char *ezos_strchr(const char *s, int c);
     EZOS_API char *ezos_strrchr(const char *s, int c);
     EZOS_API size_t ezos_strlen(const char *s);
-    EZOS_API char *ezos_strdup(const char *s);
 
     EZOS_API int ezos_atoi(const char *nptr);
     EZOS_API void ezos_bzero(void *s, size_t n);
+    EZOS_API char *ezos_strdup(const char *s);
+
+    EZOS_API void ezos_va_start(va_list ap, const char *last, ...);
+    EZOS_API void ezos_va_end(va_list ap);
+
 
 #ifdef __cplusplus
 }

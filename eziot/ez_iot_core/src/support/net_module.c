@@ -9,13 +9,18 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * 
+ * Brief:
+ * Time related interface declaration
+ * 
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-11-25     zoujinwei    first version
  *******************************************************************************/
 
 #include <ezos.h>
 #include <ezlog.h>
 #include "net_module.h"
-#include "ezos_network.h"
-#include <string.h>
 
 /** 
  *  \brief		网络连接的创建,默认为TCP协议
@@ -31,46 +36,34 @@ int net_create(char *nic_name)
     //struct ifreq ifr;
     //memset(&ifr, 0, sizeof(ifr));
 
-    socket_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    socket_fd = ezos_socket(EZ_AF_INET, EZ_SOCK_STREAM, EZ_IPPROTO_TCP);
     if (socket_fd == -1)
     {
         return -1;
     }
 
-    ret = setsockopt(socket_fd, IPPROTO_TCP, TCP_MAXSEG, &opt, sizeof(opt));
+    ret = ezos_setsockopt(socket_fd, EZ_IPPROTO_TCP, EZ_TCP_MAXSEG, &opt, sizeof(opt));
     if (ret < 0)
     {
         // ezos_printf("set socket opt, TCP_MAXSEG error\n");
     }
-
-    //TODO windows没有绑定网卡
-    //if(nic_name && strlen(nic_name) > 0)
-    //{
-    //	strncpy(ifr.ifr_name, nic_name, sizeof(ifr.ifr_name)-1);
-
-    //	ret = setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE,  (void*)&ifr, sizeof(ifr));
-    //	if (ret < 0)
-    //	{
-    //		// ezos_printf("set socket opt, SO_BINDTODEVICE error\n");
-    //	}
-    //}
 
     return socket_fd;
 }
 
 mkernel_internal_error net_connect(int socket_fd, const char *server_ip, int server_port, int timeout_ms, char szRealIp[ezdev_sdk_ip_max_len])
 {
-    struct sockaddr_in dst_addr;
+    ez_sockaddr_in_t dst_addr;
     int return_value = 0;
     int lasterror;
     int socket_err = 0;
-    socklen_t socklen = sizeof(socket_err);
-    struct hostent *host;
+    ez_socklen_t socklen = sizeof(socket_err);
+    ez_hostent_t *host;
 
-    ezos_socket_setnonblock(socket_fd);
-    memset(szRealIp, 0, ezdev_sdk_ip_max_len);
+    ezos_setnonblock(socket_fd);
+    ezos_memset(szRealIp, 0, ezdev_sdk_ip_max_len);
 
-    dst_addr.sin_family = AF_INET;
+    dst_addr.sin_family = EZ_AF_INET;
     host = ezos_gethostbyname(server_ip);
     if (host == NULL)
     {
@@ -78,14 +71,14 @@ mkernel_internal_error net_connect(int socket_fd, const char *server_ip, int ser
         return mkernel_internal_net_gethostbyname_error;
     }
 
-    memcpy(&dst_addr.sin_addr, host->h_addr_list[0], sizeof(struct in_addr));
-    inet_ntop(AF_INET, (void *)host->h_addr_list[0], szRealIp, ezdev_sdk_ip_max_len);
+    ezos_memcpy(&dst_addr.sin_addr, host->h_addr_list[0], sizeof(ez_in_addr_t));
+    ezos_inet_ntop(EZ_AF_INET, (void *)host->h_addr_list[0], szRealIp, ezdev_sdk_ip_max_len);
     ezos_printf("ezos_gethostbyname:%s\n", szRealIp);
-    dst_addr.sin_port = htons(server_port);
-    if (connect(socket_fd, (const struct sockaddr *)(&dst_addr), sizeof(dst_addr)) == -1)
+    dst_addr.sin_port = ezos_htons(server_port);
+    if (ezos_connect(socket_fd, (const ez_sockaddr_t *)(&dst_addr), sizeof(dst_addr)) == -1)
     {
-        lasterror = getlasterror();
-        if ((lasterror != EZ_EINPROGRESS) && (lasterror != EZ_EWOULDBLOCK) && (lasterror != 0))
+        lasterror = ezos_getlasterror();
+        if ((lasterror != EZ_EINPROGRESS) && (lasterror != 0))
         {
             ezlog_e(TAG_CORE, ">>>>>>>>>connect, errno:%d\n", lasterror);
             return mkernel_internal_net_connect_error;
@@ -97,7 +90,7 @@ mkernel_internal_error net_connect(int socket_fd, const char *server_ip, int ser
         timeout_ms = -1;
     }
 
-    return_value = ezos_socket_poll(socket_fd, POLL_CONNECT, timeout_ms);
+    return_value = ezos_poll(socket_fd, POLL_CONNECT, timeout_ms);
     if (return_value < 0)
     {
         return mkernel_internal_net_connect_error;
@@ -107,14 +100,13 @@ mkernel_internal_error net_connect(int socket_fd, const char *server_ip, int ser
         return mkernel_internal_net_socket_timeout;
     }
 
-    if (getsockopt(socket_fd, SOL_SOCKET, SO_ERROR, &socket_err, (socklen_t *)&socklen) == -1)
+    if (ezos_getsockopt(socket_fd, EZ_SOL_SOCKET, EZ_SO_ERROR, &socket_err, (ez_socklen_t *)&socklen) == -1)
     {
         return mkernel_internal_net_connect_error;
     }
 
     if (socket_err != 0)
     {
-        setlasterror(socket_err);
         return mkernel_internal_net_connect_error;
     }
 
@@ -129,13 +121,13 @@ mkernel_internal_error net_read(int socket_fd, unsigned char *read_buf, int read
 
     do
     {
-        return_value = ezos_socket_poll(socket_fd, POLL_RECV, read_timeout_ms);
+        return_value = ezos_poll(socket_fd, POLL_RECV, read_timeout_ms);
         if (return_value < 0)
             return mkernel_internal_net_socket_error;
         else if (return_value == 0)
             return mkernel_internal_net_socket_timeout;
 
-        rev_size = recv(socket_fd, read_buf + rev_total_size, read_buf_maxsize - rev_total_size, 0);
+        rev_size = ezos_recv(socket_fd, read_buf + rev_total_size, read_buf_maxsize - rev_total_size, 0);
         if (rev_size < 0)
         {
             return mkernel_internal_net_socket_error;
@@ -164,13 +156,13 @@ mkernel_internal_error net_write(int socket_fd, unsigned char *write_buf, int wr
 
     do
     {
-        return_value = ezos_socket_poll(socket_fd, POLL_SEND, send_timeout_ms);
+        return_value = ezos_poll(socket_fd, POLL_SEND, send_timeout_ms);
         if (return_value < 0)
             return mkernel_internal_net_socket_error;
         else if (return_value == 0)
             return mkernel_internal_net_socket_timeout;
 
-        send_size = send(socket_fd, write_buf + send_total_size, write_buf_size - send_total_size, 0);
+        send_size = ezos_send(socket_fd, write_buf + send_total_size, write_buf_size - send_total_size, 0);
         if (send_size == -1)
         {
             return mkernel_internal_net_socket_error;
@@ -185,5 +177,5 @@ mkernel_internal_error net_write(int socket_fd, unsigned char *write_buf, int wr
 
 void net_disconnect(int socket_fd)
 {
-    closesocket(socket_fd);
+    ezos_closesocket(socket_fd);
 }

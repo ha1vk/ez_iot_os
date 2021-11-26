@@ -22,35 +22,22 @@
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/tcp.h>
+#include <net/if.h>
+#include <poll.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>      
+#include <net/route.h> 
+#include <unistd.h> 
 
 
-EZOS_API int ezos_socket(int domain, int type, int protocol)
-{
-	return socket(domain, type, protocol);
-}
-
-EZOS_API int ezos_connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
-{
-	return connect(sockfd, addr, addrlen);
-}
-
-EZOS_API int ezos_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
-{
-	return bind(sockfd, addr, addrlen);
-}
-
-EZOS_API ssize_t ezos_recv(int sockfd, void *buf, size_t len, int flags)
-{
-	return recv(sockfd, buf, len, flags);
-}
-
-EZOS_API ssize_t ezos_send(int sockfd, const void *buf, size_t len, int flags)
-{
-	return send(sockfd, buf, len, flags);
-}
-
-EZOS_API int ezos_socket_setnonblock(int socket_fd)
+int ezos_socket_setnonblock(int socket_fd)
 {
 	int flag = fcntl(socket_fd, F_GETFL);
 	if (flag == -1){
@@ -62,7 +49,7 @@ EZOS_API int ezos_socket_setnonblock(int socket_fd)
 	return 0;
 }
 
-EZOS_API int ezos_socket_setblock(int socket_fd)
+int ezos_socket_setblock(int socket_fd)
 {
 	int flag;
 	flag = fcntl(socket_fd, F_GETFL);
@@ -78,13 +65,13 @@ EZOS_API int ezos_socket_setblock(int socket_fd)
 	return 0;
 }
 
-EZOS_API struct hostent* ezos_gethostbyname(const char* host)
+ez_hostent_t* ezos_gethostbyname(const char* host)
 {
-    return gethostbyname(host);
+	struct hostent *hostinfo = gethostbyname(host);
+    return (ez_hostent_t *)hostinfo;
 }
 
-
-EZOS_API int ezos_socket_poll(int socket_fd, POLL_TYPE type, int timeout)
+int ezos_poll(int socket_fd, ez_poll_type_e type, int timeout)
 {
 	struct pollfd poll_fd;
 	int nfds = 0;
@@ -133,3 +120,57 @@ EZOS_API int ezos_socket_poll(int socket_fd, POLL_TYPE type, int timeout)
 	}
 }
 
+int ezos_getlasterror()
+{
+	return errno;
+}
+
+int ezos_closesocket(int socket_fd)
+{
+	return close(socket_fd);
+}
+int ezos_connect(int socket_fd, const ez_sockaddr_t *name, ez_socklen_t namelen)
+{
+	return connect(socket_fd, (struct sockaddr *)name, (socklen_t)namelen);
+}
+
+int ezos_getsockopt (int socket_fd, int level, int optname, void *optval, ez_socklen_t *optlen)
+{
+	return getsockopt (socket_fd, level, optname, optval, (socklen_t *)optlen);
+}
+
+int ezos_setsockopt (int socket_fd, int level, int optname, const void *optval, ez_socklen_t optlen)
+{
+	return setsockopt (socket_fd, level, optname, optval, (socklen_t)optlen);
+}
+
+int ezos_recv(int socket_fd, void *mem, int len, int flags)
+{
+	return recv(socket_fd, mem, len, flags);
+}
+
+int ezos_send(int socket_fd, const void *dataptr, int size, int flags)
+{
+	return send(socket_fd, dataptr, size, flags);
+}
+
+
+int ezos_socket(int domain, int type, int protocol)
+{
+	return socket(domain, type, protocol);
+}
+
+const char * ezos_inet_ntop(int af, const void *src,char *dst, ez_socklen_t size)
+{
+	return inet_ntop(af, src,dst, size);
+}
+
+unsigned long ezos_inet_addr(const char *cp)
+{
+	return inet_addr(cp);
+}
+
+unsigned short ezos_htons(unsigned short hostshort)
+{
+	return htons(hostshort);
+}

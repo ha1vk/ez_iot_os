@@ -1,4 +1,4 @@
-if(CONFIG_EZIOT_COMPONENT_WEBCLIENT_ENABLE)
+if(CONFIG_EZIOT_COMPONENT_DOUBLE_LINK_LIST_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
@@ -16,7 +16,6 @@ if(CONFIG_EZIOT_COMPONENT_WEBCLIENT_ENABLE)
 
     ###### Add required/dependent components ######
     list(APPEND ADD_REQUIREMENTS ezos)
-    list(APPEND ADD_REQUIREMENTS ezlog)
     ###############################################
 
     ############ Add static libs ##################

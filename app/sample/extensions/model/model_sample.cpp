@@ -49,7 +49,7 @@
     }
 
 
-static int parse_attr_value(ez_model_msg* msg, char* status, int len)
+static int parse_attr_value(ez_model_msg_t* msg, char* status, int len)
 {
     do
     {
@@ -69,26 +69,26 @@ static int parse_attr_value(ez_model_msg* msg, char* status, int len)
 }
 
 //属性应答消息
-int ez_model_attr_das_reply(ez_basic_info* pbasic_info, char* msg_type, ez_model_msg* buf, ez_err_info* errinfo, unsigned int msg_seq)
+int ez_model_attr_das_reply(ez_basic_info_t* pbasic_info, char* msg_type, ez_model_msg_t* buf, ez_err_info_t* errinfo, unsigned int msg_seq)
 { 
     ez_log_d(TAG_APP," attribute reply:status:%d, code:%s, err_msg:%s\n", errinfo->status, errinfo->err_code, errinfo->err_msg);
     return 0;
 }
 
 //属性请求消息
-static int ez_model_attr_das_req(ez_basic_info* pbasic_info, char* msg_type, ez_model_msg* buf, unsigned int msg_seq)
+static int ez_model_attr_das_req(ez_basic_info_t* pbasic_info, char* msg_type, ez_model_msg_t* buf, unsigned int msg_seq)
 { 
     int ret = -1;
     char* szdata = NULL;
-    ez_err_info status;
-    ez_model_msg    msg;
-    ez_msg_attr msg_attr;
+    ez_err_info_t status;
+    ez_model_msg_t    msg;
+    ez_msg_attr_t msg_attr;
     char szvalue[8]={0};
     char szstatus[16]={0};
 
-    memset(&status, 0, sizeof(ez_err_info));
-    memset(&msg, 0, sizeof(ez_model_msg));
-    memset(&msg_attr, 0, sizeof(ez_msg_attr));
+    memset(&status, 0, sizeof(ez_err_info_t));
+    memset(&msg, 0, sizeof(ez_model_msg_t));
+    memset(&msg_attr, 0, sizeof(ez_msg_attr_t));
 
     if(NULL == pbasic_info||NULL== msg_type || NULL == buf)
     {
@@ -110,7 +110,7 @@ static int ez_model_attr_das_req(ez_basic_info* pbasic_info, char* msg_type, ez_
 
             strncpy(msg_attr.msg_type, "set_reply", EZ_MSG_TYPE_LEN-1);
             ///< 先应答服务的属性设置请求,此时需要将seq值原样带回去,
-            ret = ez_model_reply_to_das(pbasic_info, &msg, &status, &msg_attr);
+            ret = ez_iot_model_reply_to_das(pbasic_info, &msg, &status, &msg_attr);
 
             msg.type = model_data_type_string;
             msg.value = szstatus;
@@ -120,7 +120,7 @@ static int ez_model_attr_das_req(ez_basic_info* pbasic_info, char* msg_type, ez_
             memset(msg_attr.msg_type, 0, EZ_MSG_TYPE_LEN);
             strncpy(msg_attr.msg_type, "report", EZ_MSG_TYPE_LEN-1);
 
-            ret = ez_model_send_msg(pbasic_info, &msg, &msg_attr);
+            ret = ez_iot_model_send_msg(pbasic_info, &msg, &msg_attr);
         }
         /* code */
     } while (0);
@@ -129,24 +129,24 @@ static int ez_model_attr_das_req(ez_basic_info* pbasic_info, char* msg_type, ez_
 }
 
 //操作请求消息
-int ez_model_service_das_req(ez_basic_info* basic_info, char* msg_type, ez_model_msg* recv_buf, unsigned int msg_seq)
+int ez_model_service_das_req(ez_basic_info_t* basic_info, char* msg_type, ez_model_msg_t* recv_buf, unsigned int msg_seq)
 {   
     int ret = 0;
     int value = 50;
     char* szdata = NULL;
     bscJSON* root  = NULL;
     bscJSON* data  = NULL;
-    ez_err_info status;
-    ez_model_msg    msg;
-    ez_msg_attr msg_attr;
+    ez_err_info_t status;
+    ez_model_msg_t    msg;
+    ez_msg_attr_t msg_attr;
     if(NULL == basic_info||NULL == recv_buf||NULL  == msg_type)
     {
         ez_log_i(TAG_APP,"ez_model_service_das_req input invalid \n");
         return -1;
     }
-    memset(&status, 0, sizeof(ez_err_info));
-    memset(&msg, 0, sizeof(ez_model_msg));
-    memset(&msg_attr, 0, sizeof(ez_msg_attr));
+    memset(&status, 0, sizeof(ez_err_info_t));
+    memset(&msg, 0, sizeof(ez_model_msg_t));
+    memset(&msg_attr, 0, sizeof(ez_msg_attr_t));
     strncpy(status.err_code, "0x0", EZ_ERR_CODE_LEN-1);
     status.status = 200;
     strncpy(status.err_msg, "success", EZ_ERR_MSG_LEN - 1);
@@ -169,7 +169,7 @@ int ez_model_service_das_req(ez_basic_info* basic_info, char* msg_type, ez_model
         if(0 == strcmp(msg_type, "operate"))
         {
             strncpy(msg_attr.msg_type, "operate_reply", EZ_MSG_TYPE_LEN-1);
-            ret = ez_model_reply_to_das(basic_info, &msg, &status, &msg_attr);
+            ret = ez_iot_model_reply_to_das(basic_info, &msg, &status, &msg_attr);
         }
 
     } while (0);
@@ -181,7 +181,7 @@ int ez_model_service_das_req(ez_basic_info* basic_info, char* msg_type, ez_model
 }
 
 //操作应答消息
-int ez_service_manage_das_reply(ez_basic_info* basic_info, ez_err_info* status, void* buf)
+int ez_service_manage_das_reply(ez_basic_info_t* basic_info, ez_err_info_t* status, void* buf)
 {   
     if(NULL == status|| NULL == buf)
     {
@@ -192,7 +192,7 @@ int ez_service_manage_das_reply(ez_basic_info* basic_info, ez_err_info* status, 
     return 0;
 }
 
-static int ez_model_recv_das_reply(ez_basic_info* basic_info, char* msg_type, ez_err_info* status, ez_model_msg* buf, unsigned int msg_seq)
+static int ez_model_recv_das_reply(ez_basic_info_t* basic_info, char* msg_type, ez_err_info_t* status, ez_model_msg_t* buf, unsigned int msg_seq)
 {
     //收到das回复的应答消息。不需要再回复
     int ret = -1;
@@ -213,7 +213,7 @@ static int ez_model_recv_das_reply(ez_basic_info* basic_info, char* msg_type, ez
     return ret;
 }
 
-static int ez_model_recv_das_req(ez_basic_info* basic_info, char* msg_type, ez_model_msg* buf, unsigned int msg_seq)
+static int ez_model_recv_das_req(ez_basic_info_t* basic_info, char* msg_type, ez_model_msg_t* buf, unsigned int msg_seq)
 {
     int ret = 0;
     if(NULL == buf)
@@ -243,18 +243,18 @@ static int ez_model_recv_das_req(ez_basic_info* basic_info, char* msg_type, ez_m
 int model_sample_start()
 {
     int ret = 0;
-    ez_domain_reg  domain_reg;
-    memset(&domain_reg, 0, sizeof(ez_domain_reg));
+    ez_domain_reg_t  domain_reg;
+    memset(&domain_reg, 0, sizeof(ez_domain_reg_t));
     do 
     {
         strncpy(domain_reg.domain, "WaterPurifier",sizeof(domain_reg.domain) -1);
         domain_reg.das_req_router = ez_model_recv_das_req;
         domain_reg.das_reply_router = ez_model_recv_das_reply;
         
-        ret = ez_model_domain_reg(&domain_reg);
+        ret = ez_iot_model_domain_reg(&domain_reg);
         if(0!=ret)
         {
-            ez_log_e(TAG_APP,"ez_model_domain_reg err\n");
+            ez_log_e(TAG_APP,"ez_iot_model_domain_reg err\n");
         }
     }while(0);
 
@@ -264,10 +264,10 @@ int model_sample_start()
 int model_sample_stop()
 {
     int ret = 0;
-    ret = ez_model_domain_dereg("WaterPurifier");
+    ret = ez_iot_model_domain_dereg("WaterPurifier");
     if(0!=ret )
     {
-       ez_log_e(TAG_APP,"ez_model_domain_dereg err\n");
+       ez_log_e(TAG_APP,"ez_iot_model_domain_dereg err\n");
     }
    
     return 0;

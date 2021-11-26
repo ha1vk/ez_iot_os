@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright © 2017-2021 Ezviz Inc.
  *
@@ -9,22 +10,26 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- * xurongjun (xurongjun@ezvizlife.com)
-*******************************************************************************/
+* Contributors:
+ *    shenhongyin - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+#ifndef H_EZ_MODEL_COMM_H_
+#define H_EZ_MODEL_COMM_H_
 
-#ifndef _EZOS_H_
-#define _EZOS_H_
+#include "cJSON.h"
+#include "ez_iot_model_def.h"
 
-#include <ezos_gconfig.h>
-#include <ezos_def.h>
-#include <ezos_thread.h>
-#include <ezos_time.h>
-#include <ezos_sem.h>
-#include <ezos_socket.h>
-#include <ezos_libc.h>
-#include <ezos_kv.h>
-#include <ezos_mem.h> 
-#include <ezos_system.h>
+#define EZ_METHOD_LEN 128
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    cJSON *ez_value_to_json(ez_model_msg_t *pValue);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

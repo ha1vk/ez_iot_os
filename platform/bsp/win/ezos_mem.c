@@ -9,22 +9,34 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- * xurongjun (xurongjun@ezvizlife.com)
-*******************************************************************************/
+ * 
+ * Brief:
+ * Time related interface declaration
+ * 
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-10-27     zoujinwei    first version
+ *******************************************************************************/
 
-#ifndef _EZOS_H_
-#define _EZOS_H_
+#include <stdlib.h>
+#include <ezos_mem.h>
 
-#include <ezos_gconfig.h>
-#include <ezos_def.h>
-#include <ezos_thread.h>
-#include <ezos_time.h>
-#include <ezos_sem.h>
-#include <ezos_socket.h>
-#include <ezos_libc.h>
-#include <ezos_kv.h>
-#include <ezos_mem.h> 
-#include <ezos_system.h>
-#endif
+void *ezos_malloc(size_t size)
+{
+    return malloc(size);
+}
+
+void ezos_free(void *ptr)
+{
+    free(ptr);
+}
+
+void *ezos_calloc(size_t nmemb, size_t size)
+{
+    return calloc(nmemb, size);
+}
+
+void *ezos_realloc(void *ptr, size_t size)
+{
+    return realloc(ptr, size);
+}

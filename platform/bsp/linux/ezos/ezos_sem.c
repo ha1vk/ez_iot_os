@@ -24,17 +24,16 @@
 #include <stdlib.h>
 #include <time.h>
 
-EZOS_API ez_sem_t ezos_sem_create(void)
+
+
+ez_sem_t ezos_sem_create(void)
 {
     sem_t *semaphore = NULL;
     semaphore = (sem_t *)malloc(sizeof(sem_t));
-    if (semaphore == NULL)
-    {
+    if(semaphore == NULL){
         return NULL;
     }
-
-    if (sem_init(semaphore, 0, 0))
-    {
+    if(sem_init(semaphore, 0, 0)){
         free(semaphore);
         return NULL;
     }
@@ -42,52 +41,47 @@ EZOS_API ez_sem_t ezos_sem_create(void)
     return (ez_sem_t)semaphore;
 }
 
-EZOS_API int ezos_sem_destroy(ez_sem_t sem)
+int ezos_sem_destroy(ez_sem_t sem)
 {
     sem_t *semaphore = (sem_t *)sem;
 
-    if (semaphore == NULL)
-    {
-        return -1;
-    }
-
-    if (sem_destroy(semaphore))
-    {
+	if (semaphore == NULL){
+		return -1;
+	}
+    if(sem_destroy(semaphore)){
         free(semaphore);
         semaphore = NULL;
         return -1;
     }
-
     free(semaphore);
     semaphore = NULL;
     return 0;
 }
 
-EZOS_API int ezos_sem_wait(ez_sem_t sem, int timewait_ms)
+int ezos_sem_wait(ez_sem_t sem, int timewait_ms)
 {
     struct timespec time;
     sem_t *semaphore = (sem_t *)sem;
-    if (semaphore == NULL)
-    {
-        return -1;
-    }
-
-    if (timewait_ms == -1)
+	if (semaphore == NULL){
+		return -1;
+	}
+    if(timewait_ms == -1)
         return sem_wait(semaphore);
 
     clock_gettime(CLOCK_MONOTONIC, &time);
-    time.tv_sec += timewait_ms / 1000;
-    time.tv_nsec += ((timewait_ms % 1000) * 1000000);
+    time.tv_sec += timewait_ms/1000;
+    time.tv_nsec += ((timewait_ms%1000) *1000000);
     return sem_timedwait(semaphore, &time);
 }
 
-EZOS_API int ezos_sem_post(ez_sem_t sem)
+int ezos_sem_post(ez_sem_t sem)
 {
     sem_t *semaphore = (sem_t *)sem;
-    if (semaphore == NULL)
-    {
-        return -1;
-    }
+	if (semaphore == NULL){
+		return -1;
+	}
 
     return sem_post(semaphore);
 }
+
+

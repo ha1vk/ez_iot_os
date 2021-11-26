@@ -18,7 +18,7 @@
  * 2021-10-27     zoujinwei    first version
  * 2021-11-24     xurongjun    Redeclare the threaded user interface and implement it
  *******************************************************************************/
-
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,7 +26,6 @@
 #include <pthread.h>
 
 #include "ezos_thread.h"
-#include "ezos_sem.h"
 
 typedef void *(*task_func)(void *user_data);
 
@@ -45,6 +44,7 @@ typedef struct
 static void *sdk_thread_fun(void *aArg)
 {
     thread_data_t *pthd = (thread_data_t *)aArg;
+
     prctl(PR_SET_NAME, pthd->name);
 
     pthd->thread_fun(pthd->user_param);

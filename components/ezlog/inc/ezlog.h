@@ -31,6 +31,7 @@
 #define TAG_SHD "T_SHD"
 #define TAG_AP "T_AP"
 #define TAG_OTA "T_OTA"
+#define TAG_MOD "T_MODEL"
 #define TAG_APP "T_APP"
 #define TAG_BASE "T_BASE"
 #define TAG_TIME "T_TIME"

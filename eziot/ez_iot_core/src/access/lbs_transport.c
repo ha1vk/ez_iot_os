@@ -123,10 +123,10 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
 
 static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect_affair, EZDEV_SDK_UINT8 nUpper)
 {
-    redirect_affair->random_1 = rand() % 256;
-    redirect_affair->random_2 = rand() % 256;
-    redirect_affair->random_3 = rand() % 256;
-    redirect_affair->random_4 = rand() % 256;
+    redirect_affair->random_1 = ezos_rand() % 256;
+    redirect_affair->random_2 = ezos_rand() % 256;
+    redirect_affair->random_3 = ezos_rand() % 256;
+    redirect_affair->random_4 = ezos_rand() % 256;
 
     redirect_affair->global_out_packet.head_buf = ezos_malloc(16);
     if (NULL == redirect_affair->global_out_packet.head_buf)

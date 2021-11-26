@@ -9,22 +9,24 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- * xurongjun (xurongjun@ezvizlife.com)
-*******************************************************************************/
+* Contributors:
+ *    shenhongyin - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+#ifndef H_EZ_OTA_USER_H_
+#define H_EZ_OTA_USER_H_
 
-#ifndef _EZOS_H_
-#define _EZOS_H_
+#include "ez_iot_ota.h"
 
-#include <ezos_gconfig.h>
-#include <ezos_def.h>
-#include <ezos_thread.h>
-#include <ezos_time.h>
-#include <ezos_sem.h>
-#include <ezos_socket.h>
-#include <ezos_libc.h>
-#include <ezos_kv.h>
-#include <ezos_mem.h> 
-#include <ezos_system.h>
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
+void  ez_ota_user_init(ez_ota_msg_cb_t cb);
+
+ez_ota_msg_cb_t *ez_ota_get_callback();
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
