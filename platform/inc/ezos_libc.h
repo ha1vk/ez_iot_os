@@ -48,6 +48,7 @@ extern "C"
     EZOS_API char *ezos_strchr(const char *s, int c);
     EZOS_API char *ezos_strrchr(const char *s, int c);
     EZOS_API size_t ezos_strlen(const char *s);
+    EZOS_API char *ezos_strdup(const char *s);
 
     EZOS_API int ezos_atoi(const char *nptr);
     EZOS_API void ezos_bzero(void *s, size_t n);

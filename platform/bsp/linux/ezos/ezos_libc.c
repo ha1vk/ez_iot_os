@@ -57,7 +57,7 @@ EZOS_API int ezos_sscanf(const char *str, const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    int rv = ezos_sscanf(str, format, ap);
+    int rv = sscanf(str, format, ap);
     va_end(ap);
 
     return rv;
@@ -107,4 +107,9 @@ EZOS_API char * ezos_strstr(const char *haystack, const char *needle)
 EZOS_API size_t ezos_strlen(const char *s)
 {
     return strlen(s);
+}
+
+EZOS_API char *ezos_strdup(const char *s)
+{
+    return strdup(s);
 }
