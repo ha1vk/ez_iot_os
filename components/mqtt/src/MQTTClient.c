@@ -130,7 +130,7 @@ static int readPacket(MQTTClient *c, Timer *timer)
     }
 
     /* 3. read the rest of the buffer using a callback to supply the rest of the data */
-    if (rem_len > 0 && (c->ipstack->mqttread(c->ipstack, c->readbuf + len, rem_len, c->command_timeout_ms/*TimerLeftMS(timer)*/ != rem_len)))
+    if (rem_len > 0 && (rc = c->ipstack->mqttread(c->ipstack, c->readbuf + len, rem_len, TimerLeftMS(timer)) != rem_len))
     {
         rc = FAILURE;
         goto exit;
@@ -247,7 +247,6 @@ int cycle(MQTTClient *c, Timer *timer)
     if (packet_type == CONNACK || packet_type == PUBACK || packet_type == SUBACK ||
         packet_type == PUBLISH || packet_type == PUBREC || packet_type == PUBCOMP || packet_type == PINGRESP)
     {
-        ezos_printf("mqtt, recv packet, type:%d, keepalive timer clear", packet_type);
         TimerCountdown(&c->connect_timer, 0);
     }
 
@@ -256,7 +255,6 @@ int cycle(MQTTClient *c, Timer *timer)
     default:
         /* no more data to read, unrecoverable. Or read packet fails due to unexpected network error */
         rc = packet_type;
-        ezos_printf("mqtt, readPacket error , code:%d", rc);
         goto exit;
 
     case 0:

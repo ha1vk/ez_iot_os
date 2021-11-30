@@ -163,7 +163,7 @@ QUEUE_DEFINE(pubmsg_exchange_v3)
     {                                                                                                              \
         queque_element_##MSGTYPE *element = NULL;                                                                  \
         ezos_mutex_lock(g_queue_##MSGTYPE.lock);                                                                   \
-        ezlog_d(TAG_CORE, "%s size:%d, max size:%d", #MSGTYPE, g_queue_##MSGTYPE.size, g_queue_##MSGTYPE.maxsize); \
+        ezlog_v(TAG_CORE, "%s size:%d, max size:%d", #MSGTYPE, g_queue_##MSGTYPE.size, g_queue_##MSGTYPE.maxsize); \
         if (g_queue_##MSGTYPE.size >= g_queue_##MSGTYPE.maxsize)                                                   \
         {                                                                                                          \
             ezos_mutex_unlock(g_queue_##MSGTYPE.lock);                                                             \

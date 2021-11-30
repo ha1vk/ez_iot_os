@@ -42,10 +42,11 @@ EZOS_API ez_err_t ez_iot_core_init(const ez_server_info_t *psrv_info, const ez_d
 
     ez_iot_event_notice_set(pfunc);
     CHECK_COND_DONE(!ez_iot_devid_get(), EZ_CORE_ERR_DEVID);
-    CHECK_COND_DONE(!ezos_kv_init(&m_default_kv), EZ_CORE_ERR_STORAGE);
+    CHECK_COND_DONE(ezos_kv_init(&m_default_kv), EZ_CORE_ERR_STORAGE);
 
     int ez_rv = ez_kernel_init(psrv_info, pdev_info, ez_iot_devid_get(), ez_iot_event_adapt);
     CHECK_COND_DONE(ez_rv, EZ_CORE_ERR_GENERAL);
+    g_is_inited = ez_true;
 
 done:
     FUNC_OUT();
@@ -62,14 +63,14 @@ EZOS_API ez_err_t ez_iot_core_start(ez_void_t)
     g_running = ez_true;
 
     const ez_char_t *main_thread_name = "ez_core_main";
-    rv = ezos_thread_create(&g_main_thread, main_thread_name, main_thread_func, NULL,
+    rv = ezos_thread_create(&g_main_thread, main_thread_name, main_thread_func, (void*)main_thread_name,
                             CONFIG_EZIOT_CORE_ACEESS_TASK_STACK_SIZE, CONFIG_EZIOT_CORE_ACEESS_TASK_PRIORITY);
 
     CHECK_COND_DONE(rv, EZ_CORE_ERR_MEMORY);
 
 #if CONFIG_EZIOT_CORE_MULTI_TASK
     const ez_char_t *user_thread_name = "ez_core_user";
-    rv = ezos_thread_create(&g_user_thread, user_thread_name, user_thread_func, NULL,
+    rv = ezos_thread_create(&g_user_thread, user_thread_name, user_thread_func, (void*)user_thread_name,
                             CONFIG_EZIOT_CORE_USER_TASK_STACK_SIZE, CONFIG_EZIOT_CORE_USER_TASK_PRIORITY);
 
     CHECK_COND_DONE(rv, EZ_CORE_ERR_MEMORY);
@@ -162,14 +163,15 @@ EZOS_API ez_err_t ez_iot_core_ctrl(ez_cmd_e cmd, ez_void_t *arg)
 static void main_thread_func(void *param)
 {
     ez_err_t rv = EZ_CORE_ERR_SUCC;
-    ez_bool_t *running = (ez_bool_t *)param;
+    char *thread_name = (char*)param;
 
     do
     {
         rv = ez_kernel_yield();
+
         if (EZ_CORE_ERR_NOT_READY == rv || EZ_CORE_ERR_RISK_CRTL == rv)
         {
-            ezlog_e(TAG_CORE, "err occured, thread will exit, rv:%d", rv);
+            ezlog_w(TAG_CORE, "thread %s exit, rv:%d", thread_name, rv);
             break;
         }
 
@@ -177,14 +179,14 @@ static void main_thread_func(void *param)
         rv = ez_kernel_yield_user();
         if (EZ_CORE_ERR_NOT_READY == rv || EZ_CORE_ERR_RISK_CRTL == rv)
         {
-            ezlog_e(TAG_CORE, "err occured, thread will exit, rv:%d", rv);
+            ezlog_w(TAG_CORE, "thread %s exit, rv:%d", thread_name, rv);
             break;
         }
 #endif
 
         rv = EZ_CORE_ERR_SUCC;
         ezos_delay_ms(10);
-    } while (*running);
+    } while (g_running);
 
     return;
 }
@@ -193,19 +195,19 @@ static void main_thread_func(void *param)
 static void user_thread_func(void *param)
 {
     ez_err_t rv = EZ_CORE_ERR_SUCC;
-    ez_bool_t *running = (ez_bool_t *)param;
+    char *thread_name = (char*)param;
 
     do
     {
         rv = ez_kernel_yield_user();
         if (EZ_CORE_ERR_NOT_READY == rv || EZ_CORE_ERR_RISK_CRTL == rv)
         {
-            ezlog_e(TAG_CORE, "err occured, thread will exit, rv:%d", rv);
+            ezlog_w(TAG_CORE, "thread %s exit, rv:%d", thread_name, rv);
             break;
         }
 
         ezos_delay_ms(10);
-    } while (*running);
+    } while (g_running);
 
     return;
 }

@@ -290,30 +290,30 @@ mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel)
 
     switch (sdk_kernel->cnt_state)
     {
-    case sdk_cnt_unredirect:
-    {
-        sdk_error = cnt_lbs_redirect_do(sdk_kernel);
-        break;
-    }
-    case sdk_cnt_redirected:
-    {
-        sdk_error = cnt_das_reg_do(sdk_kernel);
-        break;
-    }
-    case sdk_cnt_das_reged:
-    {
-        sdk_error = cnt_das_work_do(sdk_kernel);
-        break;
-    }
-    case sdk_cnt_das_break:
-    {
-        sdk_error = cnt_das_retry_do(sdk_kernel);
-        break;
-    }
-    default:
-    {
-        sdk_error = mkernel_internal_internal_err;
-    }
+        case sdk_cnt_unredirect:
+        {
+            sdk_error = cnt_lbs_redirect_do(sdk_kernel);
+            break;
+        }
+        case sdk_cnt_redirected:
+        {
+            sdk_error = cnt_das_reg_do(sdk_kernel);
+            break;
+        }
+        case sdk_cnt_das_reged:
+        {
+            sdk_error = cnt_das_work_do(sdk_kernel);
+            break;
+        }
+        case sdk_cnt_das_break:
+        {
+            sdk_error = cnt_das_retry_do(sdk_kernel);
+            break;
+        }
+        default:
+        {
+            sdk_error = mkernel_internal_internal_err;
+        }
     }
 
     if (mkernel_internal_mqtt_blacklist == sdk_error)
@@ -327,13 +327,12 @@ mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel)
         context.last_error = sdk_error;
         ezos_memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
         ezos_memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
-        ezlog_e(TAG_CORE, "broadcast_user_event, sdk_kernel_event_break, code:%d", sdk_error);
         broadcast_user_event(SDK_KERNEL_EVENT_BREAK, (void *)&context, sizeof(context));
 
         sdk_kernel->cnt_state = sdk_cnt_unredirect;
         sdk_kernel->lbs_redirect_times = 0;
         sdk_kernel->das_retry_times = 0;
-        ezlog_a(TAG_CORE, "dev go to lbs redirect, code:%d", sdk_error);
+        ezlog_d(TAG_CORE, "redirect, code:%d", sdk_error);
     }
 
     return sdk_error;

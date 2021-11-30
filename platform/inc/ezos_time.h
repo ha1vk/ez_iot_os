@@ -50,6 +50,8 @@ extern "C"
         int tm_wday;
         int tm_yday;
         int tm_isdst;
+        long int tm_gmtoff;
+        char *tm_zone;
     }ezos_tm_t;
 
     typedef struct ezos_timezone

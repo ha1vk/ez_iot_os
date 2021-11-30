@@ -30,47 +30,47 @@ extern "C"
 #endif
 
 /* errno */
-#define EZ_EWOULDBLOCK          10035
-#define EZ_EINPROGRESS			115
-#define EZ_EAGAIN   			 11
+#define EZ_EWOULDBLOCK 10035
+#define EZ_EINPROGRESS 115
+#define EZ_EAGAIN 11
 
-#define EZ_AF_UNSPEC       0
-#define EZ_AF_INET         2
-#define EZ_PF_INET         AF_INET
-#define EZ_PF_UNSPEC       AF_UNSPEC
+#define EZ_AF_UNSPEC 0
+#define EZ_AF_INET 2
+#define EZ_PF_INET AF_INET
+#define EZ_PF_UNSPEC AF_UNSPEC
 
-#define EZ_AF_UNSPEC       0
-#define EZ_AF_INET         2
-#define EZ_PF_INET         AF_INET
-#define EZ_PF_UNSPEC       AF_UNSPEC
+#define EZ_AF_UNSPEC 0
+#define EZ_AF_INET 2
+#define EZ_PF_INET AF_INET
+#define EZ_PF_UNSPEC AF_UNSPEC
 
-#define EZ_IPPROTO_IP      0
-#define EZ_IPPROTO_TCP     6
-#define EZ_IPPROTO_UDP     17
+#define EZ_IPPROTO_IP 0
+#define EZ_IPPROTO_TCP 6
+#define EZ_IPPROTO_UDP 17
 #define EZ_IPPROTO_UDPLITE 136
 
 /* Socket protocol types (TCP/UDP/RAW) */
-#define EZ_SOCK_STREAM     1
-#define EZ_SOCK_DGRAM      2
-#define EZ_SOCK_RAW        3
+#define EZ_SOCK_STREAM 1
+#define EZ_SOCK_DGRAM 2
+#define EZ_SOCK_RAW 3
 
-#define EZ_IPPROTO_IP      0
-#define EZ_IPPROTO_TCP     6
-#define EZ_IPPROTO_UDP     17
+#define EZ_IPPROTO_IP 0
+#define EZ_IPPROTO_TCP 6
+#define EZ_IPPROTO_UDP 17
 #define EZ_IPPROTO_UDPLITE 136
 
-#define EZ_SO_SNDBUF       0x1001          /* send buffer size */
-#define EZ_SO_RCVBUF       0x1002          /* receive buffer size */
-#define EZ_SO_SNDLOWAT     0x1003          /* send low-water mark */
-#define EZ_SO_RCVLOWAT     0x1004          /* receive low-water mark */
-#define EZ_SO_SNDTIMEO     0x1005          /* send timeout */
-#define EZ_SO_RCVTIMEO     0x1006          /* receive timeout */
-#define EZ_SO_ERROR        0x1007          /* get error status and clear */
-#define EZ_SO_TYPE         0x1008          /* get socket type */
+#define EZ_SO_SNDBUF 0x1001   /* send buffer size */
+#define EZ_SO_RCVBUF 0x1002   /* receive buffer size */
+#define EZ_SO_SNDLOWAT 0x1003 /* send low-water mark */
+#define EZ_SO_RCVLOWAT 0x1004 /* receive low-water mark */
+#define EZ_SO_SNDTIMEO 0x1005 /* send timeout */
+#define EZ_SO_RCVTIMEO 0x1006 /* receive timeout */
+#define EZ_SO_ERROR 0x1007    /* get error status and clear */
+#define EZ_SO_TYPE 0x1008     /* get socket type */
 
-#define  EZ_SOL_SOCKET  0xfff    /* options for socket level */
+#define EZ_SOL_SOCKET 0xfff /* options for socket level */
 
-#define EZ_TCP_MAXSEG          	 4
+#define EZ_TCP_MAXSEG 4
 
     typedef enum
     {
@@ -91,33 +91,34 @@ extern "C"
     typedef int ez_socklen_t;
 
     /** For compatibility with BSD code */
-    typedef struct ez_in_addr {
+    typedef struct ez_in_addr
+    {
         unsigned int s_addr;
-    }ez_in_addr_t;
+    } ez_in_addr_t;
 
     /* members are in network byte order */
-    typedef struct ez_sockaddr_in {
-        unsigned char sin_len;
-        unsigned char sin_family;
+    typedef struct ez_sockaddr_in
+    {
+        unsigned short sin_family;
         unsigned short sin_port;
         ez_in_addr_t sin_addr;
         char sin_zero[8];
-    }ez_sockaddr_in_t;
+    } ez_sockaddr_in_t;
 
     typedef struct ez_sockaddr
     {
-        unsigned char sa_len;
-        unsigned char sa_family;
+        unsigned short sin_family;
         unsigned char sa_data[14];
     } ez_sockaddr_t;
 
-    typedef struct ez_hostent {
-        char  *h_name;            /* official name of host */
-        char **h_aliases;         /* alias list */
-        int    h_addrtype;        /* host address type */
-        int    h_length;          /* length of address */
-        char **h_addr_list;       /* list of addresses */
-    }ez_hostent_t;
+    typedef struct ez_hostent
+    {
+        char *h_name;       /* official name of host */
+        char **h_aliases;   /* alias list */
+        int h_addrtype;     /* host address type */
+        int h_length;       /* length of address */
+        char **h_addr_list; /* list of addresses */
+    } ez_hostent_t;
 
     EZOS_API int ezos_socket(int domain, int type, int protocol);
 
@@ -137,15 +138,15 @@ extern "C"
 
     EZOS_API int ezos_send(int socket_fd, const void *dataptr, int size, int flags);
 
-    EZOS_API int ezos_getsockopt (int socket_fd, int level, int optname, void *optval, ez_socklen_t *optlen);
+    EZOS_API int ezos_getsockopt(int socket_fd, int level, int optname, void *optval, ez_socklen_t *optlen);
 
     EZOS_API int ezos_setsockopt(int socket_fd, int level, int optname, const void *optval, ez_socklen_t optlen);
 
     EZOS_API int ezos_getlasterror();
 
-    EZOS_API ez_hostent_t* ezos_gethostbyname(const char* host);
+    EZOS_API ez_hostent_t *ezos_gethostbyname(const char *host);
 
-    EZOS_API const char * ezos_inet_ntop(int af, const void *src,char *dst, ez_socklen_t size);
+    EZOS_API const char *ezos_inet_ntop(int af, const void *src, char *dst, ez_socklen_t size);
 
     EZOS_API unsigned short ezos_htons(unsigned short hostshort);
 

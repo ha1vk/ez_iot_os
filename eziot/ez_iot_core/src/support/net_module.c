@@ -45,7 +45,7 @@ int net_create(char *nic_name)
     ret = ezos_setsockopt(socket_fd, EZ_IPPROTO_TCP, EZ_TCP_MAXSEG, &opt, sizeof(opt));
     if (ret < 0)
     {
-        // ezos_printf("set socket opt, TCP_MAXSEG error\n");
+        // ezos_printf("set socket opt, TCP_MAXSEG error");
     }
 
     return socket_fd;
@@ -54,6 +54,7 @@ int net_create(char *nic_name)
 mkernel_internal_error net_connect(int socket_fd, const char *server_ip, int server_port, int timeout_ms, char szRealIp[ezdev_sdk_ip_max_len])
 {
     ez_sockaddr_in_t dst_addr;
+
     int return_value = 0;
     int lasterror;
     int socket_err = 0;
@@ -67,20 +68,19 @@ mkernel_internal_error net_connect(int socket_fd, const char *server_ip, int ser
     host = ezos_gethostbyname(server_ip);
     if (host == NULL)
     {
-        ezos_printf("gethost error\n");
+        ezlog_e(TAG_CORE, "gethost error");
         return mkernel_internal_net_gethostbyname_error;
     }
 
     ezos_memcpy(&dst_addr.sin_addr, host->h_addr_list[0], sizeof(ez_in_addr_t));
     ezos_inet_ntop(EZ_AF_INET, (void *)host->h_addr_list[0], szRealIp, ezdev_sdk_ip_max_len);
-    ezos_printf("ezos_gethostbyname:%s\n", szRealIp);
     dst_addr.sin_port = ezos_htons(server_port);
     if (ezos_connect(socket_fd, (const ez_sockaddr_t *)(&dst_addr), sizeof(dst_addr)) == -1)
     {
         lasterror = ezos_getlasterror();
         if ((lasterror != EZ_EINPROGRESS) && (lasterror != 0))
         {
-            ezlog_e(TAG_CORE, ">>>>>>>>>connect, errno:%d\n", lasterror);
+            ezlog_e(TAG_CORE, "connect, errno:%d", lasterror);
             return mkernel_internal_net_connect_error;
         }
     }

@@ -155,7 +155,7 @@ static void ut_log_kw()
 
 static void ut_log_dump16()
 {
-    ez_char_t buf[32] = {0};
+    ez_uint8_t buf[32] = {0};
     uassert_int_equal(0, ezlog_init());
     ezlog_start();
 
@@ -165,7 +165,7 @@ static void ut_log_dump16()
 
 static void ut_log_dump32()
 {
-    ez_char_t buf[32] = {0};
+    ez_uint8_t buf[32] = {0};
     uassert_int_equal(0, ezlog_init());
     ezlog_start();
 

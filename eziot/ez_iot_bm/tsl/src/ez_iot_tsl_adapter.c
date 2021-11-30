@@ -281,15 +281,15 @@ static void strip_msg_wrap(void *buf, ez_tsl_value_t *tsl_data)
         switch (tsl_data->type)
         {
         case EZ_TSL_DATA_TYPE_BOOL:
-            tsl_data->size = sizeof(bool);
-            tsl_data->value_bool = (bool)js_data->valueint;
+            tsl_data->size = sizeof(ez_bool_t);
+            tsl_data->value_bool = (ez_bool_t)js_data->valueint;
             break;
         case EZ_TSL_DATA_TYPE_INT:
             tsl_data->value_int = js_data->valueint;
-            tsl_data->size = sizeof(int);
+            tsl_data->size = sizeof(js_data->valueint);
             break;
         case EZ_TSL_DATA_TYPE_DOUBLE:
-            tsl_data->size = sizeof(double);
+            tsl_data->size = sizeof(js_data->valuedouble);
             tsl_data->value_double = js_data->valuedouble;
             break;
         case EZ_TSL_DATA_TYPE_STRING:

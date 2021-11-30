@@ -1,22 +1,27 @@
-/**
- * @file ut_online.cc
- * @author xurongjun (xurongjun@ezvizlife.com)
- * @brief 测试iot-sdk上线/添加相关的基本功能
- * @version 0.1
- * @date 2020-11-06
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
  * 
- * @copyright Copyright (c) 2020
- * 
- */
+ * Contributors:
+ * XuRongjun (xurongjun@ezvizlife.com) ez iot core unit-test case
+ *******************************************************************************/
 
 #include <stdlib.h>
-#include <string.h>
-#include "ut_config.h"
+#include <ezos.h>
+#include <utest.h>
+#include <ezlog.h>
+#include <kv_imp.h>
+
+#include "ez_iot_core_def.h"
 #include "ez_iot_core.h"
-#include "ez_iot_log.h"
-#include "ez_hal/hal_thread.h"
-#include "kv_imp.h"
-#include "utest.h"
 
 /**
  * @brief Test interface compatibility and error codes
@@ -26,163 +31,154 @@ void ut_online_errcode();
 void ut_online_access();
 void ut_online_restart();
 
-UTEST_TC_EXPORT(ut_online_errcode, NULL, NULL, DEFAULT_TIMEOUT_S);
-UTEST_TC_EXPORT(ut_online_access, NULL, NULL, DEFAULT_TIMEOUT_S);
-UTEST_TC_EXPORT(ut_online_restart, NULL, NULL, DEFAULT_TIMEOUT_S);
+static long global_init();
 
-static int32_t ez_recv_msg_cb(ez_iot_cloud2dev_msg_type_t msg_type, void *data, int len);
-static int32_t ez_recv_event_cb(ez_iot_event_t event_type, void *data, int len);
+UTEST_TC_EXPORT(ut_online_errcode, global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(ut_online_access, global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(ut_online_restart, global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+
+static ez_int32_t ez_event_notice_func(ez_event_e event_type, ez_void_t *data, ez_int32_t len);
 static int dev_event_waitfor(int event_id, int time_ms);
 
 static int m_event_id = -1;
 static int m_last_err = 0;
-static ez_iot_srv_info_t m_lbs_addr = {(int8_t *)EZ_IOT_CLOUD_ENTRY_HOST, EZ_IOT_CLOUD_ENTRY_PORT};
-static ez_iot_callbacks_t m_cbs = {ez_recv_msg_cb, ez_recv_event_cb};
-static ez_iot_dev_info_t m_dev_info = {
-    .auth_mode = EZ_IOT_DEV_AUTH_MODE,
-    .dev_subserial = EZ_IOT_DEV_UUID,
-    .dev_verification_code = EZ_IOT_DEV_LICENSE,
-    .dev_firmwareversion = EZ_IOT_DEV_FWVER,
-    .dev_type = EZ_IOT_DEV_PRODUCT_KEY,
-    .dev_typedisplay = EZ_IOT_DEV_DISPLAY_NAME,
-    .dev_id = EZ_IOT_DEV_ID,
-};
+static ez_server_info_t m_lbs_addr = {CONFIG_EZIOT_UNIT_TEST_CLOUD_HOST, CONFIG_EZIOT_UNIT_TEST_CLOUD_PORT};
+static ez_dev_info_t m_dev_info = {0};
 
-static ez_iot_kv_callbacks_t m_kv_cbs = {
-    .ez_kv_init = kv_init,
-    .ez_kv_raw_set = kv_raw_set,
-    .ez_kv_raw_get = kv_raw_get,
-    .ez_kv_del = kv_del,
-    .ez_kv_del_by_prefix = kv_del_by_prefix,
-    .ez_kv_print = kv_print,
-    .ez_kv_deinit = kv_deinit,
+static ez_kv_func_t g_kv_func = {
+    .ezos_kv_init = kv_init,
+    .ezos_kv_raw_set = kv_raw_set,
+    .ezos_kv_raw_get = kv_raw_get,
+    .ezos_kv_del = kv_del,
+    .ezos_kv_del_by_prefix = kv_del_by_prefix,
+    .ezos_kv_print = kv_print,
+    .ezos_kv_deinit = kv_deinit,
 };
 
 void ut_online_errcode()
 {
-  ez_iot_srv_info_t lbs_addr_null = {NULL, 8666};
-  ez_iot_kv_callbacks_t kv_cbs_null = {0};
-  int8_t *dev_token = (int8_t *)"1111111";
+    ez_byte_t devid[32] = {0};
 
-  ez_iot_dev_info_t dev_info_null = {0};
+    uassert_int_equal(EZ_CORE_ERR_NOT_INIT, ez_iot_core_start());
+    uassert_int_equal(EZ_CORE_ERR_NOT_INIT, ez_iot_core_stop());
 
-  uassert_int_equal(ez_errno_not_init, ez_iot_start());
-  uassert_int_equal(ez_errno_not_init, ez_iot_stop());
-  uassert_int_equal(ez_errno_not_init, ez_iot_binding(dev_token));
-  uassert_int_equal(ez_errno_not_init, ez_iot_set_keepalive(100));
+    uassert_int_equal(EZ_CORE_ERR_PARAM_INVALID, ez_iot_core_init(NULL, NULL, NULL));
+    uassert_int_equal(EZ_CORE_ERR_PARAM_INVALID, ez_iot_core_init(&m_lbs_addr, NULL, NULL));
+    uassert_int_equal(EZ_CORE_ERR_PARAM_INVALID, ez_iot_core_init(&m_lbs_addr, &m_dev_info, NULL));
 
-  uassert_int_equal(ez_errno_param_invalid, ez_iot_init(NULL, NULL, NULL, NULL));
-  uassert_int_equal(ez_errno_param_invalid, ez_iot_init(&m_lbs_addr, NULL, NULL, NULL));
-  uassert_int_equal(ez_errno_param_invalid, ez_iot_init(&m_lbs_addr, &dev_info_null, NULL, NULL));
-  uassert_int_equal(ez_errno_param_invalid, ez_iot_init(&m_lbs_addr, &dev_info_null, &m_cbs, NULL));
-  uassert_int_equal(ez_errno_param_invalid, ez_iot_init(&m_lbs_addr, &dev_info_null, &m_cbs, NULL));
-  uassert_int_equal(ez_errno_param_invalid, ez_iot_init(&m_lbs_addr, &dev_info_null, &m_cbs, &kv_cbs_null));
-  uassert_int_equal(ez_errno_param_invalid, ez_iot_init(&lbs_addr_null, &dev_info_null, &m_cbs, &m_kv_cbs));
-  uassert_int_equal(ez_errno_succ, ez_iot_init(&m_lbs_addr, &dev_info_null, &m_cbs, &m_kv_cbs));
+    uassert_int_equal(EZ_CORE_ERR_DEVID, ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func));
 
-  uassert_int_equal(ez_errno_not_ready, ez_iot_stop());
-  uassert_int_equal(ez_errno_not_ready, ez_iot_binding(dev_token));
-  uassert_int_equal(ez_errno_not_ready, ez_iot_set_keepalive(100));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func));
 
-  uassert_int_equal(ez_errno_succ, ez_iot_start());
-  uassert_int_equal(ez_errno_succ, ez_iot_binding(dev_token));
-  uassert_int_equal(ez_errno_succ, ez_iot_set_keepalive(100));
-  uassert_int_equal(ez_errno_succ, ez_iot_stop());
+    uassert_int_equal(EZ_CORE_ERR_NOT_READY, ez_iot_core_stop());
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_start());
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
 
-  uassert_int_equal(ez_errno_not_ready, ez_iot_binding(dev_token));
-  uassert_int_equal(ez_errno_not_ready, ez_iot_set_keepalive(100));
-  ez_iot_fini();
-
-  //re test
-  uassert_int_equal(ez_errno_not_init, ez_iot_start());
-  uassert_int_equal(ez_errno_not_init, ez_iot_stop());
-  uassert_int_equal(ez_errno_not_init, ez_iot_binding(dev_token));
-  uassert_int_equal(ez_errno_not_init, ez_iot_set_keepalive(100));
-
-  uassert_int_equal(ez_errno_succ, ez_iot_init(&m_lbs_addr, &m_dev_info, &m_cbs, &m_kv_cbs));
-
-  uassert_int_equal(ez_errno_not_ready, ez_iot_stop());
-  uassert_int_equal(ez_errno_not_ready, ez_iot_binding(dev_token));
-  uassert_int_equal(ez_errno_not_ready, ez_iot_set_keepalive(100));
-
-  uassert_int_equal(ez_errno_succ, ez_iot_start());
-  uassert_int_equal(ez_errno_succ, ez_iot_binding(dev_token));
-  uassert_int_equal(ez_errno_succ, ez_iot_set_keepalive(100));
-  hal_thread_sleep(3000);
-  uassert_int_equal(ez_errno_succ, ez_iot_stop());
-  ez_iot_fini();
+    ez_iot_core_deinit();
 }
 
 void ut_online_access()
 {
-  uassert_int_equal(ez_errno_succ, ez_iot_init(&m_lbs_addr, &m_dev_info, &m_cbs, &m_kv_cbs));
-  uassert_int_equal(ez_errno_succ, ez_iot_start());
-  uassert_int_equal(ez_errno_succ, dev_event_waitfor(ez_iot_event_online, DEFAULT_TIMEOUT_S * 1000));
-  hal_thread_sleep(30000);
-  uassert_int_equal(ez_errno_succ, ez_iot_stop());
-  ez_iot_fini();
+    ez_byte_t devid[32] = {0};
+
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func));
+
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_start());
+    uassert_int_equal(EZ_CORE_ERR_SUCC, dev_event_waitfor(EZ_EVENT_ONLINE, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS * 1000));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
+
+    ezos_delay_ms(3000);
+    ez_iot_core_deinit();
 }
 
 void ut_online_restart()
 {
-  uassert_int_equal(ez_errno_succ, ez_iot_init(&m_lbs_addr, &m_dev_info, &m_cbs, &m_kv_cbs));
-  uassert_int_equal(ez_errno_succ, ez_iot_start());
-  uassert_int_equal(ez_errno_succ, dev_event_waitfor(ez_iot_event_online, DEFAULT_TIMEOUT_S * 1000));
-  uassert_int_equal(ez_errno_succ, ez_iot_stop());
+    ez_byte_t devid[32] = {0};
 
-  uassert_int_equal(ez_errno_succ, ez_iot_start());
-  uassert_int_equal(ez_errno_succ, dev_event_waitfor(ez_iot_event_online, DEFAULT_TIMEOUT_S * 1000));
-  uassert_int_equal(ez_errno_succ, ez_iot_stop());
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func));
 
-  uassert_int_equal(ez_errno_succ, ez_iot_start());
-  uassert_int_equal(ez_errno_succ, dev_event_waitfor(ez_iot_event_online, DEFAULT_TIMEOUT_S * 1000));
-  uassert_int_equal(ez_errno_succ, ez_iot_stop());
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_start());
+    uassert_int_equal(EZ_CORE_ERR_SUCC, dev_event_waitfor(EZ_EVENT_ONLINE, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS * 1000));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
 
-  ez_iot_fini();
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_start());
+    uassert_int_equal(EZ_CORE_ERR_SUCC, dev_event_waitfor(EZ_EVENT_ONLINE, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS * 1000));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
+
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_start());
+    uassert_int_equal(EZ_CORE_ERR_SUCC, dev_event_waitfor(EZ_EVENT_ONLINE, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS * 1000));
+    uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
+
+    ez_iot_core_deinit();
 }
 
 static int dev_event_waitfor(int event_id, int time_ms)
 {
-  int ret = -1;
-  int index = 0;
-  m_event_id = -1;
-  m_last_err = 0;
+    int ret = -1;
+    int index = 0;
+    m_event_id = -1;
+    m_last_err = 0;
 
-  do
-  {
-    if (event_id == m_event_id)
+    do
     {
-      m_last_err = 0;
-      ret = 0;
-      break;
+        if (event_id == m_event_id)
+        {
+            m_last_err = 0;
+            ret = 0;
+            break;
+        }
+
+        ezos_delay_ms(10);
+        index += 10;
+    } while (index < time_ms);
+
+    return ret;
+}
+
+static ez_int32_t ez_event_notice_func(ez_event_e event_type, ez_void_t *data, ez_int32_t len)
+{
+    switch (event_type)
+    {
+    case EZ_EVENT_ONLINE:
+        m_event_id = EZ_EVENT_ONLINE;
+        break;
+    case EZ_EVENT_OFFLINE:
+        /* save devid */
+        break;
+
+    default:
+        break;
     }
 
-    hal_thread_sleep(10);
-    index += 10;
-  } while (index < time_ms);
-
-  return ret;
+    return 0;
 }
 
-static int32_t ez_recv_msg_cb(ez_iot_cloud2dev_msg_type_t msg_type, void *data, int len)
+static long global_init()
 {
-  return 0;
-}
+    ezlog_init();
+    ezlog_start();
+    ezlog_filter_lvl(4);
 
-static int32_t ez_recv_event_cb(ez_iot_event_t event_type, void *data, int len)
-{
-  switch (event_type)
-  {
-  case ez_iot_event_online:
-    m_event_id = ez_iot_event_online;
-    break;
-  case ez_iot_event_devid_update:
-    /* save devid */
-    break;
+    ezos_strncpy(m_dev_info.dev_typedisplay, CONFIG_EZIOT_UNIT_TEST_DEV_DISPLAY_NAME, sizeof(m_dev_info.dev_typedisplay) - 1);
+    ezos_strncpy(m_dev_info.dev_firmwareversion, CONFIG_EZIOT_UNIT_TEST_DEV_FIRMWARE_VERSION, sizeof(m_dev_info.dev_firmwareversion) - 1);
 
-  default:
-    break;
-  }
+#if defined(CONFIG_EZIOT_UNIT_TEST_DEV_AUTH_MODE_SAP)
+    m_dev_info.auth_mode = 0;
+    ezos_strncpy(m_dev_info.dev_type, CONFIG_EZIOT_UNIT_TEST_DEV_TYPE, sizeof(m_dev_info.dev_type) - 1);
+    ezos_strncpy(m_dev_info.dev_subserial, CONFIG_EZIOT_UNIT_TEST_DEV_SERIAL_NUMBER, sizeof(m_dev_info.dev_subserial) - 1);
+    ezos_strncpy(m_dev_info.dev_verification_code, CONFIG_EZIOT_UNIT_TEST_DEV_VERIFICATION_CODE, sizeof(m_dev_info.dev_verification_code) - 1);
+#elif defined(CONFIG_EZIOT_UNIT_TEST_DEV_AUTH_MODE_LICENCE)
+    m_dev_info.auth_mode = 1;
+    ezos_strncpy(m_dev_info.dev_type, CONFIG_EZIOT_UNIT_TEST_DEV_PRODUCT_KEY, sizeof(m_dev_info.dev_type) - 1);
+    ezos_snprintf(m_dev_info.dev_subserial, sizeof(m_dev_info.dev_subserial) - 1, "%s:%s", CONFIG_EZIOT_UNIT_TEST_DEV_PRODUCT_KEY, CONFIG_EZIOT_UNIT_TEST_DEV_NAME);
+    ezos_strncpy(m_dev_info.dev_verification_code, CONFIG_EZIOT_UNIT_TEST_DEV_LICENSE, sizeof(m_dev_info.dev_verification_code) - 1);
+#endif
 
-  return 0;
+    return 0;
 }

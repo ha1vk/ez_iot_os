@@ -9,7 +9,7 @@ ezdev_sdk_kernel g_ezdev_sdk_kernel;
 
 ez_void_t ez_iot_event_adapt(ez_kernel_event_t *ptr_event)
 {
-    if (ptr_event || g_event_notice_func)
+    if (!ptr_event || !g_event_notice_func)
     {
         return;
     }
@@ -43,7 +43,7 @@ ez_void_t ez_iot_event_adapt(ez_kernel_event_t *ptr_event)
     }
 }
 
-ez_int32_t ez_kernel_value_save(sdk_keyvalue_type valuetype, ez_int8_t *keyvalue, ez_int32_t keyvalue_size)
+ez_int32_t ez_iot_value_save(sdk_keyvalue_type valuetype, ez_uchar_t *keyvalue, ez_int32_t keyvalue_size)
 {
     ez_int32_t rv = -1;
 
@@ -62,6 +62,11 @@ ez_int32_t ez_kernel_value_save(sdk_keyvalue_type valuetype, ez_int8_t *keyvalue
 void ez_iot_event_notice_set(const ez_event_notice pfunc)
 {
     g_event_notice_func = pfunc;
+}
+
+const ez_event_notice ez_iot_event_notice_get(ez_void_t)
+{
+    return g_event_notice_func;
 }
 
 void ez_iot_devid_set(const ez_byte_t *devid)

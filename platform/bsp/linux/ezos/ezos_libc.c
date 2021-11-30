@@ -36,22 +36,24 @@ EZOS_API int ezos_printf(const char *format, ...)
 
 EZOS_API int ezos_sprintf(char *str, const char *format, ...)
 {
+    int n;
     va_list ap;
     va_start(ap, format);
-    int rv = sprintf(str, format, ap);
+    n = vsprintf(str, format, ap);
     va_end(ap);
 
-    return rv;
+    return n;
 }
 
 EZOS_API int ezos_snprintf(char *str, size_t size, const char *format, ...)
 {
+    int n;
     va_list ap;
     va_start(ap, format);
-    int rv = snprintf(str, size, format, ap);
+    n = vsnprintf(str, size, format, ap);
     va_end(ap);
 
-    return rv;
+    return n;
 }
 
 EZOS_API int ezos_vsnprintf(char *str, size_t size, const char *format, va_list ap)
@@ -69,7 +71,6 @@ EZOS_API int ezos_sscanf(const char *str, const char *format, ...)
     return rv;
 }
 
-
 EZOS_API int ezos_memcmp(const void *s1, const void *s2, size_t n)
 {
     return memcmp(s1, s2, n);
@@ -80,17 +81,22 @@ EZOS_API void *ezos_memset(void *s, int c, size_t n)
     return memset(s, c, n);
 }
 
-EZOS_API void * ezos_memcpy(void *dest, const void *src, size_t n)
+EZOS_API void *ezos_memcpy(void *dest, const void *src, size_t n)
 {
     return memcpy(dest, src, n);
 }
 
-EZOS_API char * ezos_strcpy(char *dest, const char *src)
+EZOS_API void *ezos_memmove(void *dest, const void *src, size_t n)
+{
+    return memmove(dest, src, n);
+}
+
+EZOS_API char *ezos_strcpy(char *dest, const char *src)
 {
     return strcpy(dest, src);
 }
 
-EZOS_API char * ezos_strncpy(char *dest, const char *src, size_t n)
+EZOS_API char *ezos_strncpy(char *dest, const char *src, size_t n)
 {
     return strncpy(dest, src, n);
 }
@@ -105,7 +111,7 @@ EZOS_API int ezos_strncmp(const char *s1, const char *s2, size_t n)
     return strncmp(s1, s2, n);
 }
 
-EZOS_API char * ezos_strstr(const char *haystack, const char *needle)
+EZOS_API char *ezos_strstr(const char *haystack, const char *needle)
 {
     return strstr(haystack, needle);
 }
@@ -137,7 +143,7 @@ EZOS_API void ezos_bzero(void *s, size_t n)
 
 EZOS_API char *ezos_strdup(const char *s)
 {
-    return strdup(s);;
+    return strdup(s);
 }
 
 EZOS_API void ezos_va_start(va_list ap, const char *last, ...)
@@ -149,4 +155,3 @@ EZOS_API void ezos_va_end(va_list ap)
 {
     va_end(ap);
 }
-
