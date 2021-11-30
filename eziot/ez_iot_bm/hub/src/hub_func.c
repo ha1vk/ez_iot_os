@@ -36,6 +36,8 @@
 #include "misc.h"
 #include "s2j.h"
 #include "s2jdef.h"
+#include "misc.h"
+#include "eztimer.h"
 #endif
 
 #define SAP_DEV_SN_LEN 9
@@ -115,7 +117,7 @@ EZ_INT hub_func_init(const ez_hub_callbacks_t *phub_cbs)
         return EZ_HUB_ERR_INTERNAL;
     }
 
-    g_auth_timer = ez_timer_create("auth_retry_timer", (2 * 1000 * 60), false, auth_retry_timer_cb);
+    g_auth_timer = eztimer_create("auth_retry_timer", (2 * 1000 * 60), false, auth_retry_timer_cb);
     if (NULL == g_auth_timer)
     {
         ezlog_e(TAG_AP, "start auth retry timer failed.");
@@ -128,7 +130,7 @@ void hub_func_deinit()
 {
     memset((void *)&g_phub_cbs, 0, sizeof(g_phub_cbs));
     hub_tsl_unreg_all();
-    ez_timer_delete(g_auth_timer);
+    eztimer_delete(g_auth_timer);
 
     ezos_mutex_destroy(g_hlock);
 }
@@ -136,7 +138,7 @@ void hub_func_deinit()
 ez_err_t hub_add_do(const hub_subdev_info_internal_t *subdev_info)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -193,7 +195,7 @@ done:
 ez_err_t hub_del_do(const EZ_INT8 *subdev_sn)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -250,7 +252,7 @@ done:
 ez_err_t hub_ver_update_do(const EZ_INT8 *subdev_sn, const EZ_INT8 *subdev_ver)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -303,7 +305,7 @@ done:
 ez_err_t hub_status_update_do(const EZ_INT8 *subdev_sn, EZ_BOOL online)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -349,7 +351,7 @@ done:
 ez_err_t hub_subdev_query(const EZ_INT8 *subdev_sn, hub_subdev_info_internal_t *subdev_info)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -389,7 +391,7 @@ done:
 ez_err_t hub_subdev_next(hub_subdev_info_internal_t *subdev_info)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -494,7 +496,7 @@ static EZ_INT find_dev_by_sn(cJSON *json_obj, EZ_CHAR *sn)
 EZ_INT hub_subdev_list_report(void)
 {
     EZ_INT rv = 0;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_report = NULL;
     cJSON *js_root = NULL;
@@ -555,7 +557,7 @@ done:
 EZ_INT hub_subdev_sta_report(void)
 {
     EZ_INT rv = 0;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_report = NULL;
     cJSON *js_root = NULL;
@@ -966,7 +968,7 @@ static void hub_subdev_auth_passed(EZ_INT8 *subdev_sn)
     ezlog_w(TAG_HUB, "auth_passed");
 
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    EZ_INT32 length = 0;
+    size_t length = 0;
     EZ_CHAR *pbuf = NULL;
     EZ_CHAR *pbuf_save = NULL;
     cJSON *js_root = NULL;
