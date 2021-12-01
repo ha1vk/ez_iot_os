@@ -33,13 +33,13 @@ extern "C"
         ezos_time_t tv_nsec; /* nanosecond.  */
     } ezos_timespec_t;
 
-    struct ezos_timeval
+    typedef struct ezos_timeval
     {
         ezos_time_t tv_sec;       /* Seconds.  */
         ezos_suseconds_t tv_usec; /* Microseconds.  */
-    } ezos_timeval_t;
+    }ezos_timeval_t;
 
-    struct ezos_tm
+    typedef struct ezos_tm
     {
         int tm_sec;
         int tm_min;
@@ -50,13 +50,15 @@ extern "C"
         int tm_wday;
         int tm_yday;
         int tm_isdst;
-    };
+        long int tm_gmtoff;
+        char *tm_zone;
+    }ezos_tm_t;
 
-    struct ezos_timezone
+    typedef struct ezos_timezone
     {
         int tz_minuteswest; /* minutes west of Greenwich */
         int tz_dsttime;     /* type of DST correction */
-    };
+    }ezos_timezone_t;
 
     /**
      * @brief This function will get current time from operating system startup

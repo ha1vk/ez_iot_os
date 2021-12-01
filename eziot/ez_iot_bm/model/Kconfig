@@ -1,0 +1,7 @@
+menu "ez-iot model configuration"
+    config EZIOT_MODEL_ENABLE
+        bool "Enable ez-iot model"
+        default y
+
+endmenu
+

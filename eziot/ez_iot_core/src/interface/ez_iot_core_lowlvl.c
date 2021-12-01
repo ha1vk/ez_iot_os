@@ -1,6 +1,7 @@
 #include <mbedtls/platform.h>
 #include <ezlog.h>
 #include "ez_iot_core.h"
+#include "ez_iot_core_ctx.h"
 #include "ez_iot_core_lowlvl.h"
 #include "ezdev_sdk_kernel_struct.h"
 #include "ezdev_sdk_kernel_extend.h"
@@ -30,7 +31,7 @@ static EZDEV_SDK_UINT32 genaral_seq()
 }
 
 EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info,
-                                           const ez_byte_t *devid, sdk_kernel_event_notice kernel_event_notice_cb)
+                                 const ez_byte_t *devid, sdk_kernel_event_notice kernel_event_notice_cb)
 
 {
     FUNC_IN();
@@ -44,6 +45,7 @@ EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev
     ezos_memset(&g_ezdev_sdk_kernel, 0, sizeof(g_ezdev_sdk_kernel));
     mbedtls_platform_set_calloc_free(ezos_calloc, ezos_free);
 
+    g_ezdev_sdk_kernel.key_value_save = ez_iot_value_save;
     /* init auth method */
     g_ezdev_sdk_kernel.dev_def_auth_type = sdk_dev_auth_protocol_ecdh;
     g_ezdev_sdk_kernel.dev_cur_auth_type = sdk_dev_auth_protocol_ecdh;
@@ -67,9 +69,15 @@ EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev
     ezos_strncpy(g_ezdev_sdk_kernel.dev_info.dev_typedisplay, (char *)pdev_info->dev_typedisplay, sizeof(g_ezdev_sdk_kernel.dev_info.dev_typedisplay) - 1);
     ezos_strncpy(g_ezdev_sdk_kernel.dev_info.dev_mac, (char *)pdev_info->dev_mac, sizeof(g_ezdev_sdk_kernel.dev_info.dev_mac) - 1);
 
+    ezlog_i(TAG_CORE, "type:%s", g_ezdev_sdk_kernel.dev_info.dev_type);
+    ezlog_i(TAG_CORE, "sn:%s", g_ezdev_sdk_kernel.dev_info.dev_subserial);
+    ezlog_i(TAG_CORE, "vcode:%s", g_ezdev_sdk_kernel.dev_info.dev_verification_code);
+    ezlog_i(TAG_CORE, "fw:%s", g_ezdev_sdk_kernel.dev_info.dev_firmwareversion);
+    ezlog_i(TAG_CORE, "display:%s", g_ezdev_sdk_kernel.dev_info.dev_typedisplay);
+
     ezos_strncpy((char *)g_ezdev_sdk_kernel.dev_id, (char *)devid, sizeof(g_ezdev_sdk_kernel.dev_id));
     size_t key_len = sizeof(g_ezdev_sdk_kernel.master_key);
-    CHECK_COND_DONE(!ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_MASTERKEY, g_ezdev_sdk_kernel.master_key, &key_len), EZ_CORE_ERR_STORAGE);
+    CHECK_COND_DONE(ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_MASTERKEY, g_ezdev_sdk_kernel.master_key, &key_len), EZ_CORE_ERR_STORAGE);
 
     /* 初始化链接状态 */
     g_ezdev_sdk_kernel.lbs_redirect_times = 0;
@@ -157,23 +165,25 @@ done:
 
 EZOS_API ez_err_t ez_kernel_yield()
 {
-    ez_err_t rv = EZ_CORE_ERR_SUCC;
-    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_READY);
-    rv = mkiE2ezE(access_server_yield(&g_ezdev_sdk_kernel));
+    ez_err_t rv = EZ_CORE_ERR_NOT_READY;
+    if (sdk_start == g_ezdev_sdk_kernel.my_state)
+    {
+        rv = mkiE2ezE(access_server_yield(&g_ezdev_sdk_kernel));
+    }
 
     ezlog_v(TAG_CORE, "yield rv:%d", rv);
-done:
     return rv;
 }
 
 EZOS_API ez_err_t ez_kernel_yield_user()
 {
-    ez_err_t rv = EZ_CORE_ERR_SUCC;
-    CHECK_COND_DONE(sdk_start != g_ezdev_sdk_kernel.my_state, EZ_CORE_ERR_NOT_READY);
-    rv = mkiE2ezE(extend_yield(&g_ezdev_sdk_kernel));
+    ez_err_t rv = EZ_CORE_ERR_NOT_READY;
+    if (sdk_start == g_ezdev_sdk_kernel.my_state)
+    {
+        rv = mkiE2ezE(extend_yield(&g_ezdev_sdk_kernel));
+    }
 
     ezlog_v(TAG_CORE, "yield_user rv:%d", rv);
-done:
     return rv;
 }
 
@@ -317,7 +327,7 @@ EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
     CHECK_COND_DONE(!pubmsg->msg_body, EZ_CORE_ERR_PARAM_INVALID);
     CHECK_COND_DONE(!pubmsg->msg_body_len, EZ_CORE_ERR_PARAM_INVALID);
 
-    ezlog_i(TAG_CORE, "module:%s, resource_type:%s,msg_type:%s, method:%s, ext_msg:%s, seq:%d, len:%d, string:%s\n", pubmsg->module,
+    ezlog_i(TAG_CORE, "module:%s, resource_type:%s,msg_type:%s, method:%s, ext_msg:%s, seq:%d, len:%d, string:%s", pubmsg->module,
             pubmsg->resource_type, pubmsg->msg_type, pubmsg->method, pubmsg->ext_msg, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
 
     CHECK_COND_DONE(pubmsg->msg_body_len > ezdev_sdk_send_buf_max, EZ_CORE_ERR_OUT_RANGE);
@@ -367,7 +377,7 @@ done:
     return rv;
 }
 
-EZOS_API const ez_char_t * ez_kernel_getdevinfo_bykey(const ez_char_t *key)
+EZOS_API const ez_char_t *ez_kernel_getdevinfo_bykey(const ez_char_t *key)
 {
     static const ez_char_t *g_default_value = "invalidkey";
 

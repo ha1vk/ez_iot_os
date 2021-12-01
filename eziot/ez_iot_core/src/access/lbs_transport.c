@@ -123,10 +123,10 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
 
 static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect_affair, EZDEV_SDK_UINT8 nUpper)
 {
-    redirect_affair->random_1 = rand() % 256;
-    redirect_affair->random_2 = rand() % 256;
-    redirect_affair->random_3 = rand() % 256;
-    redirect_affair->random_4 = rand() % 256;
+    redirect_affair->random_1 = ezos_rand() % 256;
+    redirect_affair->random_2 = ezos_rand() % 256;
+    redirect_affair->random_3 = ezos_rand() % 256;
+    redirect_affair->random_4 = ezos_rand() % 256;
 
     redirect_affair->global_out_packet.head_buf = ezos_malloc(16);
     if (NULL == redirect_affair->global_out_packet.head_buf)
@@ -254,11 +254,10 @@ static void clear_lbs_affair_buf(lbs_affair *redirect_affair)
 
 static void save_key_value(ezdev_sdk_kernel *sdk_kernel, lbs_affair *affair)
 {
-    ezlog_i(TAG_CORE, "save_key_value start !!!");
     ezos_memcpy(sdk_kernel->dev_id, affair->dev_id, ezdev_sdk_devid_len);
     ezos_memcpy(sdk_kernel->master_key, affair->master_key, ezdev_sdk_masterkey_len);
     ezos_memcpy(sdk_kernel->session_key, affair->session_key, ezdev_sdk_sessionkey_len);
-    ezlog_i(TAG_CORE, " save dev_id ");
+
     sdk_kernel->key_value_save(sdk_keyvalue_devid, affair->dev_id, ezdev_sdk_devid_len);
     sdk_kernel->key_value_save(sdk_keyvalue_masterkey, affair->master_key, ezdev_sdk_masterkey_len);
 }
@@ -730,7 +729,7 @@ static mkernel_internal_error aes_128_decrypt_peer_pubkey(lbs_affair *authi_affa
     }
 
     recv_plat_key_len = remain_len - authi_affair->global_in_packet.payload_buf_off;
-    ezlog_e(TAG_CORE, "recv_plat_key_len: is :%d ", recv_plat_key_len);
+    ezlog_v(TAG_CORE, "recv_plat_key_len: is :%d ", recv_plat_key_len);
 
     ezos_memcpy(aes_encrypt_key, authi_affair->share_key, 16);
 
@@ -826,7 +825,7 @@ static mkernel_internal_error parse_authentication_ii(ezdev_sdk_kernel *sdk_kern
         sdk_error = aes_128_decrypt_peer_pubkey(authi_affair, remain_len, peer_pubkey, &peer_pubkey_len, input_tag_buf, tag_buf_len);
         if (sdk_error != mkernel_internal_succ)
         {
-            ezlog_e(TAG_CORE, "aes_128_decrypt_peer_pubkeyerror");
+            ezlog_e(TAG_CORE, "aes_128_decrypt_peer_pubkey");
             return sdk_error;
         }
         ezos_memset(masterkey, 0, 48);
@@ -1718,7 +1717,7 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
     char szRealIp[ezdev_sdk_ip_max_len] = {0};
     do
     {
-        authi_affair->socket_fd = net_create(g_binding_nic);
+        authi_affair->socket_fd = net_create(NULL);
         if (authi_affair->socket_fd == -1)
         {
             ezlog_e(TAG_CORE, "lbs_connect net_work_create error");
@@ -1734,7 +1733,7 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
             net_disconnect(authi_affair->socket_fd);
             authi_affair->socket_fd = -1;
 
-            authi_affair->socket_fd = net_create(g_binding_nic);
+            authi_affair->socket_fd = net_create(NULL);
             if (authi_affair->socket_fd == -1)
             {
                 ezlog_e(TAG_CORE, "lbs_connect net_work_create error");
@@ -1925,6 +1924,7 @@ mkernel_internal_error lbs_redirect_createdevid_with_auth(ezdev_sdk_kernel *sdk_
         {
             break;
         }
+
         sdk_error = wait_authentication_ii(sdk_kernel, &auth_redirect, ctx_client);
         if (sdk_error != mkernel_internal_succ)
         {

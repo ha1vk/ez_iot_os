@@ -1149,9 +1149,9 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
         sdk_error = das_send_pubmsg_v3(sdk_kernel, &ptr_pubmsg_exchange->msg_conntext_v3);
 
         ezlog_i(TAG_CORE, "pub msg v3 result, module:%s, resource_id:%s, resource_type:%s, msg_type:%s,ext_msg:%s seq:%d",
-                                  ptr_pubmsg_exchange->msg_conntext_v3.module, ptr_pubmsg_exchange->msg_conntext_v3.resource_id,
-                                  ptr_pubmsg_exchange->msg_conntext_v3.resource_type, ptr_pubmsg_exchange->msg_conntext_v3.msg_type,
-                                  ptr_pubmsg_exchange->msg_conntext_v3.ext_msg, ptr_pubmsg_exchange->msg_conntext_v3.msg_seq);
+                ptr_pubmsg_exchange->msg_conntext_v3.module, ptr_pubmsg_exchange->msg_conntext_v3.resource_id,
+                ptr_pubmsg_exchange->msg_conntext_v3.resource_type, ptr_pubmsg_exchange->msg_conntext_v3.msg_type,
+                ptr_pubmsg_exchange->msg_conntext_v3.ext_msg, ptr_pubmsg_exchange->msg_conntext_v3.msg_seq);
 
         if (mkernel_internal_call_mqtt_pub_error == sdk_error)
         {
@@ -1167,7 +1167,7 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
         ack_context.last_error = mkiE2ezE(sdk_error);
         ack_context.msg_seq = ptr_pubmsg_exchange->msg_conntext_v3.msg_seq;
         ezos_strncpy(ack_context.module_name, ptr_pubmsg_exchange->msg_conntext_v3.method, ezdev_sdk_method_len - 1);
-        broadcast_user_event(SDK_KERNEL_EVENT_PUBLISH_ACK, (void*)&ack_context, sizeof(ack_context));
+        broadcast_user_event(SDK_KERNEL_EVENT_PUBLISH_ACK, (void *)&ack_context, sizeof(ack_context));
 
         if (ptr_pubmsg_exchange->msg_conntext_v3.msg_body)
             ezos_free(ptr_pubmsg_exchange->msg_conntext_v3.msg_body);
@@ -1205,7 +1205,7 @@ static mkernel_internal_error send_message_to_das_v2(ezdev_sdk_kernel *sdk_kerne
             sdk_error = mkernel_internal_force_cmd_risk;
 
         ezlog_i(TAG_CORE, "pub msg result, domain:%d ,cmd:%d, len:%d, seq:%d, qos:%d",
-                                  ptr_pubmsg_exchange->msg_conntext.msg_domain_id, ptr_pubmsg_exchange->msg_conntext.msg_command_id, ptr_pubmsg_exchange->msg_conntext.msg_body_len, ptr_pubmsg_exchange->msg_conntext.msg_seq, ptr_pubmsg_exchange->msg_conntext.msg_qos);
+                ptr_pubmsg_exchange->msg_conntext.msg_domain_id, ptr_pubmsg_exchange->msg_conntext.msg_command_id, ptr_pubmsg_exchange->msg_conntext.msg_body_len, ptr_pubmsg_exchange->msg_conntext.msg_seq, ptr_pubmsg_exchange->msg_conntext.msg_qos);
 
         if (mkernel_internal_call_mqtt_pub_error == sdk_error)
         {
@@ -1262,7 +1262,7 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
         if (sdk_error != mkernel_internal_succ)
         {
             ezlog_d(TAG_CORE, "das_mqtt_reg2das NetworkConnect :%s :%d, error:%d",
-                                       sdk_kernel->redirect_das_info.das_address, sdk_kernel->redirect_das_info.das_port, sdk_error);
+                    sdk_kernel->redirect_das_info.das_address, sdk_kernel->redirect_das_info.das_port, sdk_error);
             break;
         }
         connectData.MQTTVersion = 4;
@@ -1364,7 +1364,7 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
         MQTTNetFini(&g_DasNetWork);
     }
 
-    ezlog_i(TAG_CORE, "mqtt connect server, server ip:%s, port:%d", sdk_kernel->redirect_das_info.das_address, sdk_kernel->redirect_das_info.das_port);
+    ezlog_d(TAG_CORE, "mqtt connect, ip:%s, port:%d, code:%d", sdk_kernel->redirect_das_info.das_address, sdk_kernel->redirect_das_info.das_port, sdk_error);
     return sdk_error;
 }
 
@@ -1378,7 +1378,6 @@ static mkernel_internal_error das_mqtt_logout2das()
     }
     MQTTNetDisconnect(&g_DasNetWork);
     MQTTNetFini(&g_DasNetWork);
-    ezlog_d(TAG_CORE, "das_mqtt_logout2das return");
     return mkernel_internal_succ;
 }
 
@@ -1464,7 +1463,6 @@ mkernel_internal_error das_light_reg_v2(ezdev_sdk_kernel *sdk_kernel)
 mkernel_internal_error das_unreg(ezdev_sdk_kernel *sdk_kernel)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
-    ezlog_d(TAG_CORE, "das_unreg close revc_topic");
     sdk_error = das_subscribe_revc_topic(sdk_kernel, 0);
     if (sdk_error != mkernel_internal_succ)
     {
@@ -1642,7 +1640,15 @@ static int MQTTNet_write(Network *n, unsigned char *buffer, int len, int timeout
 
 static int MQTTNet_read(Network *n, unsigned char *buffer, int len, int timeout_ms)
 {
-    return net_read(n->socket_fd, buffer, len, timeout_ms);
+    mkernel_internal_error sdk_error = mkernel_internal_succ;
+
+    sdk_error = net_read(n->socket_fd, buffer, len, timeout_ms);
+    if (sdk_error == mkernel_internal_succ)
+    {
+        return len;
+    }
+
+    return 0;
 }
 
 static void MQTTNetInit(Network *network)

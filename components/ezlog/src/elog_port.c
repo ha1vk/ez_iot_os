@@ -121,7 +121,7 @@ const char *elog_port_get_p_info(void) {
     static char cur_process_info[10] = { 0 };
 
     //ezos_snprintf(cur_process_info, 10, "pid:%04d", getpid());
-    ezos_snprintf(cur_process_info, 10, "pid:%04d", 0);
+    ezos_snprintf(cur_process_info, 10, "pid:%08x", 0);
     return cur_process_info;
 }
 
@@ -133,7 +133,7 @@ const char *elog_port_get_p_info(void) {
 const char *elog_port_get_t_info(void) {
     static char cur_thread_info[10] = { 0 };
 
-    ezos_snprintf(cur_thread_info, 10, "tid:%04d", ezos_thread_self());
+    ezos_snprintf(cur_thread_info, 10, "tid:%08x", ezos_thread_self());
 
     return cur_thread_info;
 }

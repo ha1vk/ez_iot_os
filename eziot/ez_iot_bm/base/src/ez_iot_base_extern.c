@@ -27,12 +27,12 @@
 ez_void_t base_extend_start_cb(ez_void_t *pUser);
 ez_void_t base_extend_stop_cb(ez_void_t *pUser);
 ez_void_t base_extend_data_route_cb(ez_kernel_submsg_t *ptr_submsg, ez_void_t *pUser);
-ez_void_t base_extend_event_cb(ez_kernel_event_e *ptr_event, ez_void_t *pUser);
+ez_void_t base_extend_event_cb(ez_kernel_event_t *ptr_event, ez_void_t *pUser);
 
 ez_err_t base_extern_init(ez_void_t)
 {
     ez_kernel_extend_t extern_info;
-    memset(&extern_info, 0, sizeof(extern_info));
+    ezos_memset(&extern_info, 0, sizeof(extern_info));
 
     extern_info.domain_id = BASE_DOMAIN_ID;
     extern_info.pUser = NULL;
@@ -104,6 +104,6 @@ ez_void_t base_extend_data_route_cb(ez_kernel_submsg_t *ptr_submsg, ez_void_t *p
     }
 }
 
-ez_void_t base_extend_event_cb(ez_kernel_event_e *ptr_event, ez_void_t *pUser)
+ez_void_t base_extend_event_cb(ez_kernel_event_t *ptr_event, ez_void_t *pUser)
 {
 }

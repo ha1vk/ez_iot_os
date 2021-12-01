@@ -26,5 +26,5 @@
 #include <ezos_libc.h>
 #include <ezos_kv.h>
 #include <ezos_mem.h> 
-
+#include <ezos_system.h>
 #endif

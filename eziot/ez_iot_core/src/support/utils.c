@@ -178,8 +178,8 @@ char ezcore_time_isexpired_bydiff(ezos_timespec_t *assign_timer, unsigned int ti
     }
 
     ezos_get_clock(&now);
-    res.tv_sec = assign_timer->tv_sec - now.tv_sec;
-    res.tv_nsec = assign_timer->tv_nsec - now.tv_nsec;
+    res.tv_sec = now.tv_sec - assign_timer->tv_sec;
+    res.tv_nsec = now.tv_nsec - assign_timer->tv_nsec;
     if (res.tv_nsec < 0)
     {
         --res.tv_sec;

@@ -22,6 +22,7 @@ if(CONFIG_EZIOT_HUB_ENABLE)
     list(APPEND ADD_REQUIREMENTS ezxml)
     list(APPEND ADD_REQUIREMENTS ezlog)
     list(APPEND ADD_REQUIREMENTS ez_iot_core)
+    list(APPEND ADD_REQUIREMENTS eztimer)
     ###############################################
 
     ############ Add static libs ##################
