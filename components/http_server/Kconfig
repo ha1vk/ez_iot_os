@@ -1,6 +1,6 @@
-menu "Component ezhttpd configuration"
+menu "Component http_server configuration"
     config EZIOT_COMPONENT_EZHTTPD_ENABLE
-        bool "Enable ezhttpd component"
+        bool "Enable http_server component"
         default y
 
 endmenu

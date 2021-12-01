@@ -1,4 +1,4 @@
-if(CONFIG_EZIOT_COMPONENT_EZLIST_ENABLE)
+if(CONFIG_EZIOT_COMPONENT_EZTIMER_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"

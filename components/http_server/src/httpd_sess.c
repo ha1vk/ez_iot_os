@@ -79,7 +79,7 @@ ez_err_t httpd_sess_new(struct httpd_data *hd, int newfd)
     {
         if (hd->hd_sd[i].fd == -1)
         {
-            memset(&hd->hd_sd[i], 0, sizeof(hd->hd_sd[i]));
+            ezos_memset(&hd->hd_sd[i], 0, sizeof(hd->hd_sd[i]));
             hd->hd_sd[i].fd = newfd;
             hd->hd_sd[i].handle = (httpd_handle_t)hd;
             hd->hd_sd[i].send_fn = httpd_default_send;

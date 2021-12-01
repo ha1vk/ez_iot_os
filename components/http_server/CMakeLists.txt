@@ -1,4 +1,4 @@
-if(CONFIG_EZIOT_COMPONENT_EZLOG_ENABLE)
+if(CONFIG_EZIOT_COMPONENT_EZHTTPD_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
