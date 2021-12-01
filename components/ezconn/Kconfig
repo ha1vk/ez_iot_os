@@ -1,0 +1,11 @@
+menu "Component ezconn configuration"
+    config EZIOT_COMPONENT_EZCONN_ENABLE
+        bool "Enable ezconn component"
+        default y
+
+    config EZIOT_COMPONENT_EZCONN_HTTPD_STACK_SIZE
+        int "Stack size of httpd server used by distribute"
+        default 8192
+        depends on EZIOT_COMPONENT_EZCONN_ENABLE
+
+endmenu

@@ -1,9 +1,9 @@
-if(CONFIG_EZIOT_COMPONENT_EZTIMER_ENABLE)
+if(CONFIG_EZIOT_COMPONENT_EZCONN_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
         )
-    # list(APPEND ADD_PRIVATE_INCLUDE "include_private")
+    list(APPEND ADD_PRIVATE_INCLUDE "inc_private")
     ###############################################
 
     ############## Add source files ###############
@@ -15,8 +15,12 @@ if(CONFIG_EZIOT_COMPONENT_EZTIMER_ENABLE)
     ###############################################
 
     ###### Add required/dependent components ######
+    # list(APPEND ADD_REQUIREMENTS component1)
     list(APPEND ADD_REQUIREMENTS ezos)
-    list(APPEND ADD_REQUIREMENTS ezlist)
+    list(APPEND ADD_REQUIREMENTS eztimer)
+    list(APPEND ADD_REQUIREMENTS http_server)
+    list(APPEND ADD_REQUIREMENTS cJSON)
+    list(APPEND ADD_REQUIREMENTS ezlog)
     ###############################################
 
     ############ Add static libs ##################
