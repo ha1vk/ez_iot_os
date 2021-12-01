@@ -552,7 +552,7 @@ mkernel_internal_error extend_load(const ezdev_sdk_kernel_extend *external_exten
     ezos_memcpy(&g_kernel_domains[index].kernel_extend, external_extend, sizeof(ezdev_sdk_kernel_extend));
     g_kernel_domains[index].domain_risk = sdk_no_risk_control;
 
-    ezlog_v(TAG_CORE, "extend_load %d, name:%s, version:%s", external_extend->domain_id, external_extend->extend_module_name, external_extend->extend_module_version);
+    ezlog_d(TAG_CORE, "extend_load %d, name:%s, version:%s", external_extend->domain_id, external_extend->extend_module_name, external_extend->extend_module_version);
 
     return mkernel_internal_succ;
 }

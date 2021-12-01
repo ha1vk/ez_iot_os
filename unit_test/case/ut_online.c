@@ -91,7 +91,6 @@ void ut_online_access()
     uassert_int_equal(EZ_CORE_ERR_SUCC, dev_event_waitfor(EZ_EVENT_ONLINE, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS * 1000));
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
 
-    ezos_delay_ms(3000);
     ez_iot_core_deinit();
 }
 

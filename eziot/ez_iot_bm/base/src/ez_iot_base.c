@@ -87,7 +87,7 @@ EZOS_API ez_err_t ez_iot_base_bind_response(ez_int32_t challenge_code)
 
     CHECK_COND_DONE(!g_base_is_inited, EZ_BASE_ERR_NOT_INIT);
 
-    rv = base_protocol_bind_response_req(challenge_code);
+    rv = base_protocol_bind_response_req(challenge_code + 1);
     CHECK_RV_DONE(rv);
 
 done:

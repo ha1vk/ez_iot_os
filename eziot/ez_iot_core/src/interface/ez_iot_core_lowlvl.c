@@ -202,7 +202,7 @@ EZOS_API ez_err_t ez_kernel_extend_load(const ez_kernel_extend_t *external_exten
     CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_data_route, EZ_CORE_ERR_PARAM_INVALID);
     CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_start, EZ_CORE_ERR_PARAM_INVALID);
     CHECK_COND_DONE(!external_extend->ezdev_sdk_kernel_extend_stop, EZ_CORE_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!extend_load(external_extend), EZ_CORE_ERR_GENERAL);
+    CHECK_COND_DONE(extend_load(external_extend), EZ_CORE_ERR_GENERAL);
 
 done:
     FUNC_OUT();

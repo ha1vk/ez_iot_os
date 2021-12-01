@@ -133,27 +133,16 @@ endif()
 
 if(CONFIG_EZIOT_BASE_ENABLE)
 
-    # message(STATUS "CONFIG_EZIOT_BASE_ENABLE")
+    message(STATUS "CONFIG_EZIOT_BASE_ENABLE")
 
-    # list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_bm/base/inc)
+    list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_bm/base/inc)
 
-    # list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_bind.c)
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_bind.c)
 
-    # list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezos)
-    # list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezlog)
-    # list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/cJSON)
-    # list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/mqtt)
-    # list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezxml)
-    # list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/mbedtls)
-    # list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_core)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_bm)
 
-    # list(APPEND UT_DEPENS -lezos)
-    # list(APPEND UT_DEPENS -lezlog)
-    # list(APPEND UT_DEPENS -lcJSON)
-    # list(APPEND UT_DEPENS -lmqtt)
-    # list(APPEND UT_DEPENS -lezxml)
-    # list(APPEND UT_DEPENS -lmbedtls)
-    # list(APPEND UT_DEPENS -lez_iot_core)
+    list(APPEND UT_DEPENS -lez_iot_bm)
+
 endif()
 
 ##############################################根据开关定义编译的文件和链接的库#############################################
