@@ -351,7 +351,7 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
         return mkernel_internal_input_param_invalid;
     }
 
-    if (pubmsg->msg_body_len > ezdev_sdk_send_buf_max)
+    if (pubmsg->msg_body_len > CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX)
     {
         return mkernel_internal_msg_len_overrange;
     }

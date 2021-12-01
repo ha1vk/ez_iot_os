@@ -34,10 +34,33 @@ menu "ez-iot core configuration"
         default 5
         depends on EZIOT_CORE_MULTI_TASK
 
-    config EZIOT_CORE_MESSAGE_BUFFER_MAX
-        int "ezviz protocol message buffer size"
+    config EZIOT_CORE_MESSAGE_SIZE_MAX
+        int "Maximum size of business message"
         range 256 16384
         default 16384
+        depends on EZIOT_CORE_ENABLE
+
+    config EZIOT_CORE_MESSAGE_NUMBER_MAX
+        int "Maximum number of business message"
+        range 0 256
+        default 64
+        depends on EZIOT_CORE_ENABLE
+
+    config EZIOT_CORE_EXTEND_COUNT
+        int "Maximum number of ezviz protocol v2.0 business modules"
+        range 0 32
+        default 8
+        depends on EZIOT_CORE_ENABLE
+
+    config EZIOT_CORE_RISK_CONTROL_CMD_MAX
+        int "Maximum number of risk control commands"
+        range 0 64
+        default 16
+        depends on EZIOT_CORE_ENABLE
+
+    config EZIOT_CORE_DEFAULT_PUBLISH_RETRY
+        int "Default number of retries for message publish"
+        default 2
         depends on EZIOT_CORE_ENABLE
 
 endmenu

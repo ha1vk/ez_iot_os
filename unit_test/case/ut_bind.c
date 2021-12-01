@@ -73,7 +73,7 @@ void ut_base_bind_by_near()
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_start());
     uassert_int_equal(EZ_BASE_ERR_SUCC, ez_iot_base_bind_near(dev_token));
 
-    uassert_int_equal(0, dev_bind_stauts(CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS * 1000));
+    uassert_int_equal(0, dev_event_waitfor(EZ_EVENT_ONLINE, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS * 1000));
 
     ezos_delay_ms(3000);
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());

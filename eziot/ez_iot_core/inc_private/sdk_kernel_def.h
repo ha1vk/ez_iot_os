@@ -17,90 +17,14 @@
 #include <ezos.h>
 #include "ez_iot_core_def.h"
 
-#define ezdev_sdk_recv_topic_len 128             ///<	设备SDK 一些命名的长度
-#define ezdev_sdk_type_len 16                    ///<	设备SDK 类型长度
-#define ezdev_sdk_name_len 64                    ///<	设备SDK 一些命名的长度
-#define ezdev_sdk_sharekey_len 32                ///<	设备share key 长度
-#define ezdev_sdk_devserial_maxlen 72            ///< 设备序列号支持最大长度
-#define ezdev_sdk_total_len 128                  ///<	用于临时变量的存放
-#define ezdev_sdk_identificationcode_max_len 256 ///<	设备固件识别码最大长度
-#define ezdev_sdk_md5_len 32                     ///<	md5长度
-#define ezdev_sdk_sha256_len 32                  ///<	sha256数据长度
-#define ezdev_sdk_sha256_hex_len 64              ///<	sha256数据16进制长度
-#define ezdev_sdk_sha256_offset 10               ///<	sha256密文偏移值
-#define ezdev_sdk_productkey_len 32              ///<	productkey最长的长度
-#define ezdev_sdk_json_default_size 1024         ///<	cJSON_PrintBuffered 调用时给的默认大小，减少多次malloc/free过程
-#define ezdev_sdk_domain_id 1100                 ///< 设备主动下线时，内部发送下线消息使用的领域id
-#define ezdev_sdk_offline_cmd_id 0X00002807      ///< 设备主动下线时发送的指令id
-#define ezdev_sdk_cmd_version "v1.0.0"           ///< 指令版本
-#define version_max_len 32                       ///<	版本长度
-#define QOS_T1 1                                 ///< 采用Qos1
+#define EZDEV_SDK_TRUE 1
+#define EZDEV_SDK_FALSE 0
+#define EZDEV_SDK_UNUSED(var) (void)var;
 
-#define ezdev_sdk_pbkdf2_hmac_times 3 ///<
-
-#define SendISAPIReq 0x00004D01             ///< isapi协议，根据协议过滤发送报文大小
-#define SendISAPIRsp 0x00004D02             ///<
-#define SendISAPIEventReq 0x00004D03        ///<
-#define SendISAPIEventRsp 0x00004D03        ///<
-#define ezdev_sdk_com_msg_max_buf 1024 * 16 ///< 非isapi消息报文最大允许发送的size
-#define ezdev_sdk_tcp_header_len 79         ///< tcp头和唤醒包头长度
-
-#define ezdev_sdk_model_type_len 16 ///<	设备SDK 类型长度
-
-#ifdef RAM_LIMIT
-//主要是给realtek使用
-#define ezdev_sdk_send_buf_max 1024 * 2
-#define ezdev_sdk_recv_buf_max 1024 * 2
-
-#define lbs_send_buf_max 1024 * 2
-#define lbs_recv_buf_max 1024 * 2
-
-#define ezdev_sdk_extend_count 8 ///<	支持的扩展模块数量
-
-/**
-* \brief   SDK 一个领域支持的风控指令 最大数
-*/
-#define ezdev_sdk_risk_control_cmd_max 8
-#define ezdev_sdk_queue_max 32
-#else //RAM_LIMIT
-/**
-* \brief   DAS MQTT 会话使用的缓存
-*/
-
-#if RSETBUFFER //ISAPI接口发送的buffer大小设置为256k
-
-#define ezdev_sdk_send_buf_max 1024 * 256
-#define ezdev_sdk_recv_buf_max 1024 * 256
-
-#else
-
-#define ezdev_sdk_send_buf_max 1024 * 16
-#define ezdev_sdk_recv_buf_max 1024 * 16
-
-#endif
-
-#define lbs_send_buf_max 1024 * 16
-#define lbs_recv_buf_max 1024 * 16
-
-#define ezdev_sdk_auth_group_size 64                       //支持的认证协议类型组最大容量
-#define lbs_var_head_buf_max ezdev_sdk_auth_group_size + 2 //可变报文头最大长度，2个字节分别表示当前协议类型和协议组当前容量
-
-#define ezdev_sdk_extend_count 32 ///<	支持的扩展模块数量
-
-/**
-* \brief   SDK 一个领域支持的风控指令 最大数
-*/
-#define ezdev_sdk_risk_control_cmd_max 64
-#define ezdev_sdk_queue_max 64
-
-#endif //RAM_LIMIT
-
-#define ezdev_sdk_das_default_keepaliveinterval 30 ///<	DAS默认心跳时间
-#define ezdev_sdk_sharekey_salt "www.88075998.com"
-
-#define ezdev_sdk_max_publish_count 2 ///<	最多发布的次数
-#define ezdev_sdk_msg_type_req 1      ///<	das信令类型:请求
-#define ezdev_sdk_msg_type_rsp 2      ///<	das信令类型:响应
+#define EZDEV_SDK_AUTH_GROUP_SIZE 64
+#define ezdev_sdk_devserial_maxlen 72
+#define ezdev_sdk_recv_topic_len 128
+#define ezdev_sdk_identificationcode_max_len 256
 
 typedef ez_kernel_submsg_t ezdev_sdk_kernel_submsg;
 typedef ez_kernel_submsg_v3_t ezdev_sdk_kernel_submsg_v3;
@@ -123,9 +47,6 @@ typedef ez_uint16_t EZDEV_SDK_UINT16;
 typedef ez_uint32_t EZDEV_SDK_UINT32;
 typedef ez_uint64_t EZDEV_SDK_UINT64;
 typedef EZDEV_SDK_INT8 EZDEV_SDK_BOOL;
-#define EZDEV_SDK_TRUE 1
-#define EZDEV_SDK_FALSE 0
-#define EZDEV_SDK_UNUSED(var) (void)var;
 
 typedef enum
 {
@@ -185,24 +106,6 @@ typedef enum
 } sdk_dev_auth_protocol_type;
 
 /**
-* \brief   与LBS交互协议
-*/
-typedef struct
-{
-    unsigned char *head_buf;
-    EZDEV_SDK_UINT8 head_buf_Len;
-    EZDEV_SDK_UINT8 head_buf_off;
-
-    unsigned char *var_head_buf;
-    EZDEV_SDK_UINT8 var_head_buf_Len; //可变报文头
-    EZDEV_SDK_UINT8 var_head_buf_off;
-
-    unsigned char *payload_buf;
-    EZDEV_SDK_UINT32 payload_buf_Len;
-    EZDEV_SDK_UINT32 payload_buf_off;
-} lbs_packet;
-
-/**
 * \brief   与LBS交互通用协议体
 */
 typedef struct
@@ -233,19 +136,17 @@ typedef struct
  */
 typedef struct
 {
-    EZDEV_SDK_UINT16 dev_access_mode;                                          ///		设备接入模式  0-普通（2.0）   1-HUB（2.0）
-    sdk_dev_auth_mode dev_auth_mode;                                           ///<    认证模式：0 SAP认证   1 licence认证
-    EZDEV_SDK_UINT16 dev_status;                                               ///<	设备工作状态  1：正常工作模式  5：待机(或睡眠)工作模式
-    char dev_subserial[ezdev_sdk_devserial_maxlen];                            ///<	设备短序列号(对应licence认证中device_id)
-    char dev_verification_code[ezdev_sdk_verify_code_maxlen];                  ///<	设备验证码(对应licence认证中licence)
-    char dev_serial[ezdev_sdk_devserial_maxlen];                               ///<	设备长序列号
-    char dev_firmwareversion[ezdev_sdk_name_len];                              ///<	设备固件版本号
-    char dev_type[ezdev_sdk_name_len];                                         ///<	设备型号
-    char dev_typedisplay[ezdev_sdk_name_len];                                  ///<	设备显示型号
-    char dev_mac[ezdev_sdk_name_len];                                          ///<	设备网上物理地址
-    char dev_nickname[ezdev_sdk_name_len];                                     ///<	设备昵称
-    char dev_firmwareidentificationcode[ezdev_sdk_identificationcode_max_len]; ///<	设备固件识别码
-    EZDEV_SDK_UINT32 dev_oeminfo;                                              ///<	设备的OEM信息
+    EZDEV_SDK_UINT16 dev_access_mode;                                          ///< 设备接入模式  0-普通（2.0）   1-HUB（2.0）
+    sdk_dev_auth_mode dev_auth_mode;                                           ///< 认证模式：0 SAP认证   1 licence认证
+    EZDEV_SDK_UINT16 dev_status;                                               ///< 设备工作状态  1：正常工作模式  5：待机(或睡眠)工作模式
+    char dev_subserial[ezdev_sdk_devserial_maxlen];                            ///< 设备短序列号(对应licence认证中device_id)
+    char dev_verification_code[ezdev_sdk_verify_code_maxlen];                  ///< 设备验证码(对应licence认证中licence)
+    char dev_serial[ezdev_sdk_devserial_maxlen];                               ///< 设备长序列号
+    char dev_firmwareversion[ezdev_sdk_name_len];                              ///< 设备固件版本号
+    char dev_type[ezdev_sdk_name_len];                                         ///< 设备型号
+    char dev_typedisplay[ezdev_sdk_name_len];                                  ///< 设备显示型号
+    char dev_mac[ezdev_sdk_name_len];                                          ///< 设备网上物理地址
+    char dev_firmwareidentificationcode[ezdev_sdk_identificationcode_max_len]; ///< 设备固件识别码
 } dev_basic_info;
 
 /**
@@ -254,7 +155,7 @@ typedef struct
 typedef struct
 {
     sdk_risk_control_flag domain_risk;                               ///<	领域是否被风控
-    EZDEV_SDK_UINT32 cmd_risk_array[ezdev_sdk_risk_control_cmd_max]; ///<	领域内被风控的指令
+    EZDEV_SDK_UINT32 cmd_risk_array[CONFIG_EZIOT_CORE_RISK_CONTROL_CMD_MAX]; ///<	领域内被风控的指令
     ez_kernel_extend_t kernel_extend;                                ///<	SDK注册进来的领域扩展
 } ezdev_sdk_kernel_domain_info;
 
@@ -302,33 +203,10 @@ typedef struct
     EZDEV_SDK_UINT8 dev_def_auth_type;
     EZDEV_SDK_UINT8 dev_auth_type_count;
     EZDEV_SDK_UINT8 dev_last_auth_type;
-    EZDEV_SDK_UINT8 dev_auth_type_group[ezdev_sdk_auth_group_size];
-    EZDEV_SDK_INT32 (*key_value_save)
+    EZDEV_SDK_UINT8 dev_auth_type_group[EZDEV_SDK_AUTH_GROUP_SIZE];
+    EZDEV_SDK_INT32(*key_value_save)
     (EZDEV_SDK_UINT32 valuetype, unsigned char *keyvalue, EZDEV_SDK_INT32 keyvalue_size);
 } ezdev_sdk_kernel;
-
-typedef struct
-{
-    EZDEV_SDK_UINT8 random_1;
-    EZDEV_SDK_UINT8 random_2;
-    EZDEV_SDK_UINT8 random_3;
-    EZDEV_SDK_UINT8 random_4;
-
-    EZDEV_SDK_UINT16 dev_access_mode;
-    sdk_dev_auth_mode dev_auth_mode;
-    char dev_subserial[ezdev_sdk_devserial_maxlen];
-    unsigned char master_key[ezdev_sdk_masterkey_len];
-    unsigned char dev_id[ezdev_sdk_devid_len];
-
-    unsigned char session_key[ezdev_sdk_sessionkey_len];
-    unsigned char share_key[ezdev_sdk_sharekey_len];
-    EZDEV_SDK_UINT16 share_key_len;
-
-    lbs_packet global_out_packet; ///<*	lbs 发送缓冲区
-    lbs_packet global_in_packet;  ///<*	lbs 接收缓冲区
-
-    int socket_fd;
-} lbs_affair;
 
 /**
  * \brief   设备发布消息的消息存储载体

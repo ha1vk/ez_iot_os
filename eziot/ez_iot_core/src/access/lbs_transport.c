@@ -1,15 +1,22 @@
 /*******************************************************************************
-* Copyright © 2017-2021 Ezviz Inc.
-*
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Eclipse Public License v1.0
-* and Eclipse Distribution License v1.0 which accompany this distribution.
-*
-* The Eclipse Public License is available at
-*    http://www.eclipse.org/legal/epl-v10.html
-* and the Eclipse Distribution License is available at
-*   http://www.eclipse.org/org/documents/edl-v10.php.
-*******************************************************************************/
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * 
+ * Brief:
+ * Device access authentication interface implementation
+ * 
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-12-01     xurongjun    Remove redundant business codes
+ *******************************************************************************/
 
 #include <ezos.h>
 #include <ezlog.h>
@@ -28,42 +35,84 @@
 #include "mbedtls/pkcs5.h"
 #include "mbedtls/sha512.h"
 #include "aes_support.h"
-#include "json_parser.h"
 #include "net_module.h"
 #include "utils.h"
 
 AES_SUPPORT_INTERFACE
-JSON_PARSER_INTERFACE
-extern char g_binding_nic[ezdev_sdk_name_len];
 
-#define iv_len 12
-#define add_len 16
-#define tag_len 16
+#define LBS_AUTH_TAG_LEN 16
+#define LBS_AUTH_JSON_DEFAULT_LEN 1024
+#define LBS_AUTH_INFO_LEN 128
+#define LBS_AUTH_PBKDF2_HMAC_TIMES 3
+#define LBS_AUTH_SHAREKEY_LEN 32
+#define LBS_AUTH_SHAREKEY_SALT "www.88075998.com"
+#define LBS_AUTH_MD5_LEN 32
+#define LBS_AUTH_SHA256_LEN 32
+#define LBS_AUTH_SHA256_OFFSET 10
+
+typedef struct
+{
+    unsigned char *head_buf;
+    EZDEV_SDK_UINT8 head_buf_Len;
+    EZDEV_SDK_UINT8 head_buf_off;
+
+    unsigned char *var_head_buf;
+    EZDEV_SDK_UINT8 var_head_buf_Len; //可变报文头
+    EZDEV_SDK_UINT8 var_head_buf_off;
+
+    unsigned char *payload_buf;
+    EZDEV_SDK_UINT32 payload_buf_Len;
+    EZDEV_SDK_UINT32 payload_buf_off;
+} lbs_packet;
+
+typedef struct
+{
+    EZDEV_SDK_UINT8 random_1;
+    EZDEV_SDK_UINT8 random_2;
+    EZDEV_SDK_UINT8 random_3;
+    EZDEV_SDK_UINT8 random_4;
+
+    EZDEV_SDK_UINT16 dev_access_mode;
+    sdk_dev_auth_mode dev_auth_mode;
+    char dev_subserial[ezdev_sdk_devserial_maxlen];
+    unsigned char master_key[ezdev_sdk_masterkey_len];
+    unsigned char dev_id[ezdev_sdk_devid_len];
+
+    unsigned char session_key[ezdev_sdk_sessionkey_len];
+    unsigned char share_key[LBS_AUTH_SHAREKEY_LEN];
+    EZDEV_SDK_UINT16 share_key_len;
+
+    lbs_packet global_out_packet; ///<*	lbs 发送缓冲区
+    lbs_packet global_in_packet;  ///<*	lbs 接收缓冲区
+
+    int socket_fd;
+} lbs_affair;
 
 static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *authi_affair, EZDEV_SDK_UINT32 remain_len);
+static mkernel_internal_error json_parse_das_server_info(const char *jsonstring, das_info *das_server_info);
 
 static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect_affair, EZDEV_SDK_UINT8 nUpper)
 {
-    unsigned char sharekey_src[ezdev_sdk_total_len];
+    unsigned char sharekey_src[LBS_AUTH_INFO_LEN];
     EZDEV_SDK_UINT16 sharekey_src_len;
     EZDEV_SDK_UINT16 dev_verification_code_len;
     EZDEV_SDK_UINT16 sharekey_salt_len;
 
     unsigned char sharekey_dst[16];
-    unsigned char sharekey_dst_hex[ezdev_sdk_md5_len + 1];
+    unsigned char sharekey_dst_hex[LBS_AUTH_MD5_LEN + 1];
 
-    unsigned char sharekey_sha256_dst[ezdev_sdk_sha256_len];
-    unsigned char sharekey_sha256_dst_hex[ezdev_sdk_sha256_hex_len + 1];
+    unsigned char sharekey_sha256_dst[LBS_AUTH_SHA256_LEN];
+    unsigned char sharekey_sha256_dst_hex[LBS_AUTH_MD5_LEN + 1];
 
     mbedtls_md_context_t sha1_ctx;
     const mbedtls_md_info_t *info_sha1 = NULL;
 
-    ezos_memset(sharekey_src, 0, ezdev_sdk_total_len);
+    ezos_memset(sharekey_src, 0, LBS_AUTH_INFO_LEN);
     ezos_memset(sharekey_dst, 0, 16);
-    ezos_memset(sharekey_dst_hex, 0, ezdev_sdk_sharekey_len + 1);
+    ezos_memset(sharekey_dst_hex, 0, LBS_AUTH_SHAREKEY_LEN + 1);
 
     dev_verification_code_len = ezos_strlen(sdk_kernel->dev_info.dev_verification_code);
-    sharekey_salt_len = ezos_strlen(ezdev_sdk_sharekey_salt);
+    sharekey_salt_len = ezos_strlen(LBS_AUTH_SHAREKEY_SALT);
 
     sharekey_src_len = dev_verification_code_len;
     ezos_memcpy(sharekey_src, sdk_kernel->dev_info.dev_verification_code, sharekey_src_len);
@@ -82,19 +131,19 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
         md5_hexdump(sharekey_dst, 16, 0, sharekey_dst_hex);
     }
 
-    ezos_memset(sharekey_src, 0, ezdev_sdk_total_len);
+    ezos_memset(sharekey_src, 0, LBS_AUTH_INFO_LEN);
 
-    ezos_memcpy(sharekey_src, sharekey_dst_hex, ezdev_sdk_md5_len);
-    ezos_memcpy(sharekey_src + ezdev_sdk_md5_len, ezdev_sdk_sharekey_salt, sharekey_salt_len);
+    ezos_memcpy(sharekey_src, sharekey_dst_hex, LBS_AUTH_MD5_LEN);
+    ezos_memcpy(sharekey_src + LBS_AUTH_MD5_LEN, LBS_AUTH_SHAREKEY_SALT, sharekey_salt_len);
 
-    sharekey_src_len = ezdev_sdk_md5_len + sharekey_salt_len;
+    sharekey_src_len = LBS_AUTH_MD5_LEN + sharekey_salt_len;
 
     mbedtls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
     md5_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
 
-    ezos_memset(sharekey_src, 0, ezdev_sdk_total_len);
-    ezos_memcpy(sharekey_src, sharekey_dst_hex, ezdev_sdk_md5_len);
-    sharekey_src_len = ezdev_sdk_md5_len;
+    ezos_memset(sharekey_src, 0, LBS_AUTH_INFO_LEN);
+    ezos_memcpy(sharekey_src, sharekey_dst_hex, LBS_AUTH_MD5_LEN);
+    sharekey_src_len = LBS_AUTH_MD5_LEN;
 
     mbedtls_md5(sharekey_src, sharekey_src_len, sharekey_dst);
     md5_hexdump(sharekey_dst, 16, 1, sharekey_dst_hex);
@@ -111,14 +160,14 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
         return;
     }
 
-    mbedtls_pkcs5_pbkdf2_hmac(&sha1_ctx, sharekey_dst_hex, ezdev_sdk_md5_len,
-                              (const unsigned char *)ezdev_sdk_sharekey_salt, sharekey_salt_len, ezdev_sdk_pbkdf2_hmac_times, ezdev_sdk_sha256_len, sharekey_sha256_dst);
-    md5_hexdump(sharekey_sha256_dst, ezdev_sdk_sha256_len, 1, sharekey_sha256_dst_hex);
+    mbedtls_pkcs5_pbkdf2_hmac(&sha1_ctx, sharekey_dst_hex, LBS_AUTH_MD5_LEN,
+                              (const unsigned char *)LBS_AUTH_SHAREKEY_SALT, sharekey_salt_len, LBS_AUTH_PBKDF2_HMAC_TIMES, LBS_AUTH_SHA256_LEN, sharekey_sha256_dst);
+    md5_hexdump(sharekey_sha256_dst, LBS_AUTH_SHA256_LEN, 1, sharekey_sha256_dst_hex);
 
     mbedtls_md_free(&sha1_ctx);
 
-    ezos_memcpy(redirect_affair->share_key, sharekey_sha256_dst_hex + ezdev_sdk_sha256_offset, ezdev_sdk_sharekey_len);
-    redirect_affair->share_key_len = ezdev_sdk_sharekey_len;
+    ezos_memcpy(redirect_affair->share_key, sharekey_sha256_dst_hex + LBS_AUTH_SHA256_OFFSET, LBS_AUTH_SHAREKEY_LEN);
+    redirect_affair->share_key_len = LBS_AUTH_SHAREKEY_LEN;
 }
 
 static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect_affair, EZDEV_SDK_UINT8 nUpper)
@@ -138,24 +187,24 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
     redirect_affair->global_out_packet.head_buf_off = 0;
     redirect_affair->global_out_packet.head_buf_Len = 16;
 
-    redirect_affair->global_out_packet.var_head_buf = ezos_malloc(lbs_var_head_buf_max);
+    redirect_affair->global_out_packet.var_head_buf = ezos_malloc(LBS_AUTH_TAG_LEN);
     if (NULL == redirect_affair->global_out_packet.var_head_buf)
     {
         ezlog_e(TAG_CORE, "malloc out_packet head_buf err");
         return mkernel_internal_mem_lack;
     }
-    ezos_memset(redirect_affair->global_out_packet.var_head_buf, 0, lbs_var_head_buf_max);
+    ezos_memset(redirect_affair->global_out_packet.var_head_buf, 0, LBS_AUTH_TAG_LEN);
     redirect_affair->global_out_packet.var_head_buf_off = 0;
-    redirect_affair->global_out_packet.var_head_buf_Len = lbs_var_head_buf_max;
-    redirect_affair->global_out_packet.payload_buf = ezos_malloc(lbs_send_buf_max);
+    redirect_affair->global_out_packet.var_head_buf_Len = LBS_AUTH_TAG_LEN;
+    redirect_affair->global_out_packet.payload_buf = ezos_malloc(CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     if (NULL == redirect_affair->global_out_packet.payload_buf)
     {
         ezlog_e(TAG_CORE, "malloc out_packet payload_buf err");
         return mkernel_internal_mem_lack;
     }
-    ezos_memset(redirect_affair->global_out_packet.payload_buf, 0, lbs_send_buf_max);
+    ezos_memset(redirect_affair->global_out_packet.payload_buf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     redirect_affair->global_out_packet.payload_buf_off = 0;
-    redirect_affair->global_out_packet.payload_buf_Len = lbs_send_buf_max;
+    redirect_affair->global_out_packet.payload_buf_Len = CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX;
     redirect_affair->global_in_packet.head_buf = ezos_malloc(16);
     if (NULL == redirect_affair->global_in_packet.head_buf)
     {
@@ -165,24 +214,24 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
     ezos_memset(redirect_affair->global_in_packet.head_buf, 0, 16);
     redirect_affair->global_in_packet.head_buf_off = 0;
     redirect_affair->global_in_packet.head_buf_Len = 16;
-    redirect_affair->global_in_packet.var_head_buf = ezos_malloc(lbs_var_head_buf_max);
+    redirect_affair->global_in_packet.var_head_buf = ezos_malloc(LBS_AUTH_TAG_LEN);
     if (NULL == redirect_affair->global_in_packet.var_head_buf)
     {
         ezlog_e(TAG_CORE, "malloc out_packet head_buf err");
         return mkernel_internal_mem_lack;
     }
-    ezos_memset(redirect_affair->global_in_packet.var_head_buf, 0, lbs_var_head_buf_max);
+    ezos_memset(redirect_affair->global_in_packet.var_head_buf, 0, LBS_AUTH_TAG_LEN);
     redirect_affair->global_in_packet.var_head_buf_off = 0;
-    redirect_affair->global_in_packet.var_head_buf_Len = lbs_var_head_buf_max;
-    redirect_affair->global_in_packet.payload_buf = ezos_malloc(lbs_recv_buf_max);
+    redirect_affair->global_in_packet.var_head_buf_Len = LBS_AUTH_TAG_LEN;
+    redirect_affair->global_in_packet.payload_buf = ezos_malloc(CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     if (NULL == redirect_affair->global_in_packet.payload_buf)
     {
         ezlog_e(TAG_CORE, "malloc in_packet payload_buf err ");
         return mkernel_internal_mem_lack;
     }
-    ezos_memset(redirect_affair->global_in_packet.payload_buf, 0, lbs_recv_buf_max);
+    ezos_memset(redirect_affair->global_in_packet.payload_buf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     redirect_affair->global_in_packet.payload_buf_off = 0;
-    redirect_affair->global_in_packet.payload_buf_Len = lbs_recv_buf_max;
+    redirect_affair->global_in_packet.payload_buf_Len = CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX;
 
     redirect_affair->dev_auth_mode = sdk_kernel->dev_info.dev_auth_mode;
     ezos_memcpy(redirect_affair->dev_subserial, sdk_kernel->dev_info.dev_subserial, ezdev_sdk_devserial_maxlen);
@@ -242,13 +291,13 @@ static void clear_lbs_affair_buf(lbs_affair *redirect_affair)
     ezos_memset(redirect_affair->global_out_packet.head_buf, 0, 16);
     redirect_affair->global_out_packet.head_buf_off = 0;
 
-    ezos_memset(redirect_affair->global_out_packet.payload_buf, 0, lbs_send_buf_max);
+    ezos_memset(redirect_affair->global_out_packet.payload_buf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     redirect_affair->global_out_packet.payload_buf_off = 0;
 
     ezos_memset(redirect_affair->global_in_packet.head_buf, 0, 16);
     redirect_affair->global_in_packet.head_buf_off = 0;
 
-    ezos_memset(redirect_affair->global_in_packet.payload_buf, 0, lbs_recv_buf_max);
+    ezos_memset(redirect_affair->global_in_packet.payload_buf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     redirect_affair->global_in_packet.payload_buf_off = 0;
 }
 
@@ -378,7 +427,7 @@ static mkernel_internal_error common_serialize(lbs_packet *lbs_pack, unsigned ch
 static mkernel_internal_error digital_sign_serialize_sha384(lbs_packet *lbs_pack, unsigned char *sign_src, EZDEV_SDK_UINT16 sign_src_len, unsigned char *master_key, EZDEV_SDK_UINT16 master_key_len)
 {
     EZDEV_SDK_UINT32 sign_input_len = 0;
-    unsigned char sign_input[ezdev_sdk_total_len];
+    unsigned char sign_input[LBS_AUTH_INFO_LEN];
     unsigned char sign_output[64];
     EZDEV_SDK_INT32 mbedtls_result;
 
@@ -387,17 +436,17 @@ static mkernel_internal_error digital_sign_serialize_sha384(lbs_packet *lbs_pack
         return mkernel_internal_mem_lack;
     }
 
-    if (sign_src_len > ezdev_sdk_total_len)
+    if (sign_src_len > LBS_AUTH_INFO_LEN)
     {
         return mkernel_internal_input_param_invalid;
     }
-    ezos_memset(sign_input, 0, ezdev_sdk_total_len);
+    ezos_memset(sign_input, 0, LBS_AUTH_INFO_LEN);
     ezos_memset(sign_output, 0, 64);
     ezos_memcpy(sign_input, sign_src, sign_src_len);
     sign_input_len = sign_src_len;
     mbedtls_sha512(sign_input, sign_input_len, sign_output, 1);
 
-    ezos_memset(sign_input, 0, ezdev_sdk_total_len);
+    ezos_memset(sign_input, 0, LBS_AUTH_INFO_LEN);
     ezos_memcpy(sign_input, sign_output, 64);
     sign_input_len = ezos_strlen((const char *)sign_input);
 
@@ -419,7 +468,7 @@ static mkernel_internal_error digital_sign_serialize_and_check_sha384(unsigned c
                                                                       unsigned char *sign_src, EZDEV_SDK_UINT16 sign_src_len, unsigned char *master_key, EZDEV_SDK_UINT16 master_key_len)
 {
     EZDEV_SDK_UINT32 sign_input_len = 0;
-    unsigned char sign_input[ezdev_sdk_total_len];
+    unsigned char sign_input[LBS_AUTH_INFO_LEN];
     unsigned char sign_output[64];
     EZDEV_SDK_INT32 mbedtls_result = 0;
 
@@ -433,14 +482,14 @@ static mkernel_internal_error digital_sign_serialize_and_check_sha384(unsigned c
         ezlog_d(TAG_CORE, "digital_sign_serialize_and_check_sha384 ,target_sign_len != 64");
         return mkernel_internal_sign_check_error;
     }
-    ezos_memset(sign_input, 0, ezdev_sdk_total_len);
+    ezos_memset(sign_input, 0, LBS_AUTH_INFO_LEN);
     ezos_memset(sign_output, 0, 64);
 
     ezos_memcpy(sign_input, sign_src, sign_src_len);
     sign_input_len = sign_src_len;
     mbedtls_sha512(sign_input, sign_input_len, sign_output, 1);
 
-    ezos_memset(sign_input, 0, ezdev_sdk_total_len);
+    ezos_memset(sign_input, 0, LBS_AUTH_INFO_LEN);
     ezos_memcpy(sign_input, sign_output, 48);
     ezos_memset(sign_output, 0, 64);
 
@@ -657,8 +706,8 @@ static mkernel_internal_error send_authentication_i(ezdev_sdk_kernel *sdk_kernel
     EZDEV_SDK_UINT32 pubkey_len = 0;
     unsigned char encrypt_data[256] = {0};
     EZDEV_SDK_UINT32 encrypt_data_len = 0;
-    unsigned char tag_data[tag_len] = {0};
-    EZDEV_SDK_UINT32 tag_data_len = tag_len;
+    unsigned char tag_data[LBS_AUTH_TAG_LEN] = {0};
+    EZDEV_SDK_UINT32 tag_data_len = LBS_AUTH_TAG_LEN;
     do
     {
         sdk_error = common_serialize(&authi_affair->global_out_packet, DEV_PROTOCOL_LBS_FORM_VERSION, DEV_PROTOCOL_LBS_LOW_TYPE_VERSION_LICENSE,
@@ -755,10 +804,10 @@ static mkernel_internal_error parse_authentication_ii(ezdev_sdk_kernel *sdk_kern
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
     char result_code = 0;
-    unsigned char peer_pubkey[ezdev_sdk_total_len] = {0};
+    unsigned char peer_pubkey[LBS_AUTH_INFO_LEN] = {0};
     EZDEV_SDK_UINT32 peer_pubkey_len = 0;
-    unsigned char input_tag_buf[tag_len] = {0};
-    EZDEV_SDK_UINT32 tag_buf_len = tag_len;
+    unsigned char input_tag_buf[LBS_AUTH_TAG_LEN] = {0};
+    EZDEV_SDK_UINT32 tag_buf_len = LBS_AUTH_TAG_LEN;
     unsigned char masterkey[48] = {0};
     char maskerkeykey[32] = {0};
     EZDEV_SDK_UINT32 masterkey_len = 0;
@@ -987,12 +1036,12 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     EZDEV_SDK_UINT8 en_dev_id_len = 0;
     unsigned char dev_id[48] = {0};
     EZDEV_SDK_UINT32 dev_id_len = 0;
-    unsigned char sign_input[ezdev_sdk_total_len];
+    unsigned char sign_input[LBS_AUTH_INFO_LEN];
 
-    unsigned char devid_tag_buf[tag_len] = {0};
-    EZDEV_SDK_UINT32 devid_tag_buf_len = tag_len;
-    unsigned char sessionkey_tag_buf[tag_len] = {0};
-    EZDEV_SDK_UINT32 sessionkey_tag_buf_len = tag_len;
+    unsigned char devid_tag_buf[LBS_AUTH_TAG_LEN] = {0};
+    EZDEV_SDK_UINT32 devid_tag_buf_len = LBS_AUTH_TAG_LEN;
+    unsigned char sessionkey_tag_buf[LBS_AUTH_TAG_LEN] = {0};
+    EZDEV_SDK_UINT32 sessionkey_tag_buf_len = LBS_AUTH_TAG_LEN;
 
     authi_affair->global_in_packet.payload_buf_off += 3;
     ezos_memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
@@ -1053,7 +1102,7 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     }
     ezos_memcpy(authi_affair->session_key, sessionkey, sessionkey_len);
     authi_affair->global_in_packet.payload_buf_off += en_sessionkey_len;
-    ezos_memset(sign_input, 0, ezdev_sdk_total_len);
+    ezos_memset(sign_input, 0, LBS_AUTH_INFO_LEN);
     ezos_memcpy(sign_input, authi_affair->dev_subserial, ezos_strlen(authi_affair->dev_subserial));
     sdk_error = digital_sign_serialize_and_check_sha384(authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off,
                                                         remain_len - authi_affair->global_in_packet.payload_buf_off, sign_input, ezos_strlen(authi_affair->dev_subserial), authi_affair->master_key, 16);
@@ -1150,32 +1199,6 @@ static mkernel_internal_error send_refreshsessionkey_i(ezdev_sdk_kernel *sdk_ker
     return mkernel_internal_succ;
 }
 
-static mkernel_internal_error send_stun_refreshsessionkey_i(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair)
-{
-    mkernel_internal_error sdk_error = mkernel_internal_succ;
-
-    sdk_error = common_serialize(&authi_affair->global_out_packet, DEV_PROTOCOL_LBS_FORM_VERSION, DEV_PROTOCOL_LBS_LOW_TYPE_VERSION, DEV_PROTOCOL_LBS_HIGH_TYPE_VERSION);
-    if (sdk_error != mkernel_internal_succ)
-    {
-        return sdk_error;
-    }
-
-    sdk_error = refreshsessionkey_i_serialize(authi_affair);
-    if (sdk_error != mkernel_internal_succ)
-    {
-        return sdk_error;
-    }
-    sdk_error = header_serialize_old(&authi_affair->global_out_packet, DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_I, authi_affair->global_out_packet.payload_buf_off);
-    if (sdk_error != mkernel_internal_succ)
-    {
-        return sdk_error;
-    }
-
-    sdk_error = send_lbs_msg(sdk_kernel, authi_affair);
-    ezlog_d(TAG_CORE, "send_stun_refreshsessionkey_i complete, code:%d", sdk_error);
-    return mkernel_internal_succ;
-}
-
 static mkernel_internal_error parse_refreshsessionkey_ii(lbs_affair *authi_affair, EZDEV_SDK_UINT32 remain_len)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
@@ -1243,26 +1266,6 @@ static mkernel_internal_error wait_refreshsessionkey_ii(ezdev_sdk_kernel *sdk_ke
     return sdk_error;
 }
 
-static mkernel_internal_error wait_stun_refreshsessionkey_ii(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair)
-{
-    EZDEV_SDK_UINT32 rev_cmd = 0;
-    EZDEV_SDK_UINT32 remain_len = 0;
-    mkernel_internal_error sdk_error = mkernel_internal_succ;
-    sdk_error = wait_assign_response(sdk_kernel, authi_affair, &rev_cmd, &remain_len);
-    if (sdk_error != mkernel_internal_succ)
-    {
-        return sdk_error;
-    }
-
-    if (rev_cmd != DEV_PROTOCOL_STUN_REFRESHSESSIONKEY_II)
-    {
-        return mkernel_internal_net_read_error_request;
-    }
-
-    sdk_error = parse_refreshsessionkey_ii(authi_affair, remain_len);
-
-    return sdk_error;
-}
 mkernel_internal_error refreshsessionkey_iii_serialize(lbs_affair *auth_affair)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
@@ -1367,7 +1370,7 @@ static mkernel_internal_error crypto_data_req_das_serialize(lbs_affair *auth_aff
         cJSON_AddStringToObject(pJsonRoot, "Type", "DAS");
         cJSON_AddNumberToObject(pJsonRoot, "Mode", auth_affair->dev_access_mode);
 
-        json_buf = cJSON_PrintBuffered(pJsonRoot, ezdev_sdk_json_default_size, 0);
+        json_buf = cJSON_PrintBuffered(pJsonRoot, LBS_AUTH_JSON_DEFAULT_LEN, 0);
         if (json_buf == NULL)
         {
             sdk_error = mkernel_internal_json_format_error;
@@ -1375,10 +1378,10 @@ static mkernel_internal_error crypto_data_req_das_serialize(lbs_affair *auth_aff
         }
         json_len = ezos_strlen(json_buf);
         json_len_padding = calculate_padding_len(json_len);
-        if (ezdev_sdk_json_default_size > json_len_padding)
+        if (LBS_AUTH_JSON_DEFAULT_LEN > json_len_padding)
         {
             json_buf_padding = json_buf;
-            ezos_memset(json_buf + json_len, 0, ezdev_sdk_json_default_size - json_len);
+            ezos_memset(json_buf + json_len, 0, LBS_AUTH_JSON_DEFAULT_LEN - json_len);
         }
         else
         {
@@ -1459,7 +1462,7 @@ static mkernel_internal_error crypto_data_req_stun_serialize(lbs_affair *auth_af
         cJSON_AddStringToObject(pJsonRoot, "DevSerial", auth_affair->dev_subserial);
         cJSON_AddStringToObject(pJsonRoot, "Type", "STUN");
 
-        json_buf = cJSON_PrintBuffered(pJsonRoot, ezdev_sdk_json_default_size, 0);
+        json_buf = cJSON_PrintBuffered(pJsonRoot, LBS_AUTH_JSON_DEFAULT_LEN, 0);
         if (json_buf == NULL)
         {
             sdk_error = mkernel_internal_json_format_error;
@@ -1468,10 +1471,10 @@ static mkernel_internal_error crypto_data_req_stun_serialize(lbs_affair *auth_af
 
         json_len = ezos_strlen(json_buf);
         json_len_padding = calculate_padding_len(json_len);
-        if (ezdev_sdk_json_default_size > json_len_padding)
+        if (LBS_AUTH_JSON_DEFAULT_LEN > json_len_padding)
         {
             json_buf_padding = json_buf;
-            ezos_memset(json_buf + json_len, 0, ezdev_sdk_json_default_size - json_len);
+            ezos_memset(json_buf + json_len, 0, LBS_AUTH_JSON_DEFAULT_LEN - json_len);
         }
         else
         {
@@ -1613,60 +1616,6 @@ static mkernel_internal_error parse_crypto_data_rsp_das(lbs_affair *authi_affair
     return sdk_error;
 }
 
-static mkernel_internal_error parse_crypto_data_rsp_stun(lbs_affair *authi_affair, EZDEV_SDK_UINT32 remain_len, stun_info *rev_stun_info)
-{
-    mkernel_internal_error sdk_error = mkernel_internal_succ;
-
-    char result_code = 0;
-    EZDEV_SDK_UINT32 en_src_len = 0;
-    unsigned char *de_dst = NULL;
-    EZDEV_SDK_UINT32 de_dst_len = 0;
-
-    authi_affair->global_in_packet.payload_buf_off += 3;
-    ezos_memcpy(&result_code, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, 1);
-    authi_affair->global_in_packet.payload_buf_off++;
-
-    if (result_code != 0)
-    {
-        ezlog_d(TAG_CORE, "parse_crypto_data_rsp_stun platform return error code:%d", result_code);
-        return mkernel_internal_platform_error + result_code;
-    }
-
-    en_src_len = remain_len - authi_affair->global_in_packet.payload_buf_off;
-
-    de_dst = (unsigned char *)ezos_malloc(en_src_len);
-    if (de_dst == NULL)
-    {
-        return mkernel_internal_malloc_error;
-    }
-
-    ezos_memset(de_dst, 0, en_src_len);
-
-    do
-    {
-        sdk_error = aes_cbc_128_dec_padding(authi_affair->session_key, authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off,
-                                            en_src_len, de_dst, &de_dst_len);
-        if (sdk_error != mkernel_internal_succ)
-        {
-            break;
-        }
-
-        sdk_error = json_parse_stun_server_info((char *)de_dst, rev_stun_info);
-        if (sdk_error != mkernel_internal_succ)
-        {
-            break;
-        }
-    } while (0);
-
-    if (NULL != de_dst)
-    {
-        ezos_free(de_dst);
-        de_dst = NULL;
-    }
-
-    return sdk_error;
-}
-
 static mkernel_internal_error wait_crypto_data_rsp_das(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair, das_info *rev_das_info)
 {
     EZDEV_SDK_UINT32 rev_cmd = 0;
@@ -1684,27 +1633,6 @@ static mkernel_internal_error wait_crypto_data_rsp_das(ezdev_sdk_kernel *sdk_ker
     }
 
     sdk_error = parse_crypto_data_rsp_das(authi_affair, remain_len, rev_das_info);
-
-    return sdk_error;
-}
-
-static mkernel_internal_error wait_crypto_data_rsp_stun(ezdev_sdk_kernel *sdk_kernel, lbs_affair *authi_affair, stun_info *rev_stun_info)
-{
-    EZDEV_SDK_UINT32 rev_cmd = 0;
-    EZDEV_SDK_UINT32 remain_len = 0;
-    mkernel_internal_error sdk_error = mkernel_internal_succ;
-    sdk_error = wait_assign_response(sdk_kernel, authi_affair, &rev_cmd, &remain_len);
-    if (sdk_error != mkernel_internal_succ)
-    {
-        return sdk_error;
-    }
-
-    if (rev_cmd != DEV_PROTOCOL_CRYPTO_DATA_RSP)
-    {
-        return mkernel_internal_net_read_error_request;
-    }
-
-    sdk_error = parse_crypto_data_rsp_stun(authi_affair, remain_len, rev_stun_info);
 
     return sdk_error;
 }
@@ -2047,61 +1975,105 @@ mkernel_internal_error lbs_redirect(ezdev_sdk_kernel *sdk_kernel)
     return sdk_error;
 }
 
-mkernel_internal_error lbs_getstun(ezdev_sdk_kernel *sdk_kernel, stun_info *ptr_stun)
+static mkernel_internal_error json_parse_das_server_info(const char *jsonstring, das_info *das_server_info)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
-    lbs_affair auth_redirect;
-    ezos_memset(&auth_redirect, 0, sizeof(auth_redirect));
+    cJSON *json_item = NULL;
+    cJSON *address_json_item = NULL;
+    cJSON *port_json_item = NULL;
+    cJSON *udpport_json_item = NULL;
+    cJSON *domain_json_item = NULL;
+    cJSON *serverid_json_item = NULL;
+    cJSON *dasinfo_json_item = NULL;
+    cJSON *das_json_item = NULL;
 
     do
     {
-        sdk_error = init_lbs_affair(sdk_kernel, &auth_redirect, 1);
-        if (sdk_error != mkernel_internal_succ)
+        json_item = cJSON_Parse((const char *)jsonstring);
+        if (json_item == NULL)
         {
+            sdk_error = mkernel_internal_json_parse_error;
             break;
         }
 
-        sdk_error = lbs_connect(sdk_kernel, &auth_redirect);
-        if (sdk_error != mkernel_internal_succ)
+        das_json_item = cJSON_GetObjectItem(json_item, "Type");
+        if (das_json_item == NULL)
         {
+            sdk_error = mkernel_internal_json_parse_error;
+            break;
+        }
+        if (das_json_item->type != cJSON_String || das_json_item->valuestring == NULL)
+        {
+            sdk_error = mkernel_internal_json_parse_error;
+            break;
+        }
+        if (ezos_strcmp(das_json_item->valuestring, "DAS") != 0)
+        {
+            sdk_error = mkernel_internal_get_error_json;
             break;
         }
 
-        sdk_error = send_stun_refreshsessionkey_i(sdk_kernel, &auth_redirect);
-        if (sdk_error != mkernel_internal_succ)
+        dasinfo_json_item = cJSON_GetObjectItem(json_item, "DasInfo");
+        if (dasinfo_json_item == NULL)
         {
+            sdk_error = mkernel_internal_get_error_json;
             break;
         }
 
-        sdk_error = wait_stun_refreshsessionkey_ii(sdk_kernel, &auth_redirect);
-        if (sdk_error != mkernel_internal_succ)
+        address_json_item = cJSON_GetObjectItem(dasinfo_json_item, "Address");
+        port_json_item = cJSON_GetObjectItem(dasinfo_json_item, "Port");
+        udpport_json_item = cJSON_GetObjectItem(dasinfo_json_item, "UdpPort");
+        domain_json_item = cJSON_GetObjectItem(dasinfo_json_item, "Domain");
+        serverid_json_item = cJSON_GetObjectItem(dasinfo_json_item, "ServerID");
+        if (NULL == serverid_json_item || NULL == port_json_item || NULL == domain_json_item || NULL == serverid_json_item || NULL == udpport_json_item)
         {
+            sdk_error = mkernel_internal_get_error_json;
             break;
         }
 
-        clear_lbs_affair_buf(&auth_redirect);
-        sdk_error = send_stun_refreshsessionkey_iii(sdk_kernel, &auth_redirect);
-        if (sdk_error != mkernel_internal_succ)
+        if (port_json_item->type != cJSON_Number || udpport_json_item->type != cJSON_Number ||
+            serverid_json_item->type != cJSON_String || serverid_json_item->valuestring == NULL ||
+            domain_json_item->type != cJSON_String || domain_json_item->valuestring == NULL ||
+            address_json_item->type != cJSON_String || address_json_item->valuestring == NULL)
         {
+            sdk_error = mkernel_internal_get_error_json;
             break;
         }
 
-        clear_lbs_affair_buf(&auth_redirect);
-        sdk_error = send_crypto_data_req(sdk_kernel, &auth_redirect, 0);
-        if (sdk_error != mkernel_internal_succ)
+        if (ezos_strlen(address_json_item->valuestring) >= ezdev_sdk_ip_max_len)
         {
+            ezlog_d(TAG_CORE, "parse_crypto_data_rsp_das Address >= 64");
+            sdk_error = mkernel_internal_platform_appoint_error;
             break;
         }
+        ezos_strncpy(das_server_info->das_address, address_json_item->valuestring, ezos_strlen(address_json_item->valuestring));
 
-        sdk_error = wait_crypto_data_rsp_stun(sdk_kernel, &auth_redirect, ptr_stun);
-        if (sdk_error != mkernel_internal_succ)
+        if (ezos_strlen(domain_json_item->valuestring) >= ezdev_sdk_ip_max_len)
         {
+            ezlog_d(TAG_CORE, "parse_crypto_data_rsp_das domain >= 64");
+            sdk_error = mkernel_internal_platform_appoint_error;
             break;
         }
+        ezos_strncpy(das_server_info->das_domain, domain_json_item->valuestring, ezos_strlen(domain_json_item->valuestring));
+
+        if (ezos_strlen(serverid_json_item->valuestring) >= ezdev_sdk_name_len)
+        {
+            ezlog_d(TAG_CORE, "parse_crypto_data_rsp_das serverid >= 64");
+            sdk_error = mkernel_internal_platform_appoint_error;
+            break;
+        }
+        ezos_strncpy(das_server_info->das_serverid, serverid_json_item->valuestring, ezos_strlen(serverid_json_item->valuestring));
+
+        das_server_info->das_port = port_json_item->valueint;
+        das_server_info->das_udp_port = udpport_json_item->valueint;
+        ezlog_d("das_server_info:address:%s,port:%d", das_server_info->das_address, das_server_info->das_port);
     } while (0);
 
-    lbs_close(sdk_kernel, &auth_redirect);
-    fini_lbs_affair(&auth_redirect);
+    if (NULL != json_item)
+    {
+        cJSON_Delete(json_item);
+        json_item = NULL;
+    }
 
     return sdk_error;
 }

@@ -44,7 +44,7 @@ void add_cmd_risk_control(ezdev_sdk_kernel *sdk_kernel, EZDEV_SDK_UINT32 domain_
         return;
     }
 
-    for (index = 0; index < ezdev_sdk_risk_control_cmd_max; index++)
+    for (index = 0; index < CONFIG_EZIOT_CORE_RISK_CONTROL_CMD_MAX; index++)
     {
         if (0 == domain_info->cmd_risk_array[index])
         {
@@ -71,7 +71,7 @@ char check_cmd_risk_control(ezdev_sdk_kernel *sdk_kernel, EZDEV_SDK_UINT32 domai
     int index = 0;
     ezdev_sdk_kernel_domain_info *domain_info = NULL;
 
-    if (DAS_CMD_COMMON_FUN == domain_id || DAS_CMD_DOMAIN == domain_id || ezdev_sdk_offline_cmd_id == cmd_id)
+    if (DAS_CMD_COMMON_FUN == domain_id || DAS_CMD_DOMAIN == domain_id)
     {
         return 0;
     }
@@ -87,7 +87,7 @@ char check_cmd_risk_control(ezdev_sdk_kernel *sdk_kernel, EZDEV_SDK_UINT32 domai
         return 2;
     }
 
-    for (index = 0; index < ezdev_sdk_risk_control_cmd_max; index++)
+    for (index = 0; index < CONFIG_EZIOT_CORE_RISK_CONTROL_CMD_MAX; index++)
     {
         if (0 == domain_info->cmd_risk_array[index])
         {

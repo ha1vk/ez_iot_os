@@ -11,6 +11,8 @@
 #include "das_transport.h"
 #include "utils.h"
 
+#define ACCESS_DEFAULT_KEEPALIVEINTERVAL 30
+
 static ez_mutex_t g_mutex_lock;
 extern EZDEV_SDK_UINT32 g_das_transport_seq;
 extern ezdev_sdk_kernel g_ezdev_sdk_kernel;
@@ -52,7 +54,7 @@ EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev
     g_ezdev_sdk_kernel.dev_last_auth_type = sdk_dev_auth_protocol_ecdh;
     g_ezdev_sdk_kernel.dev_auth_type_count = 1;
     g_ezdev_sdk_kernel.dev_auth_type_group[0] = sdk_dev_auth_protocol_ecdh;
-    g_ezdev_sdk_kernel.das_keepalive_interval = ezdev_sdk_das_default_keepaliveinterval;
+    g_ezdev_sdk_kernel.das_keepalive_interval = ACCESS_DEFAULT_KEEPALIVEINTERVAL;
 
     /* set server info */
     ezos_strncpy(g_ezdev_sdk_kernel.server_info.server_name, (char *)psrv_info->host, ezdev_sdk_name_len - 1);
@@ -61,7 +63,6 @@ EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev
     /* set devinfo */
     g_ezdev_sdk_kernel.dev_info.dev_auth_mode = pdev_info->auth_mode;
     g_ezdev_sdk_kernel.dev_info.dev_status = 1;
-    g_ezdev_sdk_kernel.dev_info.dev_oeminfo = 0;
     ezos_strncpy(g_ezdev_sdk_kernel.dev_info.dev_subserial, (char *)pdev_info->dev_subserial, sizeof(g_ezdev_sdk_kernel.dev_info.dev_subserial) - 1);
     ezos_strncpy(g_ezdev_sdk_kernel.dev_info.dev_verification_code, (char *)pdev_info->dev_verification_code, sizeof(g_ezdev_sdk_kernel.dev_info.dev_verification_code) - 1);
     ezos_strncpy(g_ezdev_sdk_kernel.dev_info.dev_firmwareversion, (char *)pdev_info->dev_firmwareversion, sizeof(g_ezdev_sdk_kernel.dev_info.dev_firmwareversion) - 1);
@@ -226,7 +227,7 @@ EZOS_API ez_err_t ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
     ezlog_i(TAG_CORE, "domain:%d ,cmd:%d, seq:%d, len:%d, data:%s", pubmsg->msg_domain_id,
             pubmsg->msg_command_id, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
 
-    CHECK_COND_DONE(pubmsg->msg_body_len > ezdev_sdk_send_buf_max, EZ_CORE_ERR_OUT_RANGE);
+    CHECK_COND_DONE(pubmsg->msg_body_len > CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX, EZ_CORE_ERR_OUT_RANGE);
 
     cRiskResult = check_cmd_risk_control(&g_ezdev_sdk_kernel, pubmsg->msg_domain_id, pubmsg->msg_command_id);
     CHECK_COND_DONE(1 == cRiskResult, EZ_CORE_ERR_NO_EXTEND);
@@ -249,7 +250,7 @@ EZOS_API ez_err_t ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
     ezos_memset(new_pubmsg_exchange->msg_conntext.msg_body, 0, pubmsg->msg_body_len);
     new_pubmsg_exchange->msg_conntext.msg_body_len = pubmsg->msg_body_len;
     ezos_memcpy(new_pubmsg_exchange->msg_conntext.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
-    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count;
+    new_pubmsg_exchange->max_send_count = CONFIG_EZIOT_CORE_DEFAULT_PUBLISH_RETRY;
 
     if (pubmsg->msg_response == 0)
     {
@@ -330,7 +331,7 @@ EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
     ezlog_i(TAG_CORE, "module:%s, resource_type:%s,msg_type:%s, method:%s, ext_msg:%s, seq:%d, len:%d, string:%s", pubmsg->module,
             pubmsg->resource_type, pubmsg->msg_type, pubmsg->method, pubmsg->ext_msg, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
 
-    CHECK_COND_DONE(pubmsg->msg_body_len > ezdev_sdk_send_buf_max, EZ_CORE_ERR_OUT_RANGE);
+    CHECK_COND_DONE(pubmsg->msg_body_len > CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX, EZ_CORE_ERR_OUT_RANGE);
 
     new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange_v3 *)ezos_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange_v3));
     CHECK_COND_DONE(!new_pubmsg_exchange, EZ_CORE_ERR_MEMORY);
@@ -357,7 +358,7 @@ EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
     ezos_memset(new_pubmsg_exchange->msg_conntext_v3.msg_body, 0, pubmsg->msg_body_len);
     new_pubmsg_exchange->msg_conntext_v3.msg_body_len = pubmsg->msg_body_len;
     ezos_memcpy(new_pubmsg_exchange->msg_conntext_v3.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
-    new_pubmsg_exchange->max_send_count = ezdev_sdk_max_publish_count;
+    new_pubmsg_exchange->max_send_count = CONFIG_EZIOT_CORE_DEFAULT_PUBLISH_RETRY;
     new_pubmsg_exchange->msg_conntext_v3.msg_seq = pubmsg->msg_seq;
 
     CHECK_COND_DONE(das_send_pubmsg_async_v3(&g_ezdev_sdk_kernel, new_pubmsg_exchange), EZ_CORE_ERR_MEMORY);
@@ -404,10 +405,6 @@ EZOS_API const ez_char_t *ez_kernel_getdevinfo_bykey(const ez_char_t *key)
     else if (ezos_strcmp(key, "dev_mac") == 0)
     {
         return g_ezdev_sdk_kernel.dev_info.dev_mac;
-    }
-    else if (ezos_strcmp(key, "dev_nickname") == 0)
-    {
-        return g_ezdev_sdk_kernel.dev_info.dev_nickname;
     }
     else if (ezos_strcmp(key, "dev_firmwareidentificationcode") == 0)
     {

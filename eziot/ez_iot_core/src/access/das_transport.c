@@ -29,6 +29,9 @@
 #include "utils.h"
 #include "net_module.h"
 
+#define MSG_TYPE_REQ 1
+#define MSG_TYPE_RSP 2
+
 EXTERN_QUEUE_FUN(submsg)
 EXTERN_QUEUE_FUN(pubmsg_exchange)
 EXTERN_QUEUE_FUN(submsg_v3)
@@ -45,8 +48,8 @@ extern ezdev_sdk_kernel g_ezdev_sdk_kernel;
 
 MQTTClient g_DasClient;
 Network g_DasNetWork;
-unsigned char g_sendbuf[ezdev_sdk_send_buf_max];
-unsigned char g_readbuf[ezdev_sdk_recv_buf_max];
+unsigned char g_sendbuf[CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX];
+unsigned char g_readbuf[CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX];
 EZDEV_SDK_UINT32 g_das_transport_seq; ///<	与DAS通信数据包seq
 static EZDEV_SDK_BOOL g_is_first_session = EZDEV_SDK_TRUE;
 
@@ -246,9 +249,7 @@ static mkernel_internal_error serialize_devinfo(ezdev_sdk_kernel *sdk_kernel, un
         cJSON_AddStringToObject(pJsonRoot, "DevTypeDisplay", sdk_kernel->dev_info.dev_typedisplay);
         cJSON_AddStringToObject(pJsonRoot, "MAC", sdk_kernel->dev_info.dev_mac);
         cJSON_AddNumberToObject(pJsonRoot, "Status", sdk_kernel->dev_info.dev_status);
-        cJSON_AddStringToObject(pJsonRoot, "NickName", sdk_kernel->dev_info.dev_nickname);
         cJSON_AddStringToObject(pJsonRoot, "FirmwareIdentificationCode", sdk_kernel->dev_info.dev_firmwareidentificationcode);
-        cJSON_AddNumberToObject(pJsonRoot, "dev_oeminfo", sdk_kernel->dev_info.dev_oeminfo);
         cJSON_AddStringToObject(pJsonRoot, "LbsDomain", sdk_kernel->server_info.server_name);
         cJSON_AddNumberToObject(pJsonRoot, "RegMode", sdk_kernel->reg_mode);
         cJSON_AddStringToObject(pJsonRoot, "SDKMainVersion", sdk_kernel->szMainVersion);
@@ -1056,11 +1057,11 @@ static mkernel_internal_error das_send_pubmsg(ezdev_sdk_kernel *sdk_kernel, ezde
 
     if (pubmsg->msg_response == 0)
     {
-        msg_type = ezdev_sdk_msg_type_req;
+        msg_type = MSG_TYPE_REQ;
     }
     else
     {
-        msg_type = ezdev_sdk_msg_type_rsp;
+        msg_type = MSG_TYPE_RSP;
     }
     do
     {
@@ -1253,8 +1254,8 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
     unsigned char *will_message = NULL;
     EZDEV_SDK_UINT32 will_message_len = 0;
 
-    ezos_memset(g_sendbuf, 0, ezdev_sdk_send_buf_max);
-    ezos_memset(g_readbuf, 0, ezdev_sdk_recv_buf_max);
+    ezos_memset(g_sendbuf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
+    ezos_memset(g_readbuf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
 
     do
     {
@@ -1385,19 +1386,19 @@ void das_object_init(ezdev_sdk_kernel *sdk_kernel)
 {
     EZDEV_SDK_UNUSED(sdk_kernel)
     MQTTNetInit(&g_DasNetWork);
-    ezos_memset(g_sendbuf, 0, ezdev_sdk_send_buf_max);
-    ezos_memset(g_readbuf, 0, ezdev_sdk_recv_buf_max);
+    ezos_memset(g_sendbuf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
+    ezos_memset(g_readbuf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
 
-    MQTTClientInit(&g_DasClient, &g_DasNetWork, 6 * 1000, g_sendbuf, ezdev_sdk_send_buf_max, g_readbuf, ezdev_sdk_recv_buf_max);
+    MQTTClientInit(&g_DasClient, &g_DasNetWork, 6 * 1000, g_sendbuf, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX, g_readbuf, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
 
-    init_queue(ezdev_sdk_queue_max, ezdev_sdk_queue_max, ezdev_sdk_queue_max * 4);
+    init_queue(CONFIG_EZIOT_CORE_MESSAGE_NUMBER_MAX, CONFIG_EZIOT_CORE_MESSAGE_NUMBER_MAX, CONFIG_EZIOT_CORE_MESSAGE_NUMBER_MAX * 4);
 }
 
 void das_object_fini(ezdev_sdk_kernel *sdk_kernel)
 {
     EZDEV_SDK_UNUSED(sdk_kernel)
-    ezos_memset(g_sendbuf, 0, ezdev_sdk_send_buf_max);
-    ezos_memset(g_readbuf, 0, ezdev_sdk_recv_buf_max);
+    ezos_memset(g_sendbuf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
+    ezos_memset(g_readbuf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
 
     MQTTNetFini(&g_DasNetWork);
     fini_queue();

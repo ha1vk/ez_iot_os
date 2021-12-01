@@ -9,6 +9,10 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * 
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-12-01     xurongjun    Remove redundant functions
  *******************************************************************************/
 
 #include <string.h>
