@@ -18,6 +18,8 @@
  * 2021-11-25    zhangdi29     
  *******************************************************************************/
 
+#include "ezlog.h"
+
 enum
 {
     kPu2CenPltHubReportRelationShipReq = 0x00000001,
@@ -36,7 +38,12 @@ enum
 
 #define EZDEVSDK_HUB_RSP 1
 #define EZDEVSDK_HUB_REQ 0
-#include "ezlog.h"
+
+#define hub_module_id 7002
+#define hub_module_name "hub"
+#define hub_module_version "V2.0.0"
+
+
 
 EZ_INT hub_extern_init();
 

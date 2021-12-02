@@ -1,0 +1,7 @@
+menu "ez-iot shadow configuration"
+    config EZIOT_SHADOW_ENABLE
+        bool "Enable ez-iot shadow"
+        default n
+
+endmenu
+
