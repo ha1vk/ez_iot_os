@@ -45,7 +45,7 @@ extern "C"
         EZ_TSL_ERR_KEY_NOT_FOUND = TSL_MODULE_ERRNO_BASE + 0x0a,     ///< The Key is illegal, is not defined in the profile
         EZ_TSL_ERR_VALUE_TYPE = TSL_MODULE_ERRNO_BASE + 0x0b,        ///< The type of the value does not match the definition
         EZ_TSL_ERR_VALUE_ILLEGAL = TSL_MODULE_ERRNO_BASE + 0x0c,     ///< The value out of the defined range
-        EZ_TSL_ERR_PROFILE_LOADING = TSL_MODULE_ERRNO_BASE + 0x0d,   ///< The device profile is loading
+        EZ_TSL_ERR_PROFILE_LOADING = TSL_MODULE_ERRNO_BASE + 0x0d,   ///< The device profile is loading or profile illegal
         EZ_TSL_ERR_STORAGE = TSL_MODULE_ERRNO_BASE + 0x0e,           ///< An error occurred when flash I/O
     } ez_tsl_err_e;
 
@@ -137,7 +137,7 @@ extern "C"
         */
         ez_int32_t (*property2dev)(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value);
 
-    } ez_tsl_things_callbacks_t;
+    } ez_tsl_callbacks_t;
 
     /**
     * @brief 模块初始化
@@ -145,7 +145,16 @@ extern "C"
     * @param pdata_cbs 
     * @return ez_tsl_err_e 
     */
-    EZOS_API ez_err_t ez_iot_tsl_init(ez_tsl_things_callbacks_t *ptsl_cbs);
+    EZOS_API ez_err_t ez_iot_tsl_init(ez_tsl_callbacks_t *ptsl_cbs);
+
+    /**
+     * @brief 设备注册
+     * 
+     * @param pevinfo 设备信息; NULL默认当前设备，子设备不能为NULL
+     * @param profile 物模型描述文件; NULL默认从网络自动下载
+     * @return ez_tsl_err_e 
+     */
+    EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pdevinfo, ez_char_t *profile);
 
     /**
     * @brief 向平台上报一条属性
@@ -168,6 +177,14 @@ extern "C"
     * @return ez_tsl_err_e 
     */
     EZOS_API ez_err_t ez_iot_tsl_event_report(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value);
+
+    /**
+     * @brief 设备反注册
+     * 
+     * @param pevinfo 设备信息; NULL默认当前设备，子设备不能为NULL
+     * @return ez_tsl_err_e 
+     */
+    EZOS_API ez_err_t ez_iot_tsl_unreg(ez_tsl_devinfo_t *pdevinfo);
 
     /**
     * @brief tsl反初始化

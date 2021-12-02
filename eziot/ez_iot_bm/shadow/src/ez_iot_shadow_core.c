@@ -82,6 +82,9 @@ typedef struct
     LIST type_lst;        ///< 资源类型列表
 } node_dev_t;
 
+/* shadow线程句柄 */
+static ez_thread_t g_thread_handle = NULL;
+
 /* 线程运行标志位 */
 static ez_bool_t g_running = ez_false;
 
@@ -192,7 +195,7 @@ static ez_void_t shadow_module_deinit();
 
 ez_bool_t shadow_core_start()
 {
-    if (NULL == g_sem && NULL == (g_sem = ezos_sem_create()))
+    if (NULL == g_sem && NULL == (g_sem = ezos_sem_create(0, 1)))
     {
         return ez_false;
     }
@@ -205,7 +208,7 @@ ez_bool_t shadow_core_start()
     g_running = ez_true;
     ezdev_lstInit(&g_shaodw_modules);
 
-    if (!ezos_thread_create(NULL, "ez_shadow_core", shadow_core_yeild, g_sem,
+    if (ezos_thread_create(&g_thread_handle, "ez_shadow_core", shadow_core_yeild, g_sem,
                             CONFIG_EZIOT_SHADOW_STACK_SIZE, CONFIG_EZIOT_SHADOW_TASK_PRIORITY))
     {
         ezlog_e(TAG_SHD, "shadow thread create error");
@@ -234,6 +237,7 @@ ez_void_t shadow_core_stop()
 
         g_running = ez_false;
         ezos_sem_post(g_sem);
+        ezos_thread_destroy(g_thread_handle);
         ezos_sem_destroy(g_sem);
         shadow_module_deinit();
 
@@ -243,6 +247,7 @@ ez_void_t shadow_core_stop()
         }
 
         g_sem = NULL;
+        g_thread_handle = NULL;
     } while (0);
 }
 
@@ -320,7 +325,7 @@ static ez_int32_t shadow_proc_do()
 
 ez_void_t shadow_core_event_occured(shadow_event_type_e event_type)
 {
-    ezlog_d(TAG_SHD, "set semaphore, t:%d", event_type);
+    ezlog_w(TAG_SHD, "set semaphore, t:%d", event_type);
 
     switch (event_type)
     {
@@ -910,11 +915,7 @@ ez_int32_t shadow_core_cloud_data_in(ez_void_t *shadow_res, ez_uint32_t seq, ez_
     ez_int32_t rv = -1;
     ez_shadow_res_t *pshadow_res = (ez_shadow_res_t *)shadow_res;
 
-    ezlog_v(TAG_SHD, "data in:%s", business_type);
-    ezlog_v(TAG_SHD, "sn:%s", pshadow_res->dev_serial);
-    ezlog_v(TAG_SHD, "type:%s", pshadow_res->res_type);
-    ezlog_v(TAG_SHD, "index:%d", pshadow_res->local_index);
-    ezlog_v(TAG_SHD, "seq:%d", seq);
+    ezlog_d(TAG_SHD, "data in:%s, seq:%d", business_type, seq);
 
     do
     {

@@ -172,7 +172,7 @@ EZOS_API ez_err_t ez_kernel_yield()
         rv = mkiE2ezE(access_server_yield(&g_ezdev_sdk_kernel));
     }
 
-    ezlog_v(TAG_CORE, "yield rv:%d", rv);
+    // ezlog_v(TAG_CORE, "yield rv:%d", rv);
     return rv;
 }
 
@@ -184,7 +184,7 @@ EZOS_API ez_err_t ez_kernel_yield_user()
         rv = mkiE2ezE(extend_yield(&g_ezdev_sdk_kernel));
     }
 
-    ezlog_v(TAG_CORE, "yield_user rv:%d", rv);
+    // ezlog_v(TAG_CORE, "yield_user rv:%d", rv);
     return rv;
 }
 
@@ -307,7 +307,7 @@ EZOS_API ez_err_t ez_kernel_extend_load_v3(const ez_kernel_extend_v3_t *external
 
     rv = extend_load_v3(external_extend);
     CHECK_COND_DONE(mkernel_internal_extend_full == rv, EZ_CORE_ERR_MEMORY);
-    CHECK_COND_DONE(!rv, EZ_CORE_ERR_GENERAL);
+    CHECK_COND_DONE(rv, EZ_CORE_ERR_GENERAL);
     g_ezdev_sdk_kernel.v3_reg_status = sdk_v3_reged;
 
 done:

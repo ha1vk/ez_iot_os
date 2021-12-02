@@ -31,34 +31,36 @@ extern "C"
     typedef void *ez_sem_t;
 
     /**
-     * @brief 
+     * @brief create the Semaphore
      * 
-     * @return
+     * @param count Initial count 
+     * @param maxCount Max count
+     * @return  !NULL for success, or NULL for failure
      */
-    EZOS_API ez_sem_t ezos_sem_create(void);
+    EZOS_API ez_sem_t ezos_sem_create(unsigned short count, unsigned short maxCount);
 
     /**
-     * @brief 
+     * @brief Delete the semaphore
      * 
-     * @param sem 
-     * @return  
+     * @param sem semaphore operation handle
+     * @return 0 for success, or -1 for failure
      */
     EZOS_API int ezos_sem_destroy(ez_sem_t sem);
 
     /**
-     * @brief 
+     * @brief wait for semaphore
      * 
-     * @param sem 
-     * @param timewait_ms 
-     * @return  
+     * @param sem semaphore operation handle
+     * @param timewait_ms waitting time
+     * @return  0 for success, or -1 for failure
      */
     EZOS_API int ezos_sem_wait(ez_sem_t sem, int timewait_ms);
 
     /**
-     * @brief 
+     * @brief post semaphore
      * 
-     * @param sem 
-     * @return  
+     * @param sem semaphore operation handle
+     * @return 0 for success, or -1 for failure
      */
     EZOS_API int ezos_sem_post(ez_sem_t sem);
 

@@ -29,11 +29,9 @@
 
 static ez_bool_t g_tsl_is_inited = ez_false;
 
-static ez_err_t ez_iot_tsl_reg_self(void);
-
 static ez_err_t make_event_value(const ez_tsl_value_t *value, ez_tsl_value_t *tsl_value);
 
-ez_err_t ez_iot_tsl_init(ez_tsl_things_callbacks_t *ptsl_cbs)
+ez_err_t ez_iot_tsl_init(ez_tsl_callbacks_t *ptsl_cbs)
 {
     FUNC_IN();
 
@@ -48,21 +46,10 @@ ez_err_t ez_iot_tsl_init(ez_tsl_things_callbacks_t *ptsl_cbs)
     CHECK_COND_DONE(NULL == ptsl_cbs->action2dev, EZ_TSL_ERR_PARAM_INVALID);
     CHECK_COND_DONE(NULL == ptsl_cbs->property2cloud, EZ_TSL_ERR_PARAM_INVALID);
     CHECK_COND_DONE(NULL == ptsl_cbs->property2dev, EZ_TSL_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(0 != ez_iot_tsl_adapter_init(ptsl_cbs), EZ_TSL_ERR_GENERAL);
-    CHECK_COND_DONE(0 != ez_iot_shadow_init(), EZ_TSL_ERR_GENERAL);
+    CHECK_RV_DONE(ez_iot_tsl_adapter_init(ptsl_cbs));
+    CHECK_COND_DONE(0 != ez_iot_shadow_init(), EZ_TSL_ERR_MEMORY);
 
     g_tsl_is_inited = ez_true;
-
-    if (0 != ez_iot_tsl_reg_self())
-    {
-        ezlog_e(TAG_TSL, "tsl reg self");
-
-        ez_iot_shadow_deini();
-        ez_iot_tsl_adapter_deinit();
-        g_tsl_is_inited = ez_false;
-        return EZ_TSL_ERR_MEMORY;
-    }
-
 done:
     FUNC_OUT();
 
@@ -151,7 +138,7 @@ ez_err_t ez_iot_tsl_event_report(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_in
     CHECK_COND_DONE(NULL == rsc_info, EZ_TSL_ERR_PARAM_INVALID);
     CHECK_COND_DONE(NULL == key_info, EZ_TSL_ERR_PARAM_INVALID);
     CHECK_COND_DONE(NULL == key_info->domain, EZ_TSL_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(!make_event_value(value, &tsl_value), EZ_TSL_ERR_MEMORY);
+    CHECK_COND_DONE(make_event_value(value, &tsl_value), EZ_TSL_ERR_MEMORY);
 
     _rsc_info.local_index = (rsc_info->local_index) ? rsc_info->local_index : (ez_char_t *)"0";
     _rsc_info.res_type = (rsc_info->res_type) ? rsc_info->res_type : res_type;
@@ -223,19 +210,30 @@ done:
     return rv;
 }
 
-ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pevinfo)
+EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pevinfo, ez_char_t *profile)
 {
     FUNC_IN();
 
     ez_err_t rv = EZ_TSL_ERR_SUCC;
+    ez_tsl_devinfo_t devinfo = {0};
 
     CHECK_COND_DONE(ez_false == g_tsl_is_inited, EZ_TSL_ERR_NOT_INIT);
-    CHECK_COND_DONE(NULL == pevinfo, EZ_TSL_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(NULL == pevinfo->dev_subserial, EZ_TSL_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(NULL == pevinfo->dev_type, EZ_TSL_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(NULL == pevinfo->dev_firmwareversion, EZ_TSL_ERR_PARAM_INVALID);
 
-    ez_iot_tsl_adapter_add(pevinfo);
+    if (!pevinfo)
+    {
+        devinfo.dev_subserial = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_subserial");
+        devinfo.dev_type = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_type");
+        devinfo.dev_firmwareversion = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_firmwareversion");
+        pevinfo = &devinfo;
+    }
+    else
+    {
+        CHECK_COND_DONE(NULL == pevinfo->dev_subserial, EZ_TSL_ERR_PARAM_INVALID);
+        CHECK_COND_DONE(NULL == pevinfo->dev_type, EZ_TSL_ERR_PARAM_INVALID);
+        CHECK_COND_DONE(NULL == pevinfo->dev_firmwareversion, EZ_TSL_ERR_PARAM_INVALID);
+    }
+
+    ez_iot_tsl_adapter_add(pevinfo, profile);
 
 done:
     FUNC_OUT();
@@ -248,13 +246,23 @@ ez_err_t ez_iot_tsl_unreg(ez_tsl_devinfo_t *pevinfo)
     FUNC_IN();
 
     ez_err_t rv = EZ_TSL_ERR_SUCC;
+    ez_tsl_devinfo_t devinfo = {0};
 
     CHECK_COND_DONE(ez_false == g_tsl_is_inited, EZ_TSL_ERR_NOT_INIT);
 
-    CHECK_COND_DONE(NULL == pevinfo, EZ_TSL_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(NULL == pevinfo->dev_subserial, EZ_TSL_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(NULL == pevinfo->dev_type, EZ_TSL_ERR_PARAM_INVALID);
-    CHECK_COND_DONE(NULL == pevinfo->dev_firmwareversion, EZ_TSL_ERR_PARAM_INVALID);
+    if (!pevinfo)
+    {
+        devinfo.dev_subserial = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_subserial");
+        devinfo.dev_type = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_type");
+        devinfo.dev_firmwareversion = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_firmwareversion");
+        pevinfo = &devinfo;
+    }
+    else
+    {
+        CHECK_COND_DONE(NULL == pevinfo->dev_subserial, EZ_TSL_ERR_PARAM_INVALID);
+        CHECK_COND_DONE(NULL == pevinfo->dev_type, EZ_TSL_ERR_PARAM_INVALID);
+        CHECK_COND_DONE(NULL == pevinfo->dev_firmwareversion, EZ_TSL_ERR_PARAM_INVALID);
+    }
 
     ez_iot_tsl_adapter_del(pevinfo);
 
@@ -262,22 +270,6 @@ done:
     FUNC_OUT();
 
     return rv;
-}
-
-void ez_iot_tsl_checkupdate()
-{
-    // 强制更新profile文件，清空无效文件
-}
-
-static ez_err_t ez_iot_tsl_reg_self(void)
-{
-    ez_tsl_devinfo_t pevinfo = {0};
-
-    pevinfo.dev_subserial = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_subserial");
-    pevinfo.dev_type = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_type");
-    pevinfo.dev_firmwareversion = (ez_char_t *)ez_kernel_getdevinfo_bykey("dev_firmwareversion");
-
-    return ez_iot_tsl_reg(&pevinfo);
 }
 
 char g_time_zone[8] = {0};

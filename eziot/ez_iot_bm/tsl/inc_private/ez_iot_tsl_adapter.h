@@ -21,7 +21,7 @@ extern "C"
      * @param data_cbs 描述文件读写接口
      * @param things_cbs 物模型处理回调接口
      */
-    ez_err_t ez_iot_tsl_adapter_init(ez_tsl_things_callbacks_t *things_cbs);
+    ez_err_t ez_iot_tsl_adapter_init(ez_tsl_callbacks_t *things_cbs);
 
     /**
      * @brief 增加一个设备
@@ -29,7 +29,7 @@ extern "C"
      * @param dev_info 设备信息
      * @return ez_int32_t 0表示成功、-1表示失败
      */
-    ez_err_t ez_iot_tsl_adapter_add(ez_tsl_devinfo_t *dev_info);
+    ez_err_t ez_iot_tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile);
 
     /**
      * @brief 删除一个设备

@@ -218,7 +218,7 @@ static int ezos_free_domain_memory(tsl_rsc_domain *tsl_domain, int domain_num)
     return 0;
 }
 
-int ezos_free_profile_memory(ez_iot_tsl_capacity_t *capacity)
+int free_profile_memory(ez_iot_tsl_capacity_t *capacity)
 {
     int rsc_num = capacity->rsc_num;
     for (int i = 0; i < rsc_num; i++)
@@ -1235,7 +1235,7 @@ int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *c
 
     if (0 != rv)
     {
-        ezos_free_profile_memory(capacity);
+        free_profile_memory(capacity);
     }
 
     if (NULL != js_root)

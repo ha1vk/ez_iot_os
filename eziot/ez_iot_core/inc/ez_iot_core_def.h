@@ -89,6 +89,7 @@ typedef struct
     ez_err_t last_error;                              ///< 错误码
     ez_uint32_t msg_seq;                              ///< 消息
     ez_char_t module_name[ezdev_sdk_module_name_len]; ///< 模块标识
+    ez_char_t msg_type[ezdev_sdk_msg_type_len];       ///< 消息类型
 } ez_kernel_publish_ack_t;
 
 typedef enum

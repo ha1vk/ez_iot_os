@@ -140,7 +140,26 @@ if(CONFIG_EZIOT_BASE_ENABLE)
     list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_bind.c)
 
     list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_bm)
+    list(APPEND UT_DEPENS -lez_iot_bm)
 
+endif()
+
+if(CONFIG_EZIOT_TSL_ENABLE)
+
+    message(STATUS "CONFIG_EZIOT_TSL_ENABLE")
+
+    list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_bm/tsl/inc)
+
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_tsl.c)
+
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/webclient)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezutil)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezlist)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_bm)
+
+    list(APPEND UT_DEPENS -lwebclient)
+    list(APPEND UT_DEPENS -lezutil)
+    list(APPEND UT_DEPENS -lezlist)
     list(APPEND UT_DEPENS -lez_iot_bm)
 
 endif()

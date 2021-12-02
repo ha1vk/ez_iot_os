@@ -111,3 +111,8 @@ EZOS_API ez_void_t ez_iot_base_deinit(void)
 
     FUNC_OUT();
 }
+
+ez_err_t ez_iot_base_lowlvl_profile_query(const ez_char_t *req_msg, ez_void_t* func_rsp)
+{
+    return base_protocol_query_profile_req(req_msg, func_rsp);
+}

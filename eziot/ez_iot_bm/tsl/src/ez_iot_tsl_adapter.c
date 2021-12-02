@@ -54,7 +54,7 @@ typedef struct
 } tslmap_metadata_t;
 
 // *tsl things to dev cbs
-ez_tsl_things_callbacks_t g_tsl_things_cbs = {0};
+ez_tsl_callbacks_t g_tsl_things_cbs = {0};
 
 static ez_int32_t g_profile_download_thread_running = 0;
 
@@ -81,6 +81,15 @@ static ez_bool_t tsl_adapter_ref_add(ez_tsl_devinfo_t *dev_info);
  * @return ez_false 失败，找不到功能点或者引用计数为0
  */
 static ez_bool_t tsl_adapter_ref_del(ez_tsl_devinfo_t *dev_info);
+
+/**
+ * @brief 从加载功能描述文件
+ * 
+ * @param dev_info 设备信息
+ * @return ez_true 成功
+ * @return ez_false 失败，找不到对应功能描述文件或文件损坏
+ */
+static ez_bool_t tsl_adapter_profile_parse(ez_tsl_devinfo_t *dev_info, ez_char_t *profile);
 
 /**
  * @brief 从本地加载功能描述文件
@@ -729,12 +738,12 @@ static void ez_profile_get_thread(void *user_data)
 static ez_void_t iot_core_event_route(ez_kernel_event_t *ptr_event);
 static void tsl_data_route_cb(ez_kernel_submsg_v3_t *psub_msg);
 
-ez_err_t ez_iot_tsl_adapter_init(ez_tsl_things_callbacks_t *things_cbs)
+ez_err_t ez_iot_tsl_adapter_init(ez_tsl_callbacks_t *things_cbs)
 {
     ez_err_t rv = EZ_TSL_ERR_SUCC;
     ez_kernel_extend_v3_t extend_info = {0};
 
-    ezos_memcpy(&g_tsl_things_cbs, things_cbs, sizeof(ez_tsl_things_callbacks_t));
+    ezos_memcpy(&g_tsl_things_cbs, things_cbs, sizeof(ez_tsl_callbacks_t));
 
     extend_info.ez_kernel_event_route = iot_core_event_route;
     extend_info.ez_kernel_data_route = tsl_data_route_cb;
@@ -762,7 +771,7 @@ done:
     return rv;
 }
 
-ez_err_t ez_iot_tsl_adapter_add(ez_tsl_devinfo_t *dev_info)
+ez_err_t ez_iot_tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
 {
     ez_err_t rv = EZ_TSL_ERR_SUCC;
 
@@ -773,7 +782,6 @@ ez_err_t ez_iot_tsl_adapter_add(ez_tsl_devinfo_t *dev_info)
             break;
         }
 
-        /* 内存中有功能描述文件，直接增加引用计数*/
         ezlog_d(TAG_TSL, "try ram");
         if (tsl_adapter_ref_add(dev_info))
         {
@@ -781,21 +789,35 @@ ez_err_t ez_iot_tsl_adapter_add(ez_tsl_devinfo_t *dev_info)
             break;
         }
 
-        /* 从flash中加载 */
-        ezlog_d(TAG_TSL, "try flash");
-        if (tsl_adapter_profile_load(dev_info))
+        if (profile)
         {
-            tsl_adapter_dev_add(dev_info, ez_false);
-            break;
+            ezlog_d(TAG_TSL, "try param");
+            if (tsl_adapter_profile_parse(dev_info, profile))
+            {
+                tsl_adapter_dev_add(dev_info, ez_false);
+                break;
+            }
+            else
+            {
+                rv = EZ_TSL_ERR_PROFILE_LOADING;
+                break;
+            }
         }
-
-        /* 在线下载 */
-        ezlog_d(TAG_TSL, "try download");
-        if (tsl_adapter_profile_download(dev_info))
+        else
         {
-            rv = EZ_TSL_ERR_MEMORY;
-        }
+            ezlog_d(TAG_TSL, "try flash");
+            if (tsl_adapter_profile_load(dev_info))
+            {
+                tsl_adapter_dev_add(dev_info, ez_false);
+                break;
+            }
 
+            ezlog_d(TAG_TSL, "try download");
+            if (tsl_adapter_profile_download(dev_info))
+            {
+                rv = EZ_TSL_ERR_MEMORY;
+            }
+        }
     } while (0);
 
     return rv;
@@ -1187,21 +1209,25 @@ ez_int32_t tsl_find_property_rsc_by_keyinfo(const ez_char_t *sn, const ez_tsl_ke
         /* 查找domain */
         for (j = 0; j < capacity->resource[i].domain_num; j++)
         {
-            if (0 != strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
+            if (0 == strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
             {
-                continue;
+                break;
             }
         }
+
+        CHECK_COND_DONE(j == capacity->rsc_num, EZ_TSL_ERR_RSCTYPE_NOT_FOUND);
 
         /* 查找key */
         for (k = 0; k < capacity->resource[i].domain[j].prop_num; k++)
         {
             tsl_domain_prop *prop_temp = capacity->resource[i].domain[j].prop + k;
-            if (0 != strcmp(prop_temp->identifier, (char *)key_info->key))
+            if (0 == strcmp(prop_temp->identifier, (char *)key_info->key))
             {
-                continue;
+                break;
             }
         }
+
+        CHECK_COND_DONE(k == capacity->rsc_num, EZ_TSL_ERR_RSCTYPE_NOT_FOUND);
 
         ezos_strncpy(res_type, capacity->resource[i].rsc_category, len - 1);
         rv = 0;
@@ -1289,37 +1315,6 @@ static ez_bool_t tsl_adapter_capacity_add(ez_iot_tsl_capacity_t *capacity)
 
     return ez_true;
 }
-
-// ez_bool_t ez_iot_tsl_checkupdate(const int8_t *dev_type, const int8_t *dev_ver)
-// {
-//     if (NULL == dev_ver || NULL == dev_type)
-//     {
-//         return ez_false;
-//     }
-
-//     if (NULL != g_capacities_list)
-//     {
-//         return ez_false;
-//     }
-
-//     ezos_mutex_lock(g_capacities_mutex);
-//     ez_iot_tsl_capacity_t *capacity = NULL;
-//     size_t num = ezlist_size(g_capacities_list);
-//     size_t size = sizeof(ez_iot_tsl_capacity_t);
-//     for (size_t i = 0; i < num; i++)
-//     {
-//         capacity = (ez_iot_tsl_capacity_t *)ezlist_getat(g_capacities_list, i, &size, ez_false);
-//         if (0 == strcmp((char *)dev_type, capacity->dev_type) && 0 == strcmp((char *)dev_ver, capacity->dev_fw_ver))
-//         {
-//             ezlog_w(TAG_TSL, "profile already exist.");
-//             ezos_mutex_unlock(g_capacities_mutex);
-//             return ez_true;
-//         }
-//     }
-//     ezos_mutex_unlock(g_capacities_mutex);
-
-//     return ez_false;
-// }
 
 static ez_bool_t tsl_adapter_ref_add(ez_tsl_devinfo_t *dev_info)
 {
@@ -1419,6 +1414,25 @@ static void json_to_tslmap_metadata(cJSON *json_obj, tslmap_metadata_t *struct_o
 
     s2j_struct_get_basic_element_ex(struct_obj, json_obj, string, sn, "");
     s2j_struct_get_basic_element_ex(struct_obj, json_obj, string, handle, "");
+}
+
+static ez_bool_t tsl_adapter_profile_parse(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
+{
+    ez_bool_t rv = ez_false;
+    ez_iot_tsl_capacity_t capacity = {0};
+
+    CHECK_COND_DONE(0 != profile_parse((char *)profile, ezos_strlen(profile), &capacity), ez_false);
+
+    ezos_strncpy(capacity.dev_fw_ver, (char *)dev_info->dev_firmwareversion, sizeof(capacity.dev_fw_ver) - 1);
+    ezos_strncpy(capacity.dev_type, (char *)dev_info->dev_type, sizeof(capacity.dev_type) - 1);
+
+    tsl_adapter_capacity_add(&capacity);
+    tsl_adapter_shadow_inst(dev_info, &capacity);
+
+    rv = ez_true;
+done:
+
+    return rv;
 }
 
 static ez_bool_t tsl_adapter_profile_load(ez_tsl_devinfo_t *dev_info)
@@ -1948,40 +1962,33 @@ ez_void_t tsl_adapter_set_profile_url(char *dev_sn, char *url, char *md5, int ex
 
 static ez_void_t tsl_adapter_profile_query_rsp(const ez_char_t *rsp_msg)
 {
+    ez_err_t rv = EZ_TSL_ERR_SUCC;
+    (ez_void_t) rv;
+
     cJSON *root = NULL;
     cJSON *url = NULL;
     cJSON *expire = NULL;
     cJSON *md5 = NULL;
     cJSON *dev_sn = NULL;
 
-    if (NULL == (root = cJSON_Parse(rsp_msg)))
-    {
-        goto done;
-    }
+    root = cJSON_Parse(rsp_msg);
+    CHECK_COND_DONE(!root, EZ_TSL_ERR_MEMORY);
 
     url = cJSON_GetObjectItem(root, "url");
-    if (NULL == url || cJSON_String != url->type)
-    {
-        goto done;
-    }
+    CHECK_COND_DONE(!url, EZ_TSL_ERR_MEMORY);
+    CHECK_COND_DONE(cJSON_String != url->type, EZ_TSL_ERR_GENERAL);
 
     expire = cJSON_GetObjectItem(root, "expire");
-    if (NULL == expire || cJSON_Number != expire->type)
-    {
-        goto done;
-    }
+    CHECK_COND_DONE(!expire, EZ_TSL_ERR_MEMORY);
+    CHECK_COND_DONE(cJSON_Number != expire->type, EZ_TSL_ERR_MEMORY);
 
     md5 = cJSON_GetObjectItem(root, "md5");
-    if (NULL == md5 || cJSON_String != md5->type)
-    {
-        goto done;
-    }
+    CHECK_COND_DONE(!md5, EZ_TSL_ERR_MEMORY);
+    CHECK_COND_DONE(cJSON_String != md5->type, EZ_TSL_ERR_MEMORY);
 
     dev_sn = cJSON_GetObjectItem(root, "devSerial");
-    if (NULL == dev_sn || cJSON_String != dev_sn->type)
-    {
-        goto done;
-    }
+    CHECK_COND_DONE(!dev_sn, EZ_TSL_ERR_MEMORY);
+    CHECK_COND_DONE(cJSON_String != dev_sn->type, EZ_TSL_ERR_MEMORY);
 
     tsl_adapter_set_profile_url(dev_sn->valuestring, url->valuestring, md5->valuestring, expire->valueint);
 

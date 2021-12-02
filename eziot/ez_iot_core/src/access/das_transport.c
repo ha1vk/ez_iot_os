@@ -1156,7 +1156,6 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
 
         if (mkernel_internal_call_mqtt_pub_error == sdk_error)
         {
-            //发布失败，重连设备，并缓存指令
             if (ptr_pubmsg_exchange->max_send_count-- > 1)
             {
                 ezlog_e(TAG_CORE, "v3 msg send failed,das need reconnect, count--:%d", ptr_pubmsg_exchange->max_send_count);
@@ -1167,7 +1166,8 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
 
         ack_context.last_error = mkiE2ezE(sdk_error);
         ack_context.msg_seq = ptr_pubmsg_exchange->msg_conntext_v3.msg_seq;
-        ezos_strncpy(ack_context.module_name, ptr_pubmsg_exchange->msg_conntext_v3.method, ezdev_sdk_method_len - 1);
+        ezos_strncpy(ack_context.module_name, ptr_pubmsg_exchange->msg_conntext_v3.module, sizeof(ack_context.module_name) - 1);
+        ezos_strncpy(ack_context.msg_type, ptr_pubmsg_exchange->msg_conntext_v3.msg_type, sizeof(ack_context.msg_type) - 1);
         broadcast_user_event(SDK_KERNEL_EVENT_PUBLISH_ACK, (void *)&ack_context, sizeof(ack_context));
 
         if (ptr_pubmsg_exchange->msg_conntext_v3.msg_body)

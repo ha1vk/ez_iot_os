@@ -32,10 +32,14 @@
 #define CIVIL_RESULT_GENERAL_PARSE_FAILED 0x00000003 ///< 报文解析失败
 #define CIVIL_RESULT_GENERAL_SYSTEM_ERROR 0x00000004 ///< 系统内部错误
 
+typedef ez_void_t (*profile_query_rsp)(const ez_char_t *rsp_msg);
+
 static ezxml_t xml_make_rsp(ez_int32_t result);
 static cJSON *json_make_rsp(ez_int32_t result);
-static ez_err_t dev2cloud_msg_send(ez_int8_t *buf, ez_int32_t domain_id, ez_int32_t cmd_id,
-                                   const ez_int8_t *cmd_version, ez_uint8_t msg_response, ez_uint32_t msg_seq);
+static ez_err_t dev2cloud_msg_send(ez_char_t *buf, ez_int32_t domain_id, ez_int32_t cmd_id,
+                                   ez_char_t *cmd_version, ez_uint8_t msg_response, ez_uint32_t msg_seq);
+
+static profile_query_rsp g_profile_rsp_func = NULL;
 
 ez_err_t cloud2dev_xml_req_bushandle(ez_void_t *buf, ez_int32_t len, ez_int32_t rsp_cmd,
                                      ez_uint32_t seq, handle_proc_fun proc_func)
@@ -282,77 +286,24 @@ done:
     return rv;
 }
 
-ez_err_t base_protocol_query_profile_req(ez_char_t *sn, ez_char_t *type, ez_char_t *ver, ez_bool_t need_schema)
+ez_err_t base_protocol_query_profile_req(const ez_char_t *req_msg, ez_void_t *func_rsp)
 {
     ez_err_t rv = EZ_BASE_ERR_SUCC;
-    cJSON *root = NULL;
-    ez_char_t *json_str = NULL;
 
-    root = cJSON_CreateObject();
-    CHECK_COND_DONE(!root, EZ_BASE_ERR_MEMORY);
-
-    cJSON_AddStringToObject(root, "devSerial", sn);
-    cJSON_AddStringToObject(root, "pid", type);
-    cJSON_AddStringToObject(root, "version", ver);
-    cJSON_AddStringToObject(root, "profileVersion", "3.0");
-    cJSON_AddBoolToObject(root, "requireSchema", need_schema);
-
-    json_str = cJSON_PrintUnformatted(root);
-    CHECK_COND_DONE(!root, EZ_BASE_ERR_MEMORY);
-
-    rv = dev2cloud_msg_send(json_str, BASE_DOMAIN_ID, Pu2CenPltQueryFeatureProfileReq, BASE_DOMAIN_VER, MSG_TYPE_REQ, 0);
+    g_profile_rsp_func = (profile_query_rsp)func_rsp;
+    rv = dev2cloud_msg_send((ez_char_t *)req_msg, BASE_DOMAIN_ID, Pu2CenPltQueryFeatureProfileReq,
+                            BASE_DOMAIN_VER, MSG_TYPE_REQ, 0);
     CHECK_COND_DONE(rv, EZ_BASE_ERR_GENERAL);
 
 done:
-    if (NULL != json_str)
-        ezos_free(json_str);
-
-    if (NULL != root)
-        cJSON_Delete(root);
-
     return rv;
 }
 
 ez_err_t base_protocol_query_profile_rsp(ez_void_t *buf, ez_int32_t len)
 {
-    ez_err_t rv = EZ_BASE_ERR_SUCC;
+    g_profile_rsp_func(buf);
 
-    cJSON *root = NULL;
-    cJSON *url = NULL;
-    cJSON *expire = NULL;
-    cJSON *md5 = NULL;
-    cJSON *dev_sn = NULL;
-
-    root = cJSON_Parse(buf);
-    CHECK_COND_DONE(!root, EZ_BASE_ERR_MEMORY);
-
-    url = cJSON_GetObjectItem(root, "url");
-    CHECK_COND_DONE(!url, EZ_BASE_ERR_MEMORY);
-    CHECK_COND_DONE(cJSON_String != url->type, EZ_BASE_ERR_GENERAL);
-
-    expire = cJSON_GetObjectItem(root, "expire");
-    CHECK_COND_DONE(!expire, EZ_BASE_ERR_MEMORY);
-    CHECK_COND_DONE(cJSON_Number != expire->type, EZ_BASE_ERR_MEMORY);
-
-    md5 = cJSON_GetObjectItem(root, "md5");
-    CHECK_COND_DONE(!md5, EZ_BASE_ERR_MEMORY);
-    CHECK_COND_DONE(cJSON_String != md5->type, EZ_BASE_ERR_MEMORY);
-
-    dev_sn = cJSON_GetObjectItem(root, "devSerial");
-    CHECK_COND_DONE(!dev_sn, EZ_BASE_ERR_MEMORY);
-    CHECK_COND_DONE(cJSON_String != dev_sn->type, EZ_BASE_ERR_MEMORY);
-
-    //TODO
-    // rv = ez_iot_tsl_adapter_profile_url(dev_sn->valuestring, url->valuestring, md5->valuestring, expire->valueint);
-    CHECK_COND_DONE(rv, EZ_BASE_ERR_GENERAL);
-
-done:
-    if (NULL != root)
-    {
-        cJSON_Delete(root);
-    }
-
-    return rv;
+    return EZ_BASE_ERR_SUCC;
 }
 
 static ezxml_t xml_make_rsp(ez_int32_t result)
@@ -390,8 +341,8 @@ static cJSON *json_make_rsp(ez_int32_t result)
     return root;
 }
 
-static ez_err_t dev2cloud_msg_send(ez_int8_t *buf, ez_int32_t domain_id, ez_int32_t cmd_id,
-                                   const ez_int8_t *cmd_version, ez_uint8_t msg_response, ez_uint32_t msg_seq)
+static ez_err_t dev2cloud_msg_send(ez_char_t *buf, ez_int32_t domain_id, ez_int32_t cmd_id,
+                                   ez_char_t *cmd_version, ez_uint8_t msg_response, ez_uint32_t msg_seq)
 {
     ez_kernel_pubmsg_t pubmsg = {0};
 
@@ -403,7 +354,7 @@ static ez_err_t dev2cloud_msg_send(ez_int8_t *buf, ez_int32_t domain_id, ez_int3
     pubmsg.msg_domain_id = domain_id;
     pubmsg.msg_command_id = cmd_id;
 
-    ezos_strncpy(pubmsg.command_ver, (const ez_char_t *)cmd_version, sizeof(pubmsg.command_ver) - 1);
+    ezos_strncpy(pubmsg.command_ver, cmd_version, sizeof(pubmsg.command_ver) - 1);
 
     return ez_kernel_send(&pubmsg);
 }

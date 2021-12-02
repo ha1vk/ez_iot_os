@@ -64,7 +64,7 @@ void ut_base_bind_by_near()
 
     ///< 通过ap配网或者蓝牙配网从app获取token
     ez_char_t *dev_token = "68b8efe8246f461691971c95eb8ba725";
-
+ 
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid));
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func));
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func));
@@ -77,6 +77,7 @@ void ut_base_bind_by_near()
 
     ezos_delay_ms(3000);
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
+    ez_iot_base_deinit();
     ez_iot_core_deinit();
 }
 
@@ -99,6 +100,7 @@ void ut_base_bind_by_challenge()
 
     ezos_delay_ms(3000);
     uassert_int_equal(EZ_BASE_ERR_SUCC, ez_iot_core_stop());
+    ez_iot_base_deinit();
     ez_iot_core_deinit();
 }
 
@@ -118,6 +120,7 @@ void ut_base_bind_status_query()
 
     ezos_delay_ms(3000);
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
+    ez_iot_base_deinit();
     ez_iot_core_deinit();
 }
 

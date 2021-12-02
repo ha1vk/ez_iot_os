@@ -66,7 +66,7 @@ extern "C"
     ez_err_t base_protocol_bind_response_req(ez_int32_t response_code);
 
     ///< 物模型查询
-    ez_err_t base_protocol_query_profile_req(ez_char_t *sn, ez_char_t *type, ez_char_t *ver, ez_bool_t need_schema);
+    ez_err_t base_protocol_query_profile_req(const ez_char_t *req_msg, ez_void_t* func_rsp);
     ez_err_t base_protocol_query_profile_rsp(ez_void_t *buf, ez_int32_t len);
 
 #ifdef __cplusplus

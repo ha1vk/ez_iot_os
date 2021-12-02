@@ -34,8 +34,7 @@ EZOS_API ez_err_t ez_iot_shadow_init(ez_void_t)
     rv = shadow_extern_init();
     CHECK_RV_DONE(rv);
 
-    rv = shadow_core_start();
-    CHECK_RV_DONE(rv);
+    CHECK_COND_DONE(!shadow_core_start(), EZ_SHD_ERR_MEMORY);
 
     g_shd_is_inited = ez_true;
 done:

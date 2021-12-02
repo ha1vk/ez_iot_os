@@ -57,13 +57,13 @@ static ez_void_t iot_core_event_route(ez_kernel_event_t *ptr_event)
         break;
     case SDK_KERNEL_EVENT_PUBLISH_ACK:
         pack_ctx = (ez_kernel_publish_ack_t *)ptr_event->event_context;
-        if (0 == ezos_strcmp(pack_ctx->module_name, SHADOW_MODULE_NAME))
+        if (0 != ezos_strcmp(pack_ctx->module_name, SHADOW_MODULE_NAME))
         {
             ezlog_v(TAG_SHD, "publish ack, module mismatch");
             return;
         }
 
-        shadow_core_cloud_data_in(NULL, pack_ctx->msg_seq, NULL, (ez_void_t *)&pack_ctx->last_error);
+        shadow_core_cloud_data_in(NULL, pack_ctx->msg_seq, pack_ctx->msg_type, (ez_void_t *)&pack_ctx->last_error);
 
     default:
         break;
