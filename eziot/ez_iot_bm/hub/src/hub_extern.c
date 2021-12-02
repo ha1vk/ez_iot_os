@@ -17,13 +17,17 @@
  * Date           Author       Notes
  * 2021-11-25    zhangdi29     
  *******************************************************************************/
+#include <string.h>
 #include "hub_extern.h"
 #include "ezos_gconfig.h"
 #include "ezos_def.h"
 #include "ez_iot_core.h"
 #include "ez_iot_core_def.h"
+#include "ez_iot_core_lowlvl.h"
 #include "hub_func.h"
 #include "ezlog.h"
+
+
 #define hub_cmd_version "v1.0.0"
 
 static void hub_extend_start_cb(ez_void_t *pUser)
@@ -60,6 +64,25 @@ static void hub_extend_event_cb(ez_kernel_event_t *ptr_event, ez_void_t *pUser)
     }
 }
 
+
+ez_int_t hub_extern_init()
+{
+    ez_kernel_extend_t extern_info;
+    memset(&extern_info, 0, sizeof(ez_kernel_extend_t));
+
+    extern_info.domain_id = hub_module_id;
+    extern_info.pUser = NULL;
+    extern_info.ezdev_sdk_kernel_extend_start = hub_extend_start_cb;
+    extern_info.ezdev_sdk_kernel_extend_stop = hub_extend_stop_cb;
+    extern_info.ezdev_sdk_kernel_extend_data_route = hub_extend_data_route_cb;
+    extern_info.ezdev_sdk_kernel_extend_event = hub_extend_event_cb;
+
+    strncpy(extern_info.extend_module_name, hub_module_name, ezdev_sdk_extend_name_len);
+    strncpy(extern_info.extend_module_version, hub_module_version, version_max_len);
+
+    ez_int_t ret = ez_kernel_extend_load(&extern_info);
+    return ret;
+}
 
 int hub_extern_finit()
 {

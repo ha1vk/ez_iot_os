@@ -558,7 +558,7 @@ static int httpd_sock_err(const char *ctx, int sockfd)
     int sock_err;
     size_t sock_err_len = sizeof(sock_err);
 
-    if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &sock_err, &sock_err_len) < 0)
+    if (ezos_getsockopt(sockfd, EZ_SOL_SOCKET, EZ_SO_ERROR, &sock_err, &sock_err_len) < 0)
     {
         ezlog_e(TAG, LOG_FMT("error calling ezos_getsockopt : %d"), errno);
         return HTTPD_SOCK_ERR_FAIL;
@@ -607,7 +607,7 @@ ez_int32_t httpd_default_recv(httpd_handle_t hd, ez_int32_t sockfd, ez_int8_t *b
         return HTTPD_SOCK_ERR_INVALID;
     }
 
-    ez_int32_t ret = recv(sockfd, buf, buf_len, flags);
+    ez_int32_t ret = ezos_recv(sockfd, buf, buf_len, flags);
     if (ret < 0)
     {
         return httpd_sock_err("recv", sockfd);

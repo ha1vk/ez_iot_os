@@ -14,13 +14,14 @@
 
 #include <string.h>
 #include <unistd.h>
-
-#include <sys/socket.h>
 #ifdef linux 
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
 
+#include "ezos_libc.h"
+#include "ezos_socket.h"
 #include "ctrl_sock.h"
 
 /* Control socket, because in some network stacks select can't be woken up any
@@ -28,20 +29,20 @@
  */
 int cs_create_ctrl_sock(int port)
 {
-    int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    int fd = ezos_socket(EZ_AF_INET, EZ_SOCK_DGRAM, EZ_IPPROTO_UDP);
     if (fd < 0) {
         return -1;
     }
 
     int ret;
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    inet_aton("127.0.0.1", &addr.sin_addr);
-    ret = bind(fd, (struct sockaddr *)&addr, sizeof(addr));
+    ez_sockaddr_in_t addr;
+    ezos_memset(&addr, 0, sizeof(addr));
+    addr.sin_family = EZ_AF_INET;
+    addr.sin_port = ezos_htons(port);
+    ezos_inet_aton("127.0.0.1", &addr.sin_addr);
+    ret = ezos_bind(fd, (ez_sockaddr_t *)&addr, sizeof(addr));
     if (ret < 0) {
-        close(fd);
+        ezos_closesocket(fd);
         return -1;
     }
     return fd;
@@ -49,17 +50,17 @@ int cs_create_ctrl_sock(int port)
 
 void cs_free_ctrl_sock(int fd)
 {
-    close(fd);
+    ezos_closesocket(fd);
 }
 
 int cs_send_to_ctrl_sock(int send_fd, int port, void *data, unsigned int data_len)
 {
     int ret;
-    struct sockaddr_in to_addr;
-    to_addr.sin_family = AF_INET;
-    to_addr.sin_port = htons(port);
-    inet_aton("127.0.0.1", &to_addr.sin_addr);
-    ret = sendto(send_fd, data, data_len, 0, (struct sockaddr *)&to_addr, sizeof(to_addr));
+    ez_sockaddr_in_t to_addr;
+    to_addr.sin_family = EZ_AF_INET;
+    to_addr.sin_port = ezos_htons(port);
+    ezos_inet_aton("127.0.0.1", &to_addr.sin_addr);
+    ret = ezos_sendto(send_fd, data, data_len, 0, (ez_sockaddr_t *)&to_addr, sizeof(to_addr));
 
     if (ret < 0) {
         return -1;
@@ -70,7 +71,7 @@ int cs_send_to_ctrl_sock(int send_fd, int port, void *data, unsigned int data_le
 int cs_recv_from_ctrl_sock(int fd, void *data, unsigned int data_len)
 {
     int ret;
-    ret = recvfrom(fd, data, data_len, 0, NULL, NULL);
+    ret = ezos_recvfrom(fd, data, data_len, 0, NULL, NULL);
 
     if (ret < 0) {
         return -1;

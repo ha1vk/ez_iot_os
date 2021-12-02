@@ -226,7 +226,7 @@ void httpd_sess_set_descriptors(struct httpd_data *hd,
 
 static int fd_is_valid(int fd)
 {
-    return fcntl(fd, F_GETFD, 0) != -1 || errno != EBADF;
+    return ezos_fcntl(fd, F_GETFD, 0) != -1 || errno != EBADF;
 }
 
 static inline uint64_t httpd_sess_get_lru_counter()

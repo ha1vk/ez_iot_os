@@ -9,7 +9,7 @@ ez_int32_t ezos_sta_connect(ez_int8_t *ssid, ez_int8_t *password);
 
 ez_int32_t ezos_sta_stop();
 
-ez_int32_t ezos_ap_start(ez_int8_t ssid, ez_int8_t pwd, ez_uint8_t auth_mode, ez_uint8_t channel);
+ez_int32_t ezos_ap_start(ez_int8_t *ssid, ez_int8_t *password, ez_uint8_t auth_mode, ez_uint8_t channel);
 
 ez_int32_t ezos_ap_stop();
 
