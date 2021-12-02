@@ -5,6 +5,7 @@
 #include "ezlog.h"
 #include "ezos_thread.h"
 #include "ezos_time.h"
+#include "ezos_wifi.h"
 #include "ezconn_process.h"
 #include "ezconn_adapter.h"
 

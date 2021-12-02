@@ -88,7 +88,7 @@ ez_int32_t ez_timer_init(void)
     }
 
     ezos_memset(&g_list, 0, sizeof(g_list));
-    g_list.thread = ezos_thread_create(&g_list.thread, (ez_int8_t *)"ez_timer", timer_routine, (void *)&g_list, CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE, 13);
+    ezos_thread_create(&g_list.thread, (ez_int8_t *)"ez_timer", timer_routine, (void *)&g_list, CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE, 13);
     if (NULL == g_list.thread)
     {
         ezos_mutex_unlock(g_status_mutex);

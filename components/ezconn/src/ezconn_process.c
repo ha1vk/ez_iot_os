@@ -4,6 +4,7 @@
 #include "cJSON.h"
 #include "ezos_wifi.h"
 #include "ezlog.h"
+#include "eztimer.h"
 
 static ez_int32_t send_http_resp(httpd_req_t *req, ez_int32_t errcode, ez_int8_t *body)
 {
