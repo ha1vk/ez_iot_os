@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <ezos_def.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C"

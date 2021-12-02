@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <sys/param.h>
 #include <sys/errno.h>
 #include <assert.h>
@@ -23,6 +21,7 @@
 #include "ctrl_sock.h"
 #include "ezlog.h"
 #include "ezos.h"
+#include "ezos_time.h"
 
 static const char *TAG = "httpd";
 
@@ -44,9 +43,9 @@ static ez_err_t httpd_accept_conn(struct httpd_data *hd, ez_int32_t listen_fd)
         }
     }
 
-    struct sockaddr_in addr_from;
-    socklen_t addr_from_len = sizeof(addr_from);
-    int new_fd = accept(listen_fd, (struct sockaddr *)&addr_from, &addr_from_len);
+    struct ez_sockaddr_in addr_from;
+    ez_socklen_t addr_from_len = sizeof(addr_from);
+    int new_fd = ezos_accept(listen_fd, (struct ez_sockaddr *)&addr_from, &addr_from_len);
     if (new_fd < 0)
     {
         ezlog_w(TAG, LOG_FMT("error in accept (%d)"), errno);
@@ -54,16 +53,16 @@ static ez_err_t httpd_accept_conn(struct httpd_data *hd, ez_int32_t listen_fd)
     }
     ezlog_v(TAG, LOG_FMT("newfd = %d"), new_fd);
 
-    struct timeval tv;
+    ezos_timeval_t tv;
     /* Set recv timeout of this fd as per config */
     tv.tv_sec = hd->config.recv_wait_timeout;
     tv.tv_usec = 0;
-    ezos_setsockopt(new_fd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
+    ezos_setsockopt(new_fd, EZ_SOL_SOCKET, EZ_SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
 
     /* Set send timeout of this fd as per config */
     tv.tv_sec = hd->config.send_wait_timeout;
     tv.tv_usec = 0;
-    ezos_setsockopt(new_fd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&tv, sizeof(tv));
+    ezos_setsockopt(new_fd, EZ_SOL_SOCKET, EZ_SO_SNDTIMEO, (const char *)&tv, sizeof(tv));
 
     if (EZHTTPD_ERRNO_SUCC != httpd_sess_new(hd, new_fd))
     {
@@ -134,7 +133,7 @@ static void httpd_close_all_sessions(struct httpd_data *hd)
 static void httpd_process_ctrl_msg(struct httpd_data *hd)
 {
     struct httpd_ctrl_data msg;
-    int ret = recv(hd->ctrl_fd, &msg, sizeof(msg), 0);
+    int ret = ezos_recv(hd->ctrl_fd, &msg, sizeof(msg), 0);
     if (ret <= 0)
     {
         ezlog_w(TAG, LOG_FMT("error in recv (%d)"), errno);
@@ -262,7 +261,7 @@ static ez_err_t httpd_server_init(struct httpd_data *hd)
 #ifdef CONFIG_LWIP_IPV6
     int fd = ezos_socket(PF_INET6, SOCK_STREAM, 0);
 #else
-    int fd = ezos_socket(PF_INET, SOCK_STREAM, 0);
+    int fd = ezos_socket(EZ_PF_INET, EZ_SOCK_STREAM, 0);
 #endif /* CONFIG_LWIP_IPV6 */
     if (fd < 0)
     {
@@ -277,13 +276,13 @@ static ez_err_t httpd_server_init(struct httpd_data *hd)
         .sin6_addr = inaddr_any,
         .sin6_port = htons(hd->config.server_port)};
 #else
-    struct sockaddr_in serv_addr = {
-        .sin_family = PF_INET,
+    struct ez_sockaddr_in serv_addr = {
+        .sin_family = EZ_PF_INET,
         .sin_addr = {
-            .s_addr = htonl(INADDR_ANY)},
-        .sin_port = htons(hd->config.server_port)};
+            .s_addr = ezos_htonl(EZ_INADDR_ANY)},
+        .sin_port = ezos_htons(hd->config.server_port)};
 #endif /* CONFIG_LWIP_IPV6 */
-    int ret = bind(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    int ret = ezos_bind(fd, (struct ez_sockaddr *)&serv_addr, sizeof(serv_addr));
     if (ret < 0)
     {
         ezlog_e(TAG, LOG_FMT("error in bind (%d)"), errno);
@@ -291,7 +290,7 @@ static ez_err_t httpd_server_init(struct httpd_data *hd)
         return EZHTTPD_ERRNO_FAIL;
     }
 
-    ret = listen(fd, hd->config.backlog_conn);
+    ret = ezos_listen(fd, hd->config.backlog_conn);
     if (ret < 0)
     {
         ezlog_e(TAG, LOG_FMT("error in listen (%d)"), errno);
@@ -307,7 +306,7 @@ static ez_err_t httpd_server_init(struct httpd_data *hd)
         return EZHTTPD_ERRNO_FAIL;
     }
 
-    int msg_fd = ezos_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    int msg_fd = ezos_socket(EZ_AF_INET, EZ_SOCK_DGRAM, EZ_IPPROTO_UDP);
     if (msg_fd < 0)
     {
         ezlog_e(TAG, LOG_FMT("error in creating msg ezos_socket (%d)"), errno);

@@ -16,7 +16,6 @@
 #define _HTTPD_PRIV_H_
 
 #include <stdbool.h>
-#include <sys/socket.h>
 #include <sys/param.h>
 #include <ezlog.h>
 

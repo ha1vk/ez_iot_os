@@ -23,6 +23,7 @@
 #define _EZOS_SOCKET_H_
 
 #include <ezos_def.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,18 +37,15 @@ extern "C"
 
 #define EZ_AF_UNSPEC 0
 #define EZ_AF_INET 2
-#define EZ_PF_INET AF_INET
-#define EZ_PF_UNSPEC AF_UNSPEC
-
-#define EZ_AF_UNSPEC 0
-#define EZ_AF_INET 2
-#define EZ_PF_INET AF_INET
-#define EZ_PF_UNSPEC AF_UNSPEC
+#define EZ_PF_INET EZ_AF_INET
+#define EZ_PF_UNSPEC EZ_AF_UNSPEC
 
 #define EZ_IPPROTO_IP 0
 #define EZ_IPPROTO_TCP 6
 #define EZ_IPPROTO_UDP 17
 #define EZ_IPPROTO_UDPLITE 136
+
+#define EZ_INADDR_ANY ((ez_uint32_t)0x00000000UL)
 
 /* Socket protocol types (TCP/UDP/RAW) */
 #define EZ_SOCK_STREAM 1
@@ -150,6 +148,21 @@ extern "C"
 
     EZOS_API unsigned short ezos_htons(unsigned short hostshort);
 
+    EZOS_API unsigned int ezos_htonl(unsigned int hostlong);
+
+    EZOS_API int ezos_inet_aton(const char *cp, ez_in_addr_t *inp);
+
+    EZOS_API int ezos_bind(int socket_fd, const ez_sockaddr_t *addr, ez_socklen_t addrlen);
+
+    EZOS_API ez_ssize_t ezos_sendto(int socket_fd, const void *buf, ez_size_t len, int flags, const ez_sockaddr_t *dst_addr, ez_socklen_t addrlen);
+
+    EZOS_API ez_ssize_t ezos_recvfrom(int socket_fd, void *buf, ez_size_t len, int flags, ez_sockaddr_t *src_addr, ez_socklen_t *addrlen);
+
+    EZOS_API int ezos_accept(int socket_fd, struct ez_sockaddr *addr, ez_socklen_t *addrlen);
+
+    EZOS_API int ezos_listen(int socket_fd, int back_log);
+    
+    EZOS_API int ezos_fcntl(int socket_fd, int cmd, int val);
 #ifdef __cplusplus
 }
 #endif
