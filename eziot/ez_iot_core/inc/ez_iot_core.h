@@ -39,7 +39,7 @@ extern "C"
         ez_int8_t auth_mode;                 ///< 认证模式：0 SAP认证   1 licence认证
         ez_char_t dev_type[64];              ///< 设备型号(对应licence认证中productKey)
         ez_char_t dev_subserial[48];         ///< 设备短序列号(对应licence认证中productKey:deviceName)
-        ez_char_t dev_verification_code[16]; ///< 设备验证码(对应licence认证中deviceLicense)
+        ez_char_t dev_verification_code[32]; ///< 设备验证码(对应licence认证中deviceLicense)
         ez_char_t dev_firmwareversion[64];   ///< 设备固件版本号
         ez_char_t dev_typedisplay[64];       ///< 设备显示型号
         ez_char_t dev_mac[32];               ///< 设备网上物理地址
