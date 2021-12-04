@@ -1,17 +1,18 @@
-//#include "http_server.h"
-#include "eztimer.h"
-
 #include "ezconn.h"
 #include "ezlog.h"
-#include "ezos_thread.h"
 #include "ezos_wifi.h"
 #include "ezconn_adapter.h"
-#include "ezos_libc.h"
 
 ez_err_t ezconn_wifi_init()
 {
     ezlog_w(TAG_AP, "wifi init");
     return ezos_wifi_init();
+}
+
+ez_err_t ezconn_wifi_config(ezconn_wifi_mode_e wifi_mode)
+{
+    ezlog_w(TAG_AP, "wifi config");
+    return ezos_wifi_config(wifi_mode);
 }
 
 ez_err_t ezconn_sta_start(ez_int8_t *ssid, ez_int8_t *password)

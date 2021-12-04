@@ -101,6 +101,20 @@ extern "C"
      */
     ez_err_t ezconn_wifi_init();
 
+    typedef enum
+    {
+        EZCONN_WIFI_MODE_AP, 
+        EZCONN_WIFI_MODE_STA,
+        EZCONN_WIFI_MODE_APSTA,
+    } ezconn_wifi_mode_e;
+    /**
+     * @brief   设置wifi模式，ap模式/station模式/ap+station模式 
+     * 
+     * @param   wifi_mode ： see ezconn_wifi_mode_e
+     * @return  0 for success, other for failed
+     */
+    ez_err_t ezconn_wifi_config(ezconn_wifi_mode_e wifi_mode);
+
     /**
      *  @brief      station模式下连接路由器
      *  @return     成功：EZCONN_SUCC，失败：other

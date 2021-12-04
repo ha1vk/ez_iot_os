@@ -58,6 +58,7 @@ ez_err_t http_get_devinfo_handler(httpd_req_t *req)
     }
 
     g_server_busy = ez_true;
+    ezlog_i(TAG_AP, "app connected ");
     g_conn_ctx.wifi_cb(EZCONN_STATE_APP_CONNECTED, NULL);
     ezlog_i(TAG_AP, "app connected success. err_code:0x%x.", EZCONN_STATE_APP_CONNECTED);
 
@@ -70,7 +71,7 @@ ez_err_t http_get_devinfo_handler(httpd_req_t *req)
     }
     else
     {
-        ezlog_v(TAG_AP, "get dev_info success.");
+        ezlog_d(TAG_AP, "get dev_info success.");
     }
     g_server_busy = ez_false;
     return ret;
@@ -98,7 +99,7 @@ ez_err_t http_get_point_handler(httpd_req_t *req)
     }
     else
     {
-        ezlog_v(TAG_AP, "get wifi list success.");
+        ezlog_d(TAG_AP, "get wifi list success.");
     }
 
     g_server_busy = ez_false;
@@ -224,6 +225,7 @@ int32_t ezconn_adatper_init(ezconn_ap_info_t *ap_info, ezconn_dev_info_t *dev_in
         ezlog_e(TAG_AP, "%s param error.", __FUNCTION__);
         return EZCONN_ERRNO_INVALID_PARAM;
     }
+    g_conn_ctx.wifi_cb = cb;
 
     if (0 == ezos_strlen(dev_info->dev_serial))
     {
@@ -271,7 +273,7 @@ int32_t ezconn_adatper_init(ezconn_ap_info_t *ap_info, ezconn_dev_info_t *dev_in
 
         ezlog_w(TAG_AP, "ap auth_mode: %d", ap_info->auth_mode);
 
-        ezos_memcpy(&g_conn_ctx.wifi_info, ap_info, sizeof(ezconn_ap_info_t));
+        g_conn_ctx.apsta_coexist = ap_info->apsta_coexist;
 
         ret = ezos_ap_start(ap_info->ap_ssid, ap_info->ap_pwd, ap_info->auth_mode, ap_info->channel);
         if (0 != ret)
