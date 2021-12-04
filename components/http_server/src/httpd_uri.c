@@ -170,7 +170,7 @@ void httpd_unregister_all_uri_handlers(struct httpd_data *hd)
  */
 static httpd_uri_t *httpd_find_uri_handler2(httpd_err_resp_t *err,
                                             struct httpd_data *hd,
-                                            const ez_uint8_t *uri, ez_size_t uri_len,
+                                            const ez_int8_t *uri, ez_size_t uri_len,
                                             httpd_method_t method)
 {
     *err = 0;

@@ -277,11 +277,12 @@ static ez_err_t httpd_server_init(struct httpd_data *hd)
         .sin6_port = htons(hd->config.server_port)};
 #else
     struct ez_sockaddr_in serv_addr = {
-        .sin_family = EZ_PF_INET,
+        .sin_family = EZ_AF_INET,
         .sin_addr = {
             .s_addr = ezos_htonl(EZ_INADDR_ANY)},
         .sin_port = ezos_htons(hd->config.server_port)};
 #endif /* CONFIG_LWIP_IPV6 */
+
     int ret = ezos_bind(fd, (struct ez_sockaddr *)&serv_addr, sizeof(serv_addr));
     if (ret < 0)
     {

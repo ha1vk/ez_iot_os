@@ -35,7 +35,7 @@ extern "C"
                                              void (*thread_routine)(void *arg), void *arg)
     {
 
-        ezos_thread_create(*thread, name, thread_routine, arg, stacksize, prio);
+        ezos_thread_create(thread, name, thread_routine, arg, stacksize, prio);
         if (NULL != *thread)
         {
 	    	return OS_SUCCESS;
