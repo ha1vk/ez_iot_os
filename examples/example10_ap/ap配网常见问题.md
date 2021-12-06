@@ -10,9 +10,9 @@
 
 **Q**：wifi驱动实现接口和示例？
 
-**A**：wifi驱动接口见<font color=blue>hal_wifi_drv.h</font>;
+**A**：wifi驱动接口见<font color=blue>ezos_wifi_.h</font>;
 
-​		wifi驱动实现示例见<font color=blue>example_drv_wifi.c</font>，驱动示例基于乐鑫esp32实现，仅供参考;
+​		wifi驱动实现示例见<font color=blue>platform/bsp/esp32/ezos/ezos_wifi_.c</font>，驱动示例基于乐鑫esp32实现，仅供参考;
 
 ​        
 
@@ -27,7 +27,7 @@
 
 ​     ap配网未实现的内容：
 
-- wifi驱动。接入方根据wifi驱动接口说明实现，<font color=blue>hal_wifi_drv.h</font>；
+- wifi驱动。接入方根据wifi驱动接口说明实现，<font color=blue>ezos_wifi.h</font>；
 
 ​        
 

@@ -118,6 +118,7 @@ extern "C"
     /**
      *  @brief      station模式下连接路由器
      *  @return     成功：EZCONN_SUCC，失败：other
+     *  @info       需要在ezconn_wifi_config之后调用
      */
     ez_err_t ezconn_sta_start(ez_int8_t *ssid, ez_int8_t *password);
     
@@ -134,6 +135,7 @@ extern "C"
      *  @param[in]  timeout：wifi配置超时时间，范围1-60，单位min，默认15min
      *  @param[in]  support_apsta：是否支持ap、sta共存模式
      *  @return     成功：EZCONN_SUCC，失败：other
+     *  @info       需要在ezconn_wifi_config之后调用
      */
     ez_err_t ezconn_ap_start(ezconn_ap_info_t *ap_info, ezconn_dev_info_t *dev_info, wifi_info_cb cb);
 

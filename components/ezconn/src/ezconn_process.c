@@ -357,11 +357,11 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
         ez_bool_t is_succ = ez_true;
         if (wifi_state != EZOS_WIFI_STATE_CONNECT_SUCCESS)
         {
-            ezos_sta_stop(); // Èô³¬Ê±Ö®ºó»¹Î´Á¬½Ó³É¹¦£¬ÔòÍ£Ö¹µ±Ç°Á¬½Ó
+            ezos_sta_stop(); // è‹¥è¶…æ—¶ä¹‹åè¿˜æœªè¿æ¥æˆåŠŸï¼Œåˆ™åœæ­¢å½“å‰è¿æ¥
             is_succ = ez_false;
         }
         
-        // ÈôwifiÒÑ¾­Á¬½Ó£¬ÔòĞèÒªappÖØĞÂÁ¬½Óap£¬ÔÙ·¢ËÍhttp response
+        // è‹¥wifiå·²ç»è¿æ¥ï¼Œåˆ™éœ€è¦appé‡æ–°è¿æ¥apï¼Œå†å‘é€http response
         if (ctx->apsta_coexist)
         {
             gen_rsp_with_state(wifi_state, &rsp_str);
@@ -381,7 +381,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
                     ezos_delay_ms(100);
                 }
             }
-            else // ÈôwifiÎ´Á¬½Ó£¬Ôò²»ĞèÒªµÈapÖØĞÂÁ¬½Ó
+            else // è‹¥wifiæœªè¿æ¥ï¼Œåˆ™ä¸éœ€è¦ç­‰apé‡æ–°è¿æ¥
             {
                 ezos_delay_ms(3000);
             }

@@ -41,6 +41,25 @@ static void wifi_cb(ezconn_state_e err_code, ezconn_wifi_info_t *wifi_info)
     }
 }
 
+void example_ap_init_open_ap()
+{
+    ezconn_dev_info_t dev_info = {0};
+    ezconn_ap_info_t ap_info = {0};
+
+    strncpy((char *)ap_info.ap_ssid, "EZVIZ_AP_11112", sizeof(ap_info.ap_ssid) - 1);
+    ap_info.auth_mode = 0;
+    ap_info.channel = 1;
+    ap_info.ap_timeout = 5;
+    ap_info.apsta_coexist = ez_false;
+
+    strncpy((char *)dev_info.dev_serial, "88888888", sizeof(dev_info.dev_serial) - 1);
+    strncpy((char *)dev_info.dev_type, "EZ_001", sizeof(dev_info.dev_type) - 1);
+    strncpy((char *)dev_info.dev_version, "V1.0.0 build 210302", sizeof(dev_info.dev_version) - 1);
+    ezconn_wifi_init();
+    ezconn_wifi_config(EZCONN_WIFI_MODE_AP);
+    ezconn_ap_start(&ap_info, &dev_info, wifi_cb);
+    return;
+}
 
 void example_ap_init_open_apsta()
 {
