@@ -87,7 +87,10 @@ static ez_err_t profile_parse_domain(tsl_rsc_domain *pdomain, ez_int32_t domain_
 static ez_err_t profile_parse_domain_props(tsl_domain_prop *p_props, ez_int32_t props_num, cJSON *js_props);
 static ez_err_t profile_parse_domain_actions(tsl_domain_action *p_actions, ez_int32_t actions_num, cJSON *js_actions);
 static ez_err_t profile_parse_domain_events(tsl_domain_event *p_events, ez_int32_t events_num, cJSON *js_events);
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 static ez_err_t profile_parse_schema(tsl_schema_desc *schema, cJSON *js_schema);
+#endif
+
 
 /* profile free */
 static ez_void_t profile_free(tsl_capacity_t *capacity);
@@ -95,8 +98,9 @@ static ez_void_t profile_free_domain(tsl_rsc_domain *tsl_domain, ez_int32_t doma
 static ez_void_t profile_free_props(tsl_domain_prop *tsl_props, ez_int32_t prop_num);
 static ez_void_t profile_free_actions(tsl_domain_action *tsl_actions, ez_int32_t action_num);
 static ez_void_t profile_free_events(tsl_domain_event *tsl_events, ez_int32_t event_num);
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 static ez_void_t profile_free_schema(tsl_schema_desc *tsl_schema);
-
+#endif
 /* profile manager */
 static ez_mutex_t g_mutex = NULL;
 static ez_list_t g_profile_list;
@@ -329,7 +333,7 @@ static ez_int32_t profile_ref_del(node_capacity_t *node_capacity, ez_char_t *dev
     return ezlist_get_size(&node_capacity->dev_list);
 }
 
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 static ez_void_t profile_free_schema(tsl_schema_desc *tsl_schema)
 {
     switch (tsl_schema->item_type)
@@ -449,7 +453,7 @@ static ez_void_t profile_free_domain(tsl_rsc_domain *tsl_domain, ez_int32_t doma
         tsl_rsc_domain *domain = tsl_domain + index;
         if (NULL != domain->prop)
         {
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
             profile_free_props(domain->prop, domain->prop_num);
 #endif
             ezos_free(domain->prop);
@@ -458,7 +462,7 @@ static ez_void_t profile_free_domain(tsl_rsc_domain *tsl_domain, ez_int32_t doma
 
         if (NULL != domain->action)
         {
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
             profile_free_actions(domain->action, domain->action_num);
 #endif
             ezos_free(domain->action);
@@ -467,7 +471,7 @@ static ez_void_t profile_free_domain(tsl_rsc_domain *tsl_domain, ez_int32_t doma
 
         if (NULL != domain->event)
         {
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
             profile_free_events(domain->event, domain->event_num);
 #endif
             ezos_free(domain->event);
@@ -506,7 +510,7 @@ static ez_void_t profile_free(tsl_capacity_t *capacity)
     }
 }
 
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 static ez_int32_t profile_parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
 {
     ez_int32_t rv = EZ_TSL_ERR_SUCC;
@@ -951,7 +955,7 @@ static ez_int32_t profile_parse_domain_props(tsl_domain_prop *p_props, ez_int32_
         }
         ezlog_v(TAG_TSL, "prop access: %d", prop->access);
 
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
         cJSON *js_ver = cJSON_GetObjectItem(js_obj, tsl_key_version);
         if (NULL != js_ver && cJSON_String == js_ver->type)
         {
@@ -1011,7 +1015,7 @@ static ez_int32_t profile_parse_domain_actions(tsl_domain_action *p_actions, ez_
         ezos_strncpy(action->identifier, js_identify->valuestring, sizeof(action->identifier) - 1);
         ezlog_v(TAG_TSL, "action identifier: %s", action->identifier);
 
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
         cJSON *js_ver = cJSON_GetObjectItem(js_obj, tsl_key_version);
         if (NULL != js_ver && cJSON_String == js_ver->type)
         {
@@ -1102,7 +1106,7 @@ static ez_int32_t profile_parse_domain_events(tsl_domain_event *p_events, ez_int
         ezos_strncpy(event->identifier, js_identify->valuestring, sizeof(event->identifier) - 1);
         ezlog_v(TAG_TSL, "event identifier: %s", event->identifier);
 
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
         cJSON *js_ver = cJSON_GetObjectItem(js_obj, tsl_key_version);
         if (NULL != js_ver && cJSON_String == js_ver->type)
         {

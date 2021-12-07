@@ -120,9 +120,6 @@ static node_domain_t *shadow_module_add_domain(ez_list_t *lst, ez_char_t *domain
 
 static ez_void_t *shadow_module_get_next(ez_list_t *lst, ez_node_t *node);
 
-static ez_void_t shadow_module_delete_domain(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id);
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /* shadow 线程函数 */
 static ez_void_t shadow_core_yeild(ez_void_t *pparam);
 
@@ -833,9 +830,80 @@ ez_err_t shadow_core_module_addv3(ez_char_t *sn, ez_char_t *res_type, ez_int16_t
 
 ez_err_t shadow_core_module_clear(ez_char_t *sn)
 {
+    ez_node_t *node_dev = NULL;
+    ez_node_t *node_index_set = NULL;
+    ez_node_t *node_index = NULL;
+    ez_node_t *node_domain = NULL;
+    ez_node_t *node_key = NULL;
+
+    node_dev_t *pnode_dev = NULL;
+    node_index_set_t *pnode_index_set = NULL;
+    node_index_t *pnode_index = NULL;
+    node_domain_t *pnode_domain = NULL;
+    node_key_t *pnode_key = NULL;
+    ez_char_t *dev_sn = sn;
+
+    if (0 == ezos_strcmp(ez_kernel_getdevinfo_bykey("dev_subserial"), sn))
+    {
+        dev_sn = SHADOW_DEFAULT_NAME;
+    }
+
     shadow_module_lock();
-    //TODO
-    // shadow_module_delete_domain(sn, res_type, index, domain_id);
+
+    pnode_dev = shadow_module_find_dev(&g_shaodw_modules, dev_sn);
+    if (!pnode_dev)
+    {
+        goto done;
+    }
+
+    while (NULL != (node_index_set = shadow_module_get_next(&pnode_dev->type_lst, node_index_set)))
+    {
+        pnode_index_set = (node_index_set_t *)node_index_set;
+        node_index = NULL;
+
+        while (NULL != (node_index = shadow_module_get_next(&pnode_index_set->index_lst, node_index)))
+        {
+            pnode_index = (node_index_t *)node_index;
+            node_domain = NULL;
+
+            while (NULL != (node_domain = shadow_module_get_next(&pnode_index->domain_lst, node_domain)))
+            {
+                pnode_domain = (node_domain_t *)node_domain;
+                node_key = NULL;
+
+                while (NULL != (node_key = shadow_module_get_next(&pnode_domain->key_lst, node_key)))
+                {
+                    pnode_key = (node_key_t *)node_key;
+                    if (pnode_key->json_value)
+                    {
+                        cJSON_Delete((cJSON *)pnode_key->json_value);
+                        pnode_key->json_value = NULL;
+                    }
+
+                    ezlist_delete(&pnode_domain->key_lst, node_key);
+                    ezos_free(node_key);
+                    node_key = NULL;
+                }
+
+                ezlist_delete(&pnode_index->domain_lst, node_domain);
+                ezos_free(node_domain);
+                node_domain = NULL;
+            }
+
+            ezlist_delete(&pnode_index_set->index_lst, node_index);
+            ezos_free(node_index);
+            node_index = NULL;
+        }
+
+        ezlist_delete(&pnode_dev->type_lst, node_index_set);
+        ezos_free(node_index_set);
+        node_index_set = NULL;
+    }
+
+    ezlist_delete(&g_shaodw_modules, &pnode_dev->node);
+    ezos_free(pnode_dev);
+
+done:
     shadow_module_unlock();
 
     return EZ_SHD_ERR_SUCC;
@@ -987,11 +1055,6 @@ static ez_void_t shadow_module_deinit()
 
     ezos_mutex_destroy(g_hlock);
     g_hlock = NULL;
-}
-
-static ez_void_t shadow_module_delete_domain(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id)
-{
-    //TODO
 }
 
 static node_dev_t *shadow_module_find_dev(ez_list_t *lst, ez_char_t *sn)
