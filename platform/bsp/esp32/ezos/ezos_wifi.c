@@ -104,7 +104,7 @@ static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
-ez_int32_t ezos_wifi_init()
+int ezos_wifi_init()
 {
     ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
     if (g_wifi_init)
@@ -114,25 +114,43 @@ ez_int32_t ezos_wifi_init()
     }
     g_wifi_event_group = xEventGroupCreate();
     tcpip_adapter_init();
+    ESP_ERROR_CHECK(esp_event_loop_init(wifi_event_handler, NULL));
     wifi_init_config_t wifi_config = WIFI_INIT_CONFIG_DEFAULT();
-    esp_wifi_init(&wifi_config);
-    esp_event_loop_init(wifi_event_handler, NULL);
+    ESP_ERROR_CHECK(esp_wifi_init(&wifi_config));
     g_wifi_init = true;
     return 0;
 }
 
-ez_int32_t ezos_sta_connect(ez_int8_t *ssid, ez_int8_t *password)
+int ezos_wifi_config(ezos_wifi_mode_e wifi_mode)
+{
+    switch (wifi_mode)
+    {
+    case EZOS_WIFI_MODE_AP:
+        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+        break;
+    case EZOS_WIFI_MODE_STA:
+        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+        break;
+    case EZOS_WIFI_MODE_APSTA:
+        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
+        break;
+    default:
+        break;
+    }
+}
+
+int ezos_sta_connect(char *ssid, char *password)
 {
     wifi_config_t wifi_config;
     esp_err_t ret = ESP_OK;
 
     ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
-    
-    ret = esp_wifi_set_mode(WIFI_MODE_STA);
-    if (ESP_OK != ret)
+
+    wifi_mode_t wifi_mode = WIFI_MODE_NULL;
+    esp_wifi_get_mode(&wifi_mode);
+    if (WIFI_MODE_STA != wifi_mode && WIFI_MODE_APSTA != wifi_mode)
     {
-        ezlog_e(TAG_WIFI, "wifi config sta mode failed.");
-        return -1;
+        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     }
 
     g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT; //init connect state
@@ -199,7 +217,7 @@ ez_int32_t ezos_sta_connect(ez_int8_t *ssid, ez_int8_t *password)
     return 0;
 }
 
-ez_int32_t ezos_sta_stop()
+int ezos_sta_stop()
 {
     ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
     g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
@@ -207,12 +225,20 @@ ez_int32_t ezos_sta_stop()
     return 0;
 }
 
-ez_int32_t ezos_ap_start(ez_int8_t *ssid, ez_int8_t *password, ez_uint8_t auth_mode, ez_uint8_t channel)
+int ezos_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned char channel)
 {
     wifi_config_t wifi_config;
     int ssid_len = 0, pwd_len = 0;
 
     ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
+
+    wifi_mode_t wifi_mode = WIFI_MODE_NULL;
+    esp_wifi_get_mode(&wifi_mode);
+    if (WIFI_MODE_AP != wifi_mode && WIFI_MODE_APSTA != wifi_mode)
+    {
+        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    }
+
 
     memset(&wifi_config, 0, sizeof(wifi_config));
 
@@ -254,7 +280,6 @@ ez_int32_t ezos_ap_start(ez_int8_t *ssid, ez_int8_t *password, ez_uint8_t auth_m
     wifi_config.ap.authmode = auth_mode;
     wifi_config.ap.channel = channel;
 
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config));
 
     ezlog_i(TAG_WIFI, "wifi_init_softap finished.SSID:%s password:%s", wifi_config.sta.ssid, wifi_config.sta.password);
@@ -264,7 +289,7 @@ ez_int32_t ezos_ap_start(ez_int8_t *ssid, ez_int8_t *password, ez_uint8_t auth_m
     return 0;
 }
 
-ez_int32_t ezos_ap_stop()
+int ezos_ap_stop()
 {
     wifi_mode_t wifi_mode = WIFI_MODE_NULL;
     esp_err_t ret = ESP_OK;
@@ -288,7 +313,7 @@ ez_int32_t ezos_ap_stop()
     return ret;
 }
 
-ez_int32_t ezos_wifi_deinit()
+int ezos_wifi_deinit()
 {
     esp_wifi_stop();
     esp_wifi_deinit();
@@ -300,7 +325,7 @@ ez_int32_t ezos_wifi_deinit()
     return 0;
 }
 
-ez_uint8_t ezos_sta_get_scan_list(ez_uint8_t max_ap_num, ezos_wifi_list_t *ap_list)
+unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t *ap_list)
 {
     if (g_wifi_scan_start)
     {
@@ -357,7 +382,7 @@ ez_uint8_t ezos_sta_get_scan_list(ez_uint8_t max_ap_num, ezos_wifi_list_t *ap_li
 }
 
 
-ez_int32_t ezos_get_rssi(ez_int8_t *rssi)
+int ezos_get_rssi(char *rssi)
 {
     int8_t ret = -1;
 

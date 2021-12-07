@@ -8,6 +8,11 @@
 
 static ez_int32_t send_http_resp(httpd_req_t *req, ez_int32_t errcode, ez_int8_t *body)
 {
+    ezlog_v(TAG_AP, "send response. errcode: %d", errcode);
+    if (NULL != body)
+    {
+        ezlog_v(TAG_AP, "http body: %s", body);
+    }
     switch (errcode)
     {
     case EZCONN_SUCC:
@@ -16,7 +21,7 @@ static ez_int32_t send_http_resp(httpd_req_t *req, ez_int32_t errcode, ez_int8_t
         if (NULL != body) 
         {
             httpd_resp_send(req, body, ezos_strlen(body));
-            ezlog_v(TAG_AP, "rsp http body: %s", body);
+            ezlog_d(TAG_AP, "rsp http body: %s", body);
         }
         break;
     default:
@@ -49,7 +54,7 @@ static ez_int32_t process_get_devinfo_req(httpd_req_t *req, ezconn_ctx_t *ctx)
         cJSON_AddStringToObject(js_root, "dev_type", ctx->dev_info.dev_type);
         cJSON_AddStringToObject(js_root, "dev_firmwareversion", ctx->dev_info.dev_version);
 
-        char *js_str = cJSON_PrintUnformatted(js_root);
+        js_str = cJSON_PrintUnformatted(js_root);
         if (NULL == js_str)
         {
             ezlog_e(TAG_AP, "json print error.");
@@ -166,7 +171,7 @@ static ez_int8_t *get_err_str(ezos_wifi_state_e state)
     }
 }
 
-static ez_int32_t gen_rsp_with_state(ezos_wifi_state_e state, ez_int8_t *rsp_str)
+static ez_int32_t gen_rsp_with_state(ezos_wifi_state_e state, ez_int8_t **rsp_str)
 {
     ez_int32_t ret = 0;
     cJSON *js_root = NULL;
@@ -182,8 +187,8 @@ static ez_int32_t gen_rsp_with_state(ezos_wifi_state_e state, ez_int8_t *rsp_str
         cJSON_AddNumberToObject(js_root, "status_code", state);
         cJSON_AddStringToObject(js_root, "status_string", get_err_str(state));
 
-        rsp_str = cJSON_PrintUnformatted(js_root);
-        if (NULL == rsp_str)
+        *rsp_str = cJSON_PrintUnformatted(js_root);
+        if (NULL == *rsp_str)
         {
             ezlog_e(TAG_AP, "json print");
             ret = EZCONN_ERRNO_NO_MEMORY;
@@ -284,7 +289,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
     ez_int32_t ret = EZCONN_SUCC; 
 
     char *req_content = NULL;
-    char *rsp_str = NULL;
+    ez_int8_t *rsp_str = NULL;
     do 
     {
         req_content = (char *)ezos_malloc(req->content_len);
@@ -318,7 +323,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
 
         if (!ctx->apsta_coexist)
         {
-            gen_rsp_with_state(EZOS_WIFI_STATE_CONNECT_SUCCESS, rsp_str);
+            gen_rsp_with_state(EZOS_WIFI_STATE_CONNECT_SUCCESS, &rsp_str);
             send_http_resp(req, EZCONN_SUCC, rsp_str);
             if (NULL != rsp_str)
             {
@@ -352,14 +357,14 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
         ez_bool_t is_succ = ez_true;
         if (wifi_state != EZOS_WIFI_STATE_CONNECT_SUCCESS)
         {
-            ezos_sta_stop(); // Èô³¬Ê±Ö®ºó»¹Î´Á¬½Ó³É¹¦£¬ÔòÍ£Ö¹µ±Ç°Á¬½Ó
+            ezos_sta_stop(); // è‹¥è¶…æ—¶ä¹‹åè¿˜æœªè¿æ¥æˆåŠŸï¼Œåˆ™åœæ­¢å½“å‰è¿æ¥
             is_succ = ez_false;
         }
         
-        // ÈôwifiÒÑ¾­Á¬½Ó£¬ÔòĞèÒªappÖØĞÂÁ¬½Óap£¬ÔÙ·¢ËÍhttp response
+        // è‹¥wifiå·²ç»è¿æ¥ï¼Œåˆ™éœ€è¦appé‡æ–°è¿æ¥apï¼Œå†å‘é€http response
         if (ctx->apsta_coexist)
         {
-            gen_rsp_with_state(wifi_state, rsp_str);
+            gen_rsp_with_state(wifi_state, &rsp_str);
             send_http_resp(req, EZCONN_SUCC, rsp_str);
 
             if (wifi_state == EZOS_WIFI_STATE_CONNECT_SUCCESS)
@@ -376,7 +381,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
                     ezos_delay_ms(100);
                 }
             }
-            else // ÈôwifiÎ´Á¬½Ó£¬Ôò²»ĞèÒªµÈapÖØĞÂÁ¬½Ó
+            else // è‹¥wifiæœªè¿æ¥ï¼Œåˆ™ä¸éœ€è¦ç­‰apé‡æ–°è¿æ¥
             {
                 ezos_delay_ms(3000);
             }
@@ -433,6 +438,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
 ez_int32_t ezconn_process_http_req(http_req_type_e req_type, httpd_req_t *req, ezconn_ctx_t *ctx)
 {
     ez_int32_t ret = EZCONN_SUCC;
+    ezlog_v(TAG_AP, "process http req, req_type: %d", req_type);
 	switch (req_type)
 	{
 	case REQ_DEVINFO:

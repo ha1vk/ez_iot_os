@@ -2,18 +2,69 @@
 #define EZOS_WIFI_H
 
 #include "ezos_def.h"
+/**
+ * @brief   wifi模块初始化 
+ * 
+ * @return  0 for success, other for failed
+ */
+int ezos_wifi_init();
 
-ez_int32_t ezos_wifi_init();
+typedef enum
+{
+    EZOS_WIFI_MODE_AP, 
+    EZOS_WIFI_MODE_STA,
+    EZOS_WIFI_MODE_APSTA,
+} ezos_wifi_mode_e;
+/**
+ * @brief   设置wifi模式，ap模式/station模式/ap+station模式 
+ * 
+ * @param   wifi_mode ： see ezos_wifi_mode_e
+ * @return  0 for success, other for failed
+ */
+int ezos_wifi_config(ezos_wifi_mode_e wifi_mode);
 
-ez_int32_t ezos_sta_connect(ez_int8_t *ssid, ez_int8_t *password);
+/**
+ * @brief   start station mode, and connect to route specified ssid and password
+ * 
+ * @param   ssid : ssid of the route to connect
+ * @param   password : password of the route to connect
+ * @return  0 for success, other for failed 
+ * 
+ * @warning must invoke after ezos_wifi_init
+ */
+int ezos_sta_connect(char *ssid, char *password);
 
-ez_int32_t ezos_sta_stop();
+/**
+ * @brief  stop station mode  
+ * 
+ * @return  0 for success, other for failed 
+ */
+int ezos_sta_stop();
 
-ez_int32_t ezos_ap_start(ez_int8_t *ssid, ez_int8_t *password, ez_uint8_t auth_mode, ez_uint8_t channel);
+/**
+ * @brief   start ap mode
+ *
+ * @param   ssid : ap ssid
+ * @param   password : ap password
+ * @param   auth_mode : auth mode. see ezos_wifi_auth_mode_e
+ * @param   channel : ap channel
+ * @return  0 for success, other for failed
+ */
+int ezos_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned char channel);
 
-ez_int32_t ezos_ap_stop();
+/**
+ * @brief   stop ap mode, and stop http server 
+ * 
+ * @return  0 for success, other for failed
+ */
+int ezos_ap_stop();
 
-ez_int32_t ezos_wifi_deinit();
+/**
+ * @brief   wifi 模块反初始化 
+ * 
+ * @return  0 for success, other for failed
+ */
+int ezos_wifi_deinit();
 
 typedef enum
 {
@@ -28,11 +79,11 @@ typedef enum
 typedef struct
 {
     ezos_wifi_auth_mode_e authmode;
-    ez_int8_t rssi;
-    ez_uint8_t channel;
-    ez_int8_t bssid[6];
-    ez_int8_t ssid[33];
-    ez_int8_t res[2];
+    char rssi;
+    unsigned char channel;
+    char bssid[6];
+    char ssid[33];
+    char res[2];
 } ezos_wifi_list_t;
 
 /*sta或ap+sta模式下扫描wifi列表*/
@@ -44,10 +95,15 @@ typedef struct
  *
  *  @return 实际扫描到的wifi个数
  */
-ez_uint8_t ezos_sta_get_scan_list(ez_uint8_t max_ap_num, ezos_wifi_list_t *ap_list);
+unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t *ap_list);
 
-
-ez_int32_t ezos_get_rssi(ez_int8_t *rssi);
+/**
+ * @brief       获取当前连接路由器的rssi
+ * 
+ * @param[in]   rssi : rssi
+ * @return      0 for success, other for failed 
+ */
+int ezos_get_rssi(char *rssi);
 
 typedef enum
 {
@@ -60,6 +116,11 @@ typedef enum
     EZOS_WIFI_STATE_UNKNOW          = 202,  // 未知错误
 } ezos_wifi_state_e;
 
+/**
+ * @brief  获取当前配网或wifi连接状态
+ * 
+ * @return ezos_wifi_state_e 
+ */
 ezos_wifi_state_e ezos_get_state();
 
 #endif

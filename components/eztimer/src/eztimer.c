@@ -12,7 +12,7 @@ typedef struct
     ez_bool_t    reload;         // 可重复触发
     ez_int32_t  time_out;       // 超时时间ms
     ez_int32_t  count_down;     // 超时时间/100
-    ez_int32_t  (*fun)(void);   // 超时后的回调
+    void  (*fun)(void);   // 超时后的回调
 } eztimer_struct;
 
 typedef struct timer_list
@@ -72,7 +72,7 @@ static void timer_routine(void *param)
     }
 }
 
-ez_int32_t ez_timer_init(void)
+ez_int32_t eztimer_init(void)
 {
     g_status_mutex = ezos_mutex_create();
     if (NULL == g_status_mutex)
@@ -88,7 +88,7 @@ ez_int32_t ez_timer_init(void)
     }
 
     ezos_memset(&g_list, 0, sizeof(g_list));
-    ezos_thread_create(&g_list.thread, (ez_int8_t *)"ez_timer", timer_routine, (void *)&g_list, CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE, 13);
+    ezos_thread_create(&g_list.thread, (ez_int8_t *)"eztimer", timer_routine, (void *)&g_list, CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE, 13);
     if (NULL == g_list.thread)
     {
         ezos_mutex_unlock(g_status_mutex);
@@ -101,7 +101,7 @@ ez_int32_t ez_timer_init(void)
     return 0;
 }
 
-ez_int32_t ez_timer_fini(void)
+ez_int32_t eztimer_fini(void)
 {
     ezos_mutex_lock(g_status_mutex);
     if (--g_instance_count > 0)
@@ -128,13 +128,13 @@ ez_int32_t ez_timer_fini(void)
     return 0;
 }
 
-void *ez_timer_create(ez_int8_t *name, ez_int32_t time_out, ez_bool_t reload, ez_int32_t (*fun)(void))
+void *eztimer_create(ez_int8_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void))
 {
     static ez_size_t id = 0;
 
     if (ez_false == g_list.invalid)
     {
-        if (0 != ez_timer_init())
+        if (0 != eztimer_init())
         {
             return NULL;
         }
@@ -155,7 +155,7 @@ void *ez_timer_create(ez_int8_t *name, ez_int32_t time_out, ez_bool_t reload, ez
     return (void *)timer.id;
 }
 
-ez_int32_t ez_timer_delete(void *handle)
+ez_int32_t eztimer_delete(void *handle)
 {
     if (ez_false == g_list.invalid)
     {
@@ -185,12 +185,12 @@ ez_int32_t ez_timer_delete(void *handle)
 
     if (1 == list_size)
     {
-        ez_timer_fini();
+        eztimer_fini();
     }
     return 0;
 }
 
-ez_int32_t ez_timer_reset(void *handle)
+ez_int32_t eztimer_reset(void *handle)
 {
     if (ez_false == g_list.invalid)
     {
@@ -220,7 +220,7 @@ ez_int32_t ez_timer_reset(void *handle)
     return 0;
 }
 
-ez_int32_t ez_timer_change_period(void *handle, ez_int32_t new_time_out)
+ez_int32_t eztimer_change_period(void *handle, ez_int32_t new_time_out)
 {
     if (ez_false == g_list.invalid)
     {

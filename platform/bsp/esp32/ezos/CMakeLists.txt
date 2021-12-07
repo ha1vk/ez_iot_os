@@ -5,34 +5,36 @@
 
 ############### Add include ###################
 list(APPEND ADD_INCLUDE "../../../inc")
+set(IDF_PATH "/opt/esp_sdk/esp-idf")
+#export IDF_PATH=/opt/esp_sdk/esp-idf
 list(APPEND ADD_PRIVATE_INCLUDE
     ../inc_private
-    $ENV{IDF_PATH}/components/lwip/lwip/src/include
-    $ENV{IDF_PATH}/components/lwip/lwip/src/include/lwip
-    $ENV{IDF_PATH}/components/lwip/port/esp32/include
-    $ENV{IDF_PATH}/components/vfs/include
-    $ENV{IDF_PATH}/components/esp_common/include
-    $ENV{IDF_PATH}/components/xtensa/include
-    $ENV{IDF_PATH}/components/xtensa/esp32/include
-    $ENV{IDF_PATH}/components/esp_rom/include
-    $ENV{IDF_PATH}/components/lwip/include/apps/sntp
-    $ENV{IDF_PATH}/components/soc/esp32/include/
+    ${IDF_PATH}/components/lwip/lwip/src/include
+    ${IDF_PATH}/components/lwip/lwip/src/include/lwip
+    ${IDF_PATH}/components/lwip/port/esp32/include
+    ${IDF_PATH}/components/vfs/include
+    ${IDF_PATH}/components/esp_common/include
+    ${IDF_PATH}/components/xtensa/include
+    ${IDF_PATH}/components/xtensa/esp32/include
+    ${IDF_PATH}/components/esp_rom/include
+    ${IDF_PATH}/components/lwip/include/apps/sntp
+    ${IDF_PATH}/components/soc/esp32/include/
 
-    $ENV{IDF_PATH}/components/heap/include/
-    $ENV{IDF_PATH}/components/newlib/include/
-    $ENV{IDF_PATH}/components/newlib/platform_include/
-    $ENV{IDF_PATH}/components/freertos/include/freertos
-    $ENV{IDF_PATH}/components/esp_wifi/include
-    $ENV{IDF_PATH}/components/esp_event/include 
-    $ENV{IDF_PATH}/components/tcpip_adapter/include
-    $ENV{IDF_PATH}/components/lwip/include/apps
-    $ENV{IDF_PATH}/components/driver/include
-    $ENV{IDF_PATH}/components/esp_ringbuf/include
-    $ENV{IDF_PATH}/components/soc/include
+    ${IDF_PATH}/components/heap/include/
+    ${IDF_PATH}/components/newlib/include/
+    ${IDF_PATH}/components/newlib/platform_include/
+    ${IDF_PATH}/components/freertos/include/freertos
+    ${IDF_PATH}/components/esp_wifi/include
+    ${IDF_PATH}/components/esp_event/include 
+    ${IDF_PATH}/components/tcpip_adapter/include
+    ${IDF_PATH}/components/lwip/include/apps
+    ${IDF_PATH}/components/driver/include
+    ${IDF_PATH}/components/esp_ringbuf/include
+    ${IDF_PATH}/components/soc/include
 
 
-    $ENV{IDF_PATH}/components/freertos/include 
-    $ENV{IDF_PATH}/components/esp32/include 
+    ${IDF_PATH}/components/freertos/include 
+    ${IDF_PATH}/components/esp32/include 
 )
 ###############################################
 

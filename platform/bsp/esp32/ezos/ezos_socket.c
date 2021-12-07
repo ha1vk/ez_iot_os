@@ -19,6 +19,7 @@
  *******************************************************************************/
 
 #include "ezos_socket.h"
+#include "ezos_libc.h"
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
@@ -162,24 +163,45 @@ int ezos_inet_aton(const char *cp, ez_in_addr_t *inp)
     return inet_aton(cp, inp);
 }
 
+static int transfer_sockaddr(struct sockaddr *dst_addr, const ez_sockaddr_t *addr)
+{
+    dst_addr->sa_family = addr->sin_family;
+    ezos_memcpy(dst_addr->sa_data, addr->sa_data, 14);
+    return 0;
+}
+
 int ezos_bind(int socket_fd, const ez_sockaddr_t *addr, ez_socklen_t addrlen)
 {
-    return bind(socket_fd, (struct sockaddr *)addr, addrlen);
+    struct sockaddr tmp_addr = {0};
+    transfer_sockaddr(&tmp_addr, addr);
+    return bind(socket_fd, &tmp_addr, addrlen);
 }
 
 ez_ssize_t ezos_sendto(int socket_fd, const void *buf, ez_size_t len, int flags, const ez_sockaddr_t *dst_addr, ez_socklen_t addrlen)
 {
-    return sendto(socket_fd, buf, len, flags, (struct sockaddr *)dst_addr, addrlen);
+    struct sockaddr tmp_addr = {0};
+    transfer_sockaddr(&tmp_addr, dst_addr);
+    return sendto(socket_fd, buf, len, flags, &tmp_addr, addrlen);
 }
 
 ez_ssize_t ezos_recvfrom(int socket_fd, void *buf, ez_size_t len, int flags, ez_sockaddr_t *src_addr, ez_socklen_t *addrlen)
 {
-    return recvfrom(socket_fd, buf, len, flags, (struct sockaddr *)src_addr, addrlen);
+    ez_ssize_t ret = 0;
+    struct sockaddr tmp_addr = {0};
+    ret = recvfrom(socket_fd, buf, len, flags, &tmp_addr, addrlen);
+    src_addr->sin_family = tmp_addr.sa_family;
+    memcpy(src_addr->sa_data, tmp_addr.sa_data, 14);
+    return ret;
 }
 
 int ezos_accept(int socket_fd, struct ez_sockaddr *addr, ez_socklen_t *addrlen)
 {
-    return accept(socket_fd, (struct sockaddr *)addr, addrlen);
+    ez_ssize_t ret = 0;
+    struct sockaddr tmp_addr = {0};
+    ret = accept(socket_fd, &tmp_addr, addrlen);
+    addr->sin_family = tmp_addr.sa_family;
+    memcpy(addr->sa_data, tmp_addr.sa_data, 14);
+    return ret;
 }
 
 int ezos_listen(int socket_fd, int back_log)
