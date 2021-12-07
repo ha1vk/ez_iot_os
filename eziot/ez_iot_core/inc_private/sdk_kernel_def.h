@@ -244,13 +244,8 @@ typedef struct
 
 ezdev_sdk_kernel *get_ezdev_sdk_kernel();
 
-#ifdef __FILENAME__
-#define FUNC_IN() elog_output(EZ_ELOG_LVL_VERBOSE, TAG_CORE, __FILENAME__, __FUNCTION__, __LINE__, " in")
-#define FUNC_OUT() elog_output(EZ_ELOG_LVL_VERBOSE, TAG_CORE, __FILENAME__, __FUNCTION__, __LINE__, " out")
-#else
 #define FUNC_IN() elog_output(EZ_ELOG_LVL_VERBOSE, TAG_CORE, "", __FUNCTION__, __LINE__, " in")
 #define FUNC_OUT() elog_output(EZ_ELOG_LVL_VERBOSE, TAG_CORE, "", __FUNCTION__, __LINE__, " out")
-#endif
 
 #define CHECK_COND_DONE(cond, errcode)                                   \
     if ((cond))                                                          \

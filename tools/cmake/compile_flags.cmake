@@ -6,7 +6,7 @@
 
 ########## set C flags #########
 #TODO add private
-set(CMAKE_C_FLAGS -g -Wall -Wno-pointer-sign)
+set(CMAKE_C_FLAGS -g -Wall)
 ################################
 
 ###### set CXX(cpp) flags ######

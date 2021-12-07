@@ -100,8 +100,16 @@ extern "C"
         ez_char_t *local_index; ///< 通道号
     } ez_tsl_rsc_t;
 
+    typedef enum
+    {
+        EZ_EVENT_PROPERTY_FULL_REPORT, ///< 开始全量上报属性, data(NULL)
+    } ez_tsl_event_e;
+
     typedef struct
     {
+
+        ez_int32_t (*ez_tsl_notice)(ez_tsl_event_e event_type, ez_void_t *data, ez_int32_t len);
+
         /**
         * @brief 平台下发操作
         * 
@@ -184,7 +192,7 @@ extern "C"
      * @param pevinfo 设备信息; NULL默认当前设备，子设备不能为NULL
      * @return ez_tsl_err_e 
      */
-    EZOS_API ez_err_t ez_iot_tsl_unreg(ez_tsl_devinfo_t *pdevinfo);
+    EZOS_API ez_err_t ez_iot_tsl_unreg(ez_char_t *dev_subserial);
 
     /**
     * @brief tsl反初始化

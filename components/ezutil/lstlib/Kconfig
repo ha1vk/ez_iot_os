@@ -1,3 +1,0 @@
-config EZIOT_COMPONENT_EZUTIL_LST_ENABLE
-    bool "Enable lstlib module"
-    default y

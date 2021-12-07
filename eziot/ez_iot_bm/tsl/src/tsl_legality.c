@@ -4,11 +4,211 @@
 #include <ezos.h>
 #include "cJSON.h"
 
-#include "ez_iot_tsl_legality.h"
-#include "ez_iot_tsl_schema.h"
-#include "ez_iot_tsl_adapter.h"
+#include "ez_iot_tsl.h"
+#include "tsl_legality.h"
+#include "tsl_adapter.h"
+#include "tsl_profile.h"
 
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+static ez_err_t check_schema_value(const ez_void_t *schema_dsc, const ez_void_t *tsl_value);
+
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
+static int check_object_value(tsl_schema_desc *schema, ez_tsl_value_t *value);
+static int check_array_value(tsl_schema_desc *schema, ez_tsl_value_t *value);
+static int check_string_value(tsl_schema_desc *schema, ez_tsl_value_t *value);
+static int check_int_value(tsl_schema_desc *schema, ez_tsl_value_t *value);
+static int check_double_value(tsl_schema_desc *schema, ez_tsl_value_t *value);
+#endif
+
+ez_err_t tsl_legality_property_check(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value)
+{
+    ez_err_t rv = EZ_TSL_ERR_SUCC;
+    tsl_domain_prop *prop = NULL;
+    size_t i = 0;
+    size_t j = 0;
+    size_t k = 0;
+
+    const tsl_capacity_t *capacity = tsl_profile_get_lock((ez_char_t *)sn);
+    CHECK_COND_DONE(!capacity, EZ_TSL_ERR_DEV_NOT_FOUND);
+
+    for (i = 0; i < capacity->rsc_num; i++)
+    {
+        if (0 == ezos_strcmp(rsc_info->res_type, capacity->resource[i].rsc_category))
+        {
+            break;
+        }
+    }
+
+    CHECK_COND_DONE(i == capacity->rsc_num, EZ_TSL_ERR_DEV_NOT_FOUND);
+
+    for (j = 0; j < capacity->resource[i].index_num; j++)
+    {
+        if (0 == ezos_strcmp(rsc_info->local_index, capacity->resource[i].index))
+        {
+            break;
+        }
+    }
+
+    CHECK_COND_DONE(j == capacity->resource[i].index_num, EZ_TSL_ERR_INDEX_NOT_FOUND);
+
+    for (j = 0; j < capacity->resource[i].domain_num; j++)
+    {
+        if (0 == ezos_strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
+        {
+            break;
+        }
+    }
+
+    CHECK_COND_DONE(j == capacity->resource[i].domain_num, EZ_TSL_ERR_DOMAIN_NOT_FOUND);
+
+    for (k = 0; k < capacity->resource[i].domain[j].prop_num; k++)
+    {
+        tsl_domain_prop *prop_temp = capacity->resource[i].domain[j].prop + k;
+        if (0 == ezos_strcmp(prop_temp->identifier, (char *)key_info->key))
+        {
+            prop = prop_temp;
+            break;
+        }
+    }
+
+    CHECK_COND_DONE(k == capacity->resource[i].domain[j].prop_num, EZ_TSL_ERR_KEY_NOT_FOUND);
+
+    if (value)
+    {
+        rv = check_schema_value(&prop->prop_desc, value);
+    }
+
+done:
+    if (capacity)
+    {
+        tsl_profile_get_unlock();
+    }
+
+    return rv;
+}
+
+ez_err_t tsl_legality_event_check(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value)
+{
+    ez_err_t rv = EZ_TSL_ERR_SUCC;
+    tsl_domain_event *event = NULL;
+    size_t i = 0;
+    size_t j = 0;
+    size_t k = 0;
+
+    const tsl_capacity_t *capacity = tsl_profile_get_lock((ez_char_t*)sn);
+    CHECK_COND_DONE(!capacity, EZ_TSL_ERR_DEV_NOT_FOUND);
+
+    for (i = 0; i < capacity->rsc_num; i++)
+    {
+        if (0 == ezos_strcmp(rsc_info->res_type, capacity->resource[i].rsc_category))
+        {
+            break;
+        }
+    }
+
+    CHECK_COND_DONE(i == capacity->rsc_num, EZ_TSL_ERR_DEV_NOT_FOUND);
+
+    for (j = 0; j < capacity->resource[i].index_num; j++)
+    {
+        if (0 == ezos_strcmp(rsc_info->local_index, capacity->resource[i].index))
+        {
+            break;
+        }
+    }
+
+    CHECK_COND_DONE(j == capacity->resource[i].index_num, EZ_TSL_ERR_INDEX_NOT_FOUND);
+
+    for (j = 0; j < capacity->resource[i].domain_num; j++)
+    {
+        if (0 == ezos_strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
+        {
+            break;
+        }
+    }
+
+    CHECK_COND_DONE(j == capacity->resource[i].domain_num, EZ_TSL_ERR_DOMAIN_NOT_FOUND);
+
+    for (k = 0; k < capacity->resource[i].domain[j].event_num; k++)
+    {
+        tsl_domain_event *event_temp = capacity->resource[i].domain[j].event + k;
+
+        if (0 == ezos_strcmp(event_temp->identifier, (char *)key_info->key))
+        {
+            event = event_temp;
+            break;
+        }
+    }
+
+    CHECK_COND_DONE(k == capacity->resource[i].domain[j].event_num, EZ_TSL_ERR_KEY_NOT_FOUND);
+
+    if (value)
+    {
+        rv = check_schema_value(&event->input_schema, value);
+    }
+
+done:
+    if (capacity)
+    {
+        tsl_profile_get_unlock();
+    }
+
+    return rv;
+}
+
+static ez_err_t check_schema_value(const ez_void_t *schema_dsc, const ez_void_t *tsl_value)
+{
+    ez_err_t ret = EZ_TSL_ERR_SUCC;
+
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
+    tsl_schema_desc *schema = (tsl_schema_desc *)schema_dsc;
+    ez_tsl_value_t *value = (ez_tsl_value_t *)tsl_value;
+
+    if (schema->item_type != value->type)
+    {
+        if (schema->item_type == EZ_TSL_DATA_TYPE_DOUBLE && value->type == EZ_TSL_DATA_TYPE_INT)
+        {
+            ez_tsl_value_t tsl_value = {0};
+            tsl_value.type = EZ_TSL_DATA_TYPE_DOUBLE;
+            tsl_value.value_double = (double)value->value_int;
+            tsl_value.size = sizeof(double);
+            return check_double_value(schema, &tsl_value);
+        }
+        else
+        {
+            ezlog_e(TAG_TSL, "type not match. schema type: %d, value type: %d", schema->item_type, value->type);
+            return EZ_TSL_ERR_VALUE_TYPE;
+        }
+    }
+
+    switch (value->type)
+    {
+    case EZ_TSL_DATA_TYPE_BOOL:
+
+        break;
+    case EZ_TSL_DATA_TYPE_INT:
+        ret = check_int_value(schema, value);
+        break;
+    case EZ_TSL_DATA_TYPE_DOUBLE:
+        ret = check_double_value(schema, value);
+        break;
+    case EZ_TSL_DATA_TYPE_STRING:
+        ret = check_string_value(schema, value);
+        break;
+    case EZ_TSL_DATA_TYPE_ARRAY:
+        ret = check_array_value(schema, value);
+        break;
+    case EZ_TSL_DATA_TYPE_OBJECT:
+        ret = check_object_value(schema, value);
+        break;
+
+    default:
+        break;
+    }
+#endif //CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
+
+    return ret;
+}
+
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 static int check_int_value(tsl_schema_desc *schema, ez_tsl_value_t *value)
 {
     int ret = 0;
@@ -449,54 +649,4 @@ static int check_object_value(tsl_schema_desc *schema, ez_tsl_value_t *value)
     return ret;
 }
 
-ez_err_t check_schema_value(const ez_void_t *schema_dsc, const ez_void_t *tsl_value)
-{
-    ez_err_t ret = EZ_TSL_ERR_SUCC;
-    tsl_schema_desc *schema = (tsl_schema_desc *)schema_dsc;
-    ez_tsl_value_t *value = (ez_tsl_value_t *)tsl_value;
-
-    if (schema->item_type != value->type)
-    {
-        if (schema->item_type == EZ_TSL_DATA_TYPE_DOUBLE && value->type == EZ_TSL_DATA_TYPE_INT)
-        {
-            ez_tsl_value_t tsl_value = {0};
-            tsl_value.type = EZ_TSL_DATA_TYPE_DOUBLE;
-            tsl_value.value_double = (double)value->value_int;
-            tsl_value.size = sizeof(double);
-            return check_double_value(schema, &tsl_value);
-        }
-        else
-        {
-            ezlog_e(TAG_TSL, "type not match. schema type: %d, value type: %d", schema->item_type, value->type);
-            return EZ_TSL_ERR_VALUE_TYPE;
-        }
-    }
-
-    switch (value->type)
-    {
-    case EZ_TSL_DATA_TYPE_BOOL:
-
-        break;
-    case EZ_TSL_DATA_TYPE_INT:
-        ret = check_int_value(schema, value);
-        break;
-    case EZ_TSL_DATA_TYPE_DOUBLE:
-        ret = check_double_value(schema, value);
-        break;
-    case EZ_TSL_DATA_TYPE_STRING:
-        ret = check_string_value(schema, value);
-        break;
-    case EZ_TSL_DATA_TYPE_ARRAY:
-        ret = check_array_value(schema, value);
-        break;
-    case EZ_TSL_DATA_TYPE_OBJECT:
-        ret = check_object_value(schema, value);
-        break;
-
-    default:
-        break;
-    }
-    return ret;
-}
-
-#endif
+#endif //CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG

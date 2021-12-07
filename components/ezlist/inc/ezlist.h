@@ -1,85 +1,134 @@
-#ifndef EZLIST_H
-#define EZLIST_H
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * 
+ * Contributors:
+ *    xurongjun - Doubly linked list interface declaration
+ * 
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-12-04     xurongjun    first version
+ *******************************************************************************/
 
-#include <stddef.h>
+#ifndef _EZLIST_H_
+#define _EZLIST_H_
 
-#ifdef __cplusplus
-"C"
+#define LIST_FOR_EACH(type, var, list) for (var = (type *)ezlist_get_first(list); var != NULL; var = (type *)ezlist_get_next(&var->node))
+
+#if defined(__cplusplus)
+extern "C"
 {
 #endif
 
-    /* types */
-    typedef struct ezlist_s ezlist_t;
-    typedef struct ezlist_obj_s ezlist_obj_t;
-
-    enum
+    typedef struct ez_node
     {
-        ezlist_THREADSAFE = (0x01) /*!< make it thread-safe */
-    };
+        struct ez_node *next;
+        struct ez_node *prev;
+    } ez_node_t;
 
-    ezlist_t *ezlist(int options); /*!< ezlist constructor */
-    size_t ezlist_setsize(ezlist_t * list, size_t max);
-
-    int ezlist_addfirst(ezlist_t * list, const void *data, size_t size);
-    int ezlist_addlast(ezlist_t * list, const void *data, size_t size);
-    int ezlist_addat(ezlist_t * list, int index, const void *data, size_t size);
-
-    void *ezlist_getfirst(ezlist_t * list, size_t * size, int newmem);
-    void *ezlist_getlast(ezlist_t * list, size_t * size, int newmem);
-    void *ezlist_getat(ezlist_t * list, int index, size_t *size, int newmem);
-
-    void *ezlist_popfirst(ezlist_t * list, size_t * size);
-    void *ezlist_poplast(ezlist_t * list, size_t * size);
-    void *ezlist_popat(ezlist_t * list, int index, size_t *size);
-
-    int ezlist_removefirst(ezlist_t * list);
-    int ezlist_removelast(ezlist_t * list);
-    int ezlist_removeat(ezlist_t * list, int index);
-
-    int ezlist_getnext(ezlist_t * list, ezlist_obj_t * obj, int newmem);
-
-    size_t ezlist_size(ezlist_t * list);
-    size_t ezlist_datasize(ezlist_t * list);
-    void ezlist_reverse(ezlist_t * list);
-    void ezlist_clear(ezlist_t * list);
-
-    void *ezlist_toarray(ezlist_t * list, size_t * size);
-    char *ezlist_tostring(ezlist_t * list);
-
-    void ezlist_lock(ezlist_t * list);
-    void ezlist_unlock(ezlist_t * list);
-
-    void ezlist_free(ezlist_t * list);
+    typedef struct list
+    {
+        ez_node_t header;
+        int size;
+    } ez_list_t;
 
     /**
-     * ezlist container object
+     * @brief Initialize the list
+     * 
+     * @param plist 
      */
-    struct ezlist_s
-    {
-        /* private variables - do not access directly */
-        void *mutex;    /*!< initialized when ezlist_OPT_THREADSAFE is given */
-        size_t num;     /*!< number of elements */
-        size_t max;     /*!< maximum number of elements. 0 means no limit */
-        size_t datasum; /*!< total sum of data size, does not include name size */
-
-        ezlist_obj_t *first; /*!< first object pointer */
-        ezlist_obj_t *last;  /*!< last object pointer */
-    };
+    void ezlist_init(ez_list_t *plist);
 
     /**
-     * ezlist node data structure.
+     * @brief Get first node in this list
+     * 
+     * @param plist 
+     * @return node_t* 
      */
-    struct ezlist_obj_s
-    {
-        void *data;  /*!< data */
-        size_t size; /*!< data size */
+    ez_node_t *ezlist_get_first(ez_list_t *plist);
 
-        ezlist_obj_t *prev; /*!< previous link */
-        ezlist_obj_t *next; /*!< next link */
-    };
+    /**
+     * @brief Get last node in this list
+     * 
+     * @param plist 
+     * @return node_t* 
+     */
+    ez_node_t *ezlist_get_last(ez_list_t *plist);
 
-#ifdef __cplusplus
+    /**
+     * @brief Get the node at the specified position in this list
+     * 
+     * @param plist 
+     * @return node_t* 
+     */
+    ez_node_t *ezlist_get_at(ez_list_t *plist, unsigned int index);
+
+    /**
+     * @brief Get previous node in this list
+     * 
+     * @param pnode 
+     * @return node_t* 
+     */
+    ez_node_t *ezlist_get_prev(ez_node_t *pnode);
+
+    /**
+     * @brief  Get next node in this list.
+     * 
+     * @param pnode 
+     * @return node_t* 
+     */
+    ez_node_t *ezlist_get_next(ez_node_t *pnode);
+
+    /**
+     * @brief Get the number of nodes in this list
+     * 
+     * @param plist 
+     * @return int 
+     */
+    int ezlist_get_size(ez_list_t *plist);
+
+    /**
+     * @brief add a node to the end of this list
+     * 
+     * @param plist 
+     * @param pnode 
+     */
+    void ezlist_add_last(ez_list_t *plist, ez_node_t *pnode);
+
+    /**
+     * @brief Inserts a node at the specified position in this list
+     * 
+     * @param plist 
+     * @param pprev 
+     * @param pnode 
+     */
+    void ezlist_add_at(ez_list_t *plist, ez_node_t *pprev, ez_node_t *pnode);
+
+    /**
+     * @brief delete the specified node from list
+     * 
+     * @param plist 
+     * @param pnode 
+     */
+    void ezlist_delete(ez_list_t *plist, ez_node_t *pnode);
+
+    /**
+     * @brief free all of the node from this list.
+     * 
+     * @param plist 
+     */
+    void ezlist_clear(ez_list_t *plist);
+
+#if defined(__cplusplus)
 }
 #endif
 
-#endif /* ezlist_H */
+#endif /* end of _LST_LIB_H */

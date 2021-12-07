@@ -25,7 +25,7 @@
 
 static ez_bool_t g_shd_is_inited = ez_false;
 
-EZOS_API ez_err_t ez_iot_shadow_init(ez_void_t)
+EZOS_API ez_err_t ez_iot_shadow_init(ez_shadow_notice pfunc)
 {
     FUNC_IN();
 
@@ -34,7 +34,7 @@ EZOS_API ez_err_t ez_iot_shadow_init(ez_void_t)
     rv = shadow_extern_init();
     CHECK_RV_DONE(rv);
 
-    CHECK_COND_DONE(!shadow_core_start(), EZ_SHD_ERR_MEMORY);
+    CHECK_COND_DONE(!shadow_core_start(pfunc), EZ_SHD_ERR_MEMORY);
 
     g_shd_is_inited = ez_true;
 done:
@@ -43,7 +43,7 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t ez_iot_shadow_register(ez_shadow_res_t *pres, ez_char_t *domain_id, ez_shadow_module_t *module)
+EZOS_API ez_err_t ez_iot_shadow_reg(ez_shadow_res_t *pres, ez_char_t *domain_id, ez_shadow_module_t *module)
 {
     FUNC_IN();
 
@@ -83,6 +83,22 @@ EZOS_API ez_err_t ez_iot_shadow_push(ez_shadow_res_t *pres, ez_char_t *domain_id
     CHECK_RV_DONE(rv);
     shadow_core_event_occured(SHADOW_EVENT_TYPE_REPORT);
 
+done:
+    FUNC_OUT();
+
+    return rv;
+}
+
+EZOS_API ez_err_t ez_iot_shadow_unreg(ez_char_t *dev_serial)
+{
+    FUNC_IN();
+
+    ez_err_t rv = EZ_SHD_ERR_SUCC;
+
+    CHECK_COND_DONE(!g_shd_is_inited, EZ_SHD_ERR_NOT_INIT);
+    CHECK_COND_DONE(!dev_serial, EZ_SHD_ERR_PARAM_INVALID);
+
+    rv = shadow_core_module_clear(dev_serial);
 done:
     FUNC_OUT();
 
