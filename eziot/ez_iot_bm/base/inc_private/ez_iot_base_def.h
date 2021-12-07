@@ -33,13 +33,8 @@ extern "C"
 {
 #endif
 
-#ifdef __FILENAME__
-#define FUNC_IN() elog_output(EZ_ELOG_LVL_VERBOSE, TAG_BASE, __FILENAME__, __FUNCTION__, __LINE__, " in")
-#define FUNC_OUT() elog_output(EZ_ELOG_LVL_VERBOSE, TAG_BASE, __FILENAME__, __FUNCTION__, __LINE__, " out")
-#else
 #define FUNC_IN() elog_output(EZ_ELOG_LVL_VERBOSE, TAG_BASE, "", __FUNCTION__, __LINE__, " in")
 #define FUNC_OUT() elog_output(EZ_ELOG_LVL_VERBOSE, TAG_BASE, "", __FUNCTION__, __LINE__, " out")
-#endif
 
 #define CHECK_COND_DONE(cond, errcode)                                   \
     if ((cond))                                                          \

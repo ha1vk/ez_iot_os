@@ -3,7 +3,7 @@
 #include <float.h>
 #include <limits.h>
 #include "ezos.h"
-#include "lstLib.h"
+#include "ezlist.h"
 #include "cJSON.h"
 #include "ezlog.h"
 #include "misc.h"
@@ -36,7 +36,7 @@ typedef ez_int32_t (*shadow_devcloud_cb)(ez_shadow_value_t *pValue, ez_shadow_bu
 
 typedef struct
 {
-    NODE node;         ///< 双向链表的节点
+    ez_node_t node;    ///< 双向链表的节点
     ez_char_t key[32]; /// Shadow服务的Key
 
     shadow_cloud2dev_cb cloud2dev;
@@ -51,35 +51,35 @@ typedef struct
 
 typedef struct
 {
-    NODE node;                   ///< 双向链表的节点
+    ez_node_t node;              ///< 双向链表的节点
     shadow_prot_ver_e prot_ver;  ///< 协议版本号
     ez_int32_t domain_int;       ///< 领域id(int)
     ez_char_t domain_string[32]; ///< 领域id(string)
-    LIST key_lst;                ///< 信令路由表
+    ez_list_t key_lst;           ///< 信令路由表
 } node_domain_t;
 
 typedef struct
 {
-    NODE node;                  ///< 双向链表的节点
+    ez_node_t node;             ///< 双向链表的节点
     ez_int32_t index;           ///< 资源id
     ez_bool_t need_sync;        ///< 是否需要同步
     ezos_timespec_t sync_timer; ///< 同步定时器
     ez_uint16_t retry_count;    ///< 同步请求重试计数
-    LIST domain_lst;            ///< 领域列表
+    ez_list_t domain_lst;       ///< 领域列表
 } node_index_t;
 
 typedef struct
 {
-    NODE node;          ///< 双向链表的节点
-    ez_char_t type[32]; ///< 资源类型
-    LIST index_lst;     ///< 资源列表
+    ez_node_t node;      ///< 双向链表的节点
+    ez_char_t type[32];  ///< 资源类型
+    ez_list_t index_lst; ///< 资源列表
 } node_index_set_t;
 
 typedef struct
 {
-    NODE node;            ///< 双向链表的节点
+    ez_node_t node;       ///< 双向链表的节点
     ez_char_t dev_sn[48]; ///< 设备序列号
-    LIST type_lst;        ///< 资源类型列表
+    ez_list_t type_lst;   ///< 资源类型列表
 } node_dev_t;
 
 /* shadow线程句柄 */
@@ -96,27 +96,29 @@ static ez_sem_t *g_sem = NULL;
 
 static ez_char_t *g_p2c_buf = NULL;
 
+static ez_shadow_notice g_notice_pfunc = NULL;
+
 /* shadow 状态*/
 static shadow_core_status_e g_shadow_status = shadow_core_status_report;
 
-static ez_bool_t g_need_reset = ez_false;
+static ez_bool_t g_need_reset = ez_true;
 static ez_bool_t g_need_report = ez_false;
 static ez_bool_t g_need_sync = ez_false;
 //< shadow module manager class
-static LIST g_shaodw_modules;
+static ez_list_t g_shaodw_modules;
 
-static node_dev_t *shadow_module_find_dev(LIST *lst, ez_char_t *sn);
-static node_index_set_t *shadow_module_find_indexs(LIST *lst, ez_char_t *res_type);
-static node_index_t *shadow_module_find_index(LIST *lst, ez_int16_t index);
-static node_domain_t *shadow_module_find_domain(LIST *lst, ez_char_t *domain_id);
-static node_key_t *shadow_module_find_key(LIST *lst, ez_char_t *key);
+static node_dev_t *shadow_module_find_dev(ez_list_t *lst, ez_char_t *sn);
+static node_index_set_t *shadow_module_find_indexs(ez_list_t *lst, ez_char_t *res_type);
+static node_index_t *shadow_module_find_index(ez_list_t *lst, ez_int16_t index);
+static node_domain_t *shadow_module_find_domain(ez_list_t *lst, ez_char_t *domain_id);
+static node_key_t *shadow_module_find_key(ez_list_t *lst, ez_char_t *key);
 
-static node_dev_t *shadow_module_add_dev(LIST *lst, ez_char_t *sn);
-static node_index_set_t *shadow_module_add_index_set(LIST *lst, ez_char_t *res_type);
-static node_index_t *shadow_module_add_index(LIST *lst, ez_int16_t index);
-static node_domain_t *shadow_module_add_domain(LIST *lst, ez_char_t *domain_id, ez_uint16_t props_num, ez_void_t *props, shadow_prot_ver_e ver);
+static node_dev_t *shadow_module_add_dev(ez_list_t *lst, ez_char_t *sn);
+static node_index_set_t *shadow_module_add_index_set(ez_list_t *lst, ez_char_t *res_type);
+static node_index_t *shadow_module_add_index(ez_list_t *lst, ez_int16_t index);
+static node_domain_t *shadow_module_add_domain(ez_list_t *lst, ez_char_t *domain_id, ez_uint16_t props_num, ez_void_t *props, shadow_prot_ver_e ver);
 
-static ez_void_t *shadow_module_get_next(LIST *lst, NODE *node);
+static ez_void_t *shadow_module_get_next(ez_list_t *lst, ez_node_t *node);
 
 static ez_void_t shadow_module_delete_domain(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,7 +195,7 @@ static ez_void_t shadow_module_lock();
 static ez_void_t shadow_module_unlock();
 static ez_void_t shadow_module_deinit();
 
-ez_bool_t shadow_core_start()
+ez_bool_t shadow_core_start(ez_shadow_notice pfunc)
 {
     if (NULL == g_sem && NULL == (g_sem = ezos_sem_create(0, 1)))
     {
@@ -206,10 +208,11 @@ ez_bool_t shadow_core_start()
     }
 
     g_running = ez_true;
-    ezdev_lstInit(&g_shaodw_modules);
+    g_notice_pfunc = pfunc;
+    ezlist_init(&g_shaodw_modules);
 
     if (ezos_thread_create(&g_thread_handle, "ez_shadow_core", shadow_core_yeild, g_sem,
-                            CONFIG_EZIOT_SHADOW_STACK_SIZE, CONFIG_EZIOT_SHADOW_TASK_PRIORITY))
+                           CONFIG_EZIOT_SHADOW_STACK_SIZE, CONFIG_EZIOT_SHADOW_TASK_PRIORITY))
     {
         ezlog_e(TAG_SHD, "shadow thread create error");
         ezos_sem_destroy(g_sem);
@@ -379,6 +382,7 @@ static ez_void_t check_status_update()
 
     if (g_need_reset)
     {
+        g_notice_pfunc(EZ_EVENT_FULL_REPORT, NULL, 0);
         shadow_status_reset();
         status_chg = shadow_core_status_report;
     }
@@ -411,11 +415,11 @@ static ez_int32_t shadow_proc_report()
     ez_int32_t rv = 0;
     ez_int32_t total_remaining = 0;
 
-    NODE *node_dev = NULL;
-    NODE *node_index_set = NULL;
-    NODE *node_index = NULL;
-    NODE *node_domain = NULL;
-    NODE *node_key = NULL;
+    ez_node_t *node_dev = NULL;
+    ez_node_t *node_index_set = NULL;
+    ez_node_t *node_index = NULL;
+    ez_node_t *node_domain = NULL;
+    ez_node_t *node_key = NULL;
 
     node_dev_t *pnode_dev = NULL;
     node_index_set_t *pnode_index_set = NULL;
@@ -494,9 +498,9 @@ static ez_int32_t shadow_proc_sync()
     ez_int32_t rv = 0;
     ez_int32_t total_remaining = 0;
 
-    NODE *node_dev = NULL;
-    NODE *node_index_set = NULL;
-    NODE *node_index = NULL;
+    ez_node_t *node_dev = NULL;
+    ez_node_t *node_index_set = NULL;
+    ez_node_t *node_index = NULL;
 
     node_dev_t *pnode_dev = NULL;
     node_index_set_t *pnode_index_set = NULL;
@@ -584,11 +588,11 @@ static ez_int32_t shadow_proc_chg()
 
 static ez_void_t shadow_status_reset()
 {
-    NODE *node_dev = NULL;
-    NODE *node_index_set = NULL;
-    NODE *node_index = NULL;
-    NODE *node_domain = NULL;
-    NODE *node_key = NULL;
+    ez_node_t *node_dev = NULL;
+    ez_node_t *node_index_set = NULL;
+    ez_node_t *node_index = NULL;
+    ez_node_t *node_domain = NULL;
+    ez_node_t *node_key = NULL;
 
     node_dev_t *pnode_dev = NULL;
     node_index_set_t *pnode_index_set = NULL;
@@ -641,9 +645,9 @@ static ez_void_t shadow_status_reset()
 
 static ez_void_t shadow_status2sync()
 {
-    NODE *node_dev = NULL;
-    NODE *node_index_set = NULL;
-    NODE *node_index = NULL;
+    ez_node_t *node_dev = NULL;
+    ez_node_t *node_index_set = NULL;
+    ez_node_t *node_index = NULL;
 
     node_dev_t *pnode_dev = NULL;
     node_index_set_t *pnode_index_set = NULL;
@@ -820,17 +824,18 @@ ez_err_t shadow_core_module_addv3(ez_char_t *sn, ez_char_t *res_type, ez_int16_t
         rv = EZ_SHD_ERR_SUCC;
     } while (0);
 
-    ezlog_d(TAG_SHD, "shadow_core_module_addv3, dev count:%d", ezdev_lstCount(&g_shaodw_modules));
+    ezlog_d(TAG_SHD, "shadow_core_module_addv3, dev count:%d", ezlist_get_size(&g_shaodw_modules));
 
     shadow_module_unlock();
 
     return rv;
 }
 
-ez_err_t shadow_core_module_delete(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id)
+ez_err_t shadow_core_module_clear(ez_char_t *sn)
 {
     shadow_module_lock();
-    shadow_module_delete_domain(sn, res_type, index, domain_id);
+    //TODO
+    // shadow_module_delete_domain(sn, res_type, index, domain_id);
     shadow_module_unlock();
 
     return EZ_SHD_ERR_SUCC;
@@ -989,11 +994,11 @@ static ez_void_t shadow_module_delete_domain(ez_char_t *sn, ez_char_t *res_type,
     //TODO
 }
 
-static node_dev_t *shadow_module_find_dev(LIST *lst, ez_char_t *sn)
+static node_dev_t *shadow_module_find_dev(ez_list_t *lst, ez_char_t *sn)
 {
     node_dev_t *pnode = NULL;
 
-    if (NULL == lst || 0 == ezdev_lstCount(lst))
+    if (NULL == lst || 0 == ezlist_get_size(lst))
     {
         return NULL;
     }
@@ -1013,11 +1018,11 @@ static node_dev_t *shadow_module_find_dev(LIST *lst, ez_char_t *sn)
     return pnode;
 }
 
-static node_index_set_t *shadow_module_find_indexs(LIST *lst, ez_char_t *res_type)
+static node_index_set_t *shadow_module_find_indexs(ez_list_t *lst, ez_char_t *res_type)
 {
     node_index_set_t *pnode = NULL;
 
-    if (NULL == lst || 0 == ezdev_lstCount(lst))
+    if (NULL == lst || 0 == ezlist_get_size(lst))
     {
         return NULL;
     }
@@ -1037,11 +1042,11 @@ static node_index_set_t *shadow_module_find_indexs(LIST *lst, ez_char_t *res_typ
     return pnode;
 }
 
-static node_index_t *shadow_module_find_index(LIST *lst, ez_int16_t index)
+static node_index_t *shadow_module_find_index(ez_list_t *lst, ez_int16_t index)
 {
     node_index_t *pnode = NULL;
 
-    if (NULL == lst || 0 == ezdev_lstCount(lst))
+    if (NULL == lst || 0 == ezlist_get_size(lst))
     {
         return NULL;
     }
@@ -1061,11 +1066,11 @@ static node_index_t *shadow_module_find_index(LIST *lst, ez_int16_t index)
     return pnode;
 }
 
-static node_domain_t *shadow_module_find_domain(LIST *lst, ez_char_t *domain_id)
+static node_domain_t *shadow_module_find_domain(ez_list_t *lst, ez_char_t *domain_id)
 {
     node_domain_t *pnode = NULL;
 
-    if (NULL == lst || 0 == ezdev_lstCount(lst))
+    if (NULL == lst || 0 == ezlist_get_size(lst))
     {
         return NULL;
     }
@@ -1085,11 +1090,11 @@ static node_domain_t *shadow_module_find_domain(LIST *lst, ez_char_t *domain_id)
     return pnode;
 }
 
-static node_key_t *shadow_module_find_key(LIST *lst, ez_char_t *key)
+static node_key_t *shadow_module_find_key(ez_list_t *lst, ez_char_t *key)
 {
     node_key_t *pnode = NULL;
 
-    if (NULL == lst || 0 == ezdev_lstCount(lst))
+    if (NULL == lst || 0 == ezlist_get_size(lst))
     {
         return NULL;
     }
@@ -1109,7 +1114,7 @@ static node_key_t *shadow_module_find_key(LIST *lst, ez_char_t *key)
     return pnode;
 }
 
-static node_dev_t *shadow_module_add_dev(LIST *lst, ez_char_t *sn)
+static node_dev_t *shadow_module_add_dev(ez_list_t *lst, ez_char_t *sn)
 {
     node_dev_t *pnode = NULL;
 
@@ -1132,12 +1137,12 @@ static node_dev_t *shadow_module_add_dev(LIST *lst, ez_char_t *sn)
 
     ezos_memset(pnode, 0, sizeof(node_dev_t));
     ezos_strncpy(pnode->dev_sn, sn, sizeof(pnode->dev_sn) - 1);
-    ezdev_lstAdd(lst, &pnode->node);
+    ezlist_add_last(lst, &pnode->node);
 
     return pnode;
 }
 
-static node_index_set_t *shadow_module_add_index_set(LIST *lst, ez_char_t *res_type)
+static node_index_set_t *shadow_module_add_index_set(ez_list_t *lst, ez_char_t *res_type)
 {
     node_index_set_t *pnode = NULL;
 
@@ -1168,12 +1173,12 @@ static node_index_set_t *shadow_module_add_index_set(LIST *lst, ez_char_t *res_t
         ezos_strncpy(pnode->type, res_type, sizeof(pnode->type) - 1);
     }
 
-    ezdev_lstAdd(lst, &pnode->node);
+    ezlist_add_last(lst, &pnode->node);
 
     return pnode;
 }
 
-static node_index_t *shadow_module_add_index(LIST *lst, ez_int16_t index)
+static node_index_t *shadow_module_add_index(ez_list_t *lst, ez_int16_t index)
 {
     node_index_t *pnode = NULL;
 
@@ -1198,12 +1203,12 @@ static node_index_t *shadow_module_add_index(LIST *lst, ez_int16_t index)
     pnode->index = index;
     pnode->need_sync = 1;
     pnode->retry_count = 0;
-    ezdev_lstAdd(lst, &pnode->node);
+    ezlist_add_last(lst, &pnode->node);
 
     return pnode;
 }
 
-static node_domain_t *shadow_module_add_domain(LIST *lst, ez_char_t *domain_id, ez_uint16_t props_num, ez_void_t *props, shadow_prot_ver_e ver)
+static node_domain_t *shadow_module_add_domain(ez_list_t *lst, ez_char_t *domain_id, ez_uint16_t props_num, ez_void_t *props, shadow_prot_ver_e ver)
 {
     node_domain_t *rv = NULL;
     node_domain_t *pnode_domain = NULL;
@@ -1229,7 +1234,7 @@ static node_domain_t *shadow_module_add_domain(LIST *lst, ez_char_t *domain_id, 
             ezos_memset(pnode_domain, 0, sizeof(node_domain_t));
             ezos_strncpy(pnode_domain->domain_string, domain_id, sizeof(pnode_domain->domain_string) - 1);
             pnode_domain->prot_ver = ver;
-            ezdev_lstAdd(lst, &pnode_domain->node);
+            ezlist_add_last(lst, &pnode_domain->node);
         }
 
         for (i = 0; i < props_num; i++)
@@ -1262,7 +1267,7 @@ static node_domain_t *shadow_module_add_domain(LIST *lst, ez_char_t *domain_id, 
                 pnode_key->msg_seq = 0;
                 pnode_key->need_report = 1;
 
-                ezdev_lstAdd(&pnode_domain->key_lst, &pnode_key->node);
+                ezlist_add_last(&pnode_domain->key_lst, &pnode_key->node);
             }
         }
 
@@ -1272,7 +1277,7 @@ static node_domain_t *shadow_module_add_domain(LIST *lst, ez_char_t *domain_id, 
     return rv;
 }
 
-static ez_void_t *shadow_module_get_next(LIST *lst, NODE *node)
+static ez_void_t *shadow_module_get_next(ez_list_t *lst, ez_node_t *node)
 {
     if (NULL == lst)
     {
@@ -1281,10 +1286,10 @@ static ez_void_t *shadow_module_get_next(LIST *lst, NODE *node)
 
     if (NULL == node)
     {
-        return ezdev_lstFirst(lst);
+        return ezlist_get_first(lst);
     }
 
-    return ezdev_lstNext(node);
+    return ezlist_get_next(node);
 }
 
 static cJSON *tlv2json(ez_shadow_value_t *ptlv)
@@ -1324,11 +1329,11 @@ static cJSON *tlv2json(ez_shadow_value_t *ptlv)
 
 static ez_void_t shadow_reply2report(ez_uint32_t seq, ez_int32_t code)
 {
-    NODE *node_dev = NULL;
-    NODE *node_index_set = NULL;
-    NODE *node_index = NULL;
-    NODE *node_domain = NULL;
-    NODE *node_key = NULL;
+    ez_node_t *node_dev = NULL;
+    ez_node_t *node_index_set = NULL;
+    ez_node_t *node_index = NULL;
+    ez_node_t *node_domain = NULL;
+    ez_node_t *node_key = NULL;
 
     node_dev_t *pnode_dev = NULL;
     node_index_set_t *pnode_index_set = NULL;

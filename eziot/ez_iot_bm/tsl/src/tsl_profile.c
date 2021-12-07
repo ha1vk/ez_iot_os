@@ -15,15 +15,17 @@
  *
  * Change Logs:
  * Date           Author       Notes
- * 2021-11-15     chentengfei  first version 
+ * 2021-11-15     chentengfei  first version
+ * 2022-12-06     xurongjun    
  *******************************************************************************/
 
 #include <ezos.h>
 #include <cJSON.h>
+#include "ezlist.h"
 
-#include "ez_iot_tsl_legality.h"
-#include "ez_iot_tsl_adapter.h"
-#include "ez_iot_tsl_schema.h"
+#include "tsl_def.h"
+#include "tsl_legality.h"
+#include "tsl_adapter.h"
 
 const char *tsl_key_version = "version";
 const char *tsl_key_resources = "resources";
@@ -35,7 +37,6 @@ const char *tsl_key_props = "props";
 const char *tsl_key_actions = "actions";
 const char *tsl_key_events = "events";
 const char *tsl_key_access = "access";
-#ifndef COMPONENT_TSL_PROFILE_STRIP
 const char *tsl_key_schema = "schema";
 const char *tsl_key_direction = "direction";
 const char *tsl_key_input = "input";
@@ -67,7 +68,269 @@ const char *tsl_key_min_properties = "mxp";
 const char *tsl_key_dependencies = "dep";
 const char *tsl_key_schema_properties = "prop";
 
-static int free_schema_memory(tsl_schema_desc *tsl_schema)
+typedef struct
+{
+    ez_node_t node;
+    ez_char_t dev_sn[32];
+} node_dev_t;
+
+typedef struct
+{
+    ez_node_t node;
+    tsl_capacity_t capacity;
+    ez_list_t dev_list;
+} node_capacity_t;
+
+/* profile parse */
+static ez_err_t profile_parse(char *profile_value, tsl_capacity_t *capacity);
+static ez_err_t profile_parse_domain(tsl_rsc_domain *pdomain, ez_int32_t domain_num, cJSON *js_domains);
+static ez_err_t profile_parse_domain_props(tsl_domain_prop *p_props, ez_int32_t props_num, cJSON *js_props);
+static ez_err_t profile_parse_domain_actions(tsl_domain_action *p_actions, ez_int32_t actions_num, cJSON *js_actions);
+static ez_err_t profile_parse_domain_events(tsl_domain_event *p_events, ez_int32_t events_num, cJSON *js_events);
+static ez_err_t profile_parse_schema(tsl_schema_desc *schema, cJSON *js_schema);
+
+/* profile free */
+static ez_void_t profile_free(tsl_capacity_t *capacity);
+static ez_void_t profile_free_domain(tsl_rsc_domain *tsl_domain, ez_int32_t domain_num);
+static ez_void_t profile_free_props(tsl_domain_prop *tsl_props, ez_int32_t prop_num);
+static ez_void_t profile_free_actions(tsl_domain_action *tsl_actions, ez_int32_t action_num);
+static ez_void_t profile_free_events(tsl_domain_event *tsl_events, ez_int32_t event_num);
+static ez_void_t profile_free_schema(tsl_schema_desc *tsl_schema);
+
+/* profile manager */
+static ez_mutex_t g_mutex = NULL;
+static ez_list_t g_profile_list;
+static ez_bool_t profile_mutex_init();
+static ez_void_t profile_mutex_lock();
+static ez_void_t profile_mutex_unlock();
+static ez_void_t profile_mutex_deinit();
+
+static ez_void_t profile_list_free(ez_void_t);
+static node_capacity_t *profile_find_by_sn(ez_char_t *dev_sn);
+static ez_int32_t profile_ref_add(node_capacity_t *node_capacity, ez_char_t *dev_sn);
+static ez_int32_t profile_ref_del(node_capacity_t *node_capacity, ez_char_t *dev_sn);
+
+ez_err_t tsl_profile_init(ez_void_t)
+{
+    if (!profile_mutex_init())
+    {
+        return EZ_TSL_ERR_MEMORY;
+    }
+
+    ezlist_init(&g_profile_list);
+
+    return EZ_TSL_ERR_SUCC;
+}
+
+ez_err_t tsl_profile_deinit(ez_void_t)
+{
+    profile_mutex_lock();
+    profile_list_free();
+    profile_mutex_unlock();
+    profile_mutex_deinit();
+
+    return EZ_TSL_ERR_SUCC;
+}
+
+ez_bool_t tsl_profile_check(ez_char_t *dev_sn)
+{
+    ez_bool_t rv = ez_false;
+
+    profile_mutex_lock();
+
+    if (profile_find_by_sn(dev_sn))
+    {
+        rv = ez_true;
+    }
+
+    profile_mutex_unlock();
+
+    return rv;
+}
+
+ez_err_t tsl_profile_reg(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev_fwver, ez_char_t *profile)
+{
+    ez_err_t rv = EZ_TSL_ERR_SUCC;
+    ez_int32_t count = 0;
+    node_capacity_t *pnode_capacity = (node_capacity_t *)ezos_malloc(sizeof(node_capacity_t));
+    ezos_bzero(pnode_capacity, sizeof(node_capacity_t));
+
+    CHECK_COND_DONE(!pnode_capacity, EZ_TSL_ERR_MEMORY);
+
+    rv = profile_parse(profile, &pnode_capacity->capacity);
+    CHECK_RV_DONE(rv);
+
+    ezos_strncpy(pnode_capacity->capacity.dev_type, dev_type, sizeof(pnode_capacity->capacity.dev_type) - 1);
+    ezos_strncpy(pnode_capacity->capacity.dev_fw_ver, dev_type, sizeof(pnode_capacity->capacity.dev_fw_ver) - 1);
+    count = profile_ref_add(pnode_capacity, dev_sn);
+    CHECK_COND_DONE(count < 1, EZ_TSL_ERR_MEMORY);
+
+    profile_mutex_lock();
+    ezlist_add_last(&g_profile_list, &pnode_capacity->node);
+    pnode_capacity = NULL;
+    profile_mutex_unlock();
+
+done:
+    SAFE_FREE(pnode_capacity);
+
+    return rv;
+}
+
+ez_bool_t tsl_profile_ref_add(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev_fwver)
+{
+    ez_bool_t rv = ez_false;
+    node_capacity_t *pnode_capacity = NULL;
+
+    profile_mutex_lock();
+
+    LIST_FOR_EACH(node_capacity_t, pnode_capacity, &g_profile_list)
+    {
+        if (0 == ezos_strcmp(dev_type, pnode_capacity->capacity.dev_type) &&
+            0 == ezos_strcmp(dev_fwver, pnode_capacity->capacity.dev_fw_ver))
+        {
+            profile_ref_add(pnode_capacity, dev_sn);
+            rv = ez_true;
+            break;
+        }
+    }
+
+    profile_mutex_unlock();
+
+    return rv;
+}
+
+ez_void_t tsl_profile_ref_del(ez_char_t *dev_sn)
+{
+    node_capacity_t *pnode_capacity = NULL;
+    ez_int32_t count = 0;
+
+    profile_mutex_lock();
+
+    pnode_capacity = profile_find_by_sn(dev_sn);
+    count = profile_ref_del(pnode_capacity, dev_sn);
+    if (count < 1)
+    {
+        ezlog_w(TAG_TSL, "ref = 0, free capacity");
+        ezlist_delete(&g_profile_list, &pnode_capacity->node);
+        ezlist_clear(&pnode_capacity->dev_list);
+        profile_free(&pnode_capacity->capacity);
+        ezos_free(pnode_capacity);
+    }
+
+    profile_mutex_unlock();
+}
+
+const tsl_capacity_t *tsl_profile_get_lock(ez_char_t *dev_sn)
+{
+    node_capacity_t *pnode_capacity = NULL;
+
+    profile_mutex_lock();
+
+    pnode_capacity = profile_find_by_sn(dev_sn);
+    if (!pnode_capacity)
+    {
+        profile_mutex_unlock();
+        return NULL;
+    }
+
+    return &pnode_capacity->capacity;
+}
+
+ez_void_t tsl_profile_get_unlock(ez_void_t)
+{
+    profile_mutex_unlock();
+}
+
+static ez_bool_t profile_mutex_init()
+{
+    g_mutex = ezos_mutex_create();
+    if (NULL == g_mutex)
+    {
+        return ez_false;
+    }
+
+    return ez_true;
+}
+
+static ez_void_t profile_mutex_lock()
+{
+    if (NULL == g_mutex)
+    {
+        return;
+    }
+
+    ezos_mutex_lock(g_mutex);
+}
+
+static ez_void_t profile_mutex_unlock()
+{
+    if (NULL == g_mutex)
+    {
+        return;
+    }
+
+    ezos_mutex_unlock(g_mutex);
+}
+
+static ez_void_t profile_mutex_deinit()
+{
+    if (NULL == g_mutex)
+    {
+        return;
+    }
+
+    ezos_mutex_destroy(g_mutex);
+    g_mutex = NULL;
+}
+
+static ez_void_t profile_list_free(ez_void_t)
+{
+    node_capacity_t *node_capacity = NULL;
+
+    LIST_FOR_EACH(node_capacity_t, node_capacity, &g_profile_list)
+    {
+        ezlist_clear(&node_capacity->dev_list);
+        profile_free(&node_capacity->capacity);
+        ezos_free(node_capacity);
+    }
+
+    ezlist_clear(&g_profile_list);
+}
+
+static ez_int32_t profile_ref_add(node_capacity_t *node_capacity, ez_char_t *dev_sn)
+{
+    node_dev_t *node_dev = (node_dev_t *)ezos_malloc(sizeof(node_dev_t));
+    if (NULL == node_dev)
+    {
+        return -1;
+    }
+
+    ezos_bzero(node_dev, sizeof(node_dev_t));
+    ezos_strncpy(node_dev->dev_sn, dev_sn, sizeof(node_dev->dev_sn) - 1);
+    ezlist_add_last(&node_capacity->dev_list, &node_dev->node);
+
+    return ezlist_get_size(&node_capacity->dev_list);
+}
+
+static ez_int32_t profile_ref_del(node_capacity_t *node_capacity, ez_char_t *dev_sn)
+{
+    node_dev_t *node_dev = NULL;
+
+    LIST_FOR_EACH(node_dev_t, node_dev, &node_capacity->dev_list)
+    {
+        if (0 == ezos_strcmp(dev_sn, node_dev->dev_sn))
+        {
+            ezlist_delete(&node_capacity->dev_list, &node_dev->node);
+            ezos_free(node_dev);
+            break;
+        }
+    }
+
+    return ezlist_get_size(&node_capacity->dev_list);
+}
+
+#ifndef COMPONENT_TSL_PROFILE_STRIP
+static ez_void_t profile_free_schema(tsl_schema_desc *tsl_schema)
 {
     switch (tsl_schema->item_type)
     {
@@ -104,10 +367,10 @@ static int free_schema_memory(tsl_schema_desc *tsl_schema)
     {
         if (NULL != tsl_schema->type_array.item_prop)
         {
-            int index = tsl_schema->type_array.prop_num;
+            ez_int32_t index = tsl_schema->type_array.prop_num;
             for (int i = 0; i < index; i++)
             {
-                free_schema_memory(tsl_schema->type_array.item_prop + i);
+                profile_free_schema(tsl_schema->type_array.item_prop + i);
             }
             ezos_free(tsl_schema->type_array.item_prop);
             tsl_schema->type_array.item_prop = NULL;
@@ -123,10 +386,10 @@ static int free_schema_memory(tsl_schema_desc *tsl_schema)
         }
         if (NULL != tsl_schema->type_object.property)
         {
-            int index = tsl_schema->type_object.prop_num;
+            ez_int32_t index = tsl_schema->type_object.prop_num;
             for (int i = 0; i < index; i++)
             {
-                free_schema_memory(tsl_schema->type_object.property + i);
+                profile_free_schema(tsl_schema->type_object.property + i);
             }
             ezos_free(tsl_schema->type_object.property);
             tsl_schema->type_object.property = NULL;
@@ -137,35 +400,32 @@ static int free_schema_memory(tsl_schema_desc *tsl_schema)
     default:
         break;
     }
-    return 0;
 }
 
-static int ezos_free_props_memory(tsl_domain_prop *tsl_props, int prop_num)
+static ez_void_t profile_free_props(tsl_domain_prop *tsl_props, ez_int32_t prop_num)
 {
-    int index = 0;
+    ez_int32_t index = 0;
     for (index = 0; index < prop_num; index++)
     {
         tsl_domain_prop *prop = tsl_props + index;
-        free_schema_memory(&prop->prop_desc);
+        profile_free_schema(&prop->prop_desc);
     }
-    return 0;
 }
 
-static int ezos_free_actions_memory(tsl_domain_action *tsl_actions, int action_num)
+static ez_void_t profile_free_actions(tsl_domain_action *tsl_actions, ez_int32_t action_num)
 {
-    int index = 0;
+    ez_int32_t index = 0;
     for (index = 0; index < action_num; index++)
     {
         tsl_domain_action *action = tsl_actions + index;
-        free_schema_memory(&action->input_schema);
-        free_schema_memory(&action->output_schema);
+        profile_free_schema(&action->input_schema);
+        profile_free_schema(&action->output_schema);
     }
-    return 0;
 }
 
-static int ezos_free_events_memory(tsl_domain_event *tsl_events, int event_num)
+static ez_void_t profile_free_events(tsl_domain_event *tsl_events, ez_int32_t event_num)
 {
-    int index = 0;
+    ez_int32_t index = 0;
     if (NULL != tsl_events->event_type)
     {
         ezos_free(tsl_events->event_type);
@@ -175,23 +435,22 @@ static int ezos_free_events_memory(tsl_domain_event *tsl_events, int event_num)
     for (index = 0; index < event_num; index++)
     {
         tsl_domain_event *event = tsl_events + index;
-        free_schema_memory(&event->input_schema);
-        free_schema_memory(&event->output_schema);
+        profile_free_schema(&event->input_schema);
+        profile_free_schema(&event->output_schema);
     }
-    return 0;
 }
 #endif
 
-static int ezos_free_domain_memory(tsl_rsc_domain *tsl_domain, int domain_num)
+static ez_void_t profile_free_domain(tsl_rsc_domain *tsl_domain, ez_int32_t domain_num)
 {
-    int index = 0;
+    ez_int32_t index = 0;
     for (index = 0; index < domain_num; index++)
     {
         tsl_rsc_domain *domain = tsl_domain + index;
         if (NULL != domain->prop)
         {
 #ifndef COMPONENT_TSL_PROFILE_STRIP
-            ezos_free_props_memory(domain->prop, domain->prop_num);
+            profile_free_props(domain->prop, domain->prop_num);
 #endif
             ezos_free(domain->prop);
             domain->prop = NULL;
@@ -200,7 +459,7 @@ static int ezos_free_domain_memory(tsl_rsc_domain *tsl_domain, int domain_num)
         if (NULL != domain->action)
         {
 #ifndef COMPONENT_TSL_PROFILE_STRIP
-            ezos_free_actions_memory(domain->action, domain->action_num);
+            profile_free_actions(domain->action, domain->action_num);
 #endif
             ezos_free(domain->action);
             domain->action = NULL;
@@ -209,18 +468,17 @@ static int ezos_free_domain_memory(tsl_rsc_domain *tsl_domain, int domain_num)
         if (NULL != domain->event)
         {
 #ifndef COMPONENT_TSL_PROFILE_STRIP
-            ezos_free_events_memory(domain->event, domain->event_num);
+            profile_free_events(domain->event, domain->event_num);
 #endif
             ezos_free(domain->event);
             domain->event = NULL;
         }
     }
-    return 0;
 }
 
-int free_profile_memory(ez_iot_tsl_capacity_t *capacity)
+static ez_void_t profile_free(tsl_capacity_t *capacity)
 {
-    int rsc_num = capacity->rsc_num;
+    ez_int32_t rsc_num = capacity->rsc_num;
     for (int i = 0; i < rsc_num; i++)
     {
         tsl_profile_resource *tsl_rsc = capacity->resource + i;
@@ -234,7 +492,7 @@ int free_profile_memory(ez_iot_tsl_capacity_t *capacity)
 
             if (NULL != tsl_rsc->domain)
             {
-                ezos_free_domain_memory(tsl_rsc->domain, tsl_rsc->domain_num);
+                profile_free_domain(tsl_rsc->domain, tsl_rsc->domain_num);
                 ezos_free(tsl_rsc->domain);
                 tsl_rsc->domain = NULL;
             }
@@ -246,13 +504,12 @@ int free_profile_memory(ez_iot_tsl_capacity_t *capacity)
         ezos_free(capacity->resource);
         capacity->resource = NULL;
     }
-    return 0;
 }
 
 #ifndef COMPONENT_TSL_PROFILE_STRIP
-static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
+static ez_int32_t profile_parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
 {
-    int rv = EZ_TSL_ERR_SUCC;
+    ez_int32_t rv = EZ_TSL_ERR_SUCC;
 
     if (NULL == schema || NULL == js_schema)
     {
@@ -354,7 +611,7 @@ static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
             cJSON *js_enum = cJSON_GetObjectItem(js_schema, tsl_key_enum);
             if (NULL != js_enum && cJSON_Array == js_enum->type)
             {
-                int array_size = cJSON_GetArraySize(js_enum);
+                ez_int32_t array_size = cJSON_GetArraySize(js_enum);
                 if (0 == array_size)
                 {
                     ezlog_e(TAG_TSL, "integer enum size 0.");
@@ -429,7 +686,7 @@ static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
             cJSON *js_enum = cJSON_GetObjectItem(js_schema, tsl_key_enum);
             if (NULL != js_enum && cJSON_Array == js_enum->type)
             {
-                int array_size = cJSON_GetArraySize(js_enum);
+                ez_int32_t array_size = cJSON_GetArraySize(js_enum);
                 if (0 == array_size)
                 {
                     ezlog_e(TAG_TSL, "number enum size 0");
@@ -478,7 +735,7 @@ static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
             cJSON *js_enum = cJSON_GetObjectItem(js_schema, tsl_key_enum);
             if (NULL != js_enum && cJSON_Array == js_enum->type)
             {
-                int array_size = cJSON_GetArraySize(js_enum);
+                ez_int32_t array_size = cJSON_GetArraySize(js_enum);
                 if (0 == array_size)
                 {
                     ezlog_e(TAG_TSL, "string enum size 0.");
@@ -544,7 +801,7 @@ static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
             schema->type_array.prop_num = 1;
             ezlog_v(TAG_TSL, "array prop size: %d", schema->type_array.prop_num);
 
-            parse_schema(schema->type_array.item_prop, js_items);
+            profile_parse_schema(schema->type_array.item_prop, js_items);
         }
         break;
 
@@ -567,7 +824,7 @@ static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
             cJSON *js_required = cJSON_GetObjectItem(js_schema, tsl_key_required);
             if (NULL != js_required && cJSON_Array == js_required->type)
             {
-                int arr_size = cJSON_GetArraySize(js_required);
+                ez_int32_t arr_size = cJSON_GetArraySize(js_required);
                 if (0 != arr_size)
                 {
                     schema->type_object.required = (char *)ezos_malloc(MAX_ARR_REQUIRE_LENGTH * arr_size);
@@ -602,7 +859,7 @@ static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
             cJSON *js_obj_prop = cJSON_GetObjectItem(js_schema, tsl_key_schema_properties);
             if (NULL != js_obj_prop && cJSON_Array == js_obj_prop->type)
             {
-                int arr_size = cJSON_GetArraySize(js_obj_prop);
+                ez_int32_t arr_size = cJSON_GetArraySize(js_obj_prop);
                 if (0 != arr_size)
                 {
                     schema->type_object.property = (tsl_schema_desc *)ezos_malloc(sizeof(tsl_schema_desc) * arr_size);
@@ -623,7 +880,7 @@ static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
                         cJSON *js_prop = cJSON_GetArrayItem(js_obj_prop, i);
                         if (NULL != js_prop && cJSON_Object == js_prop->type)
                         {
-                            parse_schema(sub_schema, js_prop);
+                            profile_parse_schema(sub_schema, js_prop);
                         }
                     }
                 }
@@ -645,7 +902,7 @@ static int parse_schema(tsl_schema_desc *schema, cJSON *js_schema)
 }
 #endif
 
-static int parse_domain_props(tsl_domain_prop *p_props, int props_num, cJSON *js_props)
+static ez_int32_t profile_parse_domain_props(tsl_domain_prop *p_props, ez_int32_t props_num, cJSON *js_props)
 {
     if (NULL == js_props || NULL == p_props || 0 >= props_num)
     {
@@ -654,7 +911,7 @@ static int parse_domain_props(tsl_domain_prop *p_props, int props_num, cJSON *js
     }
 
     ezlog_v(TAG_TSL, "@@@@@@@@@@@@ props @@@@@@@@@@");
-    int rv = EZ_TSL_ERR_SUCC;
+    ez_int32_t rv = EZ_TSL_ERR_SUCC;
     for (int i = 0; i < props_num; i++)
     {
         tsl_domain_prop *prop = p_props + i;
@@ -710,7 +967,7 @@ static int parse_domain_props(tsl_domain_prop *p_props, int props_num, cJSON *js
             break;
         }
 
-        rv = parse_schema(&prop->prop_desc, js_schema);
+        rv = profile_parse_schema(&prop->prop_desc, js_schema);
         if (0 != rv)
         {
             ezlog_e(TAG_TSL, "parse schema error.");
@@ -722,7 +979,7 @@ static int parse_domain_props(tsl_domain_prop *p_props, int props_num, cJSON *js
     return rv;
 }
 
-static int parse_domain_actions(tsl_domain_action *p_actions, int actions_num, cJSON *js_actions)
+static ez_int32_t profile_parse_domain_actions(tsl_domain_action *p_actions, ez_int32_t actions_num, cJSON *js_actions)
 {
     if (NULL == js_actions || NULL == p_actions || 0 >= actions_num)
     {
@@ -731,7 +988,7 @@ static int parse_domain_actions(tsl_domain_action *p_actions, int actions_num, c
     }
 
     ezlog_v(TAG_TSL, "@@@@@@@@@@@@ actions @@@@@@@@@@");
-    int rv = EZ_TSL_ERR_SUCC;
+    ez_int32_t rv = EZ_TSL_ERR_SUCC;
     for (int i = 0; i < actions_num; i++)
     {
         tsl_domain_action *action = p_actions + i;
@@ -783,7 +1040,7 @@ static int parse_domain_actions(tsl_domain_action *p_actions, int actions_num, c
                 break;
             }
 
-            rv = parse_schema(&action->input_schema, js_schema);
+            rv = profile_parse_schema(&action->input_schema, js_schema);
             if (rv != 0)
             {
                 ezlog_e(TAG_TSL, "actiom input absent.");
@@ -801,7 +1058,7 @@ static int parse_domain_actions(tsl_domain_action *p_actions, int actions_num, c
                 ezlog_e(TAG_TSL, "action output schema absent.");
                 break;
             }
-            rv = parse_schema(&action->output_schema, js_schema);
+            rv = profile_parse_schema(&action->output_schema, js_schema);
             if (rv != 0)
             {
                 ezlog_e(TAG_TSL, "action output absent.");
@@ -814,16 +1071,16 @@ static int parse_domain_actions(tsl_domain_action *p_actions, int actions_num, c
     return rv;
 }
 
-static int parse_domain_events(tsl_domain_event *p_events, int events_num, cJSON *js_events)
+static ez_int32_t profile_parse_domain_events(tsl_domain_event *p_events, ez_int32_t events_num, cJSON *js_events)
 {
     if (NULL == js_events || NULL == p_events || 0 >= events_num)
     {
         ezlog_e(TAG_TSL, "parse domain events param error.");
         return EZ_TSL_ERR_PARAM_INVALID;
     }
-    int rv = EZ_TSL_ERR_SUCC;
+    ez_int32_t rv = EZ_TSL_ERR_SUCC;
 
-    int arr_size = cJSON_GetArraySize(js_events);
+    ez_int32_t arr_size = cJSON_GetArraySize(js_events);
     for (size_t i = 0; i < arr_size; i++)
     {
         tsl_domain_event *event = p_events + i;
@@ -861,7 +1118,7 @@ static int parse_domain_events(tsl_domain_event *p_events, int events_num, cJSON
             break;
         }
 
-        int arr_size = cJSON_GetArraySize(js_event_type);
+        ez_int32_t arr_size = cJSON_GetArraySize(js_event_type);
         if (0 != arr_size)
         {
             event->event_type = (char *)ezos_malloc(MAX_EVENT_TYPE_KEY_LENGTH * arr_size);
@@ -901,7 +1158,7 @@ static int parse_domain_events(tsl_domain_event *p_events, int events_num, cJSON
                 break;
             }
 
-            rv = parse_schema(&event->input_schema, js_schema);
+            rv = profile_parse_schema(&event->input_schema, js_schema);
             if (rv != 0)
             {
                 ezlog_e(TAG_TSL, "event schema parse error.");
@@ -920,7 +1177,7 @@ static int parse_domain_events(tsl_domain_event *p_events, int events_num, cJSON
                 break;
             }
 
-            rv = parse_schema(&event->output_schema, js_schema);
+            rv = profile_parse_schema(&event->output_schema, js_schema);
             if (rv != 0)
             {
                 ezlog_e(TAG_TSL, "event schema parse error.");
@@ -933,15 +1190,15 @@ static int parse_domain_events(tsl_domain_event *p_events, int events_num, cJSON
     return rv;
 }
 
-int parse_domain(tsl_rsc_domain *pdomain, int domain_num, cJSON *js_domains)
+static ez_int32_t profile_parse_domain(tsl_rsc_domain *pdomain, ez_int32_t domain_num, cJSON *js_domains)
 {
     if (NULL == pdomain || 0 >= domain_num)
     {
-        ezlog_e(TAG_TSL, "parse_domain param error.");
+        ezlog_e(TAG_TSL, "profile_parse_domain param error.");
         return EZ_TSL_ERR_PARAM_INVALID;
     }
 
-    int rv = EZ_TSL_ERR_SUCC;
+    ez_int32_t rv = EZ_TSL_ERR_SUCC;
 
     ezlog_v(TAG_TSL, "--------------------------- domain ------------------------");
     for (int j = 0; j < domain_num; j++)
@@ -973,7 +1230,7 @@ int parse_domain(tsl_rsc_domain *pdomain, int domain_num, cJSON *js_domains)
             goto actions;
         }
 
-        int props_num = cJSON_GetArraySize(js_props);
+        ez_int32_t props_num = cJSON_GetArraySize(js_props);
         if (0 == props_num)
         {
             ezlog_w(TAG_TSL, "props array size 0.");
@@ -992,7 +1249,7 @@ int parse_domain(tsl_rsc_domain *pdomain, int domain_num, cJSON *js_domains)
         domain->prop_num = props_num;
         ezlog_v(TAG_TSL, "domain props num: %d", domain->prop_num);
 
-        rv = parse_domain_props(domain->prop, domain->prop_num, js_props);
+        rv = profile_parse_domain_props(domain->prop, domain->prop_num, js_props);
         if (0 != rv)
         {
             ezlog_e(TAG_TSL, "domain props parse failed.");
@@ -1008,7 +1265,7 @@ int parse_domain(tsl_rsc_domain *pdomain, int domain_num, cJSON *js_domains)
             // rv = EZ_TSL_ERR_PARAM_INVALID;
             goto events;
         }
-        int actions_num = cJSON_GetArraySize(js_actions);
+        ez_int32_t actions_num = cJSON_GetArraySize(js_actions);
         if (0 == actions_num)
         {
             ezlog_w(TAG_TSL, "action array size 0.");
@@ -1027,7 +1284,7 @@ int parse_domain(tsl_rsc_domain *pdomain, int domain_num, cJSON *js_domains)
         domain->action_num = actions_num;
         ezlog_v(TAG_TSL, "domain actions num: %d", domain->action_num);
 
-        rv = parse_domain_actions(domain->action, domain->action_num, js_actions);
+        rv = profile_parse_domain_actions(domain->action, domain->action_num, js_actions);
         if (0 != rv)
         {
             ezlog_e(TAG_TSL, "domain actions parse failed.");
@@ -1045,7 +1302,7 @@ int parse_domain(tsl_rsc_domain *pdomain, int domain_num, cJSON *js_domains)
             continue;
         }
 
-        int events_num = cJSON_GetArraySize(js_events);
+        ez_int32_t events_num = cJSON_GetArraySize(js_events);
         if (0 == events_num)
         {
             ezlog_w(TAG_TSL, "events array size 0.");
@@ -1064,7 +1321,7 @@ int parse_domain(tsl_rsc_domain *pdomain, int domain_num, cJSON *js_domains)
         domain->event_num = events_num;
         ezlog_v(TAG_TSL, "domain events num: %d", domain->event_num);
 
-        rv = parse_domain_events(domain->event, domain->event_num, js_events);
+        rv = profile_parse_domain_events(domain->event, domain->event_num, js_events);
         if (0 != rv)
         {
             ezlog_e(TAG_TSL, "domain events parse failed.");
@@ -1076,17 +1333,15 @@ int parse_domain(tsl_rsc_domain *pdomain, int domain_num, cJSON *js_domains)
     return rv;
 }
 
-int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *capacity)
+static ez_int32_t profile_parse(char *profile_value, tsl_capacity_t *capacity)
 {
-    int rv = EZ_TSL_ERR_SUCC;
+    ez_int32_t rv = EZ_TSL_ERR_SUCC;
 
-    if (NULL == capacity || NULL == profile_value || 0 >= profile_len)
+    if (NULL == capacity || NULL == profile_value)
     {
         ezlog_e(TAG_TSL, "profile param error.");
         return EZ_TSL_ERR_PARAM_INVALID;
     }
-
-    ezlog_hexdump(TAG_TSL, 16, profile_value, profile_len);
 
     cJSON *js_root = NULL;
     do
@@ -1115,7 +1370,7 @@ int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *c
             break;
         }
 
-        int array_size = cJSON_GetArraySize(js_src);
+        ez_int32_t array_size = cJSON_GetArraySize(js_src);
         if (0 == array_size)
         {
             ezlog_e(TAG_TSL, "array size 0.");
@@ -1132,7 +1387,6 @@ int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *c
         }
         ezos_memset(capacity->resource, 0, sizeof(tsl_profile_resource) * array_size);
 
-        capacity->ref = 1;
         capacity->rsc_num = array_size;
         ezlog_v(TAG_TSL, "resources num: %d", capacity->rsc_num);
 
@@ -1165,7 +1419,7 @@ int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *c
                 break;
             }
 
-            int index_size = cJSON_GetArraySize(js_index);
+            ez_int32_t index_size = cJSON_GetArraySize(js_index);
             if (0 == index_size)
             {
                 ezlog_e(TAG_TSL, "local_index absent.");
@@ -1204,7 +1458,7 @@ int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *c
                 rv = EZ_TSL_ERR_PARAM_INVALID;
                 break;
             }
-            int domain_size = cJSON_GetArraySize(js_domain);
+            ez_int32_t domain_size = cJSON_GetArraySize(js_domain);
             if (0 == domain_size)
             {
                 ezlog_e(TAG_TSL, "domain array size 0.");
@@ -1224,7 +1478,7 @@ int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *c
             p_src->domain_num = domain_size;
             ezlog_v(TAG_TSL, "resource domain num: %d", p_src->domain_num);
 
-            rv = parse_domain(p_src->domain, p_src->domain_num, js_domain);
+            rv = profile_parse_domain(p_src->domain, p_src->domain_num, js_domain);
             if (0 != rv)
             {
                 ezlog_e(TAG_TSL, "parse domain failed.");
@@ -1235,7 +1489,7 @@ int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *c
 
     if (0 != rv)
     {
-        free_profile_memory(capacity);
+        profile_free(capacity);
     }
 
     if (NULL != js_root)
@@ -1244,4 +1498,23 @@ int profile_parse(char *profile_value, int profile_len, ez_iot_tsl_capacity_t *c
     }
 
     return rv;
+}
+
+static node_capacity_t *profile_find_by_sn(ez_char_t *dev_sn)
+{
+    node_capacity_t *node_capacity = NULL;
+    node_dev_t *node_dev = NULL;
+
+    LIST_FOR_EACH(node_capacity_t, node_capacity, &g_profile_list)
+    {
+        LIST_FOR_EACH(node_dev_t, node_dev, &node_capacity->dev_list)
+        {
+            if (0 == ezos_strcmp(dev_sn, node_dev->dev_sn))
+            {
+                return node_capacity;
+            }
+        }
+    }
+
+    return NULL;
 }

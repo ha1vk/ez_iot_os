@@ -112,10 +112,6 @@ extern "C"
         * @return ez_uint32_t  成功0，失败-1 
         */
         ez_err_t (*business2cloud)(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram);
-
-        // ez_uint32_t ver;       ///< shadow业务的版本号
-        // ez_uint32_t seq;       ///< 状态发送后的seq
-        // ez_int8_t need_report; ///< 是否需要上报标志
     } ez_shadow_business_t;
 
     typedef struct
@@ -124,12 +120,19 @@ extern "C"
         ez_shadow_business_t *business; ///< 注册的业务
     } ez_shadow_module_t;
 
+    typedef enum
+    {
+        EZ_EVENT_FULL_REPORT, ///< 开始全量上报状态, data(NULL)
+    } ez_shadow_event_e;
+
+    typedef ez_int32_t (*ez_shadow_notice)(ez_shadow_event_e event_type, ez_void_t *data, ez_int32_t len);
+
     /**
     * @brief 初始化shadow模块
     * 
     * @return 
     */
-    EZOS_API ez_err_t ez_iot_shadow_init(ez_void_t);
+    EZOS_API ez_err_t ez_iot_shadow_init(ez_shadow_notice pfunc);
 
     /**
     * @brief 向shadow注册一个领域模块
@@ -139,7 +142,7 @@ extern "C"
     * @param module 领域key列表
     * @return  
     */
-    EZOS_API ez_err_t ez_iot_shadow_register(ez_shadow_res_t *pres, ez_char_t *domain_id, ez_shadow_module_t *module);
+    EZOS_API ez_err_t ez_iot_shadow_reg(ez_shadow_res_t *pres, ez_char_t *domain_id, ez_shadow_module_t *module);
 
     /**
     * @brief key值发生更变，触发上报
@@ -151,6 +154,14 @@ extern "C"
     * @return  
     */
     EZOS_API ez_err_t ez_iot_shadow_push(ez_shadow_res_t *pres, ez_char_t *domain_id, ez_char_t *pkey, ez_shadow_value_t *pvalue);
+
+    /**
+     * @brief 反注册
+     * 
+     * @param dev_serial 设备序列号
+     * @return 
+     */
+    EZOS_API ez_err_t ez_iot_shadow_unreg(ez_char_t *dev_serial);
 
     /**
     * @brief 反初始化shadow模块

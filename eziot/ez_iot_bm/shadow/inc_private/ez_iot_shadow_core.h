@@ -33,7 +33,7 @@ extern "C"
      * @return true 
      * @return false 
      */
-    ez_bool_t shadow_core_start();
+    ez_bool_t shadow_core_start(ez_shadow_notice pfunc);
 
     /**
      * @brief shadow模块停止运行
@@ -62,12 +62,12 @@ extern "C"
     ez_err_t shadow_core_module_addv3(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id, ez_uint16_t props_num, ez_void_t *props);
 
     /**
-     * @brief 删除领域模块
+     * @brief 反注册设备
      * 
      * @param handle 领域对应句柄
      * @return int 
      */
-    ez_err_t shadow_core_module_delete(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id);
+    ez_err_t shadow_core_module_clear(ez_char_t *sn);
 
     /**
      * @brief key值发生更变，触发上报。

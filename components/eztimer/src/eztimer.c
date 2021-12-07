@@ -17,7 +17,7 @@ typedef struct
 
 typedef struct timer_list
 {
-    ezlist_t    *list;             //eztimer_struct
+    list_t    *list;             //eztimer_struct
     ez_int32_t  msec;              //轮询时间，默认100ms
     ez_bool_t   invalid;
     void        *thread;
