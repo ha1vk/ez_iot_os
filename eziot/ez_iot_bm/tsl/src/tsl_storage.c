@@ -52,16 +52,17 @@ ez_void_t tsl_storage_print(ez_void_t)
 
 ez_err_t tsl_storage_load(ez_char_t *dev_sn, ez_char_t **buf, ez_uint32_t *len)
 {
-    size_t length = 0;
+    size_t length = CONFIG_EZIOT_TSL_PROFILE_SIZE;
     ez_err_t rv = EZ_KV_ERR_SUCC;
     tslmap_metadata_t tsl_metadata = {0};
-    size_t tslmap_len = 0;
+    size_t tslmap_len = CONFIG_EZIOT_TSL_PROFILE_MAP_SIZE;
     ez_char_t *pbuf = NULL;
     cJSON *js_root = NULL;
     ez_int32_t index = -1;
 
+    ezos_kv_print();
     CHECK_RV_DONE(ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_TSLMAP, NULL, &tslmap_len));
-    CHECK_COND_DONE(0 == tslmap_len, -1);
+    CHECK_COND_DONE(0 == tslmap_len, EZ_KV_ERR_NAME);
 
     pbuf = ezos_malloc(tslmap_len + 1);
     CHECK_COND_DONE(!pbuf, -1);
@@ -90,6 +91,7 @@ ez_err_t tsl_storage_load(ez_char_t *dev_sn, ez_char_t **buf, ez_uint32_t *len)
     pbuf = NULL;
 done:
     SAFE_FREE(pbuf);
+    cJSON_Delete(js_root);
 
     return rv;
 }
@@ -106,6 +108,7 @@ ez_err_t tsl_storage_save(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev
     tslmap_metadata_t tsl_metadata = {0};
     size_t tslmap_len = 0;
 
+    CHECK_COND_DONE(len > CONFIG_EZIOT_TSL_PROFILE_SIZE, EZ_KV_ERR_SAVED_FULL);
     storage_devinfo2index(dev_sn, dev_type, dev_fwver, handle_curr);
     ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_TSLMAP, NULL, &tslmap_len);
 
@@ -139,6 +142,7 @@ ez_err_t tsl_storage_save(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev
             CHECK_COND_DONE(!(js_tslmap_item = tslmap_metadata_to_json(&tsl_metadata)), -1);
             cJSON_AddItemToArray(js_root, js_tslmap_item);
             CHECK_COND_DONE(!(pbuf_save = cJSON_PrintUnformatted(js_root)), -1);
+            CHECK_COND_DONE(ezos_strlen(pbuf_save) > CONFIG_EZIOT_TSL_PROFILE_MAP_SIZE, EZ_KV_ERR_SAVED_FULL);
             CHECK_COND_DONE(ezos_kv_raw_set(EZ_KV_DEFALUT_KEY_TSLMAP, pbuf_save, ezos_strlen(pbuf_save)), -1);
             ezlog_d(TAG_TSL, "add handle succ!!");
         }

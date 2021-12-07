@@ -176,7 +176,7 @@ void ut_tsl_prop_report_bool()
     }
 
     uassert_int_equal(EZ_TSL_ERR_SUCC, rv);
-    ezos_delay_ms(30000);
+    ezos_delay_ms(3000);
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
     uassert_int_equal(EZ_TSL_ERR_SUCC, ez_iot_tsl_unreg(NULL));
     uassert_int_equal(EZ_TSL_ERR_SUCC, ez_iot_tsl_deinit());

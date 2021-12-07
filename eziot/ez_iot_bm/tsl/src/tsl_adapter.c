@@ -389,28 +389,18 @@ static void ez_profile_get_thread(void *param)
 
                 ezlog_w(TAG_TSL, "profile dl succ, sn:%s", query_info->dev_sn);
 
-                if (!tsl_profile_reg(query_info->dev_sn, query_info->dev_type,
-                                     query_info->dev_fw_ver, buf))
+                if (0 == tsl_profile_reg(query_info->dev_sn, query_info->dev_type,
+                                    query_info->dev_fw_ver, buf))
                 {
-                    continue;
+                    ezlog_w(TAG_TSL, "profile reg succ, sn:%s", query_info->dev_sn);
+                    tsl_adapter_shadow_inst(query_info->dev_sn);
+                    tsl_storage_save(query_info->dev_sn, query_info->dev_type, query_info->dev_fw_ver, buf, length);
                 }
-
-                ezlog_w(TAG_TSL, "profile reg succ, sn:%s", query_info->dev_sn);
-                tsl_adapter_shadow_inst(query_info->dev_sn);
-
-                if (!tsl_storage_save(query_info->dev_sn, query_info->dev_type,
-                                      query_info->dev_fw_ver, buf, length))
-                {
-                    ezos_free(buf);
-                    continue;
-                }
-
-                ezlog_w(TAG_TSL, "profile save succ, sn:%s", query_info->dev_sn);
 
                 ezlist_delete(&g_download_list, &query_info->node);
                 ezos_free(query_info);
                 ezos_free(buf);
-                query_info = NULL;
+                break;
             }
             else if (status_query == query_info->status && !time_isexpired(&query_info->timer))
             {
@@ -527,7 +517,7 @@ ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
         if (EZ_KV_ERR_SUCC == rv)
         {
             rv = tsl_profile_reg(dev_info->dev_subserial, dev_info->dev_type,
-                                 dev_info->dev_firmwareversion, profile);
+                                 dev_info->dev_firmwareversion, buf);
 
             CHECK_COND_DONE(rv, EZ_TSL_ERR_MEMORY);
             tsl_adapter_shadow_inst(dev_info->dev_subserial);
@@ -535,8 +525,7 @@ ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
         else if (EZ_KV_ERR_NAME == rv)
         {
             ezlog_w(TAG_TSL, "try download");
-            rv = tsl_adapter_profile_download(dev_info);
-            CHECK_COND_DONE(rv, EZ_TSL_ERR_MEMORY);
+            CHECK_COND_DONE(!tsl_adapter_profile_download(dev_info), EZ_TSL_ERR_MEMORY);
         }
         else
         {
@@ -632,11 +621,12 @@ static void tsl_adapter_query_job_update(ez_char_t *dev_sn, dev_stauts_e status,
         return;
     }
 
-    switch (query_info->status)
+    switch (status)
     {
     case status_need_update:
     {
         time_countdown(&query_info->timer, 30 * 1000);
+        query_info->status = status;
     }
     break;
     case status_query:
@@ -648,6 +638,7 @@ static void tsl_adapter_query_job_update(ez_char_t *dev_sn, dev_stauts_e status,
     case status_loading:
     {
         query_info->status = status;
+        ezos_memcpy(&query_info->download_info, download_info, sizeof(query_info->download_info));
     }
     break;
     default:
@@ -695,12 +686,14 @@ static ez_bool_t tsl_adapter_dl_task_yeild()
         ezos_mutex_unlock(g_adapter_mutex);
 
         ezos_thread_destroy(g_download_thread);
+        g_download_thread_running = ez_true;
 
         if (0 != ezos_thread_create(&g_download_thread, dl_thread_name,
                                     ez_profile_get_thread, (void *)dl_thread_name,
                                     CONFIG_EZIOT_TSL_DOWNLOAD_STACK_SIZE,
                                     CONFIG_EZIOT_TSL_DOWNLOAD_TASK_PRIORITY))
         {
+            g_download_thread_running = ez_false;
             ezlog_e(TAG_TSL, "create profile get thread failed.");
             break;
         }
