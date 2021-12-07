@@ -47,7 +47,7 @@ extern "C"
         OTA_CODE_RECOVERY = 0X0050003D,        ///< 升级失败，通过备份系统或最小系统恢复
         OTA_CODE_UART_ERR = 0X0050003E,        ///< 外挂设备升级失败
         OTA_CODE_MAX = 0X0050004F
-    } ez_ota_errcode_t;
+    } ez_ota_errcode_e;
 
     typedef enum
     {
@@ -60,7 +60,7 @@ extern "C"
         EZ_OTA_ERR_REGISTER_ERR = OTA_MODULE_ERRNO_BASE + 0x06,      ///< register error
         EZ_OTA_ERR_DOWNLOAD_ALREADY = OTA_MODULE_ERRNO_BASE + 0x07,      ///< download_already
         EZ_OTA_ERR_MEM_ERROR = OTA_MODULE_ERRNO_BASE + 0x08,      ///< malloc error
-    } ez_ota_err_t;
+    } ez_ota_err_e;
 
     /**
      * \brief   服务下发的ota消息通知回调
@@ -70,7 +70,7 @@ extern "C"
     typedef enum
     {
         START_UPGRADE, ///< 通知设备执行升级,收到该消息后,设备开始执行升级动作 data: ez_ota_upgrade_info_t*,
-    } ez_ota_event_t;
+    } ez_ota_event_e;
 
     /**
      * @brief 升级过程状态变化，设备只有在ota_state_upgradeable、ota_state_succ、ota_state_fail三种状态下,
@@ -84,14 +84,14 @@ extern "C"
         OTA_STATE_BURNING = 4,            ///< 正在烧录
         OTA_STATE_BURNING_COMPLETED = 5,  ///< 烧录完成
         OTA_STATE_REBOOTING = 6,          ///< 正在重启
-    } ez_ota_status_t;
+    } ez_ota_status_e;
 
     typedef enum
     {
         OTA_PROGRESS_MIN = 1,
 
         OTA_PROGRESS_MAX = 100
-    } ez_ota_progress_t;
+    } ez_ota_progress_e;
 
     typedef struct
     {
@@ -158,7 +158,7 @@ extern "C"
     */
     typedef struct
     {
-        ez_int8_t dev_serial[32]; ///< 子设备序列号
+        ez_int8_t dev_serial[72]; ///< 子设备序列号
     } ez_ota_res_t;
 
     /** 
@@ -171,7 +171,7 @@ extern "C"
     */
     typedef struct
     {
-        ez_int32_t (*ota_recv_msg)(ez_ota_res_t *pres, ez_ota_event_t event, ez_void_t *data, ez_int32_t len);
+        ez_int32_t (*ota_recv_msg)(ez_ota_res_t *pres, ez_ota_event_e event, ez_void_t *data, ez_int32_t len);
     } ez_ota_msg_cb_t;
 
     /**
@@ -204,7 +204,7 @@ extern "C"
      * @brief 升级组件初始化
      * 
      * @param pdata_cbs 
-     * @return ez_ota_err_t 
+     * @return ez_ota_err_e 
      */
     EZOS_API ez_err_t ez_iot_ota_init(ez_ota_init_t *pota_init);
 
@@ -213,7 +213,7 @@ extern "C"
      * @param pres 设备信息，NULL标识当前设备，!NULL标识子设备
      * @param pmodules 设备模块信息列表,可以有多个模块，
      * @param  timeout_ms   指定超时时间及Qos
-     * @return ez_ota_err_t 
+     * @return ez_ota_err_e 
      */
     EZOS_API ez_err_t ez_iot_ota_modules_report(const ez_ota_res_t *pres, const ez_ota_modules_t *pmodules, ez_int32_t timeout_ms);
 
@@ -221,7 +221,7 @@ extern "C"
      * @brief 通知升级服务，设备待升级，设备开机上线上报一次即可。
      * 
      * @param pres 设备信息，NULL标识当前设备，!NULL标识子设备
-     * @return ez_ota_err_t 
+     * @return ez_ota_err_e 
      */
     EZOS_API ez_err_t ez_iot_ota_status_ready(const ez_ota_res_t *pres, ez_int8_t *pmodule);
 
@@ -229,7 +229,7 @@ extern "C"
      * @brief 升级成功信息上报
      * 
      * @param pres 设备信息，NULL标识当前设备，!NULL标识子设备
-     * @return ez_ota_err_t 
+     * @return ez_ota_err_e 
      */
     EZOS_API ez_err_t ez_iot_ota_status_succ(const ez_ota_res_t *pres, ez_int8_t *pmodule);
 
@@ -240,9 +240,9 @@ extern "C"
      * @param pmodule 固件模块名称
      * @param perr_msg 升级失败错误码
      * @param code 升级失败错误码
-     * @return ez_ota_err_t 
+     * @return ez_ota_err_e 
      */
-    EZOS_API ez_err_t ez_iot_ota_status_fail(const ez_ota_res_t *pres, ez_int8_t *pmodule, ez_int8_t *perr_msg, ez_ota_errcode_t code);
+    EZOS_API ez_err_t ez_iot_ota_status_fail(const ez_ota_res_t *pres, ez_int8_t *pmodule, ez_int8_t *perr_msg, ez_ota_errcode_e code);
 
     /**
      * @brief 上报设备升级进度,请按照服务下发间隔时间上报,
@@ -250,26 +250,26 @@ extern "C"
      * @param pmodule 模块信息，NULL标识当前设备，!NULL标识子设备
      * @param status 设备升级状态
      * @param progress 升级进度 1-100
-     * @return ez_ota_err_t 
+     * @return ez_ota_err_e 
      * 
      * note:app点击升级后,需要在10s时间内上报一次进度信息,否则app端可能会直接提示升级成功，正常可报stating
      * 
      */
-    EZOS_API ez_err_t ez_iot_ota_progress_report(const ez_ota_res_t *pres, ez_int8_t *pmodule, ez_ota_status_t status, ez_int16_t progress);
+    EZOS_API ez_err_t ez_iot_ota_progress_report(const ez_ota_res_t *pres, ez_int8_t *pmodule, ez_ota_status_e status, ez_int16_t progress);
 
     /**
      * @brief 下载升级包
      * @param input_info 升级信息
      * @param get_file   下载数据回调
      * @param notify      下载过程信息通知，包括超时,c
-     * @return ez_ota_err_t 
+     * @return ez_ota_err_e 
      */
     EZOS_API ez_err_t ez_iot_ota_download(ez_ota_download_info_t *input_info, get_file_cb file_cb, notify_cb notify, ez_void_t *user_data);
 
     /**
      * @brief 
      * 
-     * @return ez_ota_err_t 
+     * @return ez_ota_err_e 
      */
     EZOS_API ez_err_t ez_iot_ota_deinit();
 

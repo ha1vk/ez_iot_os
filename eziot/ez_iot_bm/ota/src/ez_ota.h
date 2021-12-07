@@ -23,7 +23,7 @@ extern "C"
 {
 #endif
 
-ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, const ez_int8_t*perr_msg, ez_ota_errcode_t errcode, ez_int8_t status, ez_int16_t progress);
+ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, const ez_int8_t*perr_msg, ez_ota_errcode_e errcode, ez_int8_t status, ez_int16_t progress);
 
 ez_err_t  ez_ota_file_download(ez_ota_download_info_t *input_info, get_file_cb file_cb, notify_cb notify, void* user_data);
 

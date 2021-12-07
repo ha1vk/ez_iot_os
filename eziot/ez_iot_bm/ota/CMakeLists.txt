@@ -19,8 +19,8 @@ if(CONFIG_EZIOT_OTA_ENABLE)
     list(APPEND ADD_REQUIREMENTS cJSON)
     list(APPEND ADD_REQUIREMENTS ezlog)
     list(APPEND ADD_REQUIREMENTS ez_iot_core)
-    list(APPEND ADD_REQUIREMENTS ezos)
     list(APPEND ADD_REQUIREMENTS webclient)
+    list(APPEND ADD_REQUIREMENTS ezos)
     ###############################################
 
     ############ Add static libs ##################
