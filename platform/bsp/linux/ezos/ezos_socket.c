@@ -11,7 +11,7 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  * 
  * Brief:
- * Time related interface declaration
+ * 
  * 
  * Change Logs:
  * Date           Author       Notes
@@ -21,6 +21,7 @@
 #include "ezos_socket.h"
 #include <time.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -199,20 +200,56 @@ const char *ezos_inet_ntop(int af, const void *src, char *dst, ez_socklen_t size
     return inet_ntop(af, src, dst, size);
 }
 
-unsigned long ezos_inet_addr(const char *cp)
-{
-    return inet_addr(cp);
-}
-
 unsigned short ezos_htons(unsigned short hostshort)
 {
     return htons(hostshort);
 }
 
+unsigned int ezos_htonl(unsigned int hostlong)
+{
+    return htonl(hostlong);
+}
+
+int ezos_inet_aton(const char *cp, ez_in_addr_t *inp)
+{
+    return inet_aton(cp, (struct in_addr *)inp);
+}
+
+int ezos_bind(int socket_fd, const ez_sockaddr_t *addr, ez_socklen_t addrlen)
+{
+    return bind(socket_fd, (struct sockaddr *)addr, (socklen_t)addrlen);
+}
+
+ez_ssize_t ezos_sendto(int socket_fd, const void *buf, ez_size_t len, int flags, const ez_sockaddr_t *dst_addr, ez_socklen_t addrlen)
+{
+    return sendto(socket_fd, buf, len, flags, (struct sockaddr *)dst_addr, (socklen_t)addrlen);
+}
+
+ez_ssize_t ezos_recvfrom(int socket_fd, void *buf, ez_size_t len, int flags, ez_sockaddr_t *src_addr, ez_socklen_t *addrlen)
+{
+    return recvfrom(socket_fd, buf, len, flags, (struct sockaddr *)src_addr, (socklen_t *)addrlen);
+}
+
+int ezos_accept(int socket_fd, struct ez_sockaddr *addr, ez_socklen_t *addrlen)
+{
+    return accept(socket_fd, (struct sockaddr *)addr, (socklen_t *)addrlen);
+}
+
+int ezos_listen(int socket_fd, int back_log)
+{
+    return listen(socket_fd, back_log);
+}
+    
+int ezos_fcntl(int socket_fd, int cmd, int val)
+{
+    return fcntl(socket_fd, cmd, val);
+}
+
 static int ezso2bspso(int so_type)
 {
     int bspso = so_type;
-    for (size_t i = 0; i < sizeof(g_so_maping) / sizeof(so_map_pair_t); i++)
+    size_t i;
+    for (i = 0; i < sizeof(g_so_maping) / sizeof(so_map_pair_t); i++)
     {
         if (g_so_maping[i].ez_so_type == so_type)
         {
@@ -222,4 +259,9 @@ static int ezso2bspso(int so_type)
     }
 
     return bspso;
+}
+
+unsigned int ezos_inet_addr(const char *ip)
+{
+    return (unsigned int)inet_addr(ip);
 }

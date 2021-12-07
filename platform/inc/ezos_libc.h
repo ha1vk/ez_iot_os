@@ -56,9 +56,6 @@ extern "C"
     EZOS_API void ezos_bzero(void *s, size_t n);
     EZOS_API char *ezos_strdup(const char *s);
 
-    EZOS_API void ezos_va_start(va_list ap, const char *last, ...);
-    EZOS_API void ezos_va_end(va_list ap);
-
 
 #ifdef __cplusplus
 }

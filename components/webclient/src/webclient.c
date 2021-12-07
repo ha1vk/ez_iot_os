@@ -21,7 +21,7 @@
 #include <ezlog.h>
 
 
-
+#define TAG_WEB    "web"
 #define DBG_ENABLE
 #define DBG_SECTION_NAME "web"
 #ifdef WEBCLIENT_DEBUG
@@ -125,7 +125,7 @@ static int webclient_read_line(struct webclient_session *session, char *buffer, 
 
     if (count > size)
     {
-        ezlog_e(TAG_OTA,"read line failed. The line data length is out of buffer size(%d)!\n", count);
+        ezlog_e(TAG_WEB,"read line failed. The line data length is out of buffer size(%d)!\n", count);
         return -WEBCLIENT_ERROR;
     }
 
@@ -152,13 +152,13 @@ static int webclient_read_line(struct webclient_session *session, char *buffer, 
  * http://[fe80::1]/index.html
  * http://[fe80::1]:80/index.html
  */
-static int webclient_resolve_address(struct webclient_session *session, ez_sockaddr_in_t *dst_addr,
+static int webclient_resolve_address(struct webclient_session *session, ez_sockaddr_in_t **dst_addr,
                                      const char *url, const char **request)
 {
     int rc = WEBCLIENT_OK;
     char *ptr;
     char port_str[6] = "80"; /* default port of 80(http) */
-    unsigned short port;
+    unsigned short port = 80;
     const char *port_ptr;
     const char *path_ptr;
     ez_hostent_t *host;
@@ -167,6 +167,7 @@ static int webclient_resolve_address(struct webclient_session *session, ez_socka
     const char *host_addr = 0;
     int url_len, host_addr_len = 0;
 
+    EZ_ASSERT(dst_addr);
     EZ_ASSERT(request);
 
     url_len = ezos_strlen(url);
@@ -256,7 +257,7 @@ static int webclient_resolve_address(struct webclient_session *session, ez_socka
         session->host = host_addr_new;
     }
 
-    ezlog_d(TAG_OTA,"host address: %s , port: %s\n", session->host, port_str);
+    ezlog_d(TAG_WEB,"host address: %s , port: %s\n", session->host, port_str);
 
 #ifdef WEBCLIENT_USING_MBED_TLS
     if (session->tls_session)
@@ -276,20 +277,26 @@ static int webclient_resolve_address(struct webclient_session *session, ez_socka
     {
         
 
-        dst_addr->sin_family = EZ_AF_INET;
+        
         host = ezos_gethostbyname(session->host);
         if (host == NULL)
         {
-            ezlog_e(TAG_OTA,"getaddrinfo err: '%s'\n", session->host);
+            ezlog_e(TAG_WEB,"getaddrinfo err: '%s'\n", session->host);
             rc = -WEBCLIENT_ERROR;
             goto __exit;
         }
+        *dst_addr = ezos_malloc(sizeof(ez_sockaddr_in_t));
+        if(*dst_addr == NULL){
+            rc = -WEBCLIENT_ERROR;
+            goto __exit;
+        }
+        (*dst_addr)->sin_family = EZ_AF_INET;
         port = ezos_atoi(port_str);
-        dst_addr->sin_port = ezos_htons(port);
-        ezos_memcpy(&dst_addr->sin_addr, host->h_addr_list[0], sizeof(ez_in_addr_t));
+        (*dst_addr)->sin_port = ezos_htons(port);
+        ezos_memcpy(&((*dst_addr)->sin_addr), host->h_addr_list[0], sizeof(ez_in_addr_t));
         ezos_memset(ipstr, 0, 32);
         ezos_inet_ntop(EZ_AF_INET, (void *)host->h_addr_list[0], ipstr, 32);
-        ezlog_d(TAG_OTA,"ezos_gethostbyname:%s : %d\n", ipstr, dst_addr->sin_port);
+        ezlog_d(TAG_WEB,"ezos_gethostbyname:%s\n", ipstr);
     }
 
 __exit:
@@ -332,13 +339,13 @@ static int webclient_open_tls(struct webclient_session *session, const char *URI
     session->tls_session->buffer = web_malloc(session->tls_session->buffer_len);
     if (session->tls_session->buffer == NULL)
     {
-        ezlog_e(TAG_OTA,"no memory for tls_session buffer!\n");
+        ezlog_e(TAG_WEB,"no memory for tls_session buffer!\n");
         return -WEBCLIENT_ERROR;
     }
 
     if ((tls_ret = mbedtls_client_init(session->tls_session, (void *)pers, strlen(pers))) < 0)
     {
-        ezlog_e(TAG_OTA,"initialize https client failed return: -0x%x.\n", -tls_ret);
+        ezlog_e(TAG_WEB,"initialize https client failed return: -0x%x.\n", -tls_ret);
         return -WEBCLIENT_ERROR;
     }
 
@@ -360,7 +367,7 @@ static int webclient_connect(struct webclient_session *session, const char *URI)
     int rc = WEBCLIENT_OK;
     int socket_handle;
     ezos_timeval_t timeout;
-    ez_sockaddr_in_t dst_addr;
+    ez_sockaddr_in_t *dst_addr=NULL;
     const char *req_url;
 
     EZ_ASSERT(session);
@@ -376,12 +383,12 @@ static int webclient_connect(struct webclient_session *session, const char *URI)
 #elif defined(WEBCLIENT_USING_MBED_TLS)
         if (webclient_open_tls(session, URI) < 0)
         {
-            ezlog_e(TAG_OTA,"connect failed, https client open URI(%s) failed!\n", URI);
+            ezlog_e(TAG_WEB,"connect failed, https client open URI(%s) failed!\n", URI);
             return -WEBCLIENT_ERROR;
         }
         session->is_tls = RT_TRUE;
 #else
-        ezlog_e(TAG_OTA,"not support https connect, please enable webclient https configure!\n");
+        ezlog_e(TAG_WEB,"not support https connect, please enable webclient https configure!\n");
         rc = -WEBCLIENT_ERROR;
         goto __exit;
 #endif
@@ -391,13 +398,14 @@ static int webclient_connect(struct webclient_session *session, const char *URI)
     rc = webclient_resolve_address(session, &dst_addr, URI, &req_url);
     if (rc != WEBCLIENT_OK)
     {
-        ezlog_e(TAG_OTA,"connect failed, resolve address error(%d).\n", rc);
+        ezlog_e(TAG_WEB,"connect failed, resolve address error(%d).\n", rc);
         goto __exit;
     }
-
+    
     /* Not use 'getaddrinfo()' for https connection */
-    if (session->is_tls == ez_false)
+    if (session->is_tls == ez_false && dst_addr == NULL)
     {
+        ezlog_e(TAG_WEB,"is_tls\n");//zoujinwei
         rc = -WEBCLIENT_ERROR;
         goto __exit;
     }
@@ -409,7 +417,7 @@ static int webclient_connect(struct webclient_session *session, const char *URI)
     }
     else
     {
-        ezlog_e(TAG_OTA,"connect failed, resolve request address error.\n");
+        ezlog_e(TAG_WEB,"connect failed, resolve request address error.\n");
         rc = -WEBCLIENT_ERROR;
         goto __exit;
     }
@@ -421,13 +429,13 @@ static int webclient_connect(struct webclient_session *session, const char *URI)
 
         if ((tls_ret = mbedtls_client_context(session->tls_session)) < 0)
         {
-            ezlog_e(TAG_OTA,"connect failed, https client context return: -0x%x\n", -tls_ret);
+            ezlog_e(TAG_WEB,"connect failed, https client context return: -0x%x\n", -tls_ret);
             return -WEBCLIENT_ERROR;
         }
 
         if ((tls_ret = mbedtls_client_connect(session->tls_session)) < 0)
         {
-            ezlog_e(TAG_OTA,"connect failed, https client connect return: -0x%x\n", -tls_ret);
+            ezlog_e(TAG_WEB,"connect failed, https client connect return: -0x%x\n", -tls_ret);
             return -WEBCLIENT_CONNECT_FAILED;
         }
 
@@ -461,21 +469,25 @@ static int webclient_connect(struct webclient_session *session, const char *URI)
 
         if (socket_handle < 0)
         {
-            ezlog_e(TAG_OTA,"connect failed, create socket(%d) error.\n", socket_handle);
+            ezlog_e(TAG_WEB,"connect failed, create socket(%d) error.\n", socket_handle);
             rc = -WEBCLIENT_NOSOCKET;
             goto __exit;
         }
 
         /* set receive and send timeout option */
-        ezos_setsockopt(socket_handle, EZ_SOL_SOCKET, EZ_SO_RCVTIMEO, (void *)&timeout,
-                   sizeof(timeout));
-        ezos_setsockopt(socket_handle, EZ_SOL_SOCKET, EZ_SO_SNDTIMEO, (void *)&timeout,
-                   sizeof(timeout));
+        if(ezos_setsockopt(socket_handle, EZ_SOL_SOCKET, EZ_SO_RCVTIMEO, (void *)&timeout, sizeof(timeout)) != 0)
+        {
+            ezlog_e(TAG_WEB,"ezos_setsockopt EZ_SO_RCVTIMEO error\n");
+        }
+        if(ezos_setsockopt(socket_handle, EZ_SOL_SOCKET, EZ_SO_SNDTIMEO, (void *)&timeout, sizeof(timeout)))
+        {
+            ezlog_e(TAG_WEB,"ezos_setsockopt EZ_SO_SNDTIMEO error\n");
+        }
 
-        if (ezos_connect(socket_handle, (const ez_sockaddr_t *)(&dst_addr), sizeof(dst_addr)) != 0)
+        if (ezos_connect(socket_handle, (const ez_sockaddr_t *)(dst_addr), sizeof(ez_sockaddr_t)) != 0)
         {
             /* connect failed, close socket */
-            ezlog_e(TAG_OTA,"connect failed, connect socket(%d) error.\n", socket_handle);
+            ezlog_e(TAG_WEB,"connect failed, connect socket(%d) error:%d\n", socket_handle, ezos_getlasterror());
             ezos_closesocket(socket_handle);
             rc = -WEBCLIENT_CONNECT_FAILED;
             goto __exit;
@@ -485,6 +497,10 @@ static int webclient_connect(struct webclient_session *session, const char *URI)
     }
 
 __exit:
+    if (dst_addr)
+    {
+        ezos_free(dst_addr);
+    }
 
     return rc;
 }
@@ -506,22 +522,22 @@ int webclient_header_fields_add(struct webclient_session *session, const char *f
     EZ_ASSERT(session);
     EZ_ASSERT(session->header->buffer);
 
-    ezos_va_start(args, fmt);
+    va_start(args, fmt);
     length = ezos_vsnprintf(session->header->buffer + session->header->length,
                           session->header->size - session->header->length, fmt, args);
     if (length < 0)
     {
-        ezlog_e(TAG_OTA,"add fields header data failed, return length(%d) error.\n", length);
+        ezlog_e(TAG_WEB,"add fields header data failed, return length(%d) error.\n", length);
         return -WEBCLIENT_ERROR;
     }
-    ezos_va_end(args);
+    va_end(args);
 
     session->header->length += length;
 
     /* check header size */
     if (session->header->length >= session->header->size)
     {
-        ezlog_e(TAG_OTA,"not enough header buffer size(%d)!\n", session->header->size);
+        ezlog_e(TAG_WEB,"not enough header buffer size(%d)!\n", session->header->size);
         return -WEBCLIENT_ERROR;
     }
 
@@ -637,7 +653,7 @@ static int webclient_send_header(struct webclient_session *session, int method)
                 header_buffer = web_strdup(session->header->buffer);
                 if (header_buffer == NULL)
                 {
-                    ezlog_e(TAG_OTA,"no memory for header buffer!\n");
+                    ezlog_e(TAG_WEB,"no memory for header buffer!\n");
                     rc = -WEBCLIENT_NOMEM;
                     goto __exit;
                 }
@@ -679,7 +695,7 @@ static int webclient_send_header(struct webclient_session *session, int method)
             /* check header size */
             if (session->header->length > session->header->size)
             {
-                ezlog_e(TAG_OTA,"send header failed, not enough header buffer size(%d)!\n", session->header->size);
+                ezlog_e(TAG_WEB,"send header failed, not enough header buffer size(%d)!\n", session->header->size);
                 rc = -WEBCLIENT_NOBUFFER;
                 goto __exit;
             }
@@ -696,7 +712,7 @@ static int webclient_send_header(struct webclient_session *session, int method)
     {
         char *header_str, *header_ptr;
         int header_line_len;
-        ezlog_d(TAG_OTA,"request header:\n");
+        ezlog_d(TAG_WEB,"request header:\n");
 
         for (header_str = session->header->buffer; (header_ptr = ezos_strstr(header_str, "\r\n")) != NULL;)
         {
@@ -704,7 +720,7 @@ static int webclient_send_header(struct webclient_session *session, int method)
 
             if (header_line_len > 0)
             {
-                ezlog_d(TAG_OTA,"%.*s\n", header_line_len, header_str);
+                ezlog_d(TAG_WEB,"%.*s\n", header_line_len, header_str);
             }
             header_str = header_ptr + ezos_strlen("\r\n");
         }
@@ -739,7 +755,7 @@ int webclient_handle_response(struct webclient_session *session)
     ezos_memset(session->header->buffer, 0x00, session->header->size);
     session->header->length = 0;
 
-    ezlog_d(TAG_OTA,"response header:\n");
+    ezlog_d(TAG_WEB,"response header:\n");
     /* We now need to read the header information */
     while (1)
     {
@@ -763,13 +779,13 @@ int webclient_handle_response(struct webclient_session *session)
         mime_buffer[rc - 1] = '\0';
 
         /* echo response header data */
-        ezlog_d(TAG_OTA,"%s\n", mime_buffer);
+        ezlog_d(TAG_WEB,"%s\n", mime_buffer);
 
         session->header->length += rc;
 
         if (session->header->length >= session->header->size)
         {
-            ezlog_e(TAG_OTA,"not enough header buffer size(%d)!\n", session->header->size);
+            ezlog_e(TAG_WEB,"not enough header buffer size(%d)!\n", session->header->size);
             return -WEBCLIENT_NOMEM;
         }
     }
@@ -778,7 +794,7 @@ int webclient_handle_response(struct webclient_session *session)
     mime_ptr = web_strdup(session->header->buffer);
     if (mime_ptr == NULL)
     {
-        ezlog_e(TAG_OTA,"no memory for get http status code buffer!\n");
+        ezlog_e(TAG_WEB,"no memory for get http status code buffer!\n");
         return -WEBCLIENT_NOMEM;
     }
 
@@ -846,7 +862,7 @@ struct webclient_session *webclient_session_create(size_t header_sz)
     session = (struct webclient_session *)web_calloc(1, sizeof(struct webclient_session));
     if (session == NULL)
     {
-        ezlog_e(TAG_OTA,"webclient create failed, no memory for webclient session!\n");
+        ezlog_e(TAG_WEB,"webclient create failed, no memory for webclient session!\n");
         return NULL;
     }
     /* initialize the socket of session */
@@ -856,7 +872,7 @@ struct webclient_session *webclient_session_create(size_t header_sz)
     session->header = (struct webclient_header *)web_calloc(1, sizeof(struct webclient_header));
     if (session->header == NULL)
     {
-        ezlog_e(TAG_OTA,"webclient create failed, no memory for session header!\n");
+        ezlog_e(TAG_WEB,"webclient create failed, no memory for session header!\n");
         web_free(session);
         session = NULL;
         return NULL;
@@ -865,7 +881,7 @@ struct webclient_session *webclient_session_create(size_t header_sz)
     session->header->buffer = (char *)web_calloc(1, header_sz);
     if (session->header->buffer == NULL)
     {
-        ezlog_e(TAG_OTA,"webclient create failed, no memory for session header buffer!\n");
+        ezlog_e(TAG_WEB,"webclient create failed, no memory for session header buffer!\n");
         web_free(session->header);
         web_free(session);
         session = NULL;
@@ -912,7 +928,7 @@ int webclient_get(struct webclient_session *session, const char *URI)
 
     /* handle the response header of webclient server */
     resp_status = webclient_handle_response(session);
-    ezlog_d(TAG_OTA,"get position handle response(%d).\n", resp_status);
+    ezlog_d(TAG_WEB,"get position handle response(%d).\n", resp_status);
     if (resp_status > 0)
     {
         const char *location = webclient_header_fields_get(session, "Location");
@@ -961,30 +977,28 @@ int webclient_get_position(struct webclient_session *session, const char *URI, i
 
     EZ_ASSERT(session);
     EZ_ASSERT(URI);
-
     rc = webclient_connect(session, URI);
     if (rc != WEBCLIENT_OK)
     {
+        ezlog_e(TAG_WEB,"webclient_connect error(%d).\n", rc);
         return rc;
     }
-
     /* splice header*/
     if (webclient_header_fields_add(session, "Range: bytes=%d-\r\n", position) <= 0)
     {
         rc = -WEBCLIENT_ERROR;
         return rc;
     }
-
     rc = webclient_send_header(session, WEBCLIENT_GET);
     if (rc != WEBCLIENT_OK)
     {
+        ezlog_e(TAG_WEB,"webclient_send_header fail\n");
         return rc;
     }
-
     /* handle the response header of webclient server */
     resp_status = webclient_handle_response(session);
 
-    ezlog_d(TAG_OTA,"get position handle response(%d).\n", resp_status);
+    ezlog_d(TAG_WEB,"get position handle response(%d).\n", resp_status);
 
     if (resp_status > 0)
     {
@@ -1042,7 +1056,7 @@ int webclient_post(struct webclient_session *session, const char *URI, const voi
 
     if ((post_data != NULL) && (data_len == 0))
     {
-        ezlog_e(TAG_OTA,"input post data length failed\n");
+        ezlog_e(TAG_WEB,"input post data length failed\n");
         return -WEBCLIENT_ERROR;
     }
 
@@ -1066,7 +1080,7 @@ int webclient_post(struct webclient_session *session, const char *URI, const voi
 
         /* resolve response data, get http status code */
         resp_status = webclient_handle_response(session);
-        ezlog_d(TAG_OTA,"post handle response(%d).\n", resp_status);
+        ezlog_d(TAG_WEB,"post handle response(%d).\n", resp_status);
     }
 
     return resp_status;
@@ -1242,7 +1256,7 @@ int webclient_read(struct webclient_session *session, void *buffer, size_t lengt
             }
 
 #endif
-            ezlog_d(TAG_OTA,"receive data error(%d).\n", bytes_read);
+            ezlog_d(TAG_WEB,"receive data error(%d).\n", bytes_read);
 
             if (total_read)
             {
@@ -1253,7 +1267,7 @@ int webclient_read(struct webclient_session *session, void *buffer, size_t lengt
                 if (ezos_getlasterror() == EZ_EWOULDBLOCK || ezos_getlasterror() == EZ_EAGAIN)
                 {
                     /* recv timeout */
-                    ezlog_e(TAG_OTA,"receive data timeout.\n");
+                    ezlog_e(TAG_WEB,"receive data timeout.\n");
                     return -WEBCLIENT_TIMEOUT;
                 }
                 else
@@ -1458,7 +1472,7 @@ int webclient_response(struct webclient_session *session, void **response, size_
             new_resp = web_realloc(response_buf, result_sz + 1);
             if (new_resp == NULL)
             {
-                ezlog_e(TAG_OTA,"no memory for realloc new response buffer!\n");
+                ezlog_e(TAG_WEB,"no memory for realloc new response buffer!\n");
                 break;
             }
 
@@ -1535,7 +1549,7 @@ int webclient_request_header_add(char **request_header, const char *fmt, ...)
         header = ezos_calloc(1, WEBCLIENT_HEADER_BUFSZ);
         if (header == NULL)
         {
-            ezlog_e(TAG_OTA,"No memory for webclient request header add.\n");
+            ezlog_e(TAG_WEB,"No memory for webclient request header add.\n");
             return -1;
         }
         *request_header = header;
@@ -1545,20 +1559,20 @@ int webclient_request_header_add(char **request_header, const char *fmt, ...)
         header = *request_header;
     }
 
-    ezos_va_start(args, fmt);
+    va_start(args, fmt);
     header_length = ezos_strlen(header);
     length = ezos_vsnprintf(header + header_length, WEBCLIENT_HEADER_BUFSZ - header_length, fmt, args);
     if (length < 0)
     {
-        ezlog_e(TAG_OTA,"add request header data failed, return length(%d) error.\n", length);
+        ezlog_e(TAG_WEB,"add request header data failed, return length(%d) error.\n", length);
         return -WEBCLIENT_ERROR;
     }
-    ezos_va_end(args);
+    va_end(args);
 
     /* check header size */
     if (ezos_strlen(header) >= WEBCLIENT_HEADER_BUFSZ)
     {
-        ezlog_e(TAG_OTA,"not enough request header data size(%d)!\n", WEBCLIENT_HEADER_BUFSZ);
+        ezlog_e(TAG_WEB,"not enough request header data size(%d)!\n", WEBCLIENT_HEADER_BUFSZ);
         return -WEBCLIENT_ERROR;
     }
 
@@ -1592,20 +1606,20 @@ int webclient_request(const char *URI, const char *header, const void *post_data
 
     if (post_data == NULL && response == NULL)
     {
-        ezlog_e(TAG_OTA,"request get failed, get response data cannot be empty.\n");
+        ezlog_e(TAG_WEB,"request get failed, get response data cannot be empty.\n");
         return -WEBCLIENT_ERROR;
     }
 
     if ((post_data != NULL) && (data_len == 0))
     {
-        ezlog_e(TAG_OTA,"input post data length failed\n");
+        ezlog_e(TAG_WEB,"input post data length failed\n");
         return -WEBCLIENT_ERROR;
     }
 
     if ((response != NULL && resp_len == NULL) ||
         (response == NULL && resp_len != NULL))
     {
-        ezlog_e(TAG_OTA,"input response data or length failed\n");
+        ezlog_e(TAG_WEB,"input response data or length failed\n");
         return -WEBCLIENT_ERROR;
     }
 

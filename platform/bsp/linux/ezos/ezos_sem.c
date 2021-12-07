@@ -11,7 +11,7 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  * 
  * Brief:
- * Time related interface declaration
+ * 
  * 
  * Change Logs:
  * Date           Author       Notes

@@ -229,15 +229,13 @@ static void ez_ota_data_route_cb(ez_kernel_submsg_v3_t* ptr_submsg)
         ezlog_e(TAG_OTA,"ez_ota_data_route_cb input NULL\n");
 		return;
 	}
-
+    
     ezlog_d(TAG_OTA,"ota recv buf:%s\n", (const char*)ptr_submsg->buf);
     ezos_memset(&res, 0, sizeof(ez_ota_res_t));
-
     ezos_strncpy((char*)res.dev_serial, ptr_submsg->sub_serial, ezdev_sdk_max_serial_len-1); 
 
     ezlog_d(TAG_OTA,"ota recv msg,child_id: %s,res_id:%s,res_type:%s,method:%s\n",res.dev_serial,\
              ptr_submsg->resource_id, ptr_submsg->resource_type, ptr_submsg->method);
-
     if(0 == ezos_strcmp(ptr_submsg->method, "inform"))
     {
       
@@ -248,6 +246,7 @@ static void ez_ota_data_route_cb(ez_kernel_submsg_v3_t* ptr_submsg)
     }
 
 	ezlog_i(TAG_OTA,"ota notify :result_code %d,msg_type:%s,seq:%d\n", result_code, ptr_submsg->msg_type, ptr_submsg->msg_seq);
+    return;
 }
 
 static void ez_ota_event_route_cb(ez_kernel_event_t* ptr_event)
