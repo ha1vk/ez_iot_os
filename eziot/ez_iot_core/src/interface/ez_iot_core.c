@@ -76,6 +76,7 @@ EZOS_API ez_err_t ez_iot_core_start(ez_void_t)
     CHECK_COND_DONE(rv, EZ_CORE_ERR_MEMORY);
 #endif
 
+done:
     if (EZ_CORE_ERR_SUCC != rv)
     {
         g_running = ez_false;
@@ -89,7 +90,6 @@ EZOS_API ez_err_t ez_iot_core_start(ez_void_t)
 #endif
     }
 
-done:
     FUNC_OUT();
 
     return rv;

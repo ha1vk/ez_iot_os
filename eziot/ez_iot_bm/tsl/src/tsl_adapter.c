@@ -89,7 +89,6 @@ static ez_int32_t tsl_action_process(ez_kernel_submsg_v3_t *submsg)
     ez_kernel_pubmsg_v3_t pubmsg = {0};
 
     ezlog_i(TAG_TSL, "seq in: %d", submsg->msg_seq);
-    ezlog_d(TAG_TSL, "recv msg: %s", submsg->buf);
 
     // example "domain/identifier"
     ez_int32_t num = ezos_sscanf(submsg->ext_msg, "%32[^/]/%32", domain, identifier);
@@ -860,7 +859,7 @@ static ez_void_t strip_msg_wrap(ez_void_t *buf, ez_tsl_value_t *tsl_data)
         js_msg = cJSON_Parse((char *)buf);
         if (NULL == js_msg)
         {
-            ezlog_e(TAG_TSL, "msg parse: %s", buf);
+            ezlog_e(TAG_TSL, "msg parse");
             break;
         }
 

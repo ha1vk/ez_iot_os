@@ -84,7 +84,7 @@ ez_err_t tsl_storage_load(ez_char_t *dev_sn, ez_char_t **buf, ez_uint32_t *len)
 
     ezos_memset(pbuf, 0, length + 1);
     CHECK_COND_DONE(ezos_kv_raw_get(tsl_metadata.handle, pbuf, &length), EZ_KV_ERR_NAME);
-    ezlog_d(TAG_TSL, "length: %d,read_buf: %s, ", length, pbuf);
+    ezlog_d(TAG_TSL, "length: %zu, read_buf: %s, ", length, pbuf);
 
     *buf = pbuf;
     *len = length;

@@ -1321,16 +1321,19 @@ static node_domain_t *shadow_module_add_domain(ez_list_t *lst, ez_char_t *domain
             else
             {
                 pnode_key = (node_key_t *)malloc(sizeof(node_key_t));
-                ezlog_v(TAG_SHD, "addv3: key:%s", pservices[i].key);
-                ezos_memset(pnode_key, 0, sizeof(node_key_t));
-                ezos_strncpy(pnode_key->key, pservices[i].key, sizeof(pnode_key->key) - 1);
-                pnode_key->cloud2dev = pservices[i].business2dev;
-                pnode_key->dev2cloud = pservices[i].business2cloud;
-                pnode_key->stat_ver = 0;
-                pnode_key->msg_seq = 0;
-                pnode_key->need_report = 1;
+                if (pnode_key)
+                {
+                    ezlog_v(TAG_SHD, "addv3: key:%s", pservices[i].key);
+                    ezos_memset(pnode_key, 0, sizeof(node_key_t));
+                    ezos_strncpy(pnode_key->key, pservices[i].key, sizeof(pnode_key->key) - 1);
+                    pnode_key->cloud2dev = pservices[i].business2dev;
+                    pnode_key->dev2cloud = pservices[i].business2cloud;
+                    pnode_key->stat_ver = 0;
+                    pnode_key->msg_seq = 0;
+                    pnode_key->need_report = 1;
 
-                ezlist_add_last(&pnode_domain->key_lst, &pnode_key->node);
+                    ezlist_add_last(&pnode_domain->key_lst, &pnode_key->node);
+                }
             }
         }
 

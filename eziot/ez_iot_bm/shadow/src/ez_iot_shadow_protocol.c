@@ -68,7 +68,6 @@ ez_err_t shadow_protocol_report(ez_char_t *devsn, ez_char_t *res_type, ez_uint16
         }
 
         pubmsg.msg_qos = QOS_T1;
-        pubmsg.msg_body = pubmsg.msg_body;
         pubmsg.msg_body_len = ezos_strlen(pubmsg.msg_body);
 
         ezos_strncpy(pubmsg.sub_serial, devsn, sizeof(pubmsg.sub_serial) - 1);
