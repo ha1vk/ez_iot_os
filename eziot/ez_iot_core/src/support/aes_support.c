@@ -100,21 +100,6 @@ mkernel_internal_error aes_cbc_128_dec_padding(const unsigned char aes_key[16],
     return sdk_error;
 }
 
-void buf_padding(unsigned char *buf, EZDEV_SDK_INT32 padding_len, EZDEV_SDK_INT32 len)
-{
-    EZDEV_SDK_INT32 i = 0;
-    EZDEV_SDK_INT32 padding_char = 0;
-
-    padding_char = (padding_len - len);
-
-    for (i = len; i < padding_len; i++)
-    {
-        buf[i] = (unsigned char)padding_char;
-    }
-
-    return;
-}
-
 mkernel_internal_error aes_cbc_128_enc_padding(const unsigned char aes_key[16],
                                                unsigned char *input_buf, EZDEV_SDK_UINT32 input_length, EZDEV_SDK_UINT32 input_length_padding,
                                                unsigned char *output_buf, EZDEV_SDK_UINT32 *output_length)

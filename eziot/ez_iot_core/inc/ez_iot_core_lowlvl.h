@@ -40,7 +40,7 @@ extern "C"
      * @return EZOS_API 
      */
     EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info,
-                                               const ez_byte_t *devid, sdk_kernel_event_notice kernel_event_notice_cb);
+                                     const ez_char_t *devid, sdk_kernel_event_notice kernel_event_notice_cb);
 
     /**
      * @brief 
@@ -115,7 +115,7 @@ extern "C"
      * @param key 
      * @return EZOS_API const* 
      */
-    EZOS_API const ez_char_t * ez_kernel_getdevinfo_bykey(const ez_char_t *key);
+    EZOS_API const ez_char_t *ez_kernel_getdevinfo_bykey(const ez_char_t *key);
 
 #ifdef __cplusplus
 }

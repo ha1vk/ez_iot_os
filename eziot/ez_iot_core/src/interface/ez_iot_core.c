@@ -142,7 +142,7 @@ EZOS_API ez_err_t ez_iot_core_ctrl(ez_cmd_e cmd, ez_void_t *arg)
     {
     case EZ_CMD_DEVID_SET:
     {
-        ez_byte_t *pdevid = (ez_byte_t *)arg;
+        ez_char_t *pdevid = (ez_char_t *)arg;
         ez_iot_devid_set(pdevid);
         break;
     }

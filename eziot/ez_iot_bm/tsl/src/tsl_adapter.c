@@ -260,10 +260,10 @@ static ez_int32_t profile_downloading(query_info_t *query_info, ez_char_t **buf,
 {
     ez_int32_t rv = -1;
 
-    ez_char_t md5_hex_up[16 * 2 + 1] = {0};
-    ez_char_t md5_hex[16 * 2 + 1] = {0};
+    ez_uchar_t md5_hex_up[16 * 2 + 1] = {0};
+    ez_uchar_t md5_hex[16 * 2 + 1] = {0};
     ez_int32_t already_len = 0;
-    ez_char_t md5_output[16] = {0};
+    ez_uchar_t md5_output[16] = {0};
     mbedtls_md5_context md5_ctx = {0};
 
     struct webclient_session *session = NULL;
@@ -312,7 +312,7 @@ static ez_int32_t profile_downloading(query_info_t *query_info, ez_char_t **buf,
 
         } while (ez_true);
 
-        mbedtls_md5_update(&md5_ctx, (*buf), session->content_length);
+        mbedtls_md5_update(&md5_ctx, (ez_uchar_t *)(*buf), session->content_length);
         mbedtls_md5_finish(&md5_ctx, md5_output);
         bin2hexstr(md5_output, sizeof(md5_output), 1, md5_hex_up);
         bin2hexstr(md5_output, sizeof(md5_output), 0, md5_hex);
@@ -389,7 +389,7 @@ static void ez_profile_get_thread(void *param)
                 ezlog_w(TAG_TSL, "profile dl succ, sn:%s", query_info->dev_sn);
 
                 if (0 == tsl_profile_reg(query_info->dev_sn, query_info->dev_type,
-                                    query_info->dev_fw_ver, buf))
+                                         query_info->dev_fw_ver, buf))
                 {
                     ezlog_w(TAG_TSL, "profile reg succ, sn:%s", query_info->dev_sn);
                     tsl_adapter_shadow_inst(query_info->dev_sn);

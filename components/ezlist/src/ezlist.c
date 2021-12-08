@@ -55,10 +55,10 @@ ez_node_t *ezlist_get_at(ez_list_t *plist, unsigned int index)
     }
     else
     {
-        index -= plist->size;
+        index -= plist->size - index;
         pnode = plist->header.prev;
 
-        while (index++ < 0)
+        while (index-- > 0)
             pnode = pnode->prev;
     }
 

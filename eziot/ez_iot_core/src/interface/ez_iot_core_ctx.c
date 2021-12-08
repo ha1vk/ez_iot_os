@@ -3,7 +3,7 @@
 #include "ez_iot_core_ctx.h"
 #include "ezdev_sdk_kernel_struct.h"
 
-static ez_byte_t *g_devid = NULL;
+static ez_char_t *g_devid = NULL;
 static ez_event_notice g_event_notice_func = NULL;
 ezdev_sdk_kernel g_ezdev_sdk_kernel;
 
@@ -28,7 +28,7 @@ ez_void_t ez_iot_event_adapt(ez_kernel_event_t *ptr_event)
     {
         ez_kernel_switchover_context_t *pctx = (ez_kernel_switchover_context_t *)ptr_event->event_context;
         g_event_notice_func(EZ_EVENT_ONLINE, NULL, 0);
-        if (NULL != pctx && NULL != pctx->lbs_domain)
+        if (NULL != pctx)
         {
             g_event_notice_func(EZ_EVENT_SERVER_UPDATE, pctx->lbs_domain, ezos_strlen((const char *)pctx->lbs_domain));
         }
@@ -69,15 +69,15 @@ const ez_event_notice ez_iot_event_notice_get(ez_void_t)
     return g_event_notice_func;
 }
 
-void ez_iot_devid_set(const ez_byte_t *devid)
+void ez_iot_devid_set(const ez_char_t *devid)
 {
-    static ez_byte_t m_devid[32 + 1] = {0};
+    static ez_char_t m_devid[32 + 1] = {0};
 
     ezos_strncpy(m_devid, devid, sizeof(m_devid) - 1);
     g_devid = m_devid;
 }
 
-const ez_byte_t *ez_iot_devid_get(ez_void_t)
+const ez_char_t *ez_iot_devid_get(ez_void_t)
 {
     return g_devid;
 }

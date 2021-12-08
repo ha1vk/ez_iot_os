@@ -15,7 +15,6 @@
 #define H_AES_SUPPORT_H_
 
 #define AES_SUPPORT_INTERFACE                                                                                                                             \
-    extern void buf_padding(unsigned char *buf, EZDEV_SDK_INT32 padding_len, EZDEV_SDK_INT32 len);                                                        \
     extern EZDEV_SDK_UINT32 calculate_padding_len(EZDEV_SDK_UINT32 len);                                                                                  \
     extern mkernel_internal_error aes_cbc_128_dec_padding(const unsigned char aes_key[16],                                                                \
                                                           const unsigned char *input_buf, EZDEV_SDK_UINT32 input_length,                                  \

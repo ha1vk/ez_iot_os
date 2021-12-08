@@ -102,7 +102,7 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
     unsigned char sharekey_dst_hex[LBS_AUTH_MD5_LEN + 1];
 
     unsigned char sharekey_sha256_dst[LBS_AUTH_SHA256_LEN];
-    unsigned char sharekey_sha256_dst_hex[LBS_AUTH_MD5_LEN + 1];
+    unsigned char sharekey_sha256_dst_hex[LBS_AUTH_SHA256_LEN * 2 + 1];
 
     mbedtls_md_context_t sha1_ctx;
     const mbedtls_md_info_t *info_sha1 = NULL;

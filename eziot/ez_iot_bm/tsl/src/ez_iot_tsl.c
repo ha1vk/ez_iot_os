@@ -77,7 +77,7 @@ EZOS_API ez_err_t ez_iot_tsl_property_report(const ez_char_t *sn, const ez_tsl_r
     CHECK_COND_DONE(NULL == key_info, EZ_TSL_ERR_PARAM_INVALID);
     CHECK_COND_DONE(NULL == key_info->domain, EZ_TSL_ERR_PARAM_INVALID);
 
-    CHECK_COND_DONE(tsl_adapter_status_check(sn), EZ_TSL_ERR_PROFILE_LOADING);
+    CHECK_COND_DONE(tsl_adapter_status_check((ez_char_t *)sn), EZ_TSL_ERR_PROFILE_LOADING);
 
     /* Legality check */
     rv = tsl_legality_property_check(sn, rsc_info, key_info, value);
@@ -141,7 +141,7 @@ ez_err_t ez_iot_tsl_event_report(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_in
     CHECK_COND_DONE(NULL == key_info->domain, EZ_TSL_ERR_PARAM_INVALID);
     CHECK_COND_DONE(make_event_value(value, &tsl_value), EZ_TSL_ERR_MEMORY);
 
-    CHECK_COND_DONE(tsl_adapter_status_check(sn), EZ_TSL_ERR_PROFILE_LOADING);
+    CHECK_COND_DONE(tsl_adapter_status_check((ez_char_t *)sn), EZ_TSL_ERR_PROFILE_LOADING);
 
     /* Legality check */
     rv = tsl_legality_event_check(sn, rsc_info, key_info, &tsl_value);

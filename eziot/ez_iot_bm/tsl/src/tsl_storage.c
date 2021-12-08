@@ -236,8 +236,8 @@ done:
 
 static void storage_devinfo2index(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev_fwver, ez_char_t index[32])
 {
-    ez_char_t md5_output[16] = {0};
-    ez_char_t base64_output[24 + 1] = {0};
+    ez_uchar_t md5_output[16] = {0};
+    ez_uchar_t base64_output[24 + 1] = {0};
     size_t olen = sizeof(base64_output);
 
     mbedtls_md5_context md5_ctx = {0};
@@ -245,8 +245,8 @@ static void storage_devinfo2index(ez_char_t *dev_sn, ez_char_t *dev_type, ez_cha
     mbedtls_md5_init(&md5_ctx);
     mbedtls_md5_starts(&md5_ctx);
 
-    mbedtls_md5_update(&md5_ctx, dev_type, ezos_strlen(dev_type));
-    mbedtls_md5_update(&md5_ctx, dev_fwver, ezos_strlen(dev_fwver));
+    mbedtls_md5_update(&md5_ctx, (unsigned char*)dev_type, ezos_strlen(dev_type));
+    mbedtls_md5_update(&md5_ctx, (unsigned char*)dev_fwver, ezos_strlen(dev_fwver));
     mbedtls_md5_finish(&md5_ctx, md5_output);
 
     mbedtls_base64_encode(base64_output, sizeof(base64_output), &olen, md5_output, sizeof(md5_output));

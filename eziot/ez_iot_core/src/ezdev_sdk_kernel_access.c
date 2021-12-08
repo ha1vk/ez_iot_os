@@ -340,7 +340,6 @@ mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel)
 
 mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg *pubmsg)
 {
-    EZDEV_SDK_INT32 input_length_padding = 0;
     ezdev_sdk_kernel_pubmsg_exchange *new_pubmsg_exchange = NULL;
     mkernel_internal_error kernel_internal_error = mkernel_internal_succ;
 
@@ -369,24 +368,21 @@ mkernel_internal_error ezdev_sdk_kernel_inner_send(const ezdev_sdk_kernel_pubmsg
     new_pubmsg_exchange->msg_conntext.msg_seq = pubmsg->msg_seq;
     new_pubmsg_exchange->msg_conntext.msg_domain_id = pubmsg->msg_domain_id;
     new_pubmsg_exchange->msg_conntext.msg_command_id = pubmsg->msg_command_id;
-    input_length_padding = pubmsg->msg_body_len;
 
-    new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char *)ezos_malloc(input_length_padding);
+    new_pubmsg_exchange->msg_conntext.msg_body = (ez_char_t *)ezos_malloc(pubmsg->msg_body_len);
     if (new_pubmsg_exchange->msg_conntext.msg_body == NULL)
     {
         ezos_free(new_pubmsg_exchange);
         new_pubmsg_exchange = NULL;
 
-        ezlog_e(TAG_CORE, "mkernel_internal malloc len:%d, code:%d", input_length_padding, mkernel_internal_malloc_error);
+        ezlog_e(TAG_CORE, "malloc err:%d", pubmsg->msg_body_len);
         return mkernel_internal_malloc_error;
     }
-    ezos_memset(new_pubmsg_exchange->msg_conntext.msg_body, 0, input_length_padding);
-    new_pubmsg_exchange->msg_conntext.msg_body_len = input_length_padding;
+    ezos_memset(new_pubmsg_exchange->msg_conntext.msg_body, 0, pubmsg->msg_body_len);
+    new_pubmsg_exchange->msg_conntext.msg_body_len = pubmsg->msg_body_len;
     ezos_memcpy(new_pubmsg_exchange->msg_conntext.msg_body, pubmsg->msg_body, pubmsg->msg_body_len);
 
-    buf_padding(new_pubmsg_exchange->msg_conntext.msg_body, input_length_padding, pubmsg->msg_body_len);
-
-    new_pubmsg_exchange->max_send_count = 1;
+    new_pubmsg_exchange->max_send_count = CONFIG_EZIOT_CORE_DEFAULT_PUBLISH_RETRY;
     kernel_internal_error = das_send_pubmsg_async(&g_ezdev_sdk_kernel, new_pubmsg_exchange);
     ezlog_i(TAG_CORE, "das_send_pubmsg_async offline msg send ,error code:%d", kernel_internal_error);
     if (kernel_internal_error != mkernel_internal_succ)

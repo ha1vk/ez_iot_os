@@ -24,7 +24,7 @@
 #define TIMESPEC_MILLION 1000000
 #define TIMESPEC_BILLION 1000000000
 
-void bin2hexstr(const char *src, int len, int upper, char *dst)
+void bin2hexstr(const unsigned char *src, int len, int upper, unsigned char *dst)
 {
     int i;
     char fmt[8];

@@ -145,11 +145,11 @@ static ez_void_t shadow_status2sync();
 
 static ez_void_t shadow_reply2report(ez_uint32_t seq, ez_int32_t code);
 
-static ez_void_t shadow_reply2query(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload);
+static ez_void_t shadow_reply2query(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload);
 
-static ez_int32_t shadow_set2dev(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload);
+static ez_int32_t shadow_set2dev(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload);
 
-static ez_void_t shadow_status_sync_disable(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index);
+static ez_void_t shadow_status_sync_disable(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index);
 
 /**
  * @brief 执行上报
@@ -161,9 +161,9 @@ static ez_void_t shadow_status_sync_disable(ez_uchar_t *devsn, ez_char_t *res_ty
  * @param key 
  * @return ez_int32_t -1上报失败，0不需要上报，1表示正在上报中
  */
-static ez_int32_t do_report(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, node_key_t *node_key);
+static ez_int32_t do_report(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, node_key_t *node_key);
 
-static ez_int32_t do_set(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value);
+static ez_int32_t do_set(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value);
 
 static cJSON *tlv2json(ez_shadow_value_t *ptlv);
 
@@ -677,7 +677,7 @@ static ez_void_t shadow_status2sync()
     shadow_module_unlock();
 }
 
-static ez_int32_t do_report(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, node_key_t *node_key)
+static ez_int32_t do_report(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, node_key_t *node_key)
 {
     ez_int32_t rv = 0;
     ez_shadow_value_t tlv = {0};
@@ -830,7 +830,6 @@ ez_err_t shadow_core_module_addv3(ez_char_t *sn, ez_char_t *res_type, ez_int16_t
 
 ez_err_t shadow_core_module_clear(ez_char_t *sn)
 {
-    ez_node_t *node_dev = NULL;
     ez_node_t *node_index_set = NULL;
     ez_node_t *node_index = NULL;
     ez_node_t *node_domain = NULL;
@@ -1459,7 +1458,7 @@ done:
     shadow_module_unlock();
 }
 
-static ez_int32_t shadow_set2dev(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload)
+static ez_int32_t shadow_set2dev(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload)
 {
     cJSON *json_root = NULL;
     cJSON *json_state = NULL;
@@ -1519,7 +1518,7 @@ static ez_int32_t shadow_set2dev(ez_uchar_t *devsn, ez_char_t *res_type, ez_int3
     return rv;
 }
 
-static ez_void_t shadow_status_sync_disable(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index)
+static ez_void_t shadow_status_sync_disable(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index)
 {
     node_dev_t *pnode_dev;
     node_index_set_t *pnode_indexs;
@@ -1556,7 +1555,7 @@ static ez_void_t shadow_status_sync_disable(ez_uchar_t *devsn, ez_char_t *res_ty
     shadow_module_unlock();
 }
 
-static ez_void_t shadow_reply2query(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload)
+static ez_void_t shadow_reply2query(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload)
 {
     cJSON *json_root = NULL;
     cJSON *json_code = NULL;
@@ -1651,7 +1650,7 @@ static ez_void_t shadow_reply2query(ez_uchar_t *devsn, ez_char_t *res_type, ez_i
     }
 }
 
-static ez_int32_t do_set(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value)
+static ez_int32_t do_set(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value)
 {
     ezlog_v(TAG_SHD, "do_set");
 

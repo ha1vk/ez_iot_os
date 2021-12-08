@@ -194,12 +194,8 @@ char ezcore_time_isexpired_bydiff(ezos_timespec_t *assign_timer, unsigned int ti
     {
         return 1;
     }
-    else
-    {
-        return 0;
-    }
 
-    return res.tv_sec < 0 || (res.tv_sec == 0 && res.tv_nsec <= 0);
+    return 0;
 }
 
 void ezcore_time_countdown(ezos_timespec_t *assign_timer, unsigned int time_count)
