@@ -72,10 +72,12 @@ ez_err_t tsl_legality_property_check(const ez_char_t *sn, const ez_tsl_rsc_t *rs
 
     CHECK_COND_DONE(k == capacity->resource[i].domain[j].prop_num, EZ_TSL_ERR_KEY_NOT_FOUND);
 
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
     if (value)
     {
         rv = check_schema_value(&prop->prop_desc, value);
     }
+#endif
 
 done:
     if (capacity)
@@ -140,10 +142,12 @@ ez_err_t tsl_legality_event_check(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_i
 
     CHECK_COND_DONE(k == capacity->resource[i].domain[j].event_num, EZ_TSL_ERR_KEY_NOT_FOUND);
 
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
     if (value)
     {
         rv = check_schema_value(&event->input_schema, value);
     }
+#endif
 
 done:
     if (capacity)

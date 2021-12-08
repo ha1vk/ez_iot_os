@@ -18,9 +18,9 @@ extern "C"
 
     const ez_event_notice ez_iot_event_notice_get(ez_void_t);
 
-    void ez_iot_devid_set(const ez_byte_t *devid);
+    void ez_iot_devid_set(const ez_char_t *devid);
 
-    const ez_byte_t *ez_iot_devid_get(ez_void_t);
+    const ez_char_t *ez_iot_devid_get(ez_void_t);
 
 #ifdef __cplusplus
 }

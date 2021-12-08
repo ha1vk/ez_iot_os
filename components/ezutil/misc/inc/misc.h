@@ -23,7 +23,7 @@
 
 #include <ezos.h>
 
-void bin2hexstr(const char* src, int len, int upper, char* dst);
+void bin2hexstr(const unsigned char* src, int len, int upper, unsigned char* dst);
 
 ez_bool_t time_isexpired(ezos_timespec_t *assign_timer);
 

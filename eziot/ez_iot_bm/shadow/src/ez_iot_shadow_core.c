@@ -120,9 +120,6 @@ static node_domain_t *shadow_module_add_domain(ez_list_t *lst, ez_char_t *domain
 
 static ez_void_t *shadow_module_get_next(ez_list_t *lst, ez_node_t *node);
 
-static ez_void_t shadow_module_delete_domain(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id);
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /* shadow 线程函数 */
 static ez_void_t shadow_core_yeild(ez_void_t *pparam);
 
@@ -148,11 +145,11 @@ static ez_void_t shadow_status2sync();
 
 static ez_void_t shadow_reply2report(ez_uint32_t seq, ez_int32_t code);
 
-static ez_void_t shadow_reply2query(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload);
+static ez_void_t shadow_reply2query(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload);
 
-static ez_int32_t shadow_set2dev(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload);
+static ez_int32_t shadow_set2dev(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload);
 
-static ez_void_t shadow_status_sync_disable(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index);
+static ez_void_t shadow_status_sync_disable(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index);
 
 /**
  * @brief 执行上报
@@ -164,9 +161,9 @@ static ez_void_t shadow_status_sync_disable(ez_uchar_t *devsn, ez_char_t *res_ty
  * @param key 
  * @return ez_int32_t -1上报失败，0不需要上报，1表示正在上报中
  */
-static ez_int32_t do_report(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, node_key_t *node_key);
+static ez_int32_t do_report(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, node_key_t *node_key);
 
-static ez_int32_t do_set(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value);
+static ez_int32_t do_set(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value);
 
 static cJSON *tlv2json(ez_shadow_value_t *ptlv);
 
@@ -680,7 +677,7 @@ static ez_void_t shadow_status2sync()
     shadow_module_unlock();
 }
 
-static ez_int32_t do_report(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, node_key_t *node_key)
+static ez_int32_t do_report(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, node_key_t *node_key)
 {
     ez_int32_t rv = 0;
     ez_shadow_value_t tlv = {0};
@@ -833,9 +830,79 @@ ez_err_t shadow_core_module_addv3(ez_char_t *sn, ez_char_t *res_type, ez_int16_t
 
 ez_err_t shadow_core_module_clear(ez_char_t *sn)
 {
+    ez_node_t *node_index_set = NULL;
+    ez_node_t *node_index = NULL;
+    ez_node_t *node_domain = NULL;
+    ez_node_t *node_key = NULL;
+
+    node_dev_t *pnode_dev = NULL;
+    node_index_set_t *pnode_index_set = NULL;
+    node_index_t *pnode_index = NULL;
+    node_domain_t *pnode_domain = NULL;
+    node_key_t *pnode_key = NULL;
+    ez_char_t *dev_sn = sn;
+
+    if (0 == ezos_strcmp(ez_kernel_getdevinfo_bykey("dev_subserial"), sn))
+    {
+        dev_sn = SHADOW_DEFAULT_NAME;
+    }
+
     shadow_module_lock();
-    //TODO
-    // shadow_module_delete_domain(sn, res_type, index, domain_id);
+
+    pnode_dev = shadow_module_find_dev(&g_shaodw_modules, dev_sn);
+    if (!pnode_dev)
+    {
+        goto done;
+    }
+
+    while (NULL != (node_index_set = shadow_module_get_next(&pnode_dev->type_lst, node_index_set)))
+    {
+        pnode_index_set = (node_index_set_t *)node_index_set;
+        node_index = NULL;
+
+        while (NULL != (node_index = shadow_module_get_next(&pnode_index_set->index_lst, node_index)))
+        {
+            pnode_index = (node_index_t *)node_index;
+            node_domain = NULL;
+
+            while (NULL != (node_domain = shadow_module_get_next(&pnode_index->domain_lst, node_domain)))
+            {
+                pnode_domain = (node_domain_t *)node_domain;
+                node_key = NULL;
+
+                while (NULL != (node_key = shadow_module_get_next(&pnode_domain->key_lst, node_key)))
+                {
+                    pnode_key = (node_key_t *)node_key;
+                    if (pnode_key->json_value)
+                    {
+                        cJSON_Delete((cJSON *)pnode_key->json_value);
+                        pnode_key->json_value = NULL;
+                    }
+
+                    ezlist_delete(&pnode_domain->key_lst, node_key);
+                    ezos_free(node_key);
+                    node_key = NULL;
+                }
+
+                ezlist_delete(&pnode_index->domain_lst, node_domain);
+                ezos_free(node_domain);
+                node_domain = NULL;
+            }
+
+            ezlist_delete(&pnode_index_set->index_lst, node_index);
+            ezos_free(node_index);
+            node_index = NULL;
+        }
+
+        ezlist_delete(&pnode_dev->type_lst, node_index_set);
+        ezos_free(node_index_set);
+        node_index_set = NULL;
+    }
+
+    ezlist_delete(&g_shaodw_modules, &pnode_dev->node);
+    ezos_free(pnode_dev);
+
+done:
     shadow_module_unlock();
 
     return EZ_SHD_ERR_SUCC;
@@ -987,11 +1054,6 @@ static ez_void_t shadow_module_deinit()
 
     ezos_mutex_destroy(g_hlock);
     g_hlock = NULL;
-}
-
-static ez_void_t shadow_module_delete_domain(ez_char_t *sn, ez_char_t *res_type, ez_int16_t index, ez_char_t *domain_id)
-{
-    //TODO
 }
 
 static node_dev_t *shadow_module_find_dev(ez_list_t *lst, ez_char_t *sn)
@@ -1258,16 +1320,19 @@ static node_domain_t *shadow_module_add_domain(ez_list_t *lst, ez_char_t *domain
             else
             {
                 pnode_key = (node_key_t *)malloc(sizeof(node_key_t));
-                ezlog_v(TAG_SHD, "addv3: key:%s", pservices[i].key);
-                ezos_memset(pnode_key, 0, sizeof(node_key_t));
-                ezos_strncpy(pnode_key->key, pservices[i].key, sizeof(pnode_key->key) - 1);
-                pnode_key->cloud2dev = pservices[i].business2dev;
-                pnode_key->dev2cloud = pservices[i].business2cloud;
-                pnode_key->stat_ver = 0;
-                pnode_key->msg_seq = 0;
-                pnode_key->need_report = 1;
+                if (pnode_key)
+                {
+                    ezlog_v(TAG_SHD, "addv3: key:%s", pservices[i].key);
+                    ezos_memset(pnode_key, 0, sizeof(node_key_t));
+                    ezos_strncpy(pnode_key->key, pservices[i].key, sizeof(pnode_key->key) - 1);
+                    pnode_key->cloud2dev = pservices[i].business2dev;
+                    pnode_key->dev2cloud = pservices[i].business2cloud;
+                    pnode_key->stat_ver = 0;
+                    pnode_key->msg_seq = 0;
+                    pnode_key->need_report = 1;
 
-                ezlist_add_last(&pnode_domain->key_lst, &pnode_key->node);
+                    ezlist_add_last(&pnode_domain->key_lst, &pnode_key->node);
+                }
             }
         }
 
@@ -1393,7 +1458,7 @@ done:
     shadow_module_unlock();
 }
 
-static ez_int32_t shadow_set2dev(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload)
+static ez_int32_t shadow_set2dev(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload)
 {
     cJSON *json_root = NULL;
     cJSON *json_state = NULL;
@@ -1453,7 +1518,7 @@ static ez_int32_t shadow_set2dev(ez_uchar_t *devsn, ez_char_t *res_type, ez_int3
     return rv;
 }
 
-static ez_void_t shadow_status_sync_disable(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index)
+static ez_void_t shadow_status_sync_disable(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index)
 {
     node_dev_t *pnode_dev;
     node_index_set_t *pnode_indexs;
@@ -1490,7 +1555,7 @@ static ez_void_t shadow_status_sync_disable(ez_uchar_t *devsn, ez_char_t *res_ty
     shadow_module_unlock();
 }
 
-static ez_void_t shadow_reply2query(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload)
+static ez_void_t shadow_reply2query(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *payload)
 {
     cJSON *json_root = NULL;
     cJSON *json_code = NULL;
@@ -1585,7 +1650,7 @@ static ez_void_t shadow_reply2query(ez_uchar_t *devsn, ez_char_t *res_type, ez_i
     }
 }
 
-static ez_int32_t do_set(ez_uchar_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value)
+static ez_int32_t do_set(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value)
 {
     ezlog_v(TAG_SHD, "do_set");
 

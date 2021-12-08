@@ -44,6 +44,8 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 ##############################################根据开关定义编译的文件和链接的库#############################################
 
+list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_ezos.c)
+
 if(CONFIG_EZIOT_COMPONENT_UTEST_ENABLE)
     message(STATUS "CONFIG_EZIOT_COMPONENT_UTEST_ENABLE")
     list(APPEND UT_SRCS ${ENV_UTPORT_PATH}/ut_entry.c)
@@ -92,6 +94,25 @@ if(CONFIG_EZOS_KV_ENABLE)
 
 endif()
 
+if(CONFIG_EZIOT_COMPONENT_WEBCLIENT_ENABLE)
+
+    message(STATUS "CONFIG_COMPONENT_EZIOT_WEBCLIENT_ENABLE")
+
+    list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/webclient/inc)
+
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_webclient.c)
+
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/webclient)
+
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezos)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezlog)
+
+    list(APPEND UT_DEPENS -lezos)
+    list(APPEND UT_DEPENS -lezlog)
+
+    list(APPEND UT_DEPENS -lwebclient)
+    list(APPEND UT_DEPENS -lezlog)
+endif()
 if(CONFIG_EZIOT_CORE_ENABLE)
 
     message(STATUS "CONFIG_EZIOT_CORE_ENABLE")
@@ -142,6 +163,40 @@ if(CONFIG_EZIOT_BASE_ENABLE)
     list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_bm)
     list(APPEND UT_DEPENS -lez_iot_bm)
 
+endif()
+
+if(CONFIG_EZIOT_OTA_ENABLE)
+
+    message(STATUS "CONFIG_EZIOT_OTA_ENABLE")
+
+    list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_bm/ota/inc)
+    list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_core/inc)
+
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_ota.c)
+
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_bm)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/webclient)
+
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezos)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezlog)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/cJSON)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/mqtt)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezxml)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/mbedtls)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_core)
+
+    list(APPEND UT_DEPENS -lezos)
+    list(APPEND UT_DEPENS -lezlog)
+    list(APPEND UT_DEPENS -lcJSON)
+    list(APPEND UT_DEPENS -lmqtt)
+    list(APPEND UT_DEPENS -lezxml)
+    list(APPEND UT_DEPENS -lmbedtls)
+    list(APPEND UT_DEPENS -lez_iot_core)
+
+    list(APPEND UT_DEPENS -lwebclient)
+    list(APPEND UT_DEPENS -lez_iot_bm)
+    list(APPEND UT_DEPENS -lezlog)
+    list(APPEND UT_DEPENS -lcJSON)
 endif()
 
 if(CONFIG_EZIOT_TSL_ENABLE)

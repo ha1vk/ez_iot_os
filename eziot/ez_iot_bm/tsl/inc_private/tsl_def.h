@@ -25,7 +25,7 @@ typedef enum
     ACCESS_WRITE = 0x00000002,
 } tsl_access_type_e;
 
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 typedef struct
 {
     ez_tsl_data_type_e item_type;
@@ -92,7 +92,7 @@ typedef struct
 {
     char identifier[32];
     int access;
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
     char version[8];
     tsl_schema_desc prop_desc;
 #endif
@@ -101,7 +101,7 @@ typedef struct
 typedef struct
 {
     char identifier[32];
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
     char version[8];
     char direction[16];
     tsl_schema_desc input_schema;
@@ -112,7 +112,7 @@ typedef struct
 typedef struct
 {
     char identifier[32];
-#ifndef COMPONENT_TSL_PROFILE_STRIP
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
     char version[8];
     int enum_num;
     char *event_type;

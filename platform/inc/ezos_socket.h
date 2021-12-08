@@ -163,6 +163,8 @@ extern "C"
     EZOS_API int ezos_listen(int socket_fd, int back_log);
     
     EZOS_API int ezos_fcntl(int socket_fd, int cmd, int val);
+
+    EZOS_API unsigned int ezos_inet_addr(const char *ip);
 #ifdef __cplusplus
 }
 #endif

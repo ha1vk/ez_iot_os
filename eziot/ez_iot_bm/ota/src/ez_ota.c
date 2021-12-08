@@ -46,7 +46,7 @@ typedef struct {
 } ez_ota_info_t;
 
 
-ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, const ez_int8_t* perr_msg, ez_ota_errcode_t errcode, ez_int8_t status, ez_int16_t progress)
+ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, const ez_int8_t* perr_msg, ez_ota_errcode_e errcode, ez_int8_t status, ez_int16_t progress)
 {
     ez_err_t ota_err  = EZ_OTA_ERR_SUCC;
     char* sz_progress = NULL;
@@ -123,7 +123,7 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
     unsigned int need_readlen = 1;
     httpclient_t  *h_client = NULL;
     char* recvbuffer = (char*)ezos_malloc(readlen);
-    int status  = 0;
+    int status = 0;
     unsigned int content_len = 0;
     ezlog_d(TAG_OTA,"file_download: total_len:%d, readlen:%d, offset:%d\n", *total_len, readlen, *offset);
     do
@@ -207,13 +207,14 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
     return ret;
 }
 
-static void EZOS_CALL ota_file_download_thread(void *arg)
+static void ota_file_download_thread(void *arg)
 {
     int ret= -1;
     int retry_times = 0;
     unsigned int offset = 0;
     int max_try_time = 0;
     int retry_flag = 0;
+    ezlog_e(TAG_OTA,"ota_file_download_thread start\n");
     ez_ota_info_t*  file_info = (ez_ota_info_t*)arg;
     max_try_time = file_info->retry_max;
     unsigned int total_len = file_info->total_size;
@@ -278,8 +279,8 @@ ez_err_t  ez_ota_file_download(ez_ota_download_info_t *input_info, get_file_cb f
 
         ezos_strncpy(file_info->url, (char*)input_info->url, sizeof(file_info->url)-1);
         ezos_strncpy(file_info->check_sum, (char*)input_info->degist, sizeof(file_info->check_sum)- 1);
-
-        if(ezos_thread_create(NULL, "ez_ota_download", ota_file_download_thread, file_info, 4096, 10))
+        ezlog_e(TAG_OTA,"ota_file_download_thread create\n");
+        if(ezos_thread_create(NULL, "ez_ota_download", ota_file_download_thread, file_info, CONFIG_EZIOT_OTA_TASK_STACK_SIZE, CONFIG_EZIOT_OTA_TASK_PRIORITY))
         {
             ezlog_e(TAG_OTA,"ota_download_tread create error\n");
             err = EZ_OTA_ERR_MEM_ERROR;

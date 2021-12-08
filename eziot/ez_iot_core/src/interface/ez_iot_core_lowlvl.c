@@ -33,7 +33,7 @@ static EZDEV_SDK_UINT32 genaral_seq()
 }
 
 EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev_info_t *pdev_info,
-                                 const ez_byte_t *devid, sdk_kernel_event_notice kernel_event_notice_cb)
+                                 const ez_char_t *devid, sdk_kernel_event_notice kernel_event_notice_cb)
 
 {
     FUNC_IN();
@@ -76,7 +76,7 @@ EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev
     ezlog_i(TAG_CORE, "fw:%s", g_ezdev_sdk_kernel.dev_info.dev_firmwareversion);
     ezlog_i(TAG_CORE, "display:%s", g_ezdev_sdk_kernel.dev_info.dev_typedisplay);
 
-    ezos_strncpy((char *)g_ezdev_sdk_kernel.dev_id, (char *)devid, sizeof(g_ezdev_sdk_kernel.dev_id));
+    ezos_strncpy((char *)g_ezdev_sdk_kernel.dev_id, devid, sizeof(g_ezdev_sdk_kernel.dev_id));
     size_t key_len = sizeof(g_ezdev_sdk_kernel.master_key);
     CHECK_COND_DONE(ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_MASTERKEY, g_ezdev_sdk_kernel.master_key, &key_len), EZ_CORE_ERR_STORAGE);
 
@@ -244,7 +244,7 @@ EZOS_API ez_err_t ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
     new_pubmsg_exchange->msg_conntext.msg_domain_id = pubmsg->msg_domain_id;
     new_pubmsg_exchange->msg_conntext.msg_command_id = pubmsg->msg_command_id;
 
-    new_pubmsg_exchange->msg_conntext.msg_body = (unsigned char *)ezos_malloc(pubmsg->msg_body_len);
+    new_pubmsg_exchange->msg_conntext.msg_body = (ez_char_t *)ezos_malloc(pubmsg->msg_body_len);
     CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext.msg_body, EZ_CORE_ERR_MEMORY);
 
     ezos_memset(new_pubmsg_exchange->msg_conntext.msg_body, 0, pubmsg->msg_body_len);
@@ -352,7 +352,7 @@ EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
         pubmsg->msg_seq = genaral_seq();
     }
 
-    new_pubmsg_exchange->msg_conntext_v3.msg_body = (unsigned char *)ezos_malloc(pubmsg->msg_body_len);
+    new_pubmsg_exchange->msg_conntext_v3.msg_body = (ez_char_t *)ezos_malloc(pubmsg->msg_body_len);
     CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext_v3.msg_body, EZ_CORE_ERR_MEMORY);
 
     ezos_memset(new_pubmsg_exchange->msg_conntext_v3.msg_body, 0, pubmsg->msg_body_len);

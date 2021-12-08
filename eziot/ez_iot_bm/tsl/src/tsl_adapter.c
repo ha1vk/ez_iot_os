@@ -89,7 +89,6 @@ static ez_int32_t tsl_action_process(ez_kernel_submsg_v3_t *submsg)
     ez_kernel_pubmsg_v3_t pubmsg = {0};
 
     ezlog_i(TAG_TSL, "seq in: %d", submsg->msg_seq);
-    ezlog_d(TAG_TSL, "recv msg: %s", submsg->buf);
 
     // example "domain/identifier"
     ez_int32_t num = ezos_sscanf(submsg->ext_msg, "%32[^/]/%32", domain, identifier);
@@ -261,10 +260,10 @@ static ez_int32_t profile_downloading(query_info_t *query_info, ez_char_t **buf,
 {
     ez_int32_t rv = -1;
 
-    ez_char_t md5_hex_up[16 * 2 + 1] = {0};
-    ez_char_t md5_hex[16 * 2 + 1] = {0};
+    ez_uchar_t md5_hex_up[16 * 2 + 1] = {0};
+    ez_uchar_t md5_hex[16 * 2 + 1] = {0};
     ez_int32_t already_len = 0;
-    ez_char_t md5_output[16] = {0};
+    ez_uchar_t md5_output[16] = {0};
     mbedtls_md5_context md5_ctx = {0};
 
     struct webclient_session *session = NULL;
@@ -313,7 +312,7 @@ static ez_int32_t profile_downloading(query_info_t *query_info, ez_char_t **buf,
 
         } while (ez_true);
 
-        mbedtls_md5_update(&md5_ctx, (*buf), session->content_length);
+        mbedtls_md5_update(&md5_ctx, (ez_uchar_t *)(*buf), session->content_length);
         mbedtls_md5_finish(&md5_ctx, md5_output);
         bin2hexstr(md5_output, sizeof(md5_output), 1, md5_hex_up);
         bin2hexstr(md5_output, sizeof(md5_output), 0, md5_hex);
@@ -389,28 +388,18 @@ static void ez_profile_get_thread(void *param)
 
                 ezlog_w(TAG_TSL, "profile dl succ, sn:%s", query_info->dev_sn);
 
-                if (!tsl_profile_reg(query_info->dev_sn, query_info->dev_type,
-                                     query_info->dev_fw_ver, buf))
+                if (0 == tsl_profile_reg(query_info->dev_sn, query_info->dev_type,
+                                         query_info->dev_fw_ver, buf))
                 {
-                    continue;
+                    ezlog_w(TAG_TSL, "profile reg succ, sn:%s", query_info->dev_sn);
+                    tsl_adapter_shadow_inst(query_info->dev_sn);
+                    tsl_storage_save(query_info->dev_sn, query_info->dev_type, query_info->dev_fw_ver, buf, length);
                 }
-
-                ezlog_w(TAG_TSL, "profile reg succ, sn:%s", query_info->dev_sn);
-                tsl_adapter_shadow_inst(query_info->dev_sn);
-
-                if (!tsl_storage_save(query_info->dev_sn, query_info->dev_type,
-                                      query_info->dev_fw_ver, buf, length))
-                {
-                    ezos_free(buf);
-                    continue;
-                }
-
-                ezlog_w(TAG_TSL, "profile save succ, sn:%s", query_info->dev_sn);
 
                 ezlist_delete(&g_download_list, &query_info->node);
                 ezos_free(query_info);
                 ezos_free(buf);
-                query_info = NULL;
+                break;
             }
             else if (status_query == query_info->status && !time_isexpired(&query_info->timer))
             {
@@ -527,7 +516,7 @@ ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
         if (EZ_KV_ERR_SUCC == rv)
         {
             rv = tsl_profile_reg(dev_info->dev_subserial, dev_info->dev_type,
-                                 dev_info->dev_firmwareversion, profile);
+                                 dev_info->dev_firmwareversion, buf);
 
             CHECK_COND_DONE(rv, EZ_TSL_ERR_MEMORY);
             tsl_adapter_shadow_inst(dev_info->dev_subserial);
@@ -535,8 +524,7 @@ ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
         else if (EZ_KV_ERR_NAME == rv)
         {
             ezlog_w(TAG_TSL, "try download");
-            rv = tsl_adapter_profile_download(dev_info);
-            CHECK_COND_DONE(rv, EZ_TSL_ERR_MEMORY);
+            CHECK_COND_DONE(!tsl_adapter_profile_download(dev_info), EZ_TSL_ERR_MEMORY);
         }
         else
         {
@@ -576,456 +564,6 @@ void tsl_adapter_deinit()
     g_adapter_mutex = NULL;
     g_download_thread = NULL;
 }
-
-// ez_err_t ez_iot_tsl_action_value_legal(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value)
-// {
-//     ez_err_t rv = EZ_TSL_ERR_SUCC;
-
-//     ez_char_t dev_sn[48] = {0};
-//     ez_char_t dev_type[24] = {0};
-//     ez_char_t dev_fw_ver[36] = {0};
-//     dev_stauts_e dev_status = 0;
-//     ez_tsl_devinfo_t dev_info = {.dev_subserial = dev_sn, .dev_type = dev_type, .dev_firmwareversion = dev_fw_ver};
-//     ez_iot_tsl_capacity_t *capacity = NULL;
-//     tsl_domain_action *action = NULL;
-//     size_t i = 0;
-//     size_t j = 0;
-//     size_t k = 0;
-
-//     ezos_mutex_lock(g_capacities_mutex);
-
-//     CHECK_COND_DONE(!tsl_adapter_dev_find(sn, &dev_info, &dev_status), EZ_TSL_ERR_DEV_NOT_FOUND);
-//     CHECK_COND_DONE(status_done != dev_status, EZ_TSL_ERR_PROFILE_LOADING);
-
-//     /* find capacity */
-//     size_t num = ezlist_size(g_capacities_list);
-//     for (i = 0; i < num; i++)
-//     {
-//         ez_iot_tsl_capacity_t *capacity_temp = (ez_iot_tsl_capacity_t *)ezlist_getat(g_capacities_list, i, NULL, ez_false);
-//         CHECK_COND_DONE(!capacity_temp, EZ_TSL_ERR_PROFILE_LOADING);
-
-//         if (0 != strcmp((const ez_char_t *)dev_info.dev_type, capacity_temp->dev_type) ||
-//             0 != strcmp((const ez_char_t *)dev_info.dev_firmwareversion, capacity_temp->dev_fw_ver))
-//         {
-//             continue;
-//         }
-
-//         capacity = capacity_temp;
-//         break;
-//     }
-
-//     CHECK_COND_DONE(!capacity, EZ_TSL_ERR_PROFILE_LOADING);
-
-//     /* find  resource*/
-//     size_t rsc_num = capacity->rsc_num;
-//     for (i = 0; i < rsc_num; i++)
-//     {
-//         if (0 == strcmp((const ez_char_t *)rsc_info->res_type, capacity->resource[i].rsc_category))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(i == rsc_num, EZ_TSL_ERR_DEV_NOT_FOUND);
-
-//     /* find local index*/
-//     size_t index_num = capacity->resource[i].index_num;
-//     for (j = 0; j < index_num; j++)
-//     {
-//         if (0 == strcmp(rsc_info->local_index, capacity->resource[i].index))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(j == index_num, EZ_TSL_ERR_INDEX_NOT_FOUND);
-
-//     /*find domain*/
-//     size_t domain_num = capacity->resource[i].domain_num;
-//     for (j = 0; j < domain_num; j++)
-//     {
-//         if (0 == strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(j == domain_num, EZ_TSL_ERR_DOMAIN_NOT_FOUND);
-
-//     /*find key*/
-//     size_t action_num = capacity->resource[i].domain[j].action_num;
-//     for (k = 0; k < action_num; k++)
-//     {
-//         tsl_domain_action *action_temp = capacity->resource[i].domain[j].action + k;
-
-//         if (0 == strcmp(action->identifier, (char *)key_info->key))
-//         {
-//             action = action_temp;
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(k == action_num, EZ_TSL_ERR_KEY_NOT_FOUND);
-
-// #ifndef COMPONENT_TSL_PROFILE_STRIP
-//     if (value)
-//     {
-//         rv = check_schema_value(&action->input_schema, value);
-//     }
-// #endif
-
-// done:
-//     ezos_mutex_unlock(g_capacities_mutex);
-
-//     return rv;
-// }
-
-// ez_err_t ez_iot_tsl_property_value_legal(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value)
-// {
-//     ez_err_t rv = EZ_TSL_ERR_SUCC;
-
-//     ez_char_t dev_sn[48] = {0};
-//     ez_char_t dev_type[24] = {0};
-//     ez_char_t dev_fw_ver[36] = {0};
-//     dev_stauts_e dev_status = 0;
-//     ez_tsl_devinfo_t dev_info = {.dev_subserial = dev_sn, .dev_type = dev_type, .dev_firmwareversion = dev_fw_ver};
-//     ez_iot_tsl_capacity_t *capacity = NULL;
-//     tsl_domain_prop *prop = NULL;
-
-//     size_t i = 0;
-//     size_t j = 0;
-//     size_t k = 0;
-
-//     ezos_mutex_lock(g_capacities_mutex);
-
-//     CHECK_COND_DONE(!tsl_adapter_dev_find(sn, &dev_info, &dev_status), EZ_TSL_ERR_DEV_NOT_FOUND);
-//     CHECK_COND_DONE(status_done != dev_status, EZ_TSL_ERR_PROFILE_LOADING);
-
-//     /* find capacity */
-//     size_t num = ezlist_size(g_capacities_list);
-//     for (i = 0; i < num; i++)
-//     {
-//         ez_iot_tsl_capacity_t *capacity_temp = (ez_iot_tsl_capacity_t *)ezlist_getat(g_capacities_list, i, NULL, ez_false);
-//         CHECK_COND_DONE(!capacity_temp, EZ_TSL_ERR_PROFILE_LOADING);
-
-//         if (0 != strcmp((const ez_char_t *)dev_info.dev_type, capacity_temp->dev_type) ||
-//             0 != strcmp((const ez_char_t *)dev_info.dev_firmwareversion, capacity_temp->dev_fw_ver))
-//         {
-//             continue;
-//         }
-
-//         capacity = capacity_temp;
-//         break;
-//     }
-
-//     CHECK_COND_DONE(!capacity, EZ_TSL_ERR_PROFILE_LOADING);
-
-//     /* find  resource*/
-//     size_t rsc_num = capacity->rsc_num;
-//     for (i = 0; i < rsc_num; i++)
-//     {
-//         if (0 == strcmp((const ez_char_t *)rsc_info->res_type, capacity->resource[i].rsc_category))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(i == rsc_num, EZ_TSL_ERR_DEV_NOT_FOUND);
-
-//     /* find local index*/
-//     size_t index_num = capacity->resource[i].index_num;
-//     for (j = 0; j < index_num; j++)
-//     {
-//         if (0 == strcmp(rsc_info->local_index, capacity->resource[i].index))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(j == index_num, EZ_TSL_ERR_INDEX_NOT_FOUND);
-
-//     /*find domain*/
-//     size_t domain_num = capacity->resource[i].domain_num;
-//     for (j = 0; j < domain_num; j++)
-//     {
-//         if (0 == strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(j == domain_num, EZ_TSL_ERR_DOMAIN_NOT_FOUND);
-
-//     /*find key*/
-//     size_t prop_num = capacity->resource[i].domain[j].prop_num;
-//     for (k = 0; k < prop_num; k++)
-//     {
-//         tsl_domain_prop *prop_temp = capacity->resource[i].domain[j].prop + k;
-//         if (0 == strcmp(prop_temp->identifier, (char *)key_info->key))
-//         {
-//             prop = prop_temp;
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(k == prop_num, EZ_TSL_ERR_KEY_NOT_FOUND);
-
-// #ifndef COMPONENT_TSL_PROFILE_STRIP
-//     if (value)
-//     {
-//         rv = check_schema_value(&prop->prop_desc, value);
-//     }
-// #endif
-
-// done:
-//     ezos_mutex_unlock(g_capacities_mutex);
-
-//     return rv;
-// }
-
-// ez_err_t ez_iot_tsl_event_value_legal(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value)
-// {
-//     ez_err_t rv = EZ_TSL_ERR_SUCC;
-
-//     ez_char_t dev_sn[48] = {0};
-//     ez_char_t dev_type[24] = {0};
-//     ez_char_t dev_fw_ver[36] = {0};
-//     dev_stauts_e dev_status = 0;
-//     ez_tsl_devinfo_t dev_info = {.dev_subserial = dev_sn, .dev_type = dev_type, .dev_firmwareversion = dev_fw_ver};
-//     ez_iot_tsl_capacity_t *capacity = NULL;
-//     tsl_domain_event *event = NULL;
-//     size_t i = 0;
-//     size_t j = 0;
-//     size_t k = 0;
-
-//     ezos_mutex_lock(g_capacities_mutex);
-
-//     CHECK_COND_DONE(!tsl_adapter_dev_find(sn, &dev_info, &dev_status), EZ_TSL_ERR_DEV_NOT_FOUND);
-//     CHECK_COND_DONE(status_done != dev_status, EZ_TSL_ERR_PROFILE_LOADING);
-
-//     /* find capacity */
-//     size_t num = ezlist_size(g_capacities_list);
-//     for (i = 0; i < num; i++)
-//     {
-//         ez_iot_tsl_capacity_t *capacity_temp = (ez_iot_tsl_capacity_t *)ezlist_getat(g_capacities_list, i, NULL, ez_false);
-//         CHECK_COND_DONE(!capacity_temp, EZ_TSL_ERR_PROFILE_LOADING);
-
-//         if (0 != strcmp((const ez_char_t *)dev_info.dev_type, capacity_temp->dev_type) ||
-//             0 != strcmp((const ez_char_t *)dev_info.dev_firmwareversion, capacity_temp->dev_fw_ver))
-//         {
-//             continue;
-//         }
-
-//         capacity = capacity_temp;
-//         break;
-//     }
-
-//     CHECK_COND_DONE(!capacity, EZ_TSL_ERR_PROFILE_LOADING);
-
-//     /* find  resource*/
-//     size_t rsc_num = capacity->rsc_num;
-
-//     for (i = 0; i < rsc_num; i++)
-//     {
-//         if (0 == strcmp((const ez_char_t *)rsc_info->res_type, capacity->resource[i].rsc_category))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(i == rsc_num, EZ_TSL_ERR_DEV_NOT_FOUND);
-
-//     /* find local index*/
-//     size_t index_num = capacity->resource[i].index_num;
-//     for (j = 0; j < index_num; j++)
-//     {
-//         if (0 == strcmp(rsc_info->local_index, capacity->resource[i].index))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(j == index_num, EZ_TSL_ERR_INDEX_NOT_FOUND);
-
-//     /*find domain*/
-//     size_t domain_num = capacity->resource[i].domain_num;
-//     for (j = 0; j < domain_num; j++)
-//     {
-//         if (0 == strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
-//         {
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(j == domain_num, EZ_TSL_ERR_DOMAIN_NOT_FOUND);
-
-//     /*find key*/
-//     size_t event_num = capacity->resource[i].domain[j].event_num;
-//     for (k = 0; k < event_num; k++)
-//     {
-//         tsl_domain_event *event_temp = capacity->resource[i].domain[j].event + k;
-
-//         if (0 == strcmp(event_temp->identifier, (char *)key_info->key))
-//         {
-//             event = event_temp;
-//             break;
-//         }
-//     }
-
-//     CHECK_COND_DONE(k == event_num, EZ_TSL_ERR_KEY_NOT_FOUND);
-
-// #ifndef COMPONENT_TSL_PROFILE_STRIP
-//     if (value)
-//     {
-//         rv = check_schema_value(&event->input_schema, value);
-//     }
-// #endif
-
-// done:
-//     ezos_mutex_unlock(g_capacities_mutex);
-
-//     return rv;
-// }
-
-// ez_int32_t tsl_find_property_rsc_by_keyinfo(const ez_char_t *sn, const ez_tsl_key_t *key_info, ez_char_t *res_type, ez_int32_t len)
-// {
-//     int32_t rv = EZ_TSL_ERR_DEV_NOT_FOUND;
-
-//     ez_char_t dev_sn[48] = {0};
-//     ez_char_t dev_type[24] = {0};
-//     ez_char_t dev_fw_ver[36] = {0};
-//     dev_stauts_e dev_status = 0;
-//     ez_tsl_devinfo_t dev_info = {.dev_subserial = dev_sn, .dev_type = dev_type, .dev_firmwareversion = dev_fw_ver};
-//     ez_iot_tsl_capacity_t *capacity = NULL;
-
-//     size_t i = 0;
-//     size_t j = 0;
-//     size_t k = 0;
-
-//     ezos_mutex_lock(g_capacities_mutex);
-
-//     CHECK_COND_DONE(!tsl_adapter_dev_find(sn, &dev_info, &dev_status), EZ_TSL_ERR_DEV_NOT_FOUND);
-//     CHECK_COND_DONE(status_done != dev_status, EZ_TSL_ERR_PROFILE_LOADING);
-
-//     /* find capacity */
-//     size_t num = ezlist_size(g_capacities_list);
-//     for (i = 0; i < num; i++)
-//     {
-//         ez_iot_tsl_capacity_t *capacity_temp = (ez_iot_tsl_capacity_t *)ezlist_getat(g_capacities_list, i, NULL, ez_false);
-//         CHECK_COND_DONE(!capacity_temp, EZ_TSL_ERR_PROFILE_LOADING);
-
-//         if (0 != strcmp((const ez_char_t *)dev_info.dev_type, capacity_temp->dev_type) ||
-//             0 != strcmp((const ez_char_t *)dev_info.dev_firmwareversion, capacity_temp->dev_fw_ver))
-//         {
-//             continue;
-//         }
-
-//         capacity = capacity_temp;
-//         break;
-//     }
-
-//     for (i = 0; i < capacity->rsc_num; i++)
-//     {
-//         /* 查找domain */
-//         for (j = 0; j < capacity->resource[i].domain_num; j++)
-//         {
-//             if (0 == strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
-//             {
-//                 break;
-//             }
-//         }
-
-//         CHECK_COND_DONE(j == capacity->rsc_num, EZ_TSL_ERR_RSCTYPE_NOT_FOUND);
-
-//         /* 查找key */
-//         for (k = 0; k < capacity->resource[i].domain[j].prop_num; k++)
-//         {
-//             tsl_domain_prop *prop_temp = capacity->resource[i].domain[j].prop + k;
-//             if (0 == strcmp(prop_temp->identifier, (char *)key_info->key))
-//             {
-//                 break;
-//             }
-//         }
-
-//         CHECK_COND_DONE(k == capacity->rsc_num, EZ_TSL_ERR_RSCTYPE_NOT_FOUND);
-
-//         ezos_strncpy(res_type, capacity->resource[i].rsc_category, len - 1);
-//         rv = 0;
-//     }
-
-// done:
-//     ezos_mutex_unlock(g_capacities_mutex);
-
-//     return rv;
-// }
-
-// ez_err_t tsl_find_event_rsc_by_keyinfo(const ez_char_t *sn, const ez_tsl_key_t *key_info, ez_char_t *res_type, ez_int32_t len)
-// {
-//     ez_err_t rv = EZ_TSL_ERR_DEV_NOT_FOUND;
-
-//     ez_char_t dev_sn[48] = {0};
-//     ez_char_t dev_type[24] = {0};
-//     ez_char_t dev_fw_ver[36] = {0};
-//     dev_stauts_e dev_status = 0;
-//     ez_tsl_devinfo_t dev_info = {.dev_subserial = dev_sn, .dev_type = dev_type, .dev_firmwareversion = dev_fw_ver};
-//     ez_iot_tsl_capacity_t *capacity = NULL;
-
-//     size_t i = 0;
-//     size_t j = 0;
-//     size_t k = 0;
-
-//     ezos_mutex_lock(g_capacities_mutex);
-
-//     CHECK_COND_DONE(!tsl_adapter_dev_find(sn, &dev_info, &dev_status), EZ_TSL_ERR_DEV_NOT_FOUND);
-//     CHECK_COND_DONE(status_done != dev_status, EZ_TSL_ERR_PROFILE_LOADING);
-
-//     /* find capacity */
-//     size_t num = ezlist_size(g_capacities_list);
-//     for (i = 0; i < num; i++)
-//     {
-//         ez_iot_tsl_capacity_t *capacity_temp = (ez_iot_tsl_capacity_t *)ezlist_getat(g_capacities_list, i, NULL, ez_false);
-//         CHECK_COND_DONE(!capacity_temp, EZ_TSL_ERR_PROFILE_LOADING);
-
-//         if (0 != strcmp((const ez_char_t *)dev_info.dev_type, capacity_temp->dev_type) ||
-//             0 != strcmp((const ez_char_t *)dev_info.dev_firmwareversion, capacity_temp->dev_fw_ver))
-//         {
-//             continue;
-//         }
-
-//         capacity = capacity_temp;
-//         break;
-//     }
-
-//     for (i = 0; i < capacity->rsc_num; i++)
-//     {
-//         /* 查找domain */
-//         for (j = 0; j < capacity->resource[i].domain_num; j++)
-//         {
-//             if (0 != strcmp(capacity->resource[i].domain[j].identifier, (char *)key_info->domain))
-//             {
-//                 continue;
-//             }
-//         }
-
-//         /* 查找key */
-//         for (k = 0; k < capacity->resource[i].domain[j].event_num; k++)
-//         {
-//             tsl_domain_event *event = capacity->resource[i].domain[j].event + k;
-//             if (0 != strcmp(event->identifier, (char *)key_info->key))
-//             {
-//                 continue;
-//             }
-//         }
-
-//         ezos_strncpy(res_type, capacity->resource[i].rsc_category, len - 1);
-//         rv = 0;
-//     }
-
-// done:
-//     ezos_mutex_unlock(g_capacities_mutex);
-
-//     return rv;
-// }
 
 static ez_bool_t tsl_adapter_profile_download(ez_tsl_devinfo_t *dev_info)
 {
@@ -1082,11 +620,12 @@ static void tsl_adapter_query_job_update(ez_char_t *dev_sn, dev_stauts_e status,
         return;
     }
 
-    switch (query_info->status)
+    switch (status)
     {
     case status_need_update:
     {
         time_countdown(&query_info->timer, 30 * 1000);
+        query_info->status = status;
     }
     break;
     case status_query:
@@ -1098,6 +637,7 @@ static void tsl_adapter_query_job_update(ez_char_t *dev_sn, dev_stauts_e status,
     case status_loading:
     {
         query_info->status = status;
+        ezos_memcpy(&query_info->download_info, download_info, sizeof(query_info->download_info));
     }
     break;
     default:
@@ -1145,12 +685,14 @@ static ez_bool_t tsl_adapter_dl_task_yeild()
         ezos_mutex_unlock(g_adapter_mutex);
 
         ezos_thread_destroy(g_download_thread);
+        g_download_thread_running = ez_true;
 
         if (0 != ezos_thread_create(&g_download_thread, dl_thread_name,
                                     ez_profile_get_thread, (void *)dl_thread_name,
                                     CONFIG_EZIOT_TSL_DOWNLOAD_STACK_SIZE,
                                     CONFIG_EZIOT_TSL_DOWNLOAD_TASK_PRIORITY))
         {
+            g_download_thread_running = ez_false;
             ezlog_e(TAG_TSL, "create profile get thread failed.");
             break;
         }
@@ -1317,7 +859,7 @@ static ez_void_t strip_msg_wrap(ez_void_t *buf, ez_tsl_value_t *tsl_data)
         js_msg = cJSON_Parse((char *)buf);
         if (NULL == js_msg)
         {
-            ezlog_e(TAG_TSL, "msg parse: %s", buf);
+            ezlog_e(TAG_TSL, "msg parse");
             break;
         }
 

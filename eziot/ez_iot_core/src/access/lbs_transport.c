@@ -102,7 +102,7 @@ static void generate_sharekey(ezdev_sdk_kernel *sdk_kernel, lbs_affair *redirect
     unsigned char sharekey_dst_hex[LBS_AUTH_MD5_LEN + 1];
 
     unsigned char sharekey_sha256_dst[LBS_AUTH_SHA256_LEN];
-    unsigned char sharekey_sha256_dst_hex[LBS_AUTH_MD5_LEN + 1];
+    unsigned char sharekey_sha256_dst_hex[LBS_AUTH_SHA256_LEN * 2 + 1];
 
     mbedtls_md_context_t sha1_ctx;
     const mbedtls_md_info_t *info_sha1 = NULL;
@@ -565,7 +565,7 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
         *remain_len -= authi_affair->global_in_packet.var_head_buf_off;
         if (*remain_len > authi_affair->global_in_packet.payload_buf_Len)
         {
-            ezlog_d(TAG_CORE, "wait_assign_response payload_buf size %d not enough for %d", authi_affair->global_in_packet.payload_buf_Len, remain_len);
+            ezlog_d(TAG_CORE, "wait_assign_response payload_buf size %d not enough for %d", authi_affair->global_in_packet.payload_buf_Len, *remain_len);
             return mkernel_internal_mem_lack;
         }
     }
@@ -1219,7 +1219,7 @@ static mkernel_internal_error parse_refreshsessionkey_ii(lbs_affair *authi_affai
     en_sessionkey_len = remain_len - authi_affair->global_in_packet.payload_buf_off;
     if (en_sessionkey_len != 32)
     {
-        ezlog_d(TAG_CORE, "parse_refreshsessionkey_ii en_sessionkey_len is:%d not 32");
+        ezlog_d(TAG_CORE, "parse_refreshsessionkey_ii en_sessionkey_len is not 32");
         return mkernel_internal_platform_appoint_error;
     }
 

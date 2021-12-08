@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/unit_test/port/linux/build/ut_iotsdk",
-            "args": [],
+            "args": ["ut_tsl_profile_prop_report_bool"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
