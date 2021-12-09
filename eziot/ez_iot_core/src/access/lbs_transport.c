@@ -583,7 +583,7 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
         ezlog_d(TAG_CORE, "wait_assign_response revc data error");
         return sdk_error;
     }
-    ezlog_v(TAG_CORE, "wait_assign_response succ, cmd:%d, len:%d", *rev_cmd, *remain_len);
+
     return mkernel_internal_succ;
 }
 
@@ -672,7 +672,7 @@ static mkernel_internal_error aes_128_encrypt_pubkey(lbs_affair *authi_affair, u
     {
         ezos_free(out_buf);
     }
-    ezlog_d(TAG_CORE, "aes_128_encrypt_pubkey end!");
+
     return mkernel_internal_succ;
 }
 
@@ -1058,10 +1058,10 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
     authi_affair->global_in_packet.payload_buf_off++;
     if (en_dev_id_len != 32)
     {
-        ezlog_d(TAG_CORE, "parse_authentication_create_dev_id en_dev_id_len is not 32");
+        ezlog_d(TAG_CORE, "en_dev_id_len invalid!");
         return mkernel_internal_platform_appoint_error;
     }
-    ezlog_d(TAG_CORE, "get en_dev_id_len :%d", en_dev_id_len);
+
     sdk_error = aes_gcm_128_dec_padding(authi_affair->master_key,
                                         authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, en_dev_id_len,
                                         dev_id, &dev_id_len, devid_tag_buf, devid_tag_buf_len);
@@ -1086,7 +1086,7 @@ static mkernel_internal_error parse_authentication_create_dev_id(lbs_affair *aut
         ezlog_d(TAG_CORE, "parse_authentication_createdevid_iv en_sessionkey_len is not 32");
         return mkernel_internal_platform_appoint_error;
     }
-    ezlog_d(TAG_CORE, "get en_sessionkey_len :%d", en_sessionkey_len);
+
     sdk_error = aes_gcm_128_dec_padding(authi_affair->master_key,
                                         authi_affair->global_in_packet.payload_buf + authi_affair->global_in_packet.payload_buf_off, en_sessionkey_len,
                                         sessionkey, &sessionkey_len, sessionkey_tag_buf, sessionkey_tag_buf_len);
@@ -2066,7 +2066,7 @@ static mkernel_internal_error json_parse_das_server_info(const char *jsonstring,
 
         das_server_info->das_port = port_json_item->valueint;
         das_server_info->das_udp_port = udpport_json_item->valueint;
-        ezlog_d("das_server_info:address:%s,port:%d", das_server_info->das_address, das_server_info->das_port);
+        ezlog_d(TAG_CORE, "das address:%s,port:%d", das_server_info->das_address, das_server_info->das_port);
     } while (0);
 
     if (NULL != json_item)

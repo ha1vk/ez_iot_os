@@ -295,7 +295,6 @@ static ez_void_t profile_list_free(ez_void_t)
     {
         ezlist_clear(&node_capacity->dev_list);
         profile_free(&node_capacity->capacity);
-        ezos_free(node_capacity);
     }
 
     ezlist_clear(&g_profile_list);

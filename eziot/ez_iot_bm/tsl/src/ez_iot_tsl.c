@@ -92,17 +92,14 @@ EZOS_API ez_err_t ez_iot_tsl_property_report(const ez_char_t *sn, const ez_tsl_r
         case EZ_TSL_DATA_TYPE_BOOL:
         case EZ_TSL_DATA_TYPE_INT:
             shadow_value.value_int = value->value_int;
-            ezlog_d(TAG_TSL, "tsl value:%d", value->value_int);
             break;
         case EZ_TSL_DATA_TYPE_DOUBLE:
             shadow_value.value_double = value->value_double;
-            ezlog_d(TAG_TSL, "tsl value:%lf", value->value_double);
             break;
         case EZ_TSL_DATA_TYPE_STRING:
         case EZ_TSL_DATA_TYPE_ARRAY:
         case EZ_TSL_DATA_TYPE_OBJECT:
             shadow_value.value = value->value;
-            ezlog_d(TAG_TSL, "tsl value:%s", (char *)value->value);
             break;
         default:
             CHECK_COND_DONE(1, EZ_TSL_ERR_PARAM_INVALID);
