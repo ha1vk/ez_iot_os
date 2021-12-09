@@ -25,7 +25,7 @@
 #include "hub_func.h"
 #include "ezlog.h"
 
-static EZ_INT g_hub_inited = 0;
+static ez_int_t g_hub_inited = 0;
 
 ez_err_t ez_iot_hub_init(ez_hub_callbacks_t *phub_cbs)
 {
@@ -54,7 +54,7 @@ ez_err_t ez_iot_hub_add(const ez_subdev_info_t *subdev_info)
     return hub_add_do(&subdev_obj);
 }
 
-ez_err_t ez_iot_hub_del(const EZ_INT8 *subdev_sn)
+ez_err_t ez_iot_hub_del(const ez_char_t *subdev_sn)
 {
     ezlog_w(TAG_HUB, "del");
 
@@ -63,7 +63,7 @@ ez_err_t ez_iot_hub_del(const EZ_INT8 *subdev_sn)
     return hub_del_do(subdev_sn);
 }
 
-ez_err_t ez_iot_hub_ver_update(const EZ_INT8 *subdev_sn, const EZ_INT8 *subdev_ver)
+ez_err_t ez_iot_hub_ver_update(const ez_char_t *subdev_sn, const ez_char_t *subdev_ver)
 {
     ezlog_w(TAG_HUB, "ver up");
 
@@ -73,7 +73,7 @@ ez_err_t ez_iot_hub_ver_update(const EZ_INT8 *subdev_sn, const EZ_INT8 *subdev_v
     return hub_ver_update_do(subdev_sn, subdev_ver);
 }
 
-ez_err_t ez_iot_hub_status_update(const EZ_INT8 *subdev_sn, EZ_BOOL online)
+ez_err_t ez_iot_hub_status_update(const ez_char_t *subdev_sn, ez_bool_t online)
 {
     ezlog_w(TAG_HUB, "sta up");
 
@@ -82,7 +82,7 @@ ez_err_t ez_iot_hub_status_update(const EZ_INT8 *subdev_sn, EZ_BOOL online)
     return hub_status_update_do(subdev_sn, online);
 }
 
-ez_err_t ez_iot_hub_subdev_query(const EZ_INT8 *subdev_sn, ez_subdev_info_t *subdev_info)
+ez_err_t ez_iot_hub_subdev_query(const ez_char_t *subdev_sn, ez_subdev_info_t *subdev_info)
 {
     ez_err_t rv = 0;
     hub_subdev_info_internal_t subdev_obj = {0};

@@ -49,7 +49,7 @@ EZ_INT hub_extern_init();
 
 EZ_INT hub_extern_finit();
 
-EZ_INT hub_send_msg_to_platform(const EZ_CHAR *msg, EZ_INT msg_len, EZ_INT cmd_id, EZ_UCHAR msg_response, EZ_UINT msg_seq);
+EZ_INT hub_send_msg_to_platform(const ez_char_t *msg, ez_int_t msg_len, ez_int_t cmd_id, ez_uchar_t msg_response, ez_uint_t msg_seq);
 
 #define CHECK_COND_RETURN(cond, errcode) \
         if ((cond))                          \
