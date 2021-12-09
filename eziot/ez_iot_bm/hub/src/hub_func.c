@@ -62,7 +62,7 @@ static ez_hub_callbacks_t g_phub_cbs = {0};
 
 static void *g_hlock = NULL;
 
-static void *g_auth_timer = NULL;
+static ez_int32_t g_auth_timer = 0;
 
 static ez_int32_t g_unauth_count = 0;
 
@@ -119,7 +119,7 @@ ez_int_t hub_func_init(const ez_hub_callbacks_t *phub_cbs)
     }
 
     g_auth_timer = eztimer_create("auth_retry_timer", (2 * 1000 * 60), false, auth_retry_timer_cb);
-    if (NULL == g_auth_timer)
+    if (g_auth_timer <= 0)
     {
         ezlog_e(TAG_AP, "start auth retry timer failed.");
     }
