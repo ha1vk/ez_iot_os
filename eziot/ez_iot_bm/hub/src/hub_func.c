@@ -1,4 +1,4 @@
- /*******************************************************************************
+/*******************************************************************************
  * Copyright © 2017-2021 Ezviz Inc.
  *
  * All rights reserved. This program and the accompanying materials
@@ -380,7 +380,7 @@ ez_err_t hub_subdev_query(const ez_char_t *subdev_sn, hub_subdev_info_internal_t
     json_to_subdev(js_item, (void *)subdev_info);
 
 done:
-     ezos_mutex_unlock(g_hlock);
+    ezos_mutex_unlock(g_hlock);
 
     SAFE_FREE(pbuf);
     SAFE_FREE(pbuf_save);
@@ -629,24 +629,24 @@ ez_int_t hub_subdev_auth_do(void *subdev_info)
         //首次MAC
         mbedtls_md5_init(&md5_ctx);
         mbedtls_md5_starts(&md5_ctx);
-        mbedtls_md5_update(&md5_ctx, _subdev_info->vcode, strlen(_subdev_info->vcode));
-        mbedtls_md5_update(&md5_ctx, sn, strlen(sn));
-        mbedtls_md5_finish(&md5_ctx, md5);
+        mbedtls_md5_update(&md5_ctx, (unsigned char *)_subdev_info->vcode, strlen(_subdev_info->vcode));
+        mbedtls_md5_update(&md5_ctx, (unsigned char *)sn, strlen(sn));
+        mbedtls_md5_finish(&md5_ctx, (unsigned char*)md5);
         mbedtls_md5_free(&md5_ctx);
-        bin2hexstr(md5, 16, 1, MAC);
+        bin2hexstr((unsigned char *)md5, 16, 1, (unsigned char *)MAC);
 
         //第二次MAC
         mbedtls_md5_init(&md5_ctx);
         mbedtls_md5_starts(&md5_ctx);
-        mbedtls_md5_update(&md5_ctx, MAC, strlen(MAC));
-        mbedtls_md5_update(&md5_ctx, HUB_AUTH_SALT, strlen(HUB_AUTH_SALT));
-        mbedtls_md5_finish(&md5_ctx, md5);
+        mbedtls_md5_update(&md5_ctx, (unsigned char *)MAC, strlen(MAC));
+        mbedtls_md5_update(&md5_ctx, (unsigned char *)HUB_AUTH_SALT, strlen(HUB_AUTH_SALT));
+        mbedtls_md5_finish(&md5_ctx, (unsigned char *)md5);
         mbedtls_md5_free(&md5_ctx);
-        bin2hexstr(md5, 16, 1, MAC);
+        bin2hexstr((unsigned char *)md5, 16, 1, (unsigned char *)MAC);
 
         //计算摘要值
-        mbedtls_md5(MAC, strlen(MAC), md5);
-        bin2hexstr(md5, 16, 1, MAC);
+        mbedtls_md5((unsigned char *)MAC, strlen(MAC), (unsigned char *)md5);
+        bin2hexstr((unsigned char *)md5, 16, 1, (unsigned char *)MAC);
     }
 
     cJSON_AddStringToObject(auth_info, "childserial", sn);
@@ -884,7 +884,7 @@ static cJSON *subdev_to_json(void *struct_obj)
     S2J_JSON_SET_string_ELEMENT(subdev_json, subdev_obj, ver);
     S2J_JSON_SET_string_ELEMENT(subdev_json, subdev_obj, uuid);
     S2J_JSON_SET_int_ELEMENT(subdev_json, subdev_obj, access);
-    
+
     return subdev_json;
 }
 
@@ -893,38 +893,53 @@ static void json_to_subdev(cJSON *json_obj, void *struct_obj)
     hub_subdev_info_internal_t *struct_obj_internal = (hub_subdev_info_internal_t *)struct_obj;
     cJSON *json_temp = NULL;
 
-    json_temp = cJSON_GetObjectItem(json_obj, "sta"); 
-    if (json_temp) (struct_obj_internal)->sta = json_temp->valueint; 
-    else (struct_obj_internal)->sta = 0; 
+    json_temp = cJSON_GetObjectItem(json_obj, "sta");
+    if (json_temp)
+        (struct_obj_internal)->sta = json_temp->valueint;
+    else
+        (struct_obj_internal)->sta = 0;
 
-    json_temp = cJSON_GetObjectItem(json_obj, "authm"); 
-    if (json_temp) (struct_obj_internal)->authm = json_temp->valueint; 
-    else (struct_obj_internal)->authm = 0; 
+    json_temp = cJSON_GetObjectItem(json_obj, "authm");
+    if (json_temp)
+        (struct_obj_internal)->authm = json_temp->valueint;
+    else
+        (struct_obj_internal)->authm = 0;
 
-    json_temp = cJSON_GetObjectItem(json_obj, "type"); 
-    if (json_temp) strncpy((struct_obj_internal)->type, json_temp->valuestring,sizeof((struct_obj_internal)->type)-1); 
-    else strncpy((struct_obj_internal)->type, "",sizeof((struct_obj_internal)->type)-1); 
+    json_temp = cJSON_GetObjectItem(json_obj, "type");
+    if (json_temp)
+        strncpy((struct_obj_internal)->type, json_temp->valuestring, sizeof((struct_obj_internal)->type) - 1);
+    else
+        strncpy((struct_obj_internal)->type, "", sizeof((struct_obj_internal)->type) - 1);
 
-    json_temp = cJSON_GetObjectItem(json_obj, "sn"); 
-    if (json_temp) strncpy((struct_obj_internal)->sn, json_temp->valuestring,sizeof((struct_obj_internal)->sn)-1); 
-    else strncpy((struct_obj_internal)->sn, "",sizeof((struct_obj_internal)->sn)-1); 
+    json_temp = cJSON_GetObjectItem(json_obj, "sn");
+    if (json_temp)
+        strncpy((struct_obj_internal)->sn, json_temp->valuestring, sizeof((struct_obj_internal)->sn) - 1);
+    else
+        strncpy((struct_obj_internal)->sn, "", sizeof((struct_obj_internal)->sn) - 1);
 
-    json_temp = cJSON_GetObjectItem(json_obj, "vcode"); 
-    if (json_temp) strncpy((struct_obj_internal)->vcode, json_temp->valuestring,sizeof((struct_obj_internal)->vcode)-1); 
-    else strncpy((struct_obj_internal)->vcode, "",sizeof((struct_obj_internal)->vcode)-1);
+    json_temp = cJSON_GetObjectItem(json_obj, "vcode");
+    if (json_temp)
+        strncpy((struct_obj_internal)->vcode, json_temp->valuestring, sizeof((struct_obj_internal)->vcode) - 1);
+    else
+        strncpy((struct_obj_internal)->vcode, "", sizeof((struct_obj_internal)->vcode) - 1);
 
-    json_temp = cJSON_GetObjectItem(json_obj, "ver"); 
-    if (json_temp) strncpy((struct_obj_internal)->ver, json_temp->valuestring,sizeof((struct_obj_internal)->ver)-1); 
-    else strncpy((struct_obj_internal)->ver, "",sizeof((struct_obj_internal)->ver)-1);    
+    json_temp = cJSON_GetObjectItem(json_obj, "ver");
+    if (json_temp)
+        strncpy((struct_obj_internal)->ver, json_temp->valuestring, sizeof((struct_obj_internal)->ver) - 1);
+    else
+        strncpy((struct_obj_internal)->ver, "", sizeof((struct_obj_internal)->ver) - 1);
 
-    json_temp = cJSON_GetObjectItem(json_obj, "uuid"); 
-    if (json_temp) strncpy((struct_obj_internal)->uuid, json_temp->valuestring,sizeof((struct_obj_internal)->uuid)-1); 
-    else strncpy((struct_obj_internal)->uuid, "",sizeof((struct_obj_internal)->uuid)-1);  
+    json_temp = cJSON_GetObjectItem(json_obj, "uuid");
+    if (json_temp)
+        strncpy((struct_obj_internal)->uuid, json_temp->valuestring, sizeof((struct_obj_internal)->uuid) - 1);
+    else
+        strncpy((struct_obj_internal)->uuid, "", sizeof((struct_obj_internal)->uuid) - 1);
 
-    json_temp = cJSON_GetObjectItem(json_obj, "access"); 
-    if (json_temp) (struct_obj_internal)->access = json_temp->valueint; 
-    else (struct_obj_internal)->access = 0; 
-
+    json_temp = cJSON_GetObjectItem(json_obj, "access");
+    if (json_temp)
+        (struct_obj_internal)->access = json_temp->valueint;
+    else
+        (struct_obj_internal)->access = 0;
 }
 
 static void subdev_to_relation_lst(cJSON *json_relation_lst, void *struct_obj)
@@ -938,7 +953,7 @@ static void subdev_to_relation_lst(cJSON *json_relation_lst, void *struct_obj)
     strncpy(struct_obj_report.type, struct_obj_internal->type, sizeof(struct_obj_report.childdevid) - 1);
     strncpy(struct_obj_report.version, struct_obj_internal->ver, sizeof(struct_obj_report.childdevid) - 1);
 
-    S2J_JSON_SET_int_ELEMENT(subdev_json, &struct_obj_report,connected);
+    S2J_JSON_SET_int_ELEMENT(subdev_json, &struct_obj_report, connected);
     S2J_JSON_SET_string_ELEMENT(subdev_json, &struct_obj_report, childdevid);
     S2J_JSON_SET_string_ELEMENT(subdev_json, &struct_obj_report, version);
     S2J_JSON_SET_string_ELEMENT(subdev_json, &struct_obj_report, type);
@@ -1027,7 +1042,7 @@ static void hub_subdev_auth_failure(ez_char_t *subdev_sn)
     hub_del_do(subdev_sn);
 }
 
-void  auth_retry_timer_cb(void)
+void auth_retry_timer_cb(void)
 {
     ezlog_d(TAG_HUB, "auth retry cb in");
     ez_err_t rv = 0;
@@ -1064,5 +1079,5 @@ void  auth_retry_timer_cb(void)
 
 done:
     ezlog_d(TAG_HUB, "auth retry cb out");
-    return ;
+    return;
 }
