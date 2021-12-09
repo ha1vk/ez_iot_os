@@ -15,13 +15,13 @@ static ezconn_ctx_t g_conn_ctx = {0};
 static ez_bool_t g_exit_flag = ez_true;
 static ez_bool_t g_server_busy = ez_false;
 
-int32_t ezconn_set_busy_state(ez_bool_t is_busy)
+ez_int32_t ezconn_set_busy_state(ez_bool_t is_busy)
 {
     g_server_busy = is_busy;
     return 0;
 }
 
-int32_t ezconn_set_exit_state(ez_bool_t is_exit)
+ez_int32_t ezconn_set_exit_state(ez_bool_t is_exit)
 {
     g_exit_flag = is_exit;
     return 0;

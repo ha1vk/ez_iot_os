@@ -122,7 +122,7 @@ ez_err_t tsl_storage_save(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev
     else
     {
         pbuf = ezos_malloc(tslmap_len + 1);
-        CHECK_COND_DONE(!js_root, -1);
+        CHECK_COND_DONE(!pbuf, -1);
         ezos_memset(pbuf, 0, tslmap_len + 1);
 
         CHECK_COND_DONE(ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_TSLMAP, pbuf, &tslmap_len), -1);

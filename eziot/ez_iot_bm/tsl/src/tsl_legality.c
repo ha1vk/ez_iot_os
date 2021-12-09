@@ -9,9 +9,8 @@
 #include "tsl_adapter.h"
 #include "tsl_profile.h"
 
-static ez_err_t check_schema_value(const ez_void_t *schema_dsc, const ez_void_t *tsl_value);
-
 #ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
+static ez_err_t check_schema_value(const ez_void_t *schema_dsc, const ez_void_t *tsl_value);
 static int check_object_value(tsl_schema_desc *schema, ez_tsl_value_t *value);
 static int check_array_value(tsl_schema_desc *schema, ez_tsl_value_t *value);
 static int check_string_value(tsl_schema_desc *schema, ez_tsl_value_t *value);
@@ -70,7 +69,7 @@ ez_err_t tsl_legality_property_check(const ez_char_t *sn, const ez_tsl_rsc_t *rs
         }
     }
 
-    CHECK_COND_DONE(k == capacity->resource[i].domain[j].prop_num, EZ_TSL_ERR_KEY_NOT_FOUND);
+    CHECK_COND_DONE(!prop, EZ_TSL_ERR_KEY_NOT_FOUND);
 
 #ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
     if (value)
@@ -140,7 +139,7 @@ ez_err_t tsl_legality_event_check(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_i
         }
     }
 
-    CHECK_COND_DONE(k == capacity->resource[i].domain[j].event_num, EZ_TSL_ERR_KEY_NOT_FOUND);
+    CHECK_COND_DONE(!event, EZ_TSL_ERR_KEY_NOT_FOUND);
 
 #ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
     if (value)
@@ -158,11 +157,12 @@ done:
     return rv;
 }
 
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
+
 static ez_err_t check_schema_value(const ez_void_t *schema_dsc, const ez_void_t *tsl_value)
 {
     ez_err_t ret = EZ_TSL_ERR_SUCC;
 
-#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
     tsl_schema_desc *schema = (tsl_schema_desc *)schema_dsc;
     ez_tsl_value_t *value = (ez_tsl_value_t *)tsl_value;
 
@@ -207,10 +207,10 @@ static ez_err_t check_schema_value(const ez_void_t *schema_dsc, const ez_void_t 
     default:
         break;
     }
-#endif //CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 
     return ret;
 }
+#endif //CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 
 #ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
 static int check_int_value(tsl_schema_desc *schema, ez_tsl_value_t *value)

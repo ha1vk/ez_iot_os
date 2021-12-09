@@ -45,21 +45,21 @@ extern "C"
     // 设备信息，用于ap初始化
     typedef struct
     {
-        ez_int8_t ap_ssid[32 + 1];      // ap ssid
-        ez_int8_t ap_pwd[64 + 1];       // ap password, 不需要密码则传空
+        ez_char_t ap_ssid[32 + 1];      // ap ssid
+        ez_char_t ap_pwd[64 + 1];       // ap password, 不需要密码则传空
         ez_int8_t auth_mode;            // ap auth mode, 0 for no ap_password 
         ez_uint8_t channel;             // ap channel
 
         ez_int8_t ap_timeout;           // 配网超时时间，单位min
         ez_bool_t apsta_coexist;        // 是否支持ap station模式共存
-        ez_int8_t res[2];
+        ez_char_t res[2];
     } ezconn_ap_info_t;
 
     typedef struct 
     {
-        ez_int8_t dev_serial[72];        // 设备序列号
-        ez_int8_t dev_type[64];          // 设备类型
-        ez_int8_t dev_version[64];       // 设备版本号
+        ez_char_t dev_serial[72];        // 设备序列号
+        ez_char_t dev_type[64];          // 设备类型
+        ez_char_t dev_version[64];       // 设备版本号
     } ezconn_dev_info_t;
 
     typedef enum
@@ -74,15 +74,15 @@ extern "C"
     // 配网过程获取到的信息
     typedef struct
     {
-        ez_int8_t ssid[32+1];        // 设备连接的wifi ssid
-        ez_int8_t password[64+1];    // 设备连接的wifi password
-        ez_int8_t res[2];
+        ez_char_t ssid[32+1];        // 设备连接的wifi ssid
+        ez_char_t password[64+1];    // 设备连接的wifi password
+        ez_char_t res[2];
 
-        ez_int8_t cc[4];             // 国家码cc
-        ez_int8_t token[128];        // app端校验的token
+        ez_char_t cc[4];             // 国家码cc
+        ez_char_t token[128];        // app端校验的token
     
-        ez_int8_t domain[128];       // 设备注册平台地址;
-        ez_int8_t device_id[32];     // 设备uuid，可选配置
+        ez_char_t domain[128];       // 设备注册平台地址;
+        ez_char_t device_id[32];     // 设备uuid，可选配置
     } ezconn_wifi_info_t;
 
     /**
@@ -120,7 +120,7 @@ extern "C"
      *  @return     成功：EZCONN_SUCC，失败：other
      *  @info       需要在ezconn_wifi_config之后调用
      */
-    ez_err_t ezconn_sta_start(ez_int8_t *ssid, ez_int8_t *password);
+    ez_err_t ezconn_sta_start(ez_char_t *ssid, ez_char_t *password);
     
     /**
      *  @brief      station模式停止

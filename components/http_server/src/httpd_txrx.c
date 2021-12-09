@@ -56,7 +56,7 @@ ez_err_t httpd_sess_set_pending_override(httpd_handle_t hd, ez_int32_t sockfd, h
     return EZHTTPD_ERRNO_SUCC;
 }
 
-ez_int32_t httpd_send(httpd_req_t *r, const ez_int8_t *buf, ez_size_t buf_len)
+ez_int32_t httpd_send(httpd_req_t *r, const ez_char_t *buf, ez_size_t buf_len)
 {
     if (r == NULL || buf == NULL)
     {
@@ -78,7 +78,7 @@ ez_int32_t httpd_send(httpd_req_t *r, const ez_int8_t *buf, ez_size_t buf_len)
     return ret;
 }
 
-static ez_err_t httpd_send_all(httpd_req_t *r, const ez_int8_t *buf, ez_size_t buf_len)
+static ez_err_t httpd_send_all(httpd_req_t *r, const ez_char_t *buf, ez_size_t buf_len)
 {
     struct httpd_req_aux *ra = r->aux;
     ez_int32_t ret;
@@ -98,7 +98,7 @@ static ez_err_t httpd_send_all(httpd_req_t *r, const ez_int8_t *buf, ez_size_t b
     return EZHTTPD_ERRNO_SUCC;
 }
 
-static ez_size_t httpd_recv_pending(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len)
+static ez_size_t httpd_recv_pending(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len)
 {
     struct httpd_req_aux *ra = r->aux;
     size_t offset = sizeof(ra->sd->pending_data) - ra->sd->pending_len;
@@ -111,7 +111,7 @@ static ez_size_t httpd_recv_pending(httpd_req_t *r, ez_int8_t *buf, ez_size_t bu
     return buf_len;
 }
 
-ez_int32_t httpd_recv_with_opt(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len, ez_bool_t halt_after_pending)
+ez_int32_t httpd_recv_with_opt(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len, ez_bool_t halt_after_pending)
 {
     ezlog_v(TAG, LOG_FMT("requested length = %d"), buf_len);
 
@@ -121,7 +121,7 @@ ez_int32_t httpd_recv_with_opt(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len
     /* First fetch pending data from local buffer */
     if (ra->sd->pending_len > 0)
     {
-        ezlog_v(TAG, LOG_FMT("pending length = %d"), ra->sd->pending_len);
+        ezlog_v(TAG, LOG_FMT("pending length = %zu"), ra->sd->pending_len);
         pending_len = httpd_recv_pending(r, buf, buf_len);
         buf += pending_len;
         buf_len -= pending_len;
@@ -157,12 +157,12 @@ ez_int32_t httpd_recv_with_opt(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len
     return ret + pending_len;
 }
 
-ez_int32_t httpd_recv(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len)
+ez_int32_t httpd_recv(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len)
 {
     return httpd_recv_with_opt(r, buf, buf_len, false);
 }
 
-ez_size_t httpd_unrecv(struct httpd_req *r, const ez_int8_t *buf, ez_size_t buf_len)
+ez_size_t httpd_unrecv(struct httpd_req *r, const ez_char_t *buf, ez_size_t buf_len)
 {
     struct httpd_req_aux *ra = r->aux;
     /* Truncate if external buf_len is greater than pending_data buffer size */
@@ -170,8 +170,8 @@ ez_size_t httpd_unrecv(struct httpd_req *r, const ez_int8_t *buf, ez_size_t buf_
 
     /* Copy data into internal pending_data buffer */
     ez_size_t offset = sizeof(ra->sd->pending_data) - ra->sd->pending_len;
-    ezos_memcpy(ra->sd->pending_data + offset, buf, buf_len);
-    ezlog_v(TAG, LOG_FMT("length = %d"), ra->sd->pending_len);
+    ezos_memcpy(ra->sd->pending_data + offset, buf, ra->sd->pending_len);
+    ezlog_v(TAG, LOG_FMT("length = %zu"), ra->sd->pending_len);
     return ra->sd->pending_len;
 }
 
@@ -179,7 +179,7 @@ ez_size_t httpd_unrecv(struct httpd_req *r, const ez_int8_t *buf, ez_size_t buf_
  * This API appends an additional header field-value pair in the HTTP response.
  * But the header isn't sent out until any of the send APIs is executed.
  */
-ez_err_t httpd_resp_set_hdr(httpd_req_t *r, const ez_int8_t *field, const ez_int8_t *value)
+ez_err_t httpd_resp_set_hdr(httpd_req_t *r, const ez_char_t *field, const ez_char_t *value)
 {
     if (r == NULL || field == NULL || value == NULL)
     {
@@ -213,7 +213,7 @@ ez_err_t httpd_resp_set_hdr(httpd_req_t *r, const ez_int8_t *field, const ez_int
  * This API sets the status of the HTTP response to the value specified.
  * But the status isn't sent out until any of the send APIs is executed.
  */
-ez_err_t httpd_resp_set_status(httpd_req_t *r, const ez_int8_t *status)
+ez_err_t httpd_resp_set_status(httpd_req_t *r, const ez_char_t *status)
 {
     if (r == NULL || status == NULL)
     {
@@ -234,7 +234,7 @@ ez_err_t httpd_resp_set_status(httpd_req_t *r, const ez_int8_t *status)
  * This API sets the method/type of the HTTP response to the value specified.
  * But the method isn't sent out until any of the send APIs is executed.
  */
-ez_err_t httpd_resp_set_type(httpd_req_t *r, const ez_int8_t *type)
+ez_err_t httpd_resp_set_type(httpd_req_t *r, const ez_char_t *type)
 {
     if (r == NULL || type == NULL)
     {
@@ -251,7 +251,7 @@ ez_err_t httpd_resp_set_type(httpd_req_t *r, const ez_int8_t *type)
     return EZHTTPD_ERRNO_SUCC;
 }
 
-ez_err_t httpd_resp_send(httpd_req_t *r, const ez_int8_t *buf, ez_ssize_t buf_len)
+ez_err_t httpd_resp_send(httpd_req_t *r, const ez_char_t *buf, ez_ssize_t buf_len)
 {
     if (r == NULL)
     {
@@ -329,7 +329,7 @@ ez_err_t httpd_resp_send(httpd_req_t *r, const ez_int8_t *buf, ez_ssize_t buf_le
     return EZHTTPD_ERRNO_SUCC;
 }
 
-ez_err_t httpd_resp_send_chunk(httpd_req_t *r, const ez_int8_t *buf, ez_ssize_t buf_len)
+ez_err_t httpd_resp_send_chunk(httpd_req_t *r, const ez_char_t *buf, ez_ssize_t buf_len)
 {
     if (r == NULL)
     {
@@ -499,7 +499,7 @@ ez_err_t httpd_resp_send_err(httpd_req_t *req, httpd_err_resp_t error)
     return httpd_resp_send(req, msg, ezos_strlen(msg));
 }
 
-ez_int32_t httpd_req_recv(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len)
+ez_int32_t httpd_req_recv(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len)
 {
     if (r == NULL || buf == NULL)
     {
@@ -513,7 +513,7 @@ ez_int32_t httpd_req_recv(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len)
     }
 
     struct httpd_req_aux *ra = r->aux;
-    ezlog_v(TAG, LOG_FMT("remaining length = %d"), ra->remaining_len);
+    ezlog_v(TAG, LOG_FMT("remaining length = %zu"), ra->remaining_len);
 
     if (buf_len > ra->remaining_len)
     {
@@ -556,7 +556,7 @@ static int httpd_sock_err(const char *ctx, int sockfd)
 {
     int errval;
     int sock_err;
-    size_t sock_err_len = sizeof(sock_err);
+    int sock_err_len = sizeof(sock_err);
 
     if (ezos_getsockopt(sockfd, EZ_SOL_SOCKET, EZ_SO_ERROR, &sock_err, &sock_err_len) < 0)
     {
@@ -583,7 +583,7 @@ static int httpd_sock_err(const char *ctx, int sockfd)
     return errval;
 }
 
-ez_int32_t httpd_default_send(httpd_handle_t hd, ez_int32_t sockfd, const ez_int8_t *buf, ez_size_t buf_len, ez_int32_t flags)
+ez_int32_t httpd_default_send(httpd_handle_t hd, ez_int32_t sockfd, const ez_char_t *buf, ez_size_t buf_len, ez_int32_t flags)
 {
     (void)hd;
     if (buf == NULL)
@@ -599,7 +599,7 @@ ez_int32_t httpd_default_send(httpd_handle_t hd, ez_int32_t sockfd, const ez_int
     return ret;
 }
 
-ez_int32_t httpd_default_recv(httpd_handle_t hd, ez_int32_t sockfd, ez_int8_t *buf, ez_size_t buf_len, ez_int32_t flags)
+ez_int32_t httpd_default_recv(httpd_handle_t hd, ez_int32_t sockfd, ez_char_t *buf, ez_size_t buf_len, ez_int32_t flags)
 {
     (void)hd;
     if (buf == NULL)

@@ -73,16 +73,16 @@ static ez_err_t verify_url(http_parser *parser)
     const char *at = parser_data->last.at;
     size_t length = parser_data->last.length;
 
-    if ((r->method = parser->method) < 0)
-    {
-        ezlog_w(TAG, LOG_FMT("HTTP Operation not supported"));
-        parser_data->error = HTTPD_501_METHOD_NOT_IMPLEMENTED;
-        return EZHTTPD_ERRNO_FAIL;
-    }
+//    if ((r->method = parser->method) < 0)
+//    {
+//        ezlog_w(TAG, LOG_FMT("HTTP Operation not supported"));
+//        parser_data->error = HTTPD_501_METHOD_NOT_IMPLEMENTED;
+//        return EZHTTPD_ERRNO_FAIL;
+//    }
 
     if (sizeof(r->uri) < (length + 1))
     {
-        ezlog_w(TAG, LOG_FMT("URI length (%d) greater than supported (%d)"),
+        ezlog_w(TAG, LOG_FMT("URI length (%zu) greater than supported (%zu)"),
                  length, sizeof(r->uri));
         parser_data->error = HTTPD_414_URI_TOO_LONG;
         parser_data->status = PARSING_FAILED;
@@ -92,7 +92,7 @@ static ez_err_t verify_url(http_parser *parser)
     /* Keep URI with terminating null character. Note URI string pointed
      * by 'at' is not NULL terminated, therefore use length provided by
      * parser while copying the URI to buffer */
-    strlcpy((char *)r->uri, at, (length + 1));
+    strncpy((char *)r->uri, at, length);
     ezlog_v(TAG, LOG_FMT("received URI = %s"), r->uri);
 
     /* Make sure version is HTTP/1.1 */
@@ -106,7 +106,7 @@ static ez_err_t verify_url(http_parser *parser)
 
     /* Parse URL and keep result for later */
     http_parser_url_init(res);
-    if (http_parser_parse_url(r->uri, strlen(r->uri),
+    if (http_parser_parse_url(r->uri, ezos_strlen((char *)r->uri),
                               r->method == HTTP_CONNECT, res))
     {
         ezlog_w(TAG, LOG_FMT("http_parser_parse_url failed with errno = %d"),
@@ -141,12 +141,12 @@ static ez_err_t cb_url(http_parser *parser,
         return EZHTTPD_ERRNO_FAIL;
     }
 
-    ezlog_v(TAG, LOG_FMT("processing url = %.*s"), length, at);
+    ezlog_v(TAG, LOG_FMT("processing url = %.*s"), (int)length, at);
 
     /* Update length of URL string */
     if ((parser_data->last.length += length) > HTTPD_MAX_URI_LEN)
     {
-        ezlog_w(TAG, LOG_FMT("URI length (%d) greater than supported (%d)"),
+        ezlog_w(TAG, LOG_FMT("URI length (%zu) greater than supported (%d)"),
                  parser_data->last.length, HTTPD_MAX_URI_LEN);
         parser_data->error = HTTPD_414_URI_TOO_LONG;
         parser_data->status = PARSING_FAILED;
@@ -163,9 +163,9 @@ static ez_err_t pause_parsing(http_parser *parser, const char *at)
 
     parser_data->pre_parsed = parser_data->raw_datalen - (at - ra->scratch);
 
-    if (parser_data->pre_parsed != httpd_unrecv(r, at, parser_data->pre_parsed))
+    if (parser_data->pre_parsed != httpd_unrecv(r, (ez_char_t *)at, parser_data->pre_parsed))
     {
-        ezlog_e(TAG, LOG_FMT("data too large for un-recv = %d"),
+        ezlog_e(TAG, LOG_FMT("data too large for un-recv = %zu"),
                  parser_data->pre_parsed);
         return EZHTTPD_ERRNO_FAIL;
     }
@@ -184,7 +184,7 @@ static size_t continue_parsing(http_parser *parser, size_t length)
      * so we must skip that */
     length = MIN(length, data->pre_parsed);
     data->pre_parsed -= length;
-    ezlog_v(TAG, LOG_FMT("skip pre-parsed data of size = %d"), length);
+    ezlog_v(TAG, LOG_FMT("skip pre-parsed data of size = %zu"), length);
 
     http_parser_pause(parser, 0);
     data->paused = false;
@@ -242,7 +242,7 @@ static ez_err_t cb_header_field(http_parser *parser, const char *at, size_t leng
         return EZHTTPD_ERRNO_FAIL;
     }
 
-    ezlog_v(TAG, LOG_FMT("processing field = %.*s"), length, at);
+    ezlog_v(TAG, LOG_FMT("processing field = %.*s"), (int)length, at);
 
     /* Update length of header string */
     parser_data->last.length += length;
@@ -275,7 +275,7 @@ static ez_err_t cb_header_value(http_parser *parser, const char *at, size_t leng
         return EZHTTPD_ERRNO_FAIL;
     }
 
-    ezlog_v(TAG, LOG_FMT("processing value = %.*s"), length, at);
+    ezlog_v(TAG, LOG_FMT("processing value = %.*s"), (int)length, at);
 
     /* Update length of header string */
     parser_data->last.length += length;
@@ -321,7 +321,7 @@ static ez_err_t cb_headers_complete(http_parser *parser)
     r->content_len = ((int)parser->content_length != -1 ? parser->content_length : 0);
 
     ezlog_v(TAG, LOG_FMT("bytes read     = %d"), parser->nread);
-    ezlog_v(TAG, LOG_FMT("content length = %zu"), r->content_len);
+    ezlog_v(TAG, LOG_FMT("content length = %d"), r->content_len);
 
     if (parser->upgrade)
     {
@@ -506,13 +506,13 @@ static int parse_block(http_parser *parser, size_t offset, size_t length)
         /* http_parser error */
         data->status = PARSING_FAILED;
         data->error = HTTPD_400_BAD_REQUEST;
-        ezlog_w(TAG, LOG_FMT("incomplete (%d/%d) with parser error = %d"),
+        ezlog_w(TAG, LOG_FMT("incomplete (%zu/%zu) with parser error = %d"),
                  nparsed, length, parser->http_errno);
         return -1;
     }
 
     /* Continue parsing this section of HTTP request packet */
-    ezlog_v(TAG, LOG_FMT("parsed block size = %d"), offset + nparsed);
+    ezlog_v(TAG, LOG_FMT("parsed block size = %zu"), offset + nparsed);
     return offset + nparsed;
 }
 
@@ -703,7 +703,7 @@ bool httpd_validate_req_ptr(httpd_req_t *r)
 }
 
 /* Helper function to get a URL query tag from a query string of the type param1=val1&param2=val2 */
-ez_err_t httpd_query_key_value(const ez_int8_t *qry_str, const ez_int8_t *key, ez_int8_t *val, ez_size_t val_size)
+ez_err_t httpd_query_key_value(const ez_char_t *qry_str, const ez_char_t *key, ez_char_t *val, ez_size_t val_size)
 {
     if (qry_str == NULL || key == NULL || val == NULL)
     {
@@ -754,7 +754,7 @@ ez_err_t httpd_query_key_value(const ez_int8_t *qry_str, const ez_int8_t *key, e
         val_size = qry_ptr - val_ptr + 1;
 
         /* Copy value to the caller's buffer. */
-        strlcpy(val, val_ptr, MIN(val_size, buf_len));
+        strncpy(val, val_ptr, MIN(val_size, buf_len) - 1);
 
         /* If buffer length is smaller than needed, return truncation error */
         if (buf_len < val_size)
@@ -790,7 +790,7 @@ ez_size_t httpd_req_get_url_query_len(httpd_req_t *r)
     return 0;
 }
 
-ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len)
+ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len)
 {
     if (r == NULL || buf == NULL)
     {
@@ -814,7 +814,7 @@ ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_int8_t *buf, ez_size_t b
          * null terminated query string */
         size_t min_buf_len = res->field_data[UF_QUERY].len + 1;
 
-        strlcpy(buf, qry, MIN(buf_len, min_buf_len));
+        strncpy(buf, qry, MIN(buf_len, min_buf_len) - 1);
         if (buf_len < min_buf_len)
         {
             return EZHTTPD_ERRNO_RESULT_TRUNC;
@@ -825,7 +825,7 @@ ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_int8_t *buf, ez_size_t b
 }
 
 /* Get the length of the value string of a header request field */
-ez_size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const ez_int8_t *field)
+ez_size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const ez_char_t *field)
 {
     if (r == NULL || field == NULL)
     {
@@ -876,7 +876,7 @@ ez_size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const ez_int8_t *field)
 }
 
 /* Get the value of a field from the request headers */
-ez_err_t httpd_req_get_hdr_value_str(httpd_req_t *r, const ez_int8_t *field, ez_int8_t *val, ez_size_t val_size)
+ez_err_t httpd_req_get_hdr_value_str(httpd_req_t *r, const ez_char_t *field, ez_char_t *val, ez_size_t val_size)
 {
     if (r == NULL || field == NULL)
     {
@@ -925,7 +925,7 @@ ez_err_t httpd_req_get_hdr_value_str(httpd_req_t *r, const ez_int8_t *field, ez_
         }
 
         /* Get the NULL terminated value and copy it to the caller's buffer. */
-        strlcpy(val, val_ptr, buf_len);
+        strncpy(val, val_ptr, buf_len - 1);
 
         /* Update value length, including one byte for null */
         val_size = strlen(val_ptr) + 1;

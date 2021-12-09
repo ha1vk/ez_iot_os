@@ -214,7 +214,7 @@ void elog_start(void) {
 #endif
 
     /* show version */
-    log_i("EasyLogger V%s is initialize success.", ELOG_SW_VERSION);
+    // log_v("EasyLogger V%s is initialize success.", ELOG_SW_VERSION);
 }
 
 /**

@@ -85,18 +85,17 @@ static int rnd_pseudo_rand( void *rng_state, unsigned char *output, size_t len )
 mkernel_internal_error ezdev_generate_publickey(mbedtls_ecdh_context* ctx_client, unsigned char* pubkey, EZDEV_SDK_UINT32* pubkey_len)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
-    unsigned char buf[1000];
+    unsigned char buf[128];
     size_t public_key_len = 0;
     rnd_pseudo_info rnd_info;
     int  ret = 0;
 
-    ezlog_d(TAG_CORE, "generate_public_key enter");
     do
     {
         if(ctx_client == NULL || pubkey == NULL || pubkey_len == NULL)
         {
             sdk_error = mkernel_internal_input_param_invalid;
-            ezlog_w(TAG_CORE, "generate_public_key input param error");
+            ezlog_e(TAG_CORE, "generate_public_key input param error");
             break;
         }
 
@@ -104,7 +103,7 @@ mkernel_internal_error ezdev_generate_publickey(mbedtls_ecdh_context* ctx_client
         if(ret != 0)
         {   
             sdk_error = mkernel_internal_mbedtls_ecp_group_load_err;
-            ezlog_w(TAG_CORE, "ecp_group_load err,ret: %d", ret);
+            ezlog_e(TAG_CORE, "ecp_group_load err,ret: %d", ret);
             break;
         }
 
@@ -114,9 +113,10 @@ mkernel_internal_error ezdev_generate_publickey(mbedtls_ecdh_context* ctx_client
         if(ret != 0)
         {   
             sdk_error = mkernel_internal_mbedtls_ecdh_read_public_err;
-            ezlog_w(TAG_CORE, "ecdh_make_public err,ret:%d", ret);
+            ezlog_e(TAG_CORE, "ecdh_make_public err,ret:%d", ret);
             break;
         } 
+
         /*首字节表示publickey的长度，这里要注意*/
         ezos_memcpy(pubkey, buf + 1, public_key_len -1);
         *pubkey_len = public_key_len -1;
@@ -135,7 +135,6 @@ mkernel_internal_error ezdev_generate_masterkey(mbedtls_ecdh_context* ctx_client
     rnd_pseudo_info rnd_info;
     size_t master_key_len = 0;
     unsigned char input_key[ezdev_sdk_ecdh_key_len+1]={0};
-    ezlog_d(TAG_CORE, "generate_master_key enter! ");
     
     do
     {

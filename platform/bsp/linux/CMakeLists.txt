@@ -3,7 +3,7 @@
 # @version 0.1
 # @date 2021-09-29
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 2.8)
 
 ####### Prepare building environment ##########
 get_filename_component(EZOS_PATH ../../../ ABSOLUTE)

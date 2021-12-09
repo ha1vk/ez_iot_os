@@ -53,16 +53,24 @@ static ez_err_t httpd_accept_conn(struct httpd_data *hd, ez_int32_t listen_fd)
     }
     ezlog_v(TAG, LOG_FMT("newfd = %d"), new_fd);
 
+    int rv = EZHTTPD_ERRNO_SUCC;
     ezos_timeval_t tv;
     /* Set recv timeout of this fd as per config */
     tv.tv_sec = hd->config.recv_wait_timeout;
     tv.tv_usec = 0;
-    ezos_setsockopt(new_fd, EZ_SOL_SOCKET, EZ_SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
+    rv |= ezos_setsockopt(new_fd, EZ_SOL_SOCKET, EZ_SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
 
     /* Set send timeout of this fd as per config */
     tv.tv_sec = hd->config.send_wait_timeout;
     tv.tv_usec = 0;
-    ezos_setsockopt(new_fd, EZ_SOL_SOCKET, EZ_SO_SNDTIMEO, (const char *)&tv, sizeof(tv));
+    rv |= ezos_setsockopt(new_fd, EZ_SOL_SOCKET, EZ_SO_SNDTIMEO, (const char *)&tv, sizeof(tv));
+    
+    if (EZHTTPD_ERRNO_SUCC != rv)
+    {
+        ezlog_w(TAG, "set socket option failed.");
+        ezos_closesocket(new_fd);
+        return EZHTTPD_ERRNO_FAIL;
+    }
 
     if (EZHTTPD_ERRNO_SUCC != httpd_sess_new(hd, new_fd))
     {

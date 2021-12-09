@@ -1561,7 +1561,7 @@ static mkernel_internal_error das_subscribe_revc_topic(ezdev_sdk_kernel *sdk_ker
             mqtt_result_code = MQTTUnsubscribe(&g_DasClient, subscribe_topic);
             if (mqtt_result_code != 0)
             {
-                ezlog_w(TAG_CORE, "mqtt unsubscribe:%s error, code:%d", subscribe_topic, mqtt_result_code);
+                ezlog_v(TAG_CORE, "mqtt unsubscribe:%s error, code:%d", subscribe_topic, mqtt_result_code);
             }
         }
         ezos_memset(subscribe_topic, 0, ezdev_sdk_recv_topic_len);
@@ -1569,7 +1569,7 @@ static mkernel_internal_error das_subscribe_revc_topic(ezdev_sdk_kernel *sdk_ker
         mqtt_result_code = MQTTUnsubscribe(&g_DasClient, subscribe_topic);
         if (mqtt_result_code != 0)
         {
-            ezlog_w(TAG_CORE, "mqtt unsubscribe:%s error, code:%d", subscribe_topic, mqtt_result_code);
+            ezlog_v(TAG_CORE, "mqtt unsubscribe:%s error, code:%d", subscribe_topic, mqtt_result_code);
         }
     }
     return mkernel_internal_succ;

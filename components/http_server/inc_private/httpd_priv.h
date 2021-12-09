@@ -446,7 +446,7 @@ extern "C"
  *  - Length of data : if successful
  *  - ez_errno_fail       : if failed
  */
-    ez_int32_t httpd_send(httpd_req_t *r, const ez_int8_t *buf, ez_size_t buf_len);
+    ez_int32_t httpd_send(httpd_req_t *r, const ez_char_t *buf, ez_size_t buf_len);
 
     /**
  * @brief   For receiving HTTP request data
@@ -468,7 +468,7 @@ extern "C"
  *  - Length of data : if successful
  *  - ez_errno_fail       : if failed
  */
-    ez_int32_t httpd_recv_with_opt(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len, ez_bool_t halt_after_pending);
+    ez_int32_t httpd_recv_with_opt(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len, ez_bool_t halt_after_pending);
 
     /**
  * @brief   For un-receiving HTTP request data
@@ -488,7 +488,7 @@ extern "C"
  *
  * @return  Length of data copied into pending buffer
  */
-    ez_size_t httpd_unrecv(struct httpd_req *r, const ez_int8_t *buf, ez_size_t buf_len);
+    ez_size_t httpd_unrecv(struct httpd_req *r, const ez_char_t *buf, ez_size_t buf_len);
 
     /**
  * @brief   This is the low level default send function of the HTTPD. This should
@@ -505,7 +505,7 @@ extern "C"
  *  - Length of data : if successful
  *  - -1             : if failed (appropriate errno is set)
  */
-    ez_int32_t httpd_default_send(httpd_handle_t hd, ez_int32_t sockfd, const ez_int8_t *buf, ez_size_t buf_len, ez_int32_t flags);
+    ez_int32_t httpd_default_send(httpd_handle_t hd, ez_int32_t sockfd, const ez_char_t *buf, ez_size_t buf_len, ez_int32_t flags);
 
     /**
  * @brief   This is the low level default recv function of the HTTPD. This should
@@ -522,7 +522,7 @@ extern "C"
  *  - Length of data : if successful
  *  - -1             : if failed (appropriate errno is set)
  */
-    ez_int32_t httpd_default_recv(httpd_handle_t hd, ez_int32_t sockfd, ez_int8_t *buf, ez_size_t buf_len, ez_int32_t flags);
+    ez_int32_t httpd_default_recv(httpd_handle_t hd, ez_int32_t sockfd, ez_char_t *buf, ez_size_t buf_len, ez_int32_t flags);
 
     /** End of Group : Send and Receive
  * @}

@@ -1,33 +1,26 @@
 /*******************************************************************************
-*
-*               COPYRIGHT (c) 2015-2016 Broadlink Corporation
-*                         All Rights Reserved
-*
-* The source code contained or described herein and all documents
-* related to the source code ("Material") are owned by Broadlink
-* Corporation or its licensors.  Title to the Material remains
-* with Broadlink Corporation or its suppliers and licensors.
-*
-* The Material is protected by worldwide copyright and trade secret
-* laws and treaty provisions. No part of the Material may be used,
-* copied, reproduced, modified, published, uploaded, posted, transmitted,
-* distributed, or disclosed in any way except in accordance with the
-* applicable license agreement.
-*
-* No license under any patent, copyright, trade secret or other
-* intellectual property right is granted to or conferred upon you by
-* disclosure or delivery of the Materials, either expressly, by
-* implication, inducement, estoppel, except in accordance with the
-* applicable license agreement.
-*
-* Unless otherwise agreed by Broadlink in writing, you may not remove or
-* alter this notice or any other notice embedded in Materials by Broadlink
-* or Broadlink's suppliers or licensors in any way.
-*
-*******************************************************************************/
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * 
+ * Contributors:
+ * liwei (liwei@ezvizlife.com)
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-11-25     liwei    first version 
+ *******************************************************************************/
 
-#ifndef __DNA_PWM_H
-#define __DNA_PWM_H
+
+#ifndef __EZOS_PWM_H
+#define __EZOS_PWM_H
 
 #ifdef __cplusplus
     extern "C" {

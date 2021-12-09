@@ -370,7 +370,7 @@ static void ez_profile_get_thread(void *param)
             break;
         }
 
-        ezos_mutex_unlock(g_adapter_mutex);
+        ezos_mutex_lock(g_adapter_mutex);
 
         LIST_FOR_EACH(query_info_t, query_info, &g_download_list)
         {
@@ -528,7 +528,7 @@ ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
         }
         else
         {
-            CHECK_COND_DONE(rv, EZ_TSL_ERR_MEMORY);
+            rv = EZ_TSL_ERR_MEMORY;
         }
     }
 

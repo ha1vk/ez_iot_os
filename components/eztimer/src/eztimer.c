@@ -9,7 +9,7 @@
 typedef struct
 {
     ez_node_t   node;
-    ez_int8_t   name[32];       // 可以重复
+    ez_char_t   name[32];       // 可以重复
     ez_size_t   id;             // 输出,唯一标示这个timer_struct ,不可以重复
     ez_bool_t   reload;         // 可重复触发
     ez_int32_t  time_out;       // 超时时间ms

@@ -11,8 +11,8 @@ config EZIOT_UNIT_TEST_REPORT_LOGLVL
 
 config EZIOT_UNIT_TEST_SDK_LOGLVL
     int "The log level for debugging"
-    range 0 5
-    default 0
+    range -1 5
+    default -1
     depends on EZIOT_UNIT_TEST_ENABLE
 
 config EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS

@@ -6,7 +6,7 @@
 #include "ezlog.h"
 #include "eztimer.h"
 
-static ez_int32_t send_http_resp(httpd_req_t *req, ez_int32_t errcode, ez_int8_t *body)
+static ez_int32_t send_http_resp(httpd_req_t *req, ez_int32_t errcode, ez_char_t *body)
 {
     ezlog_v(TAG_AP, "send response. errcode: %d", errcode);
     if (NULL != body)
@@ -63,7 +63,7 @@ static ez_int32_t process_get_devinfo_req(httpd_req_t *req, ezconn_ctx_t *ctx)
         }
     } while (ez_false);
 
-    send_http_resp(req, ret, (ez_int8_t *)js_str);
+    send_http_resp(req, ret, (ez_char_t *)js_str);
 
     if (NULL != js_root)
     {
@@ -140,7 +140,7 @@ static ez_int32_t process_get_list_req(httpd_req_t *req, ezconn_ctx_t *ctx)
 
     } while (ez_false);
 
-    send_http_resp(req, ret, (ez_int8_t *)js_str);
+    send_http_resp(req, ret, (ez_char_t *)js_str);
 
     if (NULL != js_root)
     {
@@ -154,7 +154,7 @@ static ez_int32_t process_get_list_req(httpd_req_t *req, ezconn_ctx_t *ctx)
     return ret;
 }
 
-static ez_int8_t *get_err_str(ezos_wifi_state_e state)
+static ez_char_t *get_err_str(ezos_wifi_state_e state)
 {
     switch (state)
     {
@@ -171,7 +171,7 @@ static ez_int8_t *get_err_str(ezos_wifi_state_e state)
     }
 }
 
-static ez_int32_t gen_rsp_with_state(ezos_wifi_state_e state, ez_int8_t **rsp_str)
+static ez_int32_t gen_rsp_with_state(ezos_wifi_state_e state, ez_char_t **rsp_str)
 {
     ez_int32_t ret = 0;
     cJSON *js_root = NULL;
@@ -289,7 +289,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
     ez_int32_t ret = EZCONN_SUCC; 
 
     char *req_content = NULL;
-    ez_int8_t *rsp_str = NULL;
+    ez_char_t *rsp_str = NULL;
     do 
     {
         req_content = (char *)ezos_malloc(req->content_len);
