@@ -10,7 +10,7 @@ typedef struct
 {
     ez_node_t   node;
     ez_char_t   name[32];       // 可以重复
-    ez_size_t   id;             // 输出,唯一标示这个timer_struct ,不可以重复
+    ez_int32_t  id;             // 输出,唯一标示这个timer_struct ,不可以重复
     ez_bool_t   reload;         // 可重复触发
     ez_int32_t  time_out;       // 超时时间ms
     ez_int32_t  count_down;     // 超时时间/100
@@ -129,22 +129,22 @@ ez_int32_t eztimer_fini(void)
     return 0;
 }
 
-void *eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void))
+ez_int32_t eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void))
 {
-    static ez_size_t id = 0;
+    static ez_int32_t id = 0;
 
     if (ez_false == g_list.invalid)
     {
         if (0 != eztimer_init())
         {
-            return NULL;
+            return -1;
         }
     }
 
     eztimer_struct *timer = (eztimer_struct *)ezos_malloc(sizeof(eztimer_struct));
     if (NULL == timer)
     {
-        return NULL;
+        return -1;
     }
 
     ezos_strncpy((char *)timer->name, (char *)name, sizeof(timer->name) - 1);
@@ -158,22 +158,17 @@ void *eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, voi
     ezlist_add_last(g_list.list, &timer->node);
     ezos_mutex_unlock(g_status_mutex);
 
-    return (void *)timer->id;
+    return timer->id;
 }
 
-ez_int32_t eztimer_delete(void *handle)
+ez_int32_t eztimer_delete(ez_int32_t timer_id)
 {
     if (ez_false == g_list.invalid)
     {
         return -1;
     }
 
-    if (NULL == handle)
-    {
-        return -1;
-    }
-
-    ez_size_t id = (ez_size_t)handle;
+    ez_int32_t id = timer_id;
 
     ezos_mutex_lock(g_status_mutex);
     ez_int32_t list_size = ezlist_get_size(g_list.list);
@@ -196,19 +191,14 @@ ez_int32_t eztimer_delete(void *handle)
     return 0;
 }
 
-ez_int32_t eztimer_reset(void *handle)
+ez_int32_t eztimer_reset(ez_int32_t timer_id)
 {
     if (ez_false == g_list.invalid)
     {
         return -1;
     }
 
-    if (NULL == handle)
-    {
-        return -1;
-    }
-
-    ez_size_t id = (ez_size_t)handle;
+    ez_int32_t id = timer_id;
 
     ezos_mutex_lock(g_status_mutex);
     eztimer_struct *timer = NULL;
@@ -224,19 +214,14 @@ ez_int32_t eztimer_reset(void *handle)
     return 0;
 }
 
-ez_int32_t eztimer_change_period(void *handle, ez_int32_t new_time_out)
+ez_int32_t eztimer_change_period(ez_int32_t timer_id, ez_int32_t new_time_out)
 {
     if (ez_false == g_list.invalid)
     {
         return -1;
     }
 
-    if (NULL == handle)
-    {
-        return -1;
-    }
-
-    ez_size_t id = (ez_size_t)handle;
+    ez_int32_t id = timer_id;
 
     ezos_mutex_lock(g_status_mutex);
     eztimer_struct *timer = NULL;

@@ -34,34 +34,34 @@ extern "C"
      * @param time_out  time out, ms
      * @param reload    support reload or not
      * @param fun       callback of the timer
-     * @return void*    return handle of new timer
+     * @return          return timer id of new timer, timer id is greater than 0
      */
-    void *eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void));
+    ez_int32_t eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void));
 
     /**
      * @brief           reset the timer which handle is specified
      * 
-     * @param handle    handle of the timer need to be reset, which return by eztimer_creates
+     * @param timer_id  timer_id of the timer need to be reset, which return by eztimer_create
      * @return ez_int32_t   0 for succ, other for failed
      */
-    ez_int32_t eztimer_reset(void *handle);
+    ez_int32_t eztimer_reset(ez_int32_t timer_id);
 
     /**
      * @brief           change the period of the timer
      *
-     * @param handle    handle of the timer
+     * @param timer_id    timer_is of the timer
      * @param new_time_out  new period of the timer to be set
      * @return ez_int32_t   0 for succ, other for failed
      */
-    ez_int32_t eztimer_change_period(void *handle, ez_int32_t new_time_out);
+    ez_int32_t eztimer_change_period(ez_int32_t timer_id, ez_int32_t new_time_out);
 
     /**
      * @brief           delete timer, if all timer are deleted, this interface will destroy the timer thread. 
      *
-     * @param handle    handler of the timer to be deleted
+     * @param timer_id  timer id of the timer to be deleted
      * @return ez_int32_t   0 for succ, other for failed
      */
-    ez_int32_t eztimer_delete(void *handle);
+    ez_int32_t eztimer_delete(ez_int32_t timer_id);
 
 #ifdef __cplusplus
 }

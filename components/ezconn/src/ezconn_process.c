@@ -92,7 +92,9 @@ static ez_int32_t process_get_list_req(httpd_req_t *req, ezconn_ctx_t *ctx)
     char *js_str = NULL;
     do 
     {
-        ezos_wifi_list_t ap_list[20] = {0};
+        ezos_wifi_list_t ap_list[20];
+        ezos_memset(ap_list, 0, sizeof(ezos_wifi_list_t) * 20);
+
         ez_uint8_t list_num = ezos_sta_get_scan_list(20, ap_list);
         if (0 == list_num)
         {
@@ -394,7 +396,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
             ezconn_set_busy_state(ez_true);
             ezconn_set_exit_state(ez_true);
 
-            if (NULL != ctx->time_out_timer)
+            if (0 < ctx->time_out_timer)
             {
                 eztimer_change_period(ctx->time_out_timer, 1000);
             }
@@ -407,7 +409,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
             if (!ctx->apsta_coexist)
             {
                 ezconn_set_exit_state(ez_true);
-                if (NULL != ctx->time_out_timer)
+                if (0 < ctx->time_out_timer)
                 {
                     eztimer_change_period(ctx->time_out_timer, 1000);
                 }
@@ -415,7 +417,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
             }
             else
             {
-                if (NULL != ctx->time_out_timer)
+                if (0 < ctx->time_out_timer)
                 {
                     eztimer_reset(ctx->time_out_timer);
                 }

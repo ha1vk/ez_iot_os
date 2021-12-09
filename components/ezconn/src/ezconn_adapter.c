@@ -245,7 +245,7 @@ int32_t ezconn_adatper_init(ezconn_ap_info_t *ap_info, ezconn_dev_info_t *dev_in
     do 
     {
         g_conn_ctx.time_out_timer = eztimer_create("ap_timeout", (ap_info->ap_timeout * 60 * 1000), ez_false, time_out_cb);
-        if (NULL == g_conn_ctx.time_out_timer)
+        if (0 >= g_conn_ctx.time_out_timer)
         {
             ezlog_e(TAG_AP, "ap timeout timer create failed.");
             ret = EZCONN_ERRNO_INTERNAL;

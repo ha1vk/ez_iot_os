@@ -7,7 +7,7 @@
 
 typedef struct
 {
-    void                *time_out_timer;
+    ez_int32_t          time_out_timer;
     httpd_handle_t      httpd_server;
     wifi_info_cb        wifi_cb;
     ezconn_dev_info_t   dev_info;
