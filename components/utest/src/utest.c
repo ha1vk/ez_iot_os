@@ -265,7 +265,7 @@ static void utest_run(const char *utest_name)
 
 void utest_testcase_run(int argc, char** argv)
 {
-    void *thr_param = RT_NULL;
+    // void *thr_param = RT_NULL;
 
     static char utest_name[UTEST_NAME_MAX_LEN];
     rt_memset(utest_name, 0x0, sizeof(utest_name));
