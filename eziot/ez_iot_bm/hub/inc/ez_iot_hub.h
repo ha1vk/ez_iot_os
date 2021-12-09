@@ -39,13 +39,13 @@ extern "C"
 
     typedef struct
     {
-        EZ_INT8 auth_mode;            ///< 认证模式：0-SAP设备, 1-licence设备
-        EZ_INT8 subdev_type[32 + 1];  ///< 子设备型号(licence设备为productKey)
-        EZ_INT8 subdev_sn[16 + 1];    ///< 子设备序列号(licence设备为deviceName)
-        EZ_INT8 subdev_vcode[32 + 1]; ///< 子设备验证码(对应licence认证中deviceLicense)
-        EZ_INT8 subdev_ver[32 + 1];   ///< 子设备固件版本号
-        EZ_INT8 subdev_uuid[16 + 1];  ///< 子设备局域部ID，用于直连或者mesh网络通讯，一般为mac地址
-        EZ_INT8 sta;                  ///< 在线状态：0-不在线，1-在线
+        ez_int8_t auth_mode;            ///< 认证模式：0-SAP设备, 1-licence设备
+        ez_char_t subdev_type[32 + 1];  ///< 子设备型号(licence设备为productKey)
+        ez_char_t subdev_sn[16 + 1];    ///< 子设备序列号(licence设备为deviceName)
+        ez_char_t subdev_vcode[32 + 1]; ///< 子设备验证码(对应licence认证中deviceLicense)
+        ez_char_t subdev_ver[32 + 1];   ///< 子设备固件版本号
+        ez_char_t subdev_uuid[16 + 1];  ///< 子设备局域部ID，用于直连或者mesh网络通讯，一般为mac地址
+        ez_int8_t sta;                  ///< 在线状态：0-不在线，1-在线
     } ez_subdev_info_t;
 
     typedef enum
@@ -57,7 +57,7 @@ extern "C"
     typedef struct
     {
         /* 接收来自本地的事件 */
-        EZ_INT32 (*recv_event)(ez_subdev_event_e event_type, void *data, EZ_INT len);
+        ez_int32_t (*recv_event)(ez_subdev_event_e event_type, void *data, ez_int_t len);
     } ez_hub_callbacks_t;
 
     /**
@@ -82,7 +82,7 @@ extern "C"
      * @param subdev_sn 子设备序列号
      * @return ez_hub_err_e 
      */
-    EZOS_API ez_err_t ez_iot_hub_del(const EZ_INT8 *subdev_sn);
+    EZOS_API ez_err_t ez_iot_hub_del(const ez_char_t *subdev_sn);
 
     /**
      * @brief 更新子设备版本号，常见于升级完成后
@@ -90,7 +90,7 @@ extern "C"
      * @param info 子设备信息
      * @return ez_hub_err_e 
      */
-    EZOS_API ez_err_t ez_iot_hub_ver_update(const EZ_INT8 *subdev_sn, const EZ_INT8 *subdev_ver);
+    EZOS_API ez_err_t ez_iot_hub_ver_update(const ez_char_t *subdev_sn, const ez_char_t *subdev_ver);
 
     /**
      * @brief 更新子设备联网状态
@@ -98,7 +98,7 @@ extern "C"
      * @param online false不在线，true在线
      * @return ez_hub_err_e 
      */
-    EZOS_API ez_err_t ez_iot_hub_status_update(const EZ_INT8 *subdev_sn, EZ_BOOL online);
+    EZOS_API ez_err_t ez_iot_hub_status_update(const ez_char_t *subdev_sn, ez_bool_t online);
 
     /**
      * @brief 根据序列号查询子设备信息
@@ -107,7 +107,7 @@ extern "C"
      * @param subdev_info 子设备信息，不能为空
      * @return ez_hub_err_e 
      */
-    EZOS_API ez_err_t ez_iot_hub_subdev_query(const EZ_INT8 *subdev_sn, ez_subdev_info_t *subdev_info);
+    EZOS_API ez_err_t ez_iot_hub_subdev_query(const ez_char_t *subdev_sn, ez_subdev_info_t *subdev_info);
 
     /**
      * @brief 枚举所有子设备信息
@@ -125,7 +125,7 @@ extern "C"
      * @param buf_len 接收缓冲区大小
      * @return ez_hub_err_e 
      */
-    EZOS_API ez_err_t ez_iot_hub_sn2uuid(const EZ_INT8 *subdev_sn, EZ_INT8 *subdev_uuid, EZ_INT32 buf_len);
+    EZOS_API ez_err_t ez_iot_hub_sn2uuid(const ez_char_t *subdev_sn, ez_char_t *subdev_uuid, ez_int32_t buf_len);
 
     /**
      * @brief 根据子设备uuid查询序列号
@@ -135,7 +135,7 @@ extern "C"
      * @param buf_len 接收缓冲区大小
      * @return ez_hub_err_e 
      */
-    EZOS_API ez_err_t ez_iot_hub_uuid2sn(const EZ_INT8 *subdev_uuid, EZ_INT8 *subdev_sn, EZ_INT32 buf_len);
+    EZOS_API ez_err_t ez_iot_hub_uuid2sn(const ez_char_t *subdev_uuid, ez_char_t *subdev_sn, ez_int32_t buf_len);
 
     /**
      * @brief 清空所有子设备，常见于网关重置

@@ -36,7 +36,7 @@ extern "C"
      * @param fun       callback of the timer
      * @return void*    return handle of new timer
      */
-    void *eztimer_create(ez_int8_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void));
+    void *eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void));
 
     /**
      * @brief           reset the timer which handle is specified

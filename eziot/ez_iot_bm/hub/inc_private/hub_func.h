@@ -38,23 +38,23 @@
 
 typedef struct
 {
-    EZ_INT8 authm;         ///< 认证模式：0-SAP设备, 1-licence设备
-    EZ_INT8 type[32 + 1];  ///< 子设备型号(licence设备为productKey)
-    EZ_INT8 sn[16 + 1];    ///< 子设备序列号(licence设备为deviceName)
-    EZ_INT8 vcode[32 + 1]; ///< 子设备验证码(对应licence认证中deviceLicense)
-    EZ_INT8 ver[32 + 1];   ///< 子设备固件版本号
-    EZ_INT8 uuid[16 + 1];  ///< 子设备局域网唯一标识
-    EZ_INT8 sta;           ///< 在线状态
-    EZ_INT8 access;        ///< 认证状态：0-未认证，1-已认证
+    ez_int8_t authm;         ///< 认证模式：0-SAP设备, 1-licence设备
+    ez_char_t type[32 + 1];  ///< 子设备型号(licence设备为productKey)
+    ez_char_t sn[16 + 1];    ///< 子设备序列号(licence设备为deviceName)
+    ez_char_t vcode[32 + 1]; ///< 子设备验证码(对应licence认证中deviceLicense)
+    ez_char_t ver[32 + 1];   ///< 子设备固件版本号
+    ez_char_t uuid[16 + 1];  ///< 子设备局域网唯一标识
+    ez_int8_t sta;           ///< 在线状态
+    ez_int8_t access;        ///< 认证状态：0-未认证，1-已认证
 } hub_subdev_info_internal_t;
 
 /**
  * @brief 初始化Hub子设备管理模块
  * 
  * @param phub_cbs 子设备添加回调
- * @return EZ_INT ez_errno_succ、ez_errno_hub_internal
+ * @return ez_int_t ez_errno_succ、ez_errno_hub_internal
  */
-EZ_INT hub_func_init(const ez_hub_callbacks_t *phub_cbs);
+ez_int_t hub_func_init(const ez_hub_callbacks_t *phub_cbs);
 
 /**
  * @brief 反初始化Hub子设备管理模块
@@ -76,7 +76,7 @@ ez_err_t hub_add_do(const hub_subdev_info_internal_t *subdev_info);
  * @param subdev_sn 子设备序列号
  * @return ez_err_t ez_errno_succ、ez_errno_hub_storage、ez_errno_hub_memory、ez_errno_hub_subdev_not_found
  */
-ez_err_t hub_del_do(const EZ_INT8 *subdev_sn);
+ez_err_t hub_del_do(const ez_char_t *subdev_sn);
 
 /**
  * @brief 更新子设备版本号
@@ -85,7 +85,7 @@ ez_err_t hub_del_do(const EZ_INT8 *subdev_sn);
  * @param subdev_ver 新的版本号
  * @return ez_err_t ez_errno_succ、ez_errno_hub_storage、ez_errno_hub_memory、ez_errno_hub_subdev_not_found
  */
-ez_err_t hub_ver_update_do(const EZ_INT8 *subdev_sn, const EZ_INT8 *subdev_ver);
+ez_err_t hub_ver_update_do(const ez_char_t *subdev_sn, const ez_char_t *subdev_ver);
 
 /**
  * @brief 更新子设备状态
@@ -94,7 +94,7 @@ ez_err_t hub_ver_update_do(const EZ_INT8 *subdev_sn, const EZ_INT8 *subdev_ver);
  * @param online 子设备在线状态
  * @return ez_err_t ez_errno_succ、ez_errno_hub_storage、ez_errno_hub_memory、ez_errno_hub_subdev_not_found
  */
-ez_err_t hub_status_update_do(const EZ_INT8 *subdev_sn, EZ_BOOL online);
+ez_err_t hub_status_update_do(const ez_char_t *subdev_sn, EZ_BOOL online);
 
 /**
  * @brief 查询子设备信息
@@ -103,7 +103,7 @@ ez_err_t hub_status_update_do(const EZ_INT8 *subdev_sn, EZ_BOOL online);
  * @param subdev_info 子设备信息
  * @return ez_err_t ez_errno_succ、ez_errno_hub_storage、ez_errno_hub_memory、ez_errno_hub_subdev_not_found
  */
-ez_err_t hub_subdev_query(const EZ_INT8 *subdev_sn, hub_subdev_info_internal_t *subdev_info);
+ez_err_t hub_subdev_query(const ez_char_t *subdev_sn, hub_subdev_info_internal_t *subdev_info);
 
 /**
  * @brief 枚举子设备
@@ -123,24 +123,24 @@ ez_err_t hub_clean_do(void);
 /**
  * @brief 上报子设备关联关系
  * 
- * @return EZ_INT 
+ * @return ez_int_t 
  */
-EZ_INT hub_subdev_list_report(void);
+ez_int_t hub_subdev_list_report(void);
 
 /**
  * @brief 更新子设备在线状态
  * 
- * @return EZ_INT 
+ * @return ez_int_t
  */
-EZ_INT hub_subdev_sta_report(void);
+ez_int_t hub_subdev_sta_report(void);
 
 /**
  * @brief 认证子设备
  * 
  * @param subdev_info 需要认证的子设备信息
- * @return EZ_INT 信令发送结果
+ * @return ez_int_t 信令发送结果
  */
-EZ_INT hub_subdev_auth_do(void *subdev_info);
+ez_int_t hub_subdev_auth_do(void *subdev_info);
 
 /**
  * @brief 子设备认证结果
@@ -148,7 +148,7 @@ EZ_INT hub_subdev_auth_do(void *subdev_info);
  * @param buf 协议报文
  * @param len 协议报文长度
  */
-void hub_subdev_auth_done(void *buf, EZ_INT len);
+void hub_subdev_auth_done(void *buf, ez_int_t len);
 
 /**
  * @brief 注册物模型，模块初始化时调用
