@@ -19,23 +19,16 @@
 *******************************************************************************/
 
 #include <stdlib.h>
+#include <unistd.h>
 #include "ezos_system.h"
-
 
 long int ezos_rand(void)
 {
-	return rand();
+    return rand();
 }
-
-long int ezos_random(void)
-{
-	return random();
-}
-
 
 int ezos_get_uuid(char *uuid, short len)
 {
-	return 0;
+    gethostname(uuid, len);
+    return 0;
 }
-
-

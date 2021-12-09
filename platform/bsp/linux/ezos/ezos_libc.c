@@ -145,13 +145,3 @@ EZOS_API char *ezos_strdup(const char *s)
 {
     return strdup(s);
 }
-
-EZOS_API void ezos_va_start(va_list ap, const char *last, ...)
-{
-    va_start(ap, last);
-}
-
-EZOS_API void ezos_va_end(va_list ap)
-{
-    va_end(ap);
-}

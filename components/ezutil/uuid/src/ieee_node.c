@@ -24,10 +24,6 @@
 #include <mbedtls/md5.h>
 #include <ieee_node.h>
 
-#if defined(_FREE_RTOS_) || defined(_FREE_RTOS_32_)
-#include "esp_system.h"
-#endif
-
 /*-----------------------------------------------------------------------------*/
 /** 
  * system dependent call to get IEEE node ID.
@@ -90,11 +86,7 @@ void get_random_info(char seed[16])
 
     /* Get some random stuff */
     gettimeofday(&r.t, (struct timezone *)0);
-#if defined(_FREE_RTOS_) || defined(_FREE_RTOS_32_)
-    esp_base_mac_addr_get((uint8_t *)r.hostname);
-#else
-    (void)gethostname(r.hostname, 256);
-#endif
+    ezos_get_uuid(r.hostname, 256);
 
     /* MD5 it */
     mbedtls_md5_init(&c);

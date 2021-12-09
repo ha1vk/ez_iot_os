@@ -28,13 +28,12 @@ extern "C"
 {
 #endif
 
-    long int ezos_rand(void);
     /**
      * @brief  Get one random 32-bit word from hardware RNG
      *
      * @return Random value between 0 and UINT32_MAX
      */
-    long int ezos_random(void);
+    long int ezos_rand(void);
 
     /**
      * @brief get device uuid
