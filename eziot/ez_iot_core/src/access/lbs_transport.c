@@ -583,7 +583,7 @@ static mkernel_internal_error wait_assign_response(ezdev_sdk_kernel *sdk_kernel,
         ezlog_d(TAG_CORE, "wait_assign_response revc data error");
         return sdk_error;
     }
-    ezlog_v(TAG_CORE, "wait_assign_response succ, cmd:%d, len:%d", *rev_cmd, *remain_len);
+
     return mkernel_internal_succ;
 }
 
@@ -2066,7 +2066,7 @@ static mkernel_internal_error json_parse_das_server_info(const char *jsonstring,
 
         das_server_info->das_port = port_json_item->valueint;
         das_server_info->das_udp_port = udpport_json_item->valueint;
-        ezlog_d("das_server_info:address:%s,port:%d", das_server_info->das_address, das_server_info->das_port);
+        ezlog_d(TAG_CORE, "das address:%s,port:%d", das_server_info->das_address, das_server_info->das_port);
     } while (0);
 
     if (NULL != json_item)
