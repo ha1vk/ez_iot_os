@@ -1,4 +1,4 @@
-# if(CONFIG_COMPONENT_MBEDTLS_ENABLED)
+if(CONFIG_EZIOT_COMPONENT_MQTT_ENABLE)
 
     ################# Add include #################
     list(APPEND ADD_INCLUDE "inc"
@@ -49,4 +49,4 @@
     # register component, DYNAMIC or SHARED flags will make component compiled to dynamic(shared) lib
     register_component()
 
-# endif()
+endif()

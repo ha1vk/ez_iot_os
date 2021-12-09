@@ -96,7 +96,7 @@ ez_err_t httpd_register_uri_handler(httpd_handle_t handle,
 }
 
 ez_err_t httpd_unregister_uri_handler(httpd_handle_t handle,
-                                      const ez_int8_t *uri, httpd_method_t method)
+                                      const ez_char_t *uri, httpd_method_t method)
 {
     if (handle == NULL || uri == NULL)
     {
@@ -119,7 +119,7 @@ ez_err_t httpd_unregister_uri_handler(httpd_handle_t handle,
     return EZHTTPD_ERRNO_NOT_FOUND;
 }
 
-ez_err_t httpd_unregister_uri(httpd_handle_t handle, const ez_int8_t *uri)
+ez_err_t httpd_unregister_uri(httpd_handle_t handle, const ez_char_t *uri)
 {
     if (handle == NULL || uri == NULL)
     {
@@ -170,7 +170,7 @@ void httpd_unregister_all_uri_handlers(struct httpd_data *hd)
  */
 static httpd_uri_t *httpd_find_uri_handler2(httpd_err_resp_t *err,
                                             struct httpd_data *hd,
-                                            const ez_int8_t *uri, ez_size_t uri_len,
+                                            const ez_char_t *uri, ez_size_t uri_len,
                                             httpd_method_t method)
 {
     *err = 0;

@@ -15,7 +15,7 @@ ez_err_t ezconn_wifi_config(ezconn_wifi_mode_e wifi_mode)
     return ezos_wifi_config(wifi_mode);
 }
 
-ez_err_t ezconn_sta_start(ez_int8_t *ssid, ez_int8_t *password)
+ez_err_t ezconn_sta_start(ez_char_t *ssid, ez_char_t *password)
 {
     ezlog_w(TAG_AP, "station start");
     return ezos_sta_connect(ssid, password);

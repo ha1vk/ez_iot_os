@@ -293,7 +293,7 @@ initializer that should be kept in sync
     {
         httpd_handle_t handle;                 /*!< Handle to server instance */
         ez_int32_t method;                            /*!< The type of HTTP request, -1 if unsupported method */
-        const ez_int8_t uri[HTTPD_MAX_URI_LEN + 1]; /*!< The URI of this request (1 byte extra for null termination) */
+        const ez_char_t uri[HTTPD_MAX_URI_LEN + 1]; /*!< The URI of this request (1 byte extra for null termination) */
         ez_size_t content_len;                    /*!< Length of the request body */
         void *aux;                             /*!< Internally used members */
 
@@ -336,7 +336,7 @@ initializer that should be kept in sync
  */
     typedef struct httpd_uri
     {
-        const ez_int8_t *uri;       /*!< The URI to handle */
+        const ez_char_t *uri;       /*!< The URI to handle */
         httpd_method_t method; /*!< Method supported by the URI */
 
         /**
@@ -419,7 +419,7 @@ initializer that should be kept in sync
  *  - ez_errno_httpd_not_found   : Handler with specified URI and method not found
  */
     ez_err_t httpd_unregister_uri_handler(httpd_handle_t handle,
-                                          const ez_int8_t *uri, httpd_method_t method);
+                                          const ez_char_t *uri, httpd_method_t method);
 
     /**
  * @brief   Unregister all URI handlers with the specified uri string
@@ -433,7 +433,7 @@ initializer that should be kept in sync
  *  - ez_errno_param_invalid : Null arguments
  *  - ez_errno_httpd_not_found   : No handler registered with specified uri string
  */
-    ez_err_t httpd_unregister_uri(httpd_handle_t handle, const ez_int8_t *uri);
+    ez_err_t httpd_unregister_uri(httpd_handle_t handle, const ez_char_t *uri);
 
     /** End of URI Handlers
  * @}
@@ -468,7 +468,7 @@ initializer that should be kept in sync
  *  - HTTPD_SOCK_ERR_TIMEOUT  : Timeout/interrupted while calling socket send()
  *  - HTTPD_SOCK_ERR_FAIL     : Unrecoverable error while calling socket send()
  */
-    typedef ez_int32_t (*httpd_send_func_t)(httpd_handle_t hd, ez_int32_t sockfd, const ez_int8_t *buf, ez_size_t buf_len, ez_int32_t flags);
+    typedef ez_int32_t (*httpd_send_func_t)(httpd_handle_t hd, ez_int32_t sockfd, const ez_char_t *buf, ez_size_t buf_len, ez_int32_t flags);
 
     /**
  * @brief  Prototype for HTTPDs low-level recv function
@@ -490,7 +490,7 @@ initializer that should be kept in sync
  *  - HTTPD_SOCK_ERR_TIMEOUT  : Timeout/interrupted while calling socket recv()
  *  - HTTPD_SOCK_ERR_FAIL     : Unrecoverable error while calling socket recv()
  */
-    typedef ez_int32_t (*httpd_recv_func_t)(httpd_handle_t hd, ez_int32_t sockfd, ez_int8_t *buf, ez_size_t buf_len, ez_int32_t flags);
+    typedef ez_int32_t (*httpd_recv_func_t)(httpd_handle_t hd, ez_int32_t sockfd, ez_char_t *buf, ez_size_t buf_len, ez_int32_t flags);
 
     /**
  * @brief  Prototype for HTTPDs low-level "get pending bytes" function
@@ -634,7 +634,7 @@ initializer that should be kept in sync
  *  - HTTPD_SOCK_ERR_TIMEOUT  : Timeout/interrupted while calling socket recv()
  *  - HTTPD_SOCK_ERR_FAIL     : Unrecoverable error while calling socket recv()
  */
-    ez_int32_t httpd_req_recv(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len);
+    ez_int32_t httpd_req_recv(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len);
 
     /**
  * @brief   Search for a field in request headers and
@@ -654,7 +654,7 @@ initializer that should be kept in sync
  *  - Length    : If field is found in the request URL
  *  - Zero      : Field not found / Invalid request / Null arguments
  */
-    ez_size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const ez_int8_t *field);
+    ez_size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const ez_char_t *field);
 
     /**
  * @brief   Get the value string of a field from the request headers
@@ -681,7 +681,7 @@ initializer that should be kept in sync
  *  - ez_errno_httpd_invalid_req  : Invalid HTTP request pointer
  *  - ez_errno_httpd_result_trunc : Value string truncated
  */
-    ez_err_t httpd_req_get_hdr_value_str(httpd_req_t *r, const ez_int8_t *field, ez_int8_t *val, ez_size_t val_size);
+    ez_err_t httpd_req_get_hdr_value_str(httpd_req_t *r, const ez_char_t *field, ez_char_t *val, ez_size_t val_size);
 
     /**
  * @brief   Get Query string length from the request URL
@@ -723,7 +723,7 @@ initializer that should be kept in sync
  *  - ez_errno_httpd_invalid_req  : Invalid HTTP request pointer
  *  - ez_errno_httpd_result_trunc : Query string truncated
  */
-    ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len);
+    ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len);
 
     /**
  * @brief   Helper function to get a URL query tag from a query
@@ -748,7 +748,7 @@ initializer that should be kept in sync
  *  - ez_errno_param_invalid        : Null arguments
  *  - ez_errno_httpd_result_trunc : Value string truncated
  */
-    ez_err_t httpd_query_key_value(const ez_int8_t *qry, const ez_int8_t *key, ez_int8_t *val, ez_size_t val_size);
+    ez_err_t httpd_query_key_value(const ez_char_t *qry, const ez_char_t *key, ez_char_t *val, ez_size_t val_size);
 
     /**
  * @brief   API to send a complete HTTP response.
@@ -787,7 +787,7 @@ initializer that should be kept in sync
  *  - ez_errno_httpd_resp_send   : Error in raw send
  *  - ez_errno_httpd_invalid_req : Invalid request
  */
-    ez_err_t httpd_resp_send(httpd_req_t *r, const ez_int8_t *buf, ez_ssize_t buf_len);
+    ez_err_t httpd_resp_send(httpd_req_t *r, const ez_char_t *buf, ez_ssize_t buf_len);
 
     /**
  * @brief   API to send one HTTP chunk
@@ -826,7 +826,7 @@ initializer that should be kept in sync
  *  - ez_errno_httpd_resp_send   : Error in raw send
  *  - ez_errno_httpd_invalid_req : Invalid request pointer
  */
-    ez_err_t httpd_resp_send_chunk(httpd_req_t *r, const ez_int8_t *buf, ez_ssize_t buf_len);
+    ez_err_t httpd_resp_send_chunk(httpd_req_t *r, const ez_char_t *buf, ez_ssize_t buf_len);
 
 /* Some commonly used status codes */
 #define HTTPD_200 "200 OK"                    /*!< HTTP Response 200 */
@@ -859,7 +859,7 @@ initializer that should be kept in sync
  *  - ez_errno_param_invalid : Null arguments
  *  - ez_errno_httpd_invalid_req : Invalid request pointer
  */
-    ez_err_t httpd_resp_set_status(httpd_req_t *r, const ez_int8_t *status);
+    ez_err_t httpd_resp_set_status(httpd_req_t *r, const ez_char_t *status);
 
 /* Some commonly used content types */
 #define HTTPD_TYPE_JSON "application/json"          /*!< HTTP Content type JSON */
@@ -888,7 +888,7 @@ initializer that should be kept in sync
  *  - ez_errno_param_invalid : Null arguments
  *  - ez_errno_httpd_invalid_req : Invalid request pointer
  */
-    ez_err_t httpd_resp_set_type(httpd_req_t *r, const ez_int8_t *type);
+    ez_err_t httpd_resp_set_type(httpd_req_t *r, const ez_char_t *type);
 
     /**
  * @brief   API to append any additional headers
@@ -914,7 +914,7 @@ initializer that should be kept in sync
  *  - ez_errno_httpd_resp_hdr    : Total additional headers exceed max allowed
  *  - ez_errno_httpd_invalid_req : Invalid request pointer
  */
-    ez_err_t httpd_resp_set_hdr(httpd_req_t *r, const ez_int8_t *field, const ez_int8_t *value);
+    ez_err_t httpd_resp_set_hdr(httpd_req_t *r, const ez_char_t *field, const ez_char_t *value);
 
     /**
  * @brief   Helper function for HTTP 404
@@ -1017,7 +1017,7 @@ initializer that should be kept in sync
  *  - HTTPD_SOCK_ERR_TIMEOUT  : Timeout/interrupted while calling socket send()
  *  - HTTPD_SOCK_ERR_FAIL     : Unrecoverable error while calling socket send()
  */
-    ez_int32_t httpd_send(httpd_req_t *r, const ez_int8_t *buf, ez_size_t buf_len);
+    ez_int32_t httpd_send(httpd_req_t *r, const ez_char_t *buf, ez_size_t buf_len);
 
     /** End of Request / Response
  * @}

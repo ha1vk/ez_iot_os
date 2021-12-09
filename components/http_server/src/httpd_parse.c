@@ -163,7 +163,7 @@ static ez_err_t pause_parsing(http_parser *parser, const char *at)
 
     parser_data->pre_parsed = parser_data->raw_datalen - (at - ra->scratch);
 
-    if (parser_data->pre_parsed != httpd_unrecv(r, (ez_int8_t *)at, parser_data->pre_parsed))
+    if (parser_data->pre_parsed != httpd_unrecv(r, (ez_char_t *)at, parser_data->pre_parsed))
     {
         ezlog_e(TAG, LOG_FMT("data too large for un-recv = %zu"),
                  parser_data->pre_parsed);
@@ -703,7 +703,7 @@ bool httpd_validate_req_ptr(httpd_req_t *r)
 }
 
 /* Helper function to get a URL query tag from a query string of the type param1=val1&param2=val2 */
-ez_err_t httpd_query_key_value(const ez_int8_t *qry_str, const ez_int8_t *key, ez_int8_t *val, ez_size_t val_size)
+ez_err_t httpd_query_key_value(const ez_char_t *qry_str, const ez_char_t *key, ez_char_t *val, ez_size_t val_size)
 {
     if (qry_str == NULL || key == NULL || val == NULL)
     {
@@ -754,7 +754,7 @@ ez_err_t httpd_query_key_value(const ez_int8_t *qry_str, const ez_int8_t *key, e
         val_size = qry_ptr - val_ptr + 1;
 
         /* Copy value to the caller's buffer. */
-        strlcpy(val, val_ptr, MIN(val_size, buf_len));
+        strncpy(val, val_ptr, MIN(val_size, buf_len) - 1);
 
         /* If buffer length is smaller than needed, return truncation error */
         if (buf_len < val_size)
@@ -790,7 +790,7 @@ ez_size_t httpd_req_get_url_query_len(httpd_req_t *r)
     return 0;
 }
 
-ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len)
+ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_char_t *buf, ez_size_t buf_len)
 {
     if (r == NULL || buf == NULL)
     {
@@ -814,7 +814,7 @@ ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_int8_t *buf, ez_size_t b
          * null terminated query string */
         size_t min_buf_len = res->field_data[UF_QUERY].len + 1;
 
-        strlcpy(buf, qry, MIN(buf_len, min_buf_len));
+        strncpy(buf, qry, MIN(buf_len, min_buf_len) - 1);
         if (buf_len < min_buf_len)
         {
             return EZHTTPD_ERRNO_RESULT_TRUNC;
@@ -825,7 +825,7 @@ ez_err_t httpd_req_get_url_query_str(httpd_req_t *r, ez_int8_t *buf, ez_size_t b
 }
 
 /* Get the length of the value string of a header request field */
-ez_size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const ez_int8_t *field)
+ez_size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const ez_char_t *field)
 {
     if (r == NULL || field == NULL)
     {
@@ -876,7 +876,7 @@ ez_size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const ez_int8_t *field)
 }
 
 /* Get the value of a field from the request headers */
-ez_err_t httpd_req_get_hdr_value_str(httpd_req_t *r, const ez_int8_t *field, ez_int8_t *val, ez_size_t val_size)
+ez_err_t httpd_req_get_hdr_value_str(httpd_req_t *r, const ez_char_t *field, ez_char_t *val, ez_size_t val_size)
 {
     if (r == NULL || field == NULL)
     {
@@ -925,7 +925,7 @@ ez_err_t httpd_req_get_hdr_value_str(httpd_req_t *r, const ez_int8_t *field, ez_
         }
 
         /* Get the NULL terminated value and copy it to the caller's buffer. */
-        strlcpy(val, val_ptr, buf_len);
+        strncpy(val, val_ptr, buf_len - 1);
 
         /* Update value length, including one byte for null */
         val_size = strlen(val_ptr) + 1;
