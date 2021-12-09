@@ -95,11 +95,11 @@ static ez_err_t profile_parse_schema(tsl_schema_desc *schema, cJSON *js_schema);
 /* profile free */
 static ez_void_t profile_free(tsl_capacity_t *capacity);
 static ez_void_t profile_free_domain(tsl_rsc_domain *tsl_domain, ez_int32_t domain_num);
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
+static ez_void_t profile_free_schema(tsl_schema_desc *tsl_schema);
 static ez_void_t profile_free_props(tsl_domain_prop *tsl_props, ez_int32_t prop_num);
 static ez_void_t profile_free_actions(tsl_domain_action *tsl_actions, ez_int32_t action_num);
 static ez_void_t profile_free_events(tsl_domain_event *tsl_events, ez_int32_t event_num);
-#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG
-static ez_void_t profile_free_schema(tsl_schema_desc *tsl_schema);
 #endif
 /* profile manager */
 static ez_mutex_t g_mutex = NULL;
