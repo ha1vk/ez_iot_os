@@ -72,8 +72,7 @@ ez_void_t base_extend_data_route_cb(ez_kernel_submsg_t *ptr_submsg, ez_void_t *p
     ez_uint32_t msg_seq = ptr_submsg->msg_seq;
     ez_int32_t result_code = 0;
 
-    ezlog_w(TAG_BASE, "cmd:%d", cmd_id);
-    ezlog_d(TAG_BASE, "seq:%d, len:%d, data:%s", msg_seq, ptr_submsg->buf_len, ptr_submsg->buf);
+    ezlog_d(TAG_BASE, "cmd:%d, seq:%d", cmd_id, msg_seq);
 
     switch (cmd_id)
     {
