@@ -121,7 +121,7 @@ ez_int32_t httpd_recv_with_opt(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len
     /* First fetch pending data from local buffer */
     if (ra->sd->pending_len > 0)
     {
-        ezlog_v(TAG, LOG_FMT("pending length = %d"), ra->sd->pending_len);
+        ezlog_v(TAG, LOG_FMT("pending length = %zu"), ra->sd->pending_len);
         pending_len = httpd_recv_pending(r, buf, buf_len);
         buf += pending_len;
         buf_len -= pending_len;
@@ -170,8 +170,8 @@ ez_size_t httpd_unrecv(struct httpd_req *r, const ez_int8_t *buf, ez_size_t buf_
 
     /* Copy data into internal pending_data buffer */
     ez_size_t offset = sizeof(ra->sd->pending_data) - ra->sd->pending_len;
-    ezos_memcpy(ra->sd->pending_data + offset, buf, buf_len);
-    ezlog_v(TAG, LOG_FMT("length = %d"), ra->sd->pending_len);
+    ezos_memcpy(ra->sd->pending_data + offset, buf, ra->sd->pending_len);
+    ezlog_v(TAG, LOG_FMT("length = %zu"), ra->sd->pending_len);
     return ra->sd->pending_len;
 }
 
@@ -513,7 +513,7 @@ ez_int32_t httpd_req_recv(httpd_req_t *r, ez_int8_t *buf, ez_size_t buf_len)
     }
 
     struct httpd_req_aux *ra = r->aux;
-    ezlog_v(TAG, LOG_FMT("remaining length = %d"), ra->remaining_len);
+    ezlog_v(TAG, LOG_FMT("remaining length = %zu"), ra->remaining_len);
 
     if (buf_len > ra->remaining_len)
     {
@@ -556,7 +556,7 @@ static int httpd_sock_err(const char *ctx, int sockfd)
 {
     int errval;
     int sock_err;
-    size_t sock_err_len = sizeof(sock_err);
+    int sock_err_len = sizeof(sock_err);
 
     if (ezos_getsockopt(sockfd, EZ_SOL_SOCKET, EZ_SO_ERROR, &sock_err, &sock_err_len) < 0)
     {

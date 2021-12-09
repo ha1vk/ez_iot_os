@@ -22,6 +22,7 @@
 #define H_EZOS_MEM_H_
 
 #include <ezos_def.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C"
