@@ -156,49 +156,106 @@ static void ut_log_kw()
 static void ut_log_dump16()
 {
     ez_uint8_t buf[32] = {0};
+    int loglvl = (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL < 0) ? 0 : CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL;
+
     uassert_int_equal(0, ezlog_init());
     ezlog_start();
 
-    ezlog_filter_lvl(EZ_ELOG_LVL_VERBOSE);
+    ezlog_filter_lvl(loglvl);
     ezlog_hexdump(TAG_APP, 16, buf, sizeof(buf));
 }
 
 static void ut_log_dump32()
 {
     ez_uint8_t buf[32] = {0};
+    int loglvl = (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL < 0) ? 0 : CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL;
     uassert_int_equal(0, ezlog_init());
     ezlog_start();
 
-    ezlog_filter_lvl(EZ_ELOG_LVL_VERBOSE);
+    ezlog_filter_lvl(loglvl);
     ezlog_hexdump(TAG_APP, 32, buf, sizeof(buf));
 }
 
 static void test_log_lvl(void)
 {
-    ezlog_a(TAG_APP, "hello word!");
-    ezlog_e(TAG_APP, "hello word!");
-    ezlog_w(TAG_APP, "hello word!");
-    ezlog_i(TAG_APP, "hello word!");
-    ezlog_d(TAG_APP, "hello word!");
-    ezlog_v(TAG_APP, "hello word!");
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_ASSERT)
+    {
+        ezlog_a(TAG_APP, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_ERROR)
+    {
+        ezlog_e(TAG_APP, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_WARN)
+    {
+        ezlog_w(TAG_APP, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_INFO)
+    {
+        ezlog_i(TAG_APP, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_DEBUG)
+    {
+        ezlog_d(TAG_APP, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_VERBOSE)
+    {
+        ezlog_v(TAG_APP, "hello word!");
+    }
 }
 
 static void test_log_tag(void)
 {
-    ezlog_a(TAG_FILTER, "hello word!");
-    ezlog_e(TAG_FILTER, "hello word!");
-    ezlog_w(TAG_FILTER, "hello word!");
-    ezlog_i(TAG_FILTER, "hello word!");
-    ezlog_d(TAG_FILTER, "hello word!");
-    ezlog_v(TAG_FILTER, "hello word!");
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_ASSERT)
+    {
+        ezlog_a(TAG_FILTER, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_ERROR)
+    {
+        ezlog_e(TAG_FILTER, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_WARN)
+    {
+        ezlog_w(TAG_FILTER, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_INFO)
+    {
+        ezlog_i(TAG_FILTER, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_DEBUG)
+    {
+        ezlog_d(TAG_FILTER, "hello word!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_VERBOSE)
+    {
+        ezlog_v(TAG_FILTER, "hello word!");
+    }
 }
 
 static void test_log_kw(void)
 {
-    ezlog_a(TAG_APP, "ezapp, easy your life!");
-    ezlog_e(TAG_APP, "ezapp, easy your life!");
-    ezlog_w(TAG_APP, "ezapp, easy your life!");
-    ezlog_i(TAG_APP, "ezapp, easy your life!");
-    ezlog_d(TAG_APP, "ezapp, easy your life!");
-    ezlog_v(TAG_APP, "ezapp, easy your life!");
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_ASSERT)
+    {
+        ezlog_a(TAG_APP, "ezapp, easy your life!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_ERROR)
+    {
+        ezlog_e(TAG_APP, "ezapp, easy your life!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_WARN)
+    {
+        ezlog_w(TAG_APP, "ezapp, easy your life!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_INFO)
+    {
+        ezlog_i(TAG_APP, "ezapp, easy your life!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_DEBUG)
+    {
+        ezlog_d(TAG_APP, "ezapp, easy your life!");
+    }
+    if (CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL >= EZ_ELOG_LVL_VERBOSE)
+    {
+        ezlog_v(TAG_APP, "ezapp, easy your life!");
+    }
 }
