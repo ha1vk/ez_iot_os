@@ -1,4 +1,5 @@
 #include "eztimer.h"
+#include "ezos_mem.h"
 #include "ezos_thread.h"
 #include "ezos_time.h"
 #include "ezos_libc.h"
@@ -7,17 +8,18 @@
 
 typedef struct
 {
+    ez_node_t   node;
     ez_int8_t   name[32];       // 可以重复
-    ez_int32_t  id;             // 输出,唯一标示这个timer_struct ,不可以重复
-    ez_bool_t    reload;         // 可重复触发
+    ez_size_t   id;             // 输出,唯一标示这个timer_struct ,不可以重复
+    ez_bool_t   reload;         // 可重复触发
     ez_int32_t  time_out;       // 超时时间ms
     ez_int32_t  count_down;     // 超时时间/100
-    void  (*fun)(void);   // 超时后的回调
+    void        (*fun)(void);   // 超时后的回调
 } eztimer_struct;
 
 typedef struct timer_list
 {
-    list_t    *list;             //eztimer_struct
+    ez_list_t   *list;             //eztimer_struct
     ez_int32_t  msec;              //轮询时间，默认100ms
     ez_bool_t   invalid;
     void        *thread;
@@ -35,11 +37,9 @@ static void timer_routine(void *param)
     while (g_list.invalid)
     {
         ezos_mutex_lock(g_status_mutex);
-        ez_int32_t list_size = ezlist_size(g_list.list);
-        ez_size_t node_size = sizeof(eztimer_struct);
-        for (ez_size_t i = 0; i < list_size; i++)
+        eztimer_struct *node= NULL;
+        LIST_FOR_EACH(eztimer_struct, node, g_list.list)
         {
-            eztimer_struct *node = ezlist_getat(g_list.list, i, &node_size, ez_false);
             if (node != NULL)
             {
                 if (0 == node->count_down)
@@ -51,7 +51,8 @@ static void timer_routine(void *param)
 
                     if (!node->reload)
                     {
-                        ezlist_removeat(g_list.list, i);
+                        ezlist_delete(g_list.list, &node->node);
+                        ezos_free(node);
                         break;
                     }
                     else
@@ -88,7 +89,7 @@ ez_int32_t eztimer_init(void)
     }
 
     ezos_memset(&g_list, 0, sizeof(g_list));
-    ezos_thread_create(&g_list.thread, (ez_int8_t *)"eztimer", timer_routine, (void *)&g_list, CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE, 13);
+    ezos_thread_create(&g_list.thread, "eztimer", timer_routine, (void *)&g_list, CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE, 13);
     if (NULL == g_list.thread)
     {
         ezos_mutex_unlock(g_status_mutex);
@@ -96,7 +97,7 @@ ez_int32_t eztimer_init(void)
     }
     g_list.invalid = ez_true;
     g_list.msec = 100;
-    g_list.list = ezlist(ezlist_THREADSAFE);
+    ezlist_init(g_list.list);
     ezos_mutex_unlock(g_status_mutex);
     return 0;
 }
@@ -112,14 +113,14 @@ ez_int32_t eztimer_fini(void)
 
     if (g_list.invalid)
     {
-        ez_int32_t list_size = ezlist_size(g_list.list);
+        ez_int32_t list_size = ezlist_get_size(g_list.list);
         if (0 == list_size)
         {
             g_list.invalid = ez_false;
             ezos_thread_destroy(g_list.thread);
             g_list.thread = NULL;
 
-            ezlist_free(g_list.list);
+            ezlist_clear(g_list.list);
         }
     }
 
@@ -140,19 +141,24 @@ void *eztimer_create(ez_int8_t *name, ez_int32_t time_out, ez_bool_t reload, voi
         }
     }
 
-    eztimer_struct timer = {0};
-    ezos_strncpy(timer.name, name, sizeof(timer.name) - 1);
-    timer.id = ++id;
-    timer.fun = fun;
-    timer.time_out = time_out;
-    timer.reload = reload;
-    timer.count_down = time_out / g_list.msec;
+    eztimer_struct *timer = (eztimer_struct *)ezos_malloc(sizeof(eztimer_struct));
+    if (NULL == timer)
+    {
+        return NULL;
+    }
+
+    ezos_strncpy((char *)timer->name, (char *)name, sizeof(timer->name) - 1);
+    timer->id = ++id;
+    timer->fun = fun;
+    timer->time_out = time_out;
+    timer->reload = reload;
+    timer->count_down = time_out / g_list.msec;
 
     ezos_mutex_lock(g_status_mutex);
-    ezlist_addlast(g_list.list, (void *)&timer, sizeof(eztimer_struct));
+    ezlist_add_last(g_list.list, &timer->node);
     ezos_mutex_unlock(g_status_mutex);
 
-    return (void *)timer.id;
+    return (void *)timer->id;
 }
 
 ez_int32_t eztimer_delete(void *handle)
@@ -170,23 +176,23 @@ ez_int32_t eztimer_delete(void *handle)
     ez_size_t id = (ez_size_t)handle;
 
     ezos_mutex_lock(g_status_mutex);
-    ez_size_t list_size = ezlist_size(g_list.list);
-    ez_size_t node_size = sizeof(eztimer_struct);
-    for (ez_size_t i = 0; i < list_size; i++)
+    ez_int32_t list_size = ezlist_get_size(g_list.list);
+    eztimer_struct *timer = NULL;
+    LIST_FOR_EACH(eztimer_struct, timer, g_list.list)
     {
-        eztimer_struct *timer = ezlist_getat(g_list.list, i, &node_size, ez_false);
         if (id == timer->id)
         {
-            ezlist_removeat(g_list.list, i);
+            ezlist_delete(g_list.list, &timer->node);
+            ezos_free(timer);
             break;
         }
     }
-    ezos_mutex_unlock(g_status_mutex);
 
     if (1 == list_size)
     {
         eztimer_fini();
     }
+    ezos_mutex_unlock(g_status_mutex);
     return 0;
 }
 
@@ -205,11 +211,9 @@ ez_int32_t eztimer_reset(void *handle)
     ez_size_t id = (ez_size_t)handle;
 
     ezos_mutex_lock(g_status_mutex);
-    ez_size_t list_size = ezlist_size(g_list.list);
-    ez_size_t node_size = sizeof(eztimer_struct);
-    for (ez_size_t i = 0; i < list_size; i++)
+    eztimer_struct *timer = NULL;
+    LIST_FOR_EACH(eztimer_struct, timer, g_list.list)
     {
-        eztimer_struct *timer = ezlist_getat(g_list.list, i, &node_size, ez_false);
         if (id == timer->id)
         {
             timer->count_down = timer->time_out / g_list.msec;
@@ -235,11 +239,9 @@ ez_int32_t eztimer_change_period(void *handle, ez_int32_t new_time_out)
     ez_size_t id = (ez_size_t)handle;
 
     ezos_mutex_lock(g_status_mutex);
-    ez_size_t list_size = ezlist_size(g_list.list);
-    ez_size_t node_size = sizeof(eztimer_struct);
-    for (ez_size_t i = 0; i < list_size; i++)
+    eztimer_struct *timer = NULL;
+    LIST_FOR_EACH(eztimer_struct, timer, g_list.list)
     {
-        eztimer_struct *timer = ezlist_getat(g_list.list, i, &node_size, ez_false);
         if (id == timer->id)
         {
             timer->time_out = new_time_out;
