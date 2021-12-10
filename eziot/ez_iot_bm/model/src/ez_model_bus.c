@@ -31,7 +31,7 @@ int ez_model_msg2platform(unsigned char *context, unsigned int context_len, ez_m
 	ezlog_v(TAG_MOD, "msg2platform seq: %d, msg:%s \n", *msg_seq, (char *)context);
 	pubmsg.msg_response = msg_response;
 	pubmsg.msg_seq = *msg_seq;
-	pubmsg.msg_body = context;
+	pubmsg.msg_body = (ez_char_t *)context;
 	pubmsg.msg_body_len = context_len;
 	pubmsg.msg_qos = msg_qos;
 

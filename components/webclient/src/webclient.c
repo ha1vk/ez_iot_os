@@ -537,7 +537,7 @@ int webclient_header_fields_add(struct webclient_session *session, const char *f
     /* check header size */
     if (session->header->length >= session->header->size)
     {
-        ezlog_e(TAG_WEB,"not enough header buffer size(%d)!\n", session->header->size);
+        ezlog_e(TAG_WEB,"not enough header buffer size(%ld)!\n", session->header->size);
         return -WEBCLIENT_ERROR;
     }
 
@@ -695,7 +695,7 @@ static int webclient_send_header(struct webclient_session *session, int method)
             /* check header size */
             if (session->header->length > session->header->size)
             {
-                ezlog_e(TAG_WEB,"send header failed, not enough header buffer size(%d)!\n", session->header->size);
+                ezlog_e(TAG_WEB,"send header failed, not enough header buffer size(%ld)!\n", session->header->size);
                 rc = -WEBCLIENT_NOBUFFER;
                 goto __exit;
             }
@@ -785,7 +785,7 @@ int webclient_handle_response(struct webclient_session *session)
 
         if (session->header->length >= session->header->size)
         {
-            ezlog_e(TAG_WEB,"not enough header buffer size(%d)!\n", session->header->size);
+            ezlog_e(TAG_WEB,"not enough header buffer size(%ld)!\n", session->header->size);
             return -WEBCLIENT_NOMEM;
         }
     }
@@ -1105,10 +1105,14 @@ int webclient_set_timeout(struct webclient_session *session, int millisecond)
     timeout.tv_usec = 0;
 
     /* set recv timeout option */
-    ezos_setsockopt(session->socket, EZ_SOL_SOCKET, EZ_SO_RCVTIMEO,
-               (void *)&timeout, sizeof(timeout));
-    ezos_setsockopt(session->socket, EZ_SOL_SOCKET, EZ_SO_SNDTIMEO,
-               (void *)&timeout, sizeof(timeout));
+    if(ezos_setsockopt(session->socket, EZ_SOL_SOCKET, EZ_SO_RCVTIMEO, (void *)&timeout, sizeof(timeout)) != 0)
+    {
+        ezlog_e(TAG_WEB,"ezos_setsockopt EZ_SO_RCVTIMEO error\n");
+    }
+    if(ezos_setsockopt(session->socket, EZ_SOL_SOCKET, EZ_SO_SNDTIMEO, (void *)&timeout, sizeof(timeout)) != 0)
+    {
+        ezlog_e(TAG_WEB,"ezos_setsockopt EZ_SO_SNDTIMEO error\n");
+    }
 
     return 0;
 }
@@ -1684,7 +1688,7 @@ int webclient_request(const char *URI, const char *header, const void *post_data
 
         if (ezos_strstr(session->header->buffer, "Content-Length") == NULL)
         {
-            webclient_header_fields_add(session, "Content-Length: %d\r\n", ezos_strlen(post_data));
+            webclient_header_fields_add(session, "Content-Length: %ld\r\n", ezos_strlen(post_data));
         }
 
         if (ezos_strstr(session->header->buffer, "Content-Type") == NULL)

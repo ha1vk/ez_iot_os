@@ -20,7 +20,7 @@ if(CONFIG_EZIOT_MODEL_ENABLE)
     list(APPEND ADD_REQUIREMENTS ezlog)
     list(APPEND ADD_REQUIREMENTS ez_iot_core)
     list(APPEND ADD_REQUIREMENTS ezos)
-    list(APPEND ADD_REQUIREMENTS double_link_list)
+    list(APPEND ADD_REQUIREMENTS ezlist)
     ###############################################
 
     ############ Add static libs ##################

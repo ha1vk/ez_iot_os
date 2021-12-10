@@ -16,9 +16,8 @@
 #include <limits.h>
 #include <math.h>
 #include <ezos.h>
-#include "double_linked_list.h"
 #include "ezlog.h"
-
+#include "ezlist.h"
 #include "ez_iot_core_def.h"
 #include "ez_iot_core_lowlvl.h"
 
@@ -30,7 +29,7 @@
 
 typedef struct
 {
-    node_t node; ///< 双向链表的节点
+    ez_node_t node; ///< 双向链表的节点
     ez_domain_reg_t *domain_info;
 } ez_domain_node_t;
 
@@ -53,7 +52,7 @@ static ez_bool_t is_double(int a, double b);
  */
 static void tlv_destroy(ez_model_msg_t *ptlv);
 
-static list_t g_model_domains;
+static ez_list_t g_model_domains;
 
 static ez_mutex_t g_model_domain_lock_h = NULL;
 static ez_mutex_t g_model_cb_lock_h     = NULL;
@@ -65,7 +64,7 @@ int ez_get_list_size()
 {
     int list_size = 0;
     ezos_mutex_lock(g_model_domain_lock_h);
-    list_size = list_get_size(&g_model_domains);
+    list_size = ezlist_get_size(&g_model_domains);
     ezos_mutex_unlock(g_model_domain_lock_h);
 
     return list_size;
@@ -84,15 +83,15 @@ int ez_set_data_route_cb(ez_model_default_cb_t *ez_data_router)
     return EZ_CODE_SUCESS;
 }
 
-static ez_domain_node_t *ez_model_find_domain_info(list_t *list, const char *domain)
+static ez_domain_node_t *ez_model_find_domain_info(ez_list_t *list, const char *domain)
 {
     ez_domain_node_t *pnode = NULL;
-    if (NULL == list || 0 == list_get_size(list) || NULL == domain)
+    if (NULL == list || 0 == ezlist_get_size(list) || NULL == domain)
     {
         ezlog_e(TAG_MOD, "ez_model_find_domain,list size  is 0 or domain is null\n");
         return NULL;
     }
-    LIST_FOR_EACH(list, ez_domain_node_t, pnode)
+    LIST_FOR_EACH(ez_domain_node_t, pnode, list)
     {
         if (0 == ezos_strcmp(pnode->domain_info->domain, domain))
         {
@@ -103,7 +102,7 @@ static ez_domain_node_t *ez_model_find_domain_info(list_t *list, const char *dom
     return NULL;
 }
 
-static int ez_model_add_domain_info(list_t *list, const ez_domain_reg_t *domain_reg)
+static int ez_model_add_domain_info(ez_list_t *list, const ez_domain_reg_t *domain_reg)
 {
     ez_domain_node_t *pnode = NULL;
     if (NULL == list || NULL == domain_reg || NULL == domain_reg->das_reply_router || NULL == domain_reg->das_req_router)
@@ -134,9 +133,9 @@ static int ez_model_add_domain_info(list_t *list, const ez_domain_reg_t *domain_
     ezos_memset(pnode->domain_info, 0, sizeof(ez_domain_reg_t));
     ezos_memcpy(pnode->domain_info, domain_reg, sizeof(ez_domain_reg_t));
 
-    list_add_from_tail(list, &pnode->node);
+    ezlist_add_last(list, &pnode->node);
 
-    ezlog_v(TAG_MOD, "ez_model_add_domain_info success size:%d\n", list_get_size(&g_model_domains));
+    ezlog_v(TAG_MOD, "ez_model_add_domain_info success size:%d\n", ezlist_get_size(&g_model_domains));
     return EZ_CODE_SUCESS;
 }
 
@@ -152,7 +151,7 @@ int ez_reg_domain(const ez_domain_reg_t *domain_reg)
     ezos_mutex_unlock(g_model_domain_lock_h);
     if (EZ_CODE_SUCESS == ret)
     {
-        ezlog_v(TAG_MOD, "Domain reg success  size:%d\n", list_get_size(&g_model_domains));
+        ezlog_v(TAG_MOD, "Domain reg success  size:%d\n", ezlist_get_size(&g_model_domains));
     }
     return ret;
 }
@@ -170,13 +169,13 @@ int ez_dereg_domain(const char *domain)
             ezos_free(pnode->domain_info);
             pnode->domain_info = NULL;
         }
-        list_delete_node(&g_model_domains, &pnode->node);
+        ezlist_delete(&g_model_domains, &pnode->node);
         ezos_free(pnode);
         pnode = NULL;
     }
     ezos_mutex_unlock(g_model_domain_lock_h);
 
-    ezlog_v(TAG_MOD, "Domain dereg success  size:%d\n", list_get_size(&g_model_domains));
+    ezlog_v(TAG_MOD, "Domain dereg success  size:%d\n", ezlist_get_size(&g_model_domains));
     return EZ_CODE_SUCESS;
 }
 
@@ -542,7 +541,7 @@ int ez_model_extern_init()
             ret = EZ_CODE_MODEL_REG_FAIL;
         }
 
-        list_init(&g_model_domains);
+        ezlist_init(&g_model_domains);
 
         g_model_domain_lock_h = ezos_mutex_create();
         if(NULL == g_model_domain_lock_h)

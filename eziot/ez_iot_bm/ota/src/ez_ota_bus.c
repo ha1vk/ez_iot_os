@@ -43,7 +43,7 @@ ez_err_t ez_ota_send_msg_to_platform(unsigned char *msg, int msg_len, const ez_o
 	}
 	pubmsg.msg_response = response;
 	pubmsg.msg_qos = (ez_kernel_qos_e)msg_qos;
-	pubmsg.msg_body = msg;
+	pubmsg.msg_body = (ez_char_t *)msg;
 	pubmsg.msg_body_len = msg_len;
 
 	ezos_strncpy(pubmsg.resource_type, "global", sizeof(pubmsg.resource_type) - 1);

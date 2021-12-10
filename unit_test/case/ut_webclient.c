@@ -32,7 +32,6 @@ void ut_webclient_test(void)
     int status  = 0;
     unsigned int content_len = 0;
     int readlen=1024;
-    int len;
     
 
     h_client = webclient_session_create(1024);
@@ -54,12 +53,10 @@ void ut_webclient_test(void)
         ezos_printf("webclient_content_length_get error:%d\n",content_len);
         return;
     }
-    ezos_printf("webclient_content_length_get OK:%d\n",content_len);
 
     char* recvbuffer = (char*)ezos_malloc(content_len+1);
     ezos_memset(recvbuffer, 0, content_len+1);
-    len = webclient_read(h_client, recvbuffer, content_len);
-    ezos_printf("webclient_read:%d\n",len);
+    webclient_read(h_client, recvbuffer, content_len);
     webclient_close(h_client);
 }
 

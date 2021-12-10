@@ -38,10 +38,8 @@ int server_create()
 		ezos_printf("test fail:\tezos_socket\n");
 		return -1;
 	}
-	ezos_printf("test OK:\tezos_socket\n");
 
 	ezos_bzero(&server_addr, sizeof(server_addr));
-	ezos_printf("test OK:\tezos_bzero\n");
 
 	server_addr.sin_family = EZ_AF_INET;
 	server_addr.sin_port = ezos_htons(MYPORT);
@@ -52,14 +50,12 @@ int server_create()
 		ezos_printf("test fail:\tezos_bind\n");
 		return -1;
 	}
-	ezos_printf("test OK:\tezos_bind\n");
 
 	//listen  
 	if (ezos_listen(socket_fd, 5) < 0){
 		ezos_printf("test fail:\tezos_listen\n");
 		return -1;
 	}
-	ezos_printf("test OK:\tezos_listen\n");
 
 	return socket_fd;
 }
@@ -83,7 +79,6 @@ static void net_server_task(void* user_data)
 			ezos_printf("test fail:\tezos_accept\n");
 			return;
 		}
-		ezos_printf("test OK:\tezos_accept\n");
 
 		recvlen = ezos_recv(clientfd, recvbuf, 50, 0);
 		if (recvlen <= 0) {
@@ -91,7 +86,6 @@ static void net_server_task(void* user_data)
 			ezos_closesocket(clientfd);
 			return;
 		}
-		ezos_printf("test OK:\tezos_recv\n");
 		ezos_closesocket(clientfd);
 		break;
 	}
@@ -142,8 +136,6 @@ int client_connect(int socket_fd)
 	}
 
 	ezos_inet_ntop(EZ_AF_INET, (void *)host->h_addr_list[0], ip, 32);
-	ezos_printf("test OK:\tezos_gethostbyname\t%s\n", ip);
-	ezos_printf("test OK:\tezos_inet_ntop\n");
 
 	dst_addr.sin_family = EZ_AF_INET;
 	dst_addr.sin_addr.s_addr = ezos_inet_addr("127.0.0.1");
@@ -164,7 +156,6 @@ int client_connect(int socket_fd)
 		ezos_printf("test fail:\tezos_socket_poll\n");
 		return -1;
 	}
-	ezos_printf("test OK:\tezos_socket_poll\n");
 
 	if (ezos_getsockopt(socket_fd, EZ_SOL_SOCKET, EZ_SO_ERROR, (char *)&socket_err, (ez_socklen_t*)&socklen) == -1) {
 		return -1;
@@ -228,7 +219,6 @@ int client_write(int socket_fd, char* write_buf, int write_buf_size, int timeout
 			ezos_printf("test fail:\tezos_send\n");
 			return -1;
 		}
-		ezos_printf("test OK:\tezos_send\n");
 
 	} while (0);
 
@@ -249,7 +239,7 @@ int net_client_task()
 	}
 	client_write(clientfd, "testnet", 7, 10000);
 	ezos_closesocket(clientfd);
-	ezos_printf("test OK:\tezos_closesocket\n");
+	
     ezos_delay_ms(2000);
 	return 0;
 }
@@ -295,8 +285,7 @@ static void test_sem_task(void* user_data)
 
 		endtime = ezos_time(NULL);
 		if ((endtime - *starttime) == 2) {
-			ezos_printf("test OK:\tezos_sem_post\n");
-			ezos_printf("test OK:\tezos_sem_wait\n");
+			
 		}
 		else {
 			ezos_printf("test fail:\tezos_sem_post\n");
@@ -316,7 +305,6 @@ static void ut_ezos_sem(void)
 		ezos_printf("test fail:\tezos_sem_create\n");
 		return;
 	}
-	ezos_printf("test OK:\tezos_sem_create\n");
 
 	starttime = ezos_malloc(sizeof(ezos_time_t));
 	*starttime = ezos_time(NULL);
@@ -330,7 +318,6 @@ static void ut_ezos_sem(void)
 
 	ezos_sem_destroy(gsem);
 	gsem = NULL;
-	ezos_printf("test OK:\tezos_sem_destroy\n");
 	ezos_free(starttime);
 }
 
@@ -338,15 +325,13 @@ static void test_thread_task(void* user_data)
 {
 	ezos_time_t* starttime = (ezos_time_t*)user_data;
 	ezos_time_t endtime;
-	ezos_printf("test OK:\tezos_thread_create\n");
 
 	if (starttime)
 	{
 		ezos_mutex_lock(glock);
 		endtime = ezos_time(NULL); 
 		if ((endtime - *starttime) == 2) {
-			ezos_printf("test OK:\tezos_mutex_lock\n");
-			ezos_printf("test OK:\tezos_mutex_unlock\n");
+			
 		}
 		else {
 			ezos_printf("test fail:\tezos_mutex_lock\n");
@@ -365,7 +350,6 @@ static void ut_ezos_thread(void)
 		ezos_printf("test fail:\tezos_mutex_create\n");
 		return;
 	}
-	ezos_printf("test OK:\tezos_mutex_create\n");
 
 	starttime = ezos_malloc(sizeof(ezos_time_t));
 	*starttime = ezos_time(NULL);
@@ -381,10 +365,8 @@ static void ut_ezos_thread(void)
 	
 	ezos_thread_destroy(gthread);
 	gthread = NULL;
-	ezos_printf("test OK:\tezos_thread_destroy\n");
 	ezos_mutex_destroy(glock);
 	glock = NULL;
-	ezos_printf("test OK:\tezos_mutex_destroy\n");
 	ezos_free(starttime);
 	return;
 }
@@ -409,11 +391,7 @@ static void ut_ezos_time(void)
 		return;
 	}
 	if (clock.tv_sec == time_val.tv_sec && clock.tv_sec == time_1 && time_1 == time_2) {
-		ezos_printf("test OK:\tezos_get_clock: tv_sec.%ld, tv_nsec.%ld\n", clock.tv_sec, clock.tv_nsec);
-		ezos_printf("test OK:\tezos_gettimeofday: tv_sec.%ld, tv_usec.%ld\n", time_val.tv_sec, time_val.tv_usec);
-		ezos_printf("test OK:\tezos_time: %ld\n", time_1);
-		ezos_printf("test OK:\tezos_time: %ld\n", time_2);
-		ezos_printf("test OK:\tezos_localtime: %04d-%2d-%02d %02d:%02d:%02d\n", tm_time.tm_year+1900, tm_time.tm_mon+1, tm_time.tm_mday, tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec);
+
 	}
 	else {
 		ezos_printf("test fail:\tezos_get_clock:%d\n", clock.tv_sec);
@@ -427,149 +405,61 @@ static void ut_ezos_time(void)
 	if ((time_2 - time_1) != 2) {
 		ezos_printf("test fail:\tez_os_delay_ms\n");
 	}
-	ezos_printf("test OK:\tezos_delay_ms\n");
 
 	return;
 }
 
 static void ut_ezos_mem(void)
 {
+	uassert_not_null(ezos_malloc(10));
 	char* src = (char*)ezos_malloc(10);
-	if (src == NULL)
-	{
-		ezos_printf("test fail:\tezos_malloc\n");
-		return;
-	}
-	ezos_memset(src, 0, 10);
-	ezos_strncpy(src, "123456789", 9);
-	ezos_printf("test OK:\tezos_malloc:%08x\n", src);
-
-	src = ezos_realloc(src, 20);
-	if (src == NULL)
-	{
-		ezos_printf("test fail:\tezos_realloc\n");
-		return;
-	}
-	ezos_memset(src, 0, 20);
-	ezos_strncpy(src, "1234567890123456789", 19);
-	ezos_printf("test OK:\tezos_realloc:%08x\n", src);
+	uassert_not_null(ezos_realloc(src, 20));
 	
 	ezos_free(src);
-	ezos_printf("test OK:\tezos_free:%08x\n", src);
-
-	src = ezos_calloc(2, 10);
-	if (src == NULL)
-	{
-		ezos_printf("test fail:\tezos_calloc\n");
-		return;
-	}
-	ezos_memset(src, 0, 20);
-	ezos_strncpy(src, "1234567890123456789", 19);
-	ezos_printf("test OK:\tezos_calloc:%08x\n", src);
+	uassert_not_null(ezos_calloc(2, 10));
 	ezos_free(src);
 }
 
 static void ut_ezos_libc(void)
 {
 	char buf[20];
-	int ret;
 	char *outstr;
 
-	ezos_printf("test OK:\tezos_printf\n");
 	buf[0] = 'a';
 	ezos_memset(buf, 0, sizeof(buf));
 	if (buf[0] != 0) {
 		ezos_printf("test fail:\tezos_memset\n");
 		return;
 	}
-	ezos_printf("test OK:\tezos_memset\n");
 
 	ezos_memcpy(buf, "helloworld", 10);
-	if ((ret = ezos_memcmp(buf, "helloworld", 10)) != 0) {
-		ezos_printf("test fail:\tezos_memcpy\n");
-		ezos_printf("test fail:\tezos_memcmp:%d\n", ret);
-		return;
-	}
-	ezos_printf("test OK:\tezos_memcpy\n");
-	ezos_printf("test OK:\tezos_memcmp\n");
+	uassert_int_equal(0, ezos_memcmp(buf, "helloworld", 10));
 
 	ezos_memset(buf, 0, sizeof(buf));
 	ezos_sprintf(buf, "hello%s", "world");
-	if (ezos_strcmp(buf, "helloworld")) {
-		ezos_printf("test fail:\tezos_sprintf\n");
-		ezos_printf("test fail:\tezos_strcmp\n");
-		return;
-	}
-	ezos_printf("test OK:\tezos_sprintf\n");
-	ezos_printf("test OK:\tezos_strcmp\n");
+	uassert_int_equal(0, ezos_strcmp(buf, "helloworld"));
 
-	if (ezos_strncmp(buf, "helloworld", 10)) {
-		ezos_printf("test fail:\tezos_strncmp\n");
-		return;
-	}
-	ezos_printf("test OK:\tezos_strncmp\n");
-
-	if (ezos_strlen(buf) != 10) {
-		ezos_printf("test fail:\tezos_strlen\n");
-		return;
-	}
-	ezos_printf("test OK:\tezos_strlen\n");
-
-	if (ezos_strstr(buf, "helloworld") == NULL) {
-		ezos_printf("test fail:\tezos_strstr\n");
-		return;
-	}
-	ezos_printf("test OK:\tezos_strstr\n");
+	uassert_int_equal(0, ezos_strncmp(buf, "helloworld", 10));
+	uassert_int_equal(10, ezos_strlen(buf));
+	uassert_not_null(ezos_strstr(buf, "helloworld"));
 
 	ezos_memset(buf, 0, sizeof(buf));
 	ezos_snprintf(buf, sizeof(buf), "helloworld");
-	if (ezos_strcmp(buf, "helloworld")) {
-		ezos_printf("test fail:\tezos_strcpy\n");
-		ezos_printf("test fail:\tezos_snprintf\n");
-		return;
-	}
-	ezos_printf("test OK:\tezos_strcpy\n");
-	ezos_printf("test OK:\tezos_snprintf\n");
+	uassert_int_equal(0, ezos_strcmp(buf, "helloworld"));
 
 	ezos_memset(buf, 0, sizeof(buf));
 	ezos_strncpy(buf, "helloworld", 10);
-	if (ezos_strcmp(buf, "helloworld")) {
-		ezos_printf("test fail:\tezos_strncpy\n");
-		return;
-	}
-	ezos_printf("test OK:\tezos_strncpy\n");
+	uassert_int_equal(0, ezos_strcmp(buf, "helloworld"));
 
-	outstr = ezos_strchr(buf, 'o');
-	if (!outstr || ezos_strcmp(outstr, "oworld")) {
-		ezos_printf("test fail:\tezos_strchr\n");
-		return;
-	}
-	ezos_printf("test OK:\tezos_strchr\n");
-
-	outstr = ezos_strrchr(buf, 'o');
-	if (!outstr || ezos_strcmp(outstr, "orld")) {
-		ezos_printf("test fail:\tezos_strrchr\n");
-		return;
-	}
-	ezos_printf("test OK:\tezos_strrchr\n");
+	uassert_not_null(ezos_strchr(buf, 'o'));
+	uassert_not_null(ezos_strrchr(buf, 'o'));
 
 	ezos_memmove(buf, buf+5, ezos_strlen(buf)-5);
-	if (ezos_strncmp(buf, "world", 5)) {
-		ezos_printf("test fail:\tezos_memmove\t%s\n", buf);
-		return;
-	}
-	ezos_printf("test OK:\tezos_memmove\n");
+	uassert_int_equal(0, ezos_strncmp(buf, "world", 5));
 
 
 	ezos_memset(buf, 0, sizeof(buf));
 	ezos_memcpy(buf, "100", 3);
-	ret = ezos_atoi(buf);
-	if (ret != 100) {
-		ezos_printf("test fail:\tezos_atoi:%d\n", ret);
-		return;
-	}
-	ezos_printf("test OK:\tezos_atoi\n");
-
-	ret = ezos_rand();
-	ezos_printf("test OK:\tezos_rand\n");
+	uassert_int_equal(100, ezos_atoi(buf));
+	ezos_rand();
 }
