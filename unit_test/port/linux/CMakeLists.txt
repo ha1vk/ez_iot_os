@@ -219,6 +219,26 @@ if(CONFIG_EZIOT_TSL_ENABLE)
 
 endif()
 
+IF(CONFIG_EZIOT_COMPONENT_EZCONN_ENABLE)
+	message(STATUS "CONFIG_EZIOT_COMPONENT_EZCONN_ENABLE")
+
+    list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/ezconn/inc)
+    
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_ap.c)
+
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezconn)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/http_server)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/eztimer)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezlog)
+
+    list(APPEND UT_DEPENS -lezconn)
+    list(APPEND UT_DEPENS -lhttp_server)
+    list(APPEND UT_DEPENS -leztimer)
+    list(APPEND UT_DEPENS -lezlog)
+    
+ENDIF()
+
+
 ##############################################根据开关定义编译的文件和链接的库#############################################
 
 #预编译宏

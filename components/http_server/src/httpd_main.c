@@ -375,6 +375,8 @@ static void httpd_delete(struct httpd_data *hd)
     ezos_free(ra->resp_hdrs);
     ezos_free(hd->hd_sd);
 
+    httpd_os_thread_delete(hd->hd_td.handle);
+
     /* ezos_free registered URI handlers */
     httpd_unregister_all_uri_handlers(hd);
     ezos_free(hd->hd_calls);

@@ -126,6 +126,7 @@ ez_int32_t eztimer_fini(void)
 
     ezos_mutex_unlock(g_status_mutex);
 
+    ezos_mutex_destroy(g_status_mutex);
     return 0;
 }
 
@@ -183,11 +184,11 @@ ez_int32_t eztimer_delete(ez_int32_t timer_id)
         }
     }
 
+    ezos_mutex_unlock(g_status_mutex);
     if (1 == list_size)
     {
         eztimer_fini();
     }
-    ezos_mutex_unlock(g_status_mutex);
     return 0;
 }
 
