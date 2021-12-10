@@ -19,8 +19,8 @@ typedef struct
 
 typedef struct timer_list
 {
-    ez_list_t   *list;             //eztimer_struct
-    ez_int32_t  msec;              //轮询时间，默认100ms
+    ez_list_t   list;             //eztimer_struct
+    ez_int32_t  msec;             //轮询时间，默认100ms
     ez_bool_t   invalid;
     void        *thread;
 } timer_list;
@@ -38,7 +38,7 @@ static void timer_routine(void *param)
     {
         ezos_mutex_lock(g_status_mutex);
         eztimer_struct *node= NULL;
-        LIST_FOR_EACH(eztimer_struct, node, g_list.list)
+        LIST_FOR_EACH(eztimer_struct, node, &g_list.list)
         {
             if (node != NULL)
             {
@@ -51,7 +51,7 @@ static void timer_routine(void *param)
 
                     if (!node->reload)
                     {
-                        ezlist_delete(g_list.list, &node->node);
+                        ezlist_delete(&g_list.list, &node->node);
                         ezos_free(node);
                         break;
                     }
@@ -97,7 +97,7 @@ ez_int32_t eztimer_init(void)
     }
     g_list.invalid = ez_true;
     g_list.msec = 100;
-    ezlist_init(g_list.list);
+    ezlist_init(&g_list.list);
     ezos_mutex_unlock(g_status_mutex);
     return 0;
 }
@@ -113,14 +113,14 @@ ez_int32_t eztimer_fini(void)
 
     if (g_list.invalid)
     {
-        ez_int32_t list_size = ezlist_get_size(g_list.list);
+        ez_int32_t list_size = ezlist_get_size(&g_list.list);
         if (0 == list_size)
         {
             g_list.invalid = ez_false;
             ezos_thread_destroy(g_list.thread);
             g_list.thread = NULL;
 
-            ezlist_clear(g_list.list);
+            ezlist_clear(&g_list.list);
         }
     }
 
@@ -155,7 +155,7 @@ ez_int32_t eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload
     timer->count_down = time_out / g_list.msec;
 
     ezos_mutex_lock(g_status_mutex);
-    ezlist_add_last(g_list.list, &timer->node);
+    ezlist_add_last(&g_list.list, &timer->node);
     ezos_mutex_unlock(g_status_mutex);
 
     return timer->id;
@@ -171,13 +171,13 @@ ez_int32_t eztimer_delete(ez_int32_t timer_id)
     ez_int32_t id = timer_id;
 
     ezos_mutex_lock(g_status_mutex);
-    ez_int32_t list_size = ezlist_get_size(g_list.list);
+    ez_int32_t list_size = ezlist_get_size(&g_list.list);
     eztimer_struct *timer = NULL;
-    LIST_FOR_EACH(eztimer_struct, timer, g_list.list)
+    LIST_FOR_EACH(eztimer_struct, timer, &g_list.list)
     {
         if (id == timer->id)
         {
-            ezlist_delete(g_list.list, &timer->node);
+            ezlist_delete(&g_list.list, &timer->node);
             ezos_free(timer);
             break;
         }
@@ -202,7 +202,7 @@ ez_int32_t eztimer_reset(ez_int32_t timer_id)
 
     ezos_mutex_lock(g_status_mutex);
     eztimer_struct *timer = NULL;
-    LIST_FOR_EACH(eztimer_struct, timer, g_list.list)
+    LIST_FOR_EACH(eztimer_struct, timer, &g_list.list)
     {
         if (id == timer->id)
         {
@@ -225,7 +225,7 @@ ez_int32_t eztimer_change_period(ez_int32_t timer_id, ez_int32_t new_time_out)
 
     ezos_mutex_lock(g_status_mutex);
     eztimer_struct *timer = NULL;
-    LIST_FOR_EACH(eztimer_struct, timer, g_list.list)
+    LIST_FOR_EACH(eztimer_struct, timer, &g_list.list)
     {
         if (id == timer->id)
         {
