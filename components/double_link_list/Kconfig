@@ -1,5 +1,0 @@
-menu "Component double_link_list configuration"
-    config EZIOT_COMPONENT_DOUBLE_LINK_LIST_ENABLE
-        bool "Enable double_link_list component"
-        default y
-endmenu
