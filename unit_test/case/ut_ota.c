@@ -285,13 +285,15 @@ void ut_ota_test(void)
     ezos_delay_ms(1000);
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_stop());
     uassert_int_equal(OTA_CODE_NONE, ez_iot_ota_deinit());
+    ez_iot_core_deinit();
+    //ezlog_stop();
 }
 
 static long global_init()
 {
-    ezlog_init();
-    ezlog_start();
-    ezlog_filter_lvl(CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL);
+    //ezlog_init();
+    //ezlog_start();
+    //ezlog_filter_lvl(CONFIG_EZIOT_UNIT_TEST_SDK_LOGLVL);
 
     ezos_strncpy(m_dev_info.dev_typedisplay, CONFIG_EZIOT_UNIT_TEST_DEV_DISPLAY_NAME, sizeof(m_dev_info.dev_typedisplay) - 1);
     ezos_strncpy(m_dev_info.dev_firmwareversion, CONFIG_EZIOT_UNIT_TEST_DEV_FIRMWARE_VERSION, sizeof(m_dev_info.dev_firmwareversion) - 1);

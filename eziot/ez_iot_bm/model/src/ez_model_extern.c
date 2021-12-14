@@ -141,7 +141,7 @@ static int ez_model_add_domain_info(ez_list_t *list, const ez_domain_reg_t *doma
 
 int ez_reg_domain(const ez_domain_reg_t *domain_reg)
 {
-    EZ_ERR_CODE_E ret = EZ_CODE_SUCESS;
+    ez_model_errcode_e ret = EZ_CODE_SUCESS;
     if (NULL == domain_reg->das_reply_router || NULL == domain_reg->das_req_router || 0 == ezos_strlen(domain_reg->domain))
     {
         return EZ_CODE_INVALID_PARAM;

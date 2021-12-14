@@ -1,2 +1,5 @@
-cd ./platform/bsp/linux/build
+cd ./platform/bsp/linux
+mkdir build
+cd ./build
+cmake ..
 make

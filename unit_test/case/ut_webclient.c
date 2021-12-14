@@ -57,6 +57,7 @@ void ut_webclient_test(void)
     char* recvbuffer = (char*)ezos_malloc(content_len+1);
     ezos_memset(recvbuffer, 0, content_len+1);
     webclient_read(h_client, recvbuffer, content_len);
+    ezos_free(recvbuffer);
     webclient_close(h_client);
 }
 

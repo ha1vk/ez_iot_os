@@ -43,7 +43,7 @@ typedef enum {
 	EZ_CODE_JSON_PRINT_ERR        = 1011, ///< JSON格式化错误
 	EZ_CODE_KERNEL_SEND_ERR       = 1012, ///< 消息发送失败
     EZ_CODE_CB_REGED              = 1013, ///< 回调已注册
-}EZ_ERR_CODE_E;
+}ez_model_errcode_e;
 
 /**
  * \brief   ez_prime 通道消息类型
@@ -55,7 +55,7 @@ typedef  enum
     ez_event,     ///< 事件消息
     ez_attribute, ///< 属性消息
     ez_service    ///< 操作消息
-} ez_model_type_t; 
+} ez_model_type_e; 
 
 /**
  * \brief   ez_prime 通用消息信息
@@ -65,7 +65,7 @@ typedef  enum
 
 typedef struct
 {   
-    ez_model_type_t type;                       ///< "event" "attribute" "service"
+    ez_model_type_e type;                       ///< "event" "attribute" "service"
     char resource_id[EZ_RES_ID_LEN];          ///< 设备资源id
     char resource_type[EZ_RES_TYPE_LEN];      ///< 设备资源类型
     char domain[EZ_COMMON_LEN];               ///< domain
@@ -99,7 +99,7 @@ typedef  enum
     model_data_type_array,
     model_data_type_object,
     model_data_type_null
-} ez_json_type_t;   
+} ez_json_type_e;   
 
 /**
  * \brief  协议消息体
@@ -107,7 +107,7 @@ typedef  enum
  */
 typedef struct
 {
-    ez_json_type_t type;
+    ez_json_type_e type;
     int length;
     union
     {

@@ -411,12 +411,14 @@ static void ut_ezos_time(void)
 
 static void ut_ezos_mem(void)
 {
-	uassert_not_null(ezos_malloc(10));
-	char* src = (char*)ezos_malloc(10);
-	uassert_not_null(ezos_realloc(src, 20));
-	
+	char *src= NULL;
+	src = ezos_malloc(10);
+	uassert_not_null(src);
+	src = ezos_realloc(src, 20);
+	uassert_not_null(src);
 	ezos_free(src);
-	uassert_not_null(ezos_calloc(2, 10));
+	src = ezos_calloc(2, 10);
+	uassert_not_null(src);
 	ezos_free(src);
 }
 
