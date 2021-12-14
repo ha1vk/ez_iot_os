@@ -16,11 +16,13 @@ if(CONFIG_EZIOT_MODEL_ENABLE)
     ###############################################
 
     ###### Add required/dependent components ######
+    
     list(APPEND ADD_REQUIREMENTS cJSON)
     list(APPEND ADD_REQUIREMENTS ezlog)
     list(APPEND ADD_REQUIREMENTS ez_iot_core)
-    list(APPEND ADD_REQUIREMENTS ezos)
     list(APPEND ADD_REQUIREMENTS ezlist)
+    list(APPEND ADD_REQUIREMENTS ezos)
+    
     ###############################################
 
     ############ Add static libs ##################

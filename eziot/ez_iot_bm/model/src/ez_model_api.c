@@ -25,7 +25,7 @@ static int g_inited = 0;
 
 static int ez_model_init()
 {
-	EZ_ERR_CODE_E ret = EZ_CODE_SUCESS;
+	ez_model_errcode_e ret = EZ_CODE_SUCESS;
 	do
 	{
 		ret = ez_model_extern_init();
@@ -64,7 +64,7 @@ static int ez_model_fini()
 
  EZOS_API int ez_iot_model_domain_reg(const ez_domain_reg_t *domain_reg)
 {
-	EZ_ERR_CODE_E ret = EZ_CODE_SUCESS;
+	ez_model_errcode_e ret = EZ_CODE_SUCESS;
 	if (NULL == domain_reg)
 	{
 		return EZ_CODE_INVALID_PARAM;

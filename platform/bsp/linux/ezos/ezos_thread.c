@@ -83,7 +83,7 @@ EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_
     else
     {
         pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED);
-        pthd->state = THREAD_STATE_JOINABLE;
+        pthd->state = THREAD_STATE_DETACHED;
     }
 
     pthread_attr_setstacksize(&thread_attr, stack_size);
