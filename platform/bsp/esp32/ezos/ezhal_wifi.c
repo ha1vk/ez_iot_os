@@ -1,4 +1,4 @@
-#include "ezos_wifi.h"
+#include "ezhal_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -10,7 +10,7 @@
 static const char *TAG_WIFI = "T_WIFI";
 
 static EventGroupHandle_t g_wifi_event_group = NULL;
-static ezos_wifi_state_e g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
+static ezhal_wifi_state_e g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
 
 static ez_bool_t g_wifi_init = false;
 
@@ -104,7 +104,7 @@ static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
-int ezos_wifi_init()
+int ezhal_wifi_init()
 {
     ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
     if (g_wifi_init)
@@ -121,7 +121,7 @@ int ezos_wifi_init()
     return 0;
 }
 
-int ezos_wifi_config(ezos_wifi_mode_e wifi_mode)
+int ezhal_wifi_config(ezhal_wifi_mode_e wifi_mode)
 {
     switch (wifi_mode)
     {
@@ -139,7 +139,7 @@ int ezos_wifi_config(ezos_wifi_mode_e wifi_mode)
     }
 }
 
-int ezos_sta_connect(char *ssid, char *password)
+int ezhal_sta_connect(char *ssid, char *password)
 {
     wifi_config_t wifi_config;
     esp_err_t ret = ESP_OK;
@@ -217,7 +217,7 @@ int ezos_sta_connect(char *ssid, char *password)
     return 0;
 }
 
-int ezos_sta_stop()
+int ezhal_sta_stop()
 {
     ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
     g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
@@ -225,7 +225,7 @@ int ezos_sta_stop()
     return 0;
 }
 
-int ezos_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned char channel)
+int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned char channel)
 {
     wifi_config_t wifi_config;
     int ssid_len = 0, pwd_len = 0;
@@ -289,7 +289,7 @@ int ezos_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned 
     return 0;
 }
 
-int ezos_ap_stop()
+int ezhal_ap_stop()
 {
     wifi_mode_t wifi_mode = WIFI_MODE_NULL;
     esp_err_t ret = ESP_OK;
@@ -313,7 +313,7 @@ int ezos_ap_stop()
     return ret;
 }
 
-int ezos_wifi_deinit()
+int ezhal_wifi_deinit()
 {
     esp_wifi_stop();
     esp_wifi_deinit();
@@ -325,7 +325,7 @@ int ezos_wifi_deinit()
     return 0;
 }
 
-unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t *ap_list)
+unsigned char ezhal_sta_get_scan_list(unsigned char max_ap_num, ezhal_wifi_list_t *ap_list)
 {
     if (g_wifi_scan_start)
     {
@@ -367,7 +367,7 @@ unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t 
     
     for (size_t i = 0; i < tmp_num; i++)
     {
-        ezos_wifi_list_t *ap_info = ap_list + i;
+        ezhal_wifi_list_t *ap_info = ap_list + i;
         wifi_ap_record_t *ap_scan_info = tmp_list + i;
         ap_info->authmode = ap_scan_info->authmode;
         ap_info->rssi = ap_scan_info->rssi;
@@ -382,7 +382,7 @@ unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t 
 }
 
 
-int ezos_get_rssi(char *rssi)
+int ezhal_get_rssi(char *rssi)
 {
     int8_t ret = -1;
 
@@ -404,7 +404,7 @@ int ezos_get_rssi(char *rssi)
     return ret;
 }
 
-ezos_wifi_state_e ezos_get_state()
+ezhal_wifi_state_e ezhal_get_wifi_state()
 {
     return g_wifi_connect_state;
 }

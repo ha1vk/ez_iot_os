@@ -128,7 +128,7 @@ const char *ezos_inet_ntop(int af, const void *src, char *dst, ez_socklen_t size
     return inet_ntop(af, src, dst, size);
 }
 
-unsigned long ezos_inet_addr(const char *cp)
+unsigned int ezos_inet_addr(const char *cp)
 {
     return inet_addr(cp);
 }
