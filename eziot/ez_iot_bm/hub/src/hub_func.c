@@ -18,8 +18,6 @@
  * 2021-11-25    zhangdi29     
  *******************************************************************************/
 #include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
 #include "ezos_gconfig.h"
 #include "ezos_def.h"
 #include "hub_func.h"
@@ -29,19 +27,10 @@
 #include "mbedtls/md5.h"
 #include "misc.h"
 #include "eztimer.h"
-//#include "timer/timer.h"
 #include "ezlog.h"
 #include "misc.h"
 #include "eztimer.h"
-#ifdef COMPONENT_TSL_ENABLE
-#include "ez_iot_tsl.h"
-#include "ez_iot_tsl_adapter.h"
-#include "ezos_kv.h"
-#include "misc.h"
-#include "s2j.h"
-#include "s2jdef.h"
 
-#endif
 
 #define SAP_DEV_SN_LEN 9
 #define SUBLIST_JSON_KEY_STA "sta"
@@ -108,7 +97,7 @@ static ez_hub_callbacks_t *hub_callbacks_get(void)
 
 ez_int_t hub_func_init(const ez_hub_callbacks_t *phub_cbs)
 {
-    memcpy((void *)&g_phub_cbs, (const void *)phub_cbs, sizeof(g_phub_cbs));
+    ezos_memcpy((void *)&g_phub_cbs, (const void *)phub_cbs, sizeof(g_phub_cbs));
     g_hlock = ezos_mutex_create();
     if (NULL == g_hlock)
     {
@@ -120,7 +109,7 @@ ez_int_t hub_func_init(const ez_hub_callbacks_t *phub_cbs)
         return EZ_HUB_ERR_INTERNAL;
     }
 
-    g_auth_timer = eztimer_create("auth_retry_timer", (2 * 1000 * 60), false, auth_retry_timer_cb);
+    g_auth_timer = eztimer_create("auth_retry_timer", (2 * 1000 * 60), ez_false, auth_retry_timer_cb);
     if (g_auth_timer <= 0)
     {
         ezlog_e(TAG_AP, "start auth retry timer failed.");
@@ -131,7 +120,7 @@ ez_int_t hub_func_init(const ez_hub_callbacks_t *phub_cbs)
 
 void hub_func_deinit()
 {
-    memset((void *)&g_phub_cbs, 0, sizeof(g_phub_cbs));
+    ezos_memset((void *)&g_phub_cbs, 0, sizeof(g_phub_cbs));
     hub_tsl_unreg_all();
     eztimer_delete(g_auth_timer);
 
@@ -162,7 +151,7 @@ ez_err_t hub_add_do(const hub_subdev_info_internal_t *subdev_info)
         /* 防止重复添加 */
         pbuf = (ez_char_t *)malloc(length + 1);
         CHECK_COND_DONE(!pbuf, EZ_HUB_ERR_MEMORY);
-        memset(pbuf, 0, length + 1);
+        ezos_memset(pbuf, 0, length + 1);
 
         CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
         CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), EZ_HUB_ERR_MEMORY);
@@ -175,7 +164,7 @@ ez_err_t hub_add_do(const hub_subdev_info_internal_t *subdev_info)
     CHECK_COND_DONE(!(js_subdev = subdev_to_json((void *)subdev_info)), EZ_HUB_ERR_MEMORY);
     cJSON_AddItemToArray(js_root, js_subdev);
     CHECK_COND_DONE(!(pbuf_save = cJSON_PrintUnformatted(js_root)), EZ_HUB_ERR_MEMORY);
-    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
+    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, ezos_strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
 
     g_unauth_count++;
     hub_subdev_auth_do((void *)subdev_info);
@@ -211,7 +200,7 @@ ez_err_t hub_del_do(const ez_char_t *subdev_sn)
     CHECK_COND_DONE(0 == length, EZ_HUB_ERR_SUBDEV_NOT_FOUND);
 
     CHECK_COND_DONE(!(pbuf = (ez_char_t *)malloc(length + 1)), EZ_HUB_ERR_MEMORY);
-    memset(pbuf, 0, length + 1);
+    ezos_memset(pbuf, 0, length + 1);
 
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
     CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), EZ_HUB_ERR_MEMORY);
@@ -223,7 +212,7 @@ ez_err_t hub_del_do(const ez_char_t *subdev_sn)
 
     cJSON_DeleteItemFromArray(js_root, index);
     CHECK_COND_DONE(!(pbuf_save = cJSON_PrintUnformatted(js_root)), EZ_HUB_ERR_MEMORY);
-    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
+    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, ezos_strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
 
     if (0 == subdev_info.access)
     {
@@ -269,7 +258,7 @@ ez_err_t hub_ver_update_do(const ez_char_t *subdev_sn, const ez_char_t *subdev_v
     CHECK_COND_DONE(0 == length, EZ_HUB_ERR_SUBDEV_NOT_FOUND);
 
     CHECK_COND_DONE(!(pbuf = (ez_char_t *)malloc(length + 1)), EZ_HUB_ERR_MEMORY);
-    memset(pbuf, 0, length + 1);
+    ezos_memset(pbuf, 0, length + 1);
 
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
     CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), EZ_HUB_ERR_MEMORY);
@@ -281,7 +270,7 @@ ez_err_t hub_ver_update_do(const ez_char_t *subdev_sn, const ez_char_t *subdev_v
 
     cJSON_ReplaceItemInObject(js_item, SUBLIST_JSON_KEY_VER, cJSON_CreateString((ez_char_t *)subdev_ver));
     CHECK_COND_DONE(!(pbuf_save = cJSON_PrintUnformatted(js_root)), EZ_HUB_ERR_MEMORY);
-    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
+    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, ezos_strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
     json_to_subdev(js_item, (void *)&subdev_info_new);
 
     hub_tsl_unreg(&subdev_info_old);
@@ -320,7 +309,7 @@ ez_err_t hub_status_update_do(const ez_char_t *subdev_sn, ez_bool_t online)
     CHECK_COND_DONE(0 == length, EZ_HUB_ERR_SUBDEV_NOT_FOUND);
 
     CHECK_COND_DONE(!(pbuf = (ez_char_t *)malloc(length + 1)), EZ_HUB_ERR_MEMORY);
-    memset(pbuf, 0, length + 1);
+    ezos_memset(pbuf, 0, length + 1);
 
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
     CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), EZ_HUB_ERR_MEMORY);
@@ -331,7 +320,7 @@ ez_err_t hub_status_update_do(const ez_char_t *subdev_sn, ez_bool_t online)
 
     cJSON_ReplaceItemInObject(js_item, SUBLIST_JSON_KEY_STA, cJSON_CreateBool((cJSON_bool)online));
     CHECK_COND_DONE(!(pbuf_save = cJSON_PrintUnformatted(js_root)), EZ_HUB_ERR_MEMORY);
-    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
+    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, ezos_strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
 done:
 
     ezos_mutex_unlock(g_hlock);
@@ -365,7 +354,7 @@ ez_err_t hub_subdev_query(const ez_char_t *subdev_sn, hub_subdev_info_internal_t
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, NULL, &length), EZ_HUB_ERR_STORAGE);
     CHECK_COND_DONE(0 == length, EZ_HUB_ERR_SUBDEV_NOT_FOUND);
     CHECK_COND_DONE(!(pbuf = (ez_char_t *)malloc(length + 1)), EZ_HUB_ERR_MEMORY);
-    memset(pbuf, 0, length + 1);
+    ezos_memset(pbuf, 0, length + 1);
 
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
     CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), EZ_HUB_ERR_MEMORY);
@@ -406,12 +395,12 @@ ez_err_t hub_subdev_next(hub_subdev_info_internal_t *subdev_info)
     CHECK_COND_DONE(0 == length, EZ_HUB_ERR_ENUM_END);
 
     CHECK_COND_DONE(!(pbuf = (ez_char_t *)malloc(length + 1)), EZ_HUB_ERR_MEMORY);
-    memset(pbuf, 0, length + 1);
+    ezos_memset(pbuf, 0, length + 1);
 
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
     CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), EZ_HUB_ERR_MEMORY);
 
-    if (0 == strlen((ez_char_t *)subdev_info->sn))
+    if (0 == ezos_strlen((ez_char_t *)subdev_info->sn))
     {
         index = find_dev_by_sn(js_root, NULL);
         if (-1 == index)
@@ -486,7 +475,7 @@ static EZ_INT find_dev_by_sn(cJSON *json_obj, ez_char_t *sn)
             continue;
         }
 
-        if (NULL == sn || 0 == strcmp(js_sn->valuestring, (ez_char_t *)sn))
+        if (NULL == sn || 0 == ezos_strcmp(js_sn->valuestring, (ez_char_t *)sn))
         {
             index = i;
             break;
@@ -513,12 +502,12 @@ EZ_INT hub_subdev_list_report(void)
 
     if (0 == length)
     {
-        CHECK_COND_DONE(hub_send_msg_to_platform("{}", strlen("{}"), kPu2CenPltHubReportRelationShipReq, EZDEVSDK_HUB_REQ, 0), EZ_HUB_ERR_INTERNAL);
+        CHECK_COND_DONE(hub_send_msg_to_platform("{}", ezos_strlen("{}"), kPu2CenPltHubReportRelationShipReq, EZDEVSDK_HUB_REQ, 0), EZ_HUB_ERR_INTERNAL);
         goto done;
     }
 
     CHECK_COND_DONE(!(pbuf = (ez_char_t *)malloc(length + 1)), EZ_HUB_ERR_MEMORY);
-    memset(pbuf, 0, length + 1);
+    ezos_memset(pbuf, 0, length + 1);
 
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
     CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), EZ_HUB_ERR_MEMORY);
@@ -528,7 +517,7 @@ EZ_INT hub_subdev_list_report(void)
     for (size_t i = 0; i < cJSON_GetArraySize(js_root); i++)
     {
         cJSON *js_item = cJSON_GetArrayItem(js_root, i);
-        memset((void *)&subdev_info, 0, sizeof(subdev_info));
+        ezos_memset((void *)&subdev_info, 0, sizeof(subdev_info));
         json_to_subdev(js_item, (void *)&subdev_info);
         if (0 == subdev_info.access)
         {
@@ -539,7 +528,7 @@ EZ_INT hub_subdev_list_report(void)
     }
 
     CHECK_COND_DONE(!(pbuf_report = cJSON_PrintUnformatted(subdev_lst)), EZ_HUB_ERR_MEMORY);
-    CHECK_COND_DONE(hub_send_msg_to_platform(pbuf_report, strlen(pbuf_report), kPu2CenPltHubReportRelationShipReq, EZDEVSDK_HUB_REQ, 0), EZ_HUB_ERR_INTERNAL);
+    CHECK_COND_DONE(hub_send_msg_to_platform(pbuf_report, ezos_strlen(pbuf_report), kPu2CenPltHubReportRelationShipReq, EZDEVSDK_HUB_REQ, 0), EZ_HUB_ERR_INTERNAL);
 
 done:
     ezos_mutex_unlock(g_hlock);
@@ -574,7 +563,7 @@ EZ_INT hub_subdev_sta_report(void)
     CHECK_COND_DONE(0 == length, EZ_HUB_ERR_SUBDEV_NOT_FOUND);
 
     CHECK_COND_DONE(!(pbuf = (ez_char_t *)malloc(length + 1)), EZ_HUB_ERR_MEMORY);
-    memset(pbuf, 0, length + 1);
+    ezos_memset(pbuf, 0, length + 1);
 
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
     CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), EZ_HUB_ERR_MEMORY);
@@ -583,13 +572,13 @@ EZ_INT hub_subdev_sta_report(void)
     for (size_t i = 0; i < cJSON_GetArraySize(js_root); i++)
     {
         cJSON *js_item = cJSON_GetArrayItem(js_root, i);
-        memset((void *)&subdev_info, 0, sizeof(subdev_info));
+        ezos_memset((void *)&subdev_info, 0, sizeof(subdev_info));
         json_to_subdev(js_item, (void *)&subdev_info);
         subdev_to_status_lst(subdev_lst, (void *)&subdev_info);
     }
 
     CHECK_COND_DONE(!(pbuf_report = cJSON_PrintUnformatted(subdev_lst)), EZ_HUB_ERR_MEMORY);
-    CHECK_COND_DONE(hub_send_msg_to_platform(pbuf_report, strlen(pbuf_report), kPu2CenPltHubReportOnlineStatusReq, EZDEVSDK_HUB_REQ, 0), EZ_HUB_ERR_INTERNAL);
+    CHECK_COND_DONE(hub_send_msg_to_platform(pbuf_report, ezos_strlen(pbuf_report), kPu2CenPltHubReportOnlineStatusReq, EZDEVSDK_HUB_REQ, 0), EZ_HUB_ERR_INTERNAL);
 
 done:
     ezos_mutex_unlock(g_hlock);
@@ -621,9 +610,9 @@ ez_int_t hub_subdev_auth_do(void *subdev_info)
     CHECK_COND_RETURN(!auth_info, EZ_HUB_ERR_MEMORY);
 
     if (0 == _subdev_info->authm)
-        strncpy(sn, _subdev_info->sn, sizeof(sn) - 1);
+        ezos_strncpy(sn, _subdev_info->sn, sizeof(sn) - 1);
     else
-        snprintf(sn, sizeof(sn) - 1, "%s:%s", _subdev_info->type, _subdev_info->sn);
+        ezos_snprintf(sn, sizeof(sn) - 1, "%s:%s", _subdev_info->type, _subdev_info->sn);
 
     {
         //生成MAC方法：md5(md5(md5(verifycode+childserial) + www.88075998.com))
@@ -631,8 +620,8 @@ ez_int_t hub_subdev_auth_do(void *subdev_info)
         //首次MAC
         mbedtls_md5_init(&md5_ctx);
         mbedtls_md5_starts(&md5_ctx);
-        mbedtls_md5_update(&md5_ctx, (unsigned char *)_subdev_info->vcode, strlen(_subdev_info->vcode));
-        mbedtls_md5_update(&md5_ctx, (unsigned char *)sn, strlen(sn));
+        mbedtls_md5_update(&md5_ctx, (unsigned char *)_subdev_info->vcode, ezos_strlen(_subdev_info->vcode));
+        mbedtls_md5_update(&md5_ctx, (unsigned char *)sn, ezos_strlen(sn));
         mbedtls_md5_finish(&md5_ctx, (unsigned char*)md5);
         mbedtls_md5_free(&md5_ctx);
         bin2hexstr((unsigned char *)md5, 16, 1, (unsigned char *)MAC);
@@ -640,14 +629,14 @@ ez_int_t hub_subdev_auth_do(void *subdev_info)
         //第二次MAC
         mbedtls_md5_init(&md5_ctx);
         mbedtls_md5_starts(&md5_ctx);
-        mbedtls_md5_update(&md5_ctx, (unsigned char *)MAC, strlen(MAC));
-        mbedtls_md5_update(&md5_ctx, (unsigned char *)HUB_AUTH_SALT, strlen(HUB_AUTH_SALT));
+        mbedtls_md5_update(&md5_ctx, (unsigned char *)MAC, ezos_strlen(MAC));
+        mbedtls_md5_update(&md5_ctx, (unsigned char *)HUB_AUTH_SALT, ezos_strlen(HUB_AUTH_SALT));
         mbedtls_md5_finish(&md5_ctx, (unsigned char *)md5);
         mbedtls_md5_free(&md5_ctx);
         bin2hexstr((unsigned char *)md5, 16, 1, (unsigned char *)MAC);
 
         //计算摘要值
-        mbedtls_md5((unsigned char *)MAC, strlen(MAC), (unsigned char *)md5);
+        mbedtls_md5((unsigned char *)MAC, ezos_strlen(MAC), (unsigned char *)md5);
         bin2hexstr((unsigned char *)md5, 16, 1, (unsigned char *)MAC);
     }
 
@@ -656,7 +645,7 @@ ez_int_t hub_subdev_auth_do(void *subdev_info)
     cJSON_AddNumberToObject(auth_info, "devAccessMode", _subdev_info->authm);
     CHECK_COND_DONE(!(pbuf_report = cJSON_PrintUnformatted(auth_info)), EZ_HUB_ERR_MEMORY);
 
-    rv = hub_send_msg_to_platform(pbuf_report, strlen(pbuf_report), kPu2CenPltHubAuthChildDeviceReq, EZDEVSDK_HUB_REQ, 0);
+    rv = hub_send_msg_to_platform(pbuf_report, ezos_strlen(pbuf_report), kPu2CenPltHubAuthChildDeviceReq, EZDEVSDK_HUB_REQ, 0);
 
 done:
     SAFE_FREE(pbuf_report);
@@ -695,14 +684,14 @@ void hub_subdev_auth_done(void *buf, EZ_INT len)
         goto done;
     }
 
-    if (SAP_DEV_SN_LEN == strlen(js_sn->valuestring))
+    if (SAP_DEV_SN_LEN == ezos_strlen(js_sn->valuestring))
     {
-        strncpy(sn, js_sn->valuestring, sizeof(sn) - 1);
+        ezos_strncpy(sn, js_sn->valuestring, sizeof(sn) - 1);
     }
     else
     {
         /* license类型设备需要截取deviceName */
-        sscanf(js_sn->valuestring, "%*[^:]:%s", sn);
+        ezos_sscanf(js_sn->valuestring, "%*[^:]:%s", sn);
     }
 
     ezlog_i(TAG_HUB, "sn:%s", sn);
@@ -909,33 +898,33 @@ static void json_to_subdev(cJSON *json_obj, void *struct_obj)
 
     json_temp = cJSON_GetObjectItem(json_obj, "type");
     if (json_temp)
-        strncpy((struct_obj_internal)->type, json_temp->valuestring, sizeof((struct_obj_internal)->type) - 1);
+        ezos_strncpy((struct_obj_internal)->type, json_temp->valuestring, sizeof((struct_obj_internal)->type) - 1);
     else
-        strncpy((struct_obj_internal)->type, "", sizeof((struct_obj_internal)->type) - 1);
+        ezos_strncpy((struct_obj_internal)->type, "", sizeof((struct_obj_internal)->type) - 1);
 
     json_temp = cJSON_GetObjectItem(json_obj, "sn");
     if (json_temp)
-        strncpy((struct_obj_internal)->sn, json_temp->valuestring, sizeof((struct_obj_internal)->sn) - 1);
+        ezos_strncpy((struct_obj_internal)->sn, json_temp->valuestring, sizeof((struct_obj_internal)->sn) - 1);
     else
-        strncpy((struct_obj_internal)->sn, "", sizeof((struct_obj_internal)->sn) - 1);
+        ezos_strncpy((struct_obj_internal)->sn, "", sizeof((struct_obj_internal)->sn) - 1);
 
     json_temp = cJSON_GetObjectItem(json_obj, "vcode");
     if (json_temp)
-        strncpy((struct_obj_internal)->vcode, json_temp->valuestring, sizeof((struct_obj_internal)->vcode) - 1);
+        ezos_strncpy((struct_obj_internal)->vcode, json_temp->valuestring, sizeof((struct_obj_internal)->vcode) - 1);
     else
-        strncpy((struct_obj_internal)->vcode, "", sizeof((struct_obj_internal)->vcode) - 1);
+        ezos_strncpy((struct_obj_internal)->vcode, "", sizeof((struct_obj_internal)->vcode) - 1);
 
     json_temp = cJSON_GetObjectItem(json_obj, "ver");
     if (json_temp)
-        strncpy((struct_obj_internal)->ver, json_temp->valuestring, sizeof((struct_obj_internal)->ver) - 1);
+        ezos_strncpy((struct_obj_internal)->ver, json_temp->valuestring, sizeof((struct_obj_internal)->ver) - 1);
     else
-        strncpy((struct_obj_internal)->ver, "", sizeof((struct_obj_internal)->ver) - 1);
+        ezos_strncpy((struct_obj_internal)->ver, "", sizeof((struct_obj_internal)->ver) - 1);
 
     json_temp = cJSON_GetObjectItem(json_obj, "uuid");
     if (json_temp)
-        strncpy((struct_obj_internal)->uuid, json_temp->valuestring, sizeof((struct_obj_internal)->uuid) - 1);
+        ezos_strncpy((struct_obj_internal)->uuid, json_temp->valuestring, sizeof((struct_obj_internal)->uuid) - 1);
     else
-        strncpy((struct_obj_internal)->uuid, "", sizeof((struct_obj_internal)->uuid) - 1);
+        ezos_strncpy((struct_obj_internal)->uuid, "", sizeof((struct_obj_internal)->uuid) - 1);
 
     json_temp = cJSON_GetObjectItem(json_obj, "access");
     if (json_temp)
@@ -951,9 +940,9 @@ static void subdev_to_relation_lst(cJSON *json_relation_lst, void *struct_obj)
 
     cJSON *subdev_json = cJSON_CreateObject();
     struct_obj_report.connected = struct_obj_internal->sta;
-    strncpy(struct_obj_report.childdevid, struct_obj_internal->sn, sizeof(struct_obj_report.childdevid) - 1);
-    strncpy(struct_obj_report.type, struct_obj_internal->type, sizeof(struct_obj_report.childdevid) - 1);
-    strncpy(struct_obj_report.version, struct_obj_internal->ver, sizeof(struct_obj_report.childdevid) - 1);
+    ezos_strncpy(struct_obj_report.childdevid, struct_obj_internal->sn, sizeof(struct_obj_report.childdevid) - 1);
+    ezos_strncpy(struct_obj_report.type, struct_obj_internal->type, sizeof(struct_obj_report.childdevid) - 1);
+    ezos_strncpy(struct_obj_report.version, struct_obj_internal->ver, sizeof(struct_obj_report.childdevid) - 1);
 
     S2J_JSON_SET_int_ELEMENT(subdev_json, &struct_obj_report, connected);
     S2J_JSON_SET_string_ELEMENT(subdev_json, &struct_obj_report, childdevid);
@@ -971,9 +960,9 @@ static void subdev_to_status_lst(cJSON *json_status_lst, void *struct_obj)
 
     cJSON *subdev_json = cJSON_CreateObject();
     struct_obj_report.connected = struct_obj_internal->sta;
-    strncpy(struct_obj_report.childdevid, struct_obj_internal->sn, sizeof(struct_obj_report.childdevid) - 1);
-    strncpy(struct_obj_report.type, struct_obj_internal->type, sizeof(struct_obj_report.childdevid) - 1);
-    strncpy(struct_obj_report.version, struct_obj_internal->ver, sizeof(struct_obj_report.childdevid) - 1);
+    ezos_strncpy(struct_obj_report.childdevid, struct_obj_internal->sn, sizeof(struct_obj_report.childdevid) - 1);
+    ezos_strncpy(struct_obj_report.type, struct_obj_internal->type, sizeof(struct_obj_report.childdevid) - 1);
+    ezos_strncpy(struct_obj_report.version, struct_obj_internal->ver, sizeof(struct_obj_report.childdevid) - 1);
 
     s2j_json_set_basic_element(subdev_json, &struct_obj_report, int, connected);
     s2j_json_set_basic_element(subdev_json, &struct_obj_report, string, childdevid);
@@ -999,7 +988,7 @@ static void hub_subdev_auth_passed(ez_char_t *subdev_sn)
     CHECK_COND_DONE(0 == length, EZ_HUB_ERR_SUBDEV_NOT_FOUND);
 
     CHECK_COND_DONE(!(pbuf = (ez_char_t *)malloc(length + 1)), EZ_HUB_ERR_MEMORY);
-    memset(pbuf, 0, length + 1);
+    ezos_memset(pbuf, 0, length + 1);
 
     CHECK_COND_DONE(ezos_kv_raw_get((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf, &length), EZ_HUB_ERR_STORAGE);
 
@@ -1012,9 +1001,9 @@ static void hub_subdev_auth_passed(ez_char_t *subdev_sn)
 
     cJSON_ReplaceItemInObject(js_item, SUBLIST_JSON_KEY_ACCESS, cJSON_CreateNumber(1));
     CHECK_COND_DONE(!(pbuf_save = cJSON_PrintUnformatted(js_root)), EZ_HUB_ERR_MEMORY);
-    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
+    CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, ezos_strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
 
-    hub_callbacks_get()->recv_event(EZ_EVENT_SUBDEV_ADD_SUCC, (void *)subdev_info.sn, strlen(subdev_info.sn));
+    hub_callbacks_get()->recv_event(EZ_EVENT_SUBDEV_ADD_SUCC, (void *)subdev_info.sn, ezos_strlen(subdev_info.sn));
     hub_tsl_reg(&subdev_info);
 
 done:

@@ -17,7 +17,7 @@
  * Date           Author       Notes
  * 2021-11-25    zhangdi29     
  *******************************************************************************/
-#include <string.h>
+#include "ezos_libc.h"
 #include "hub_extern.h"
 #include "ezos_gconfig.h"
 #include "ezos_def.h"
@@ -68,7 +68,7 @@ static void hub_extend_event_cb(ez_kernel_event_t *ptr_event, ez_void_t *pUser)
 ez_int_t hub_extern_init()
 {
     ez_kernel_extend_t extern_info;
-    memset(&extern_info, 0, sizeof(ez_kernel_extend_t));
+    ezos_memset(&extern_info, 0, sizeof(ez_kernel_extend_t));
 
     extern_info.domain_id = hub_module_id;
     extern_info.pUser = NULL;
@@ -77,8 +77,8 @@ ez_int_t hub_extern_init()
     extern_info.ezdev_sdk_kernel_extend_data_route = hub_extend_data_route_cb;
     extern_info.ezdev_sdk_kernel_extend_event = hub_extend_event_cb;
 
-    strncpy(extern_info.extend_module_name, hub_module_name, ezdev_sdk_extend_name_len);
-    strncpy(extern_info.extend_module_version, hub_module_version, version_max_len);
+    ezos_strncpy(extern_info.extend_module_name, hub_module_name, ezdev_sdk_extend_name_len);
+    ezos_strncpy(extern_info.extend_module_version, hub_module_version, version_max_len);
 
     ez_int_t ret = ez_kernel_extend_load(&extern_info);
     return ret;
@@ -92,7 +92,7 @@ int hub_extern_finit()
 int hub_send_msg_to_platform(const ez_char_t *msg, ez_int_t msg_len, ez_int_t cmd_id, ez_uchar_t msg_response, ez_uint_t msg_seq)
 {
     ez_kernel_pubmsg_t pubmsg;
-    memset(&pubmsg, 0, sizeof(ez_kernel_pubmsg_t));
+    ezos_memset(&pubmsg, 0, sizeof(ez_kernel_pubmsg_t));
 
     pubmsg.msg_response = msg_response;
     pubmsg.msg_seq = msg_seq;
@@ -103,7 +103,7 @@ int hub_send_msg_to_platform(const ez_char_t *msg, ez_int_t msg_len, ez_int_t cm
     pubmsg.msg_domain_id = hub_module_id;
     pubmsg.msg_command_id = cmd_id;
 
-    strncpy(pubmsg.command_ver, hub_module_version, version_max_len - 1);
+    ezos_strncpy(pubmsg.command_ver, hub_module_version, version_max_len - 1);
 
     ez_err_t sdk_error = ez_kernel_send(&pubmsg);
     if (sdk_error != EZ_HUB_ERR_SUCC)

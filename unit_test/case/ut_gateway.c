@@ -274,7 +274,7 @@ void ut_gateway_update()
     ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func);
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info2, ez_event_notice_func));
-    ez_tsl_init();
+ //   ez_tsl_init();
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_init(&m_hub_cbs));
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_start());
@@ -309,7 +309,7 @@ void ut_gateway_clean()
     ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func);
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info2, ez_event_notice_func));
-    ez_tsl_init();
+ //   ez_tsl_init();
     
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_init(&m_hub_cbs));
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_start());
@@ -373,7 +373,7 @@ void ut_gateway_full()
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info2, ez_event_notice_func));
 
-    ez_tsl_init();
+ //   ez_tsl_init();
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_init(&m_hub_cbs));
 

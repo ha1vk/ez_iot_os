@@ -17,7 +17,7 @@
  * Date           Author       Notes
  * 2021-11-25    zhangdi29     
  *******************************************************************************/
-#include <string.h>
+#include "ezos_libc.h"
 #include "ezos_gconfig.h"
 #include "ezos_def.h"
 #include "ez_iot_hub.h"
@@ -49,7 +49,7 @@ ez_err_t ez_iot_hub_add(const ez_subdev_info_t *subdev_info)
     hub_subdev_info_internal_t subdev_obj = {0};
 
     CHECK_COND_RETURN(!subdev_info, EZ_HUB_ERR_PARAM_INVALID);
-    memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
+    ezos_memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
 
     return hub_add_do(&subdev_obj);
 }
@@ -89,11 +89,11 @@ ez_err_t ez_iot_hub_subdev_query(const ez_char_t *subdev_sn, ez_subdev_info_t *s
 
     CHECK_COND_RETURN(!subdev_sn, EZ_HUB_ERR_PARAM_INVALID);
     CHECK_COND_RETURN(!subdev_info, EZ_HUB_ERR_PARAM_INVALID);
-    memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
+    ezos_memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
 
     if (EZ_HUB_ERR_SUCC == (rv = hub_subdev_query(subdev_sn, &subdev_obj)))
     {
-        memcpy(subdev_info, &subdev_obj, sizeof(ez_subdev_info_t));
+        ezos_memcpy(subdev_info, &subdev_obj, sizeof(ez_subdev_info_t));
     }
 
     return rv;
@@ -105,11 +105,11 @@ ez_err_t ez_iot_hub_subdev_next(ez_subdev_info_t *subdev_info)
     hub_subdev_info_internal_t subdev_obj = {0};
 
     CHECK_COND_RETURN(!subdev_info, EZ_HUB_ERR_PARAM_INVALID);
-    memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
+    ezos_memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
 
     if (EZ_HUB_ERR_SUCC == (rv = hub_subdev_next(&subdev_obj)))
     {
-        memcpy(subdev_info, &subdev_obj, sizeof(ez_subdev_info_t));
+        ezos_memcpy(subdev_info, &subdev_obj, sizeof(ez_subdev_info_t));
     }
 
     return rv;
