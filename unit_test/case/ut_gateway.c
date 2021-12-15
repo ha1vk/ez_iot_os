@@ -382,7 +382,7 @@ void ut_gateway_full()
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_start());
 
 ;
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < COMPONENT_HUB_SUBLIST_MAX; i++)
     {
         snprintf((char *)subdev_temp.subdev_sn, sizeof(subdev_temp.subdev_sn), "E11111111_%d", i);
         uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&subdev_temp));
