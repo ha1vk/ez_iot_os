@@ -1,14 +1,14 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "ezos_wifi.h"
+#include "ezhal_wifi.h"
 #include "ezos_def.h"
 
-static ezos_wifi_state_e g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
+static ezhal_wifi_state_e g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
 
 static ez_bool_t g_wifi_init = ez_false;
 
-int ezos_wifi_init()
+int ezhal_wifi_init()
 {
     printf("%s\n", __FUNCTION__);
     if (g_wifi_init)
@@ -20,7 +20,7 @@ int ezos_wifi_init()
     return 0;
 }
 
-int ezos_wifi_config(ezos_wifi_mode_e wifi_mode)
+int ezhal_wifi_config(ezhal_wifi_mode_e wifi_mode)
 {
     switch (wifi_mode)
     {
@@ -39,7 +39,7 @@ int ezos_wifi_config(ezos_wifi_mode_e wifi_mode)
     return 0;
 }
 
-int ezos_sta_connect(char *ssid, char *password)
+int ezhal_sta_connect(char *ssid, char *password)
 {
     printf("%s\n", __FUNCTION__);
 
@@ -75,14 +75,14 @@ int ezos_sta_connect(char *ssid, char *password)
     return 0;
 }
 
-int ezos_sta_stop()
+int ezhal_sta_stop()
 {
     printf("%s\n", __FUNCTION__);
     g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
     return 0;
 }
 
-int ezos_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned char channel)
+int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned char channel)
 {
     int ssid_len = 0, pwd_len = 0;
 
@@ -124,21 +124,21 @@ int ezos_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned 
     return 0;
 }
 
-int ezos_ap_stop()
+int ezhal_ap_stop()
 {
     printf("ap stop\n");
 
     return 0;
 }
 
-int ezos_wifi_deinit()
+int ezhal_wifi_deinit()
 {
     printf("ap stop\n");
 
     return 0;
 }
 
-unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t *ap_list)
+unsigned char ezhal_sta_get_scan_list(unsigned char max_ap_num, ezhal_wifi_list_t *ap_list)
 {
     printf("%s enter!!\n", __FUNCTION__);
 
@@ -150,7 +150,7 @@ unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t 
     
     for (int i = 0; i < 4; i++)
     {
-        ezos_wifi_list_t *ap_info = ap_list + i;
+        ezhal_wifi_list_t *ap_info = ap_list + i;
         ap_info->authmode = i;
         ap_info->rssi = 10 * i;
         ap_info->channel = i;
@@ -163,14 +163,14 @@ unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t 
 }
 
 
-int ezos_get_rssi(char *rssi)
+int ezhal_get_rssi(char *rssi)
 {
     *rssi = -35;
 
     return 0;
 }
 
-ezos_wifi_state_e ezos_get_state()
+ezhal_wifi_state_e ezhal_get_state()
 {
     return g_wifi_connect_state;
 }

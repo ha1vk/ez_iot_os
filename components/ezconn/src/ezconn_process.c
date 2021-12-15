@@ -2,7 +2,7 @@
 #include "ezconn.h"
 
 #include "cJSON.h"
-#include "ezos_wifi.h"
+#include "ezhal_wifi.h"
 #include "ezlog.h"
 #include "eztimer.h"
 
@@ -92,10 +92,10 @@ static ez_int32_t process_get_list_req(httpd_req_t *req, ezconn_ctx_t *ctx)
     char *js_str = NULL;
     do 
     {
-        ezos_wifi_list_t ap_list[20];
-        ezos_memset(ap_list, 0, sizeof(ezos_wifi_list_t) * 20);
+        ezhal_wifi_list_t ap_list[20];
+        ezos_memset(ap_list, 0, sizeof(ezhal_wifi_list_t) * 20);
 
-        ez_uint8_t list_num = ezos_sta_get_scan_list(20, ap_list);
+        ez_uint8_t list_num = ezhal_sta_get_scan_list(20, ap_list);
         if (0 == list_num)
         {
             ezlog_e(TAG_AP, "get list failed.");
@@ -156,7 +156,7 @@ static ez_int32_t process_get_list_req(httpd_req_t *req, ezconn_ctx_t *ctx)
     return ret;
 }
 
-static ez_char_t *get_err_str(ezos_wifi_state_e state)
+static ez_char_t *get_err_str(ezhal_wifi_state_e state)
 {
     switch (state)
     {
@@ -173,7 +173,7 @@ static ez_char_t *get_err_str(ezos_wifi_state_e state)
     }
 }
 
-static ez_int32_t gen_rsp_with_state(ezos_wifi_state_e state, ez_char_t **rsp_str)
+static ez_int32_t gen_rsp_with_state(ezhal_wifi_state_e state, ez_char_t **rsp_str)
 {
     ez_int32_t ret = 0;
     cJSON *js_root = NULL;
@@ -333,12 +333,12 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
             }
         }
        
-        ezos_sta_connect(ctx->wifi_info.ssid, ctx->wifi_info.password);
+        ezhal_sta_connect(ctx->wifi_info.ssid, ctx->wifi_info.password);
 
         ctx->wifi_cb(EZCONN_STATE_CONNECTING_ROUTE, NULL);
         ezlog_i(TAG_AP, "conneting route...");
         
-        ezos_wifi_state_e wifi_state = EZOS_WIFI_STATE_UNKNOW;
+        ezhal_wifi_state_e wifi_state = EZOS_WIFI_STATE_UNKNOW;
         for (int i = 0; i < 100; i++)
         {
             if (ctx->apsta_coexist)
@@ -349,7 +349,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
             {
                 ezos_delay_ms(300);
             }
-            wifi_state = ezos_get_state();
+            wifi_state = ezhal_get_wifi_state();
             if (EZOS_WIFI_STATE_CONNECT_SUCCESS == wifi_state)
             {
                 break;
@@ -359,7 +359,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
         ez_bool_t is_succ = ez_true;
         if (wifi_state != EZOS_WIFI_STATE_CONNECT_SUCCESS)
         {
-            ezos_sta_stop(); // 若超时之后还未连接成功，则停止当前连接
+            ezhal_sta_stop(); // 若超时之后还未连接成功，则停止当前连接
             is_succ = ez_false;
         }
         
@@ -373,7 +373,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
             {
                 for (int i = 0; i < 100; i++)
                 {
-                    wifi_state = ezos_get_state();
+                    wifi_state = ezhal_get_wifi_state();
                     if (wifi_state == EZOS_WIFI_STATE_STA_CONNECTED)
                     {
                         send_http_resp(req, EZCONN_SUCC, rsp_str);

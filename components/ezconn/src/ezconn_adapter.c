@@ -5,7 +5,7 @@
 #include "ezlog.h"
 #include "ezos_thread.h"
 #include "ezos_time.h"
-#include "ezos_wifi.h"
+#include "ezhal_wifi.h"
 #include "ezconn_process.h"
 #include "ezconn_adapter.h"
 
@@ -275,7 +275,7 @@ int32_t ezconn_adatper_init(ezconn_ap_info_t *ap_info, ezconn_dev_info_t *dev_in
 
         g_conn_ctx.apsta_coexist = ap_info->apsta_coexist;
 
-        ret = ezos_ap_start(ap_info->ap_ssid, ap_info->ap_pwd, ap_info->auth_mode, ap_info->channel);
+        ret = ezhal_ap_start(ap_info->ap_ssid, ap_info->ap_pwd, ap_info->auth_mode, ap_info->channel);
         if (0 != ret)
         {
             ezlog_e(TAG_AP, "ap start failed.");

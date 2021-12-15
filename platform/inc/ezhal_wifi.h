@@ -7,21 +7,21 @@
  * 
  * @return  0 for success, other for failed
  */
-int ezos_wifi_init();
+int ezhal_wifi_init();
 
 typedef enum
 {
     EZOS_WIFI_MODE_AP, 
     EZOS_WIFI_MODE_STA,
     EZOS_WIFI_MODE_APSTA,
-} ezos_wifi_mode_e;
+} ezhal_wifi_mode_e;
 /**
  * @brief   设置wifi模式，ap模式/station模式/ap+station模式 
  * 
- * @param   wifi_mode ： see ezos_wifi_mode_e
+ * @param   wifi_mode ： see ezhal_wifi_mode_e
  * @return  0 for success, other for failed
  */
-int ezos_wifi_config(ezos_wifi_mode_e wifi_mode);
+int ezhal_wifi_config(ezhal_wifi_mode_e wifi_mode);
 
 /**
  * @brief   start station mode, and connect to route specified ssid and password
@@ -30,41 +30,41 @@ int ezos_wifi_config(ezos_wifi_mode_e wifi_mode);
  * @param   password : password of the route to connect
  * @return  0 for success, other for failed 
  * 
- * @warning must invoke after ezos_wifi_init
+ * @warning must invoke after ezhal_wifi_init
  */
-int ezos_sta_connect(char *ssid, char *password);
+int ezhal_sta_connect(char *ssid, char *password);
 
 /**
  * @brief  stop station mode  
  * 
  * @return  0 for success, other for failed 
  */
-int ezos_sta_stop();
+int ezhal_sta_stop();
 
 /**
  * @brief   start ap mode
  *
  * @param   ssid : ap ssid
  * @param   password : ap password
- * @param   auth_mode : auth mode. see ezos_wifi_auth_mode_e
+ * @param   auth_mode : auth mode. see ezhal_wifi_auth_mode_e
  * @param   channel : ap channel
  * @return  0 for success, other for failed
  */
-int ezos_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned char channel);
+int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned char channel);
 
 /**
  * @brief   stop ap mode, and stop http server 
  * 
  * @return  0 for success, other for failed
  */
-int ezos_ap_stop();
+int ezhal_ap_stop();
 
 /**
  * @brief   wifi 模块反初始化 
  * 
  * @return  0 for success, other for failed
  */
-int ezos_wifi_deinit();
+int ezhal_wifi_deinit();
 
 typedef enum
 {
@@ -74,17 +74,17 @@ typedef enum
     EZOS_WIFI_WPA2_PERSONAL,
     EZOS_WIFI_WPA_WPA2_PERSONAL,
     EZOS_WIFI_WPA2_ENTERPRISE,
-} ezos_wifi_auth_mode_e;
+} ezhal_wifi_auth_mode_e;
 
 typedef struct
 {
-    ezos_wifi_auth_mode_e authmode;
+    ezhal_wifi_auth_mode_e authmode;
     char rssi;
     unsigned char channel;
     char bssid[6];
     char ssid[33];
     char res[2];
-} ezos_wifi_list_t;
+} ezhal_wifi_list_t;
 
 /*sta或ap+sta模式下扫描wifi列表*/
 /**
@@ -95,7 +95,7 @@ typedef struct
  *
  *  @return 实际扫描到的wifi个数
  */
-unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t *ap_list);
+unsigned char ezhal_sta_get_scan_list(unsigned char max_ap_num, ezhal_wifi_list_t *ap_list);
 
 /**
  * @brief       获取当前连接路由器的rssi
@@ -103,7 +103,7 @@ unsigned char ezos_sta_get_scan_list(unsigned char max_ap_num, ezos_wifi_list_t 
  * @param[in]   rssi : rssi
  * @return      0 for success, other for failed 
  */
-int ezos_get_rssi(char *rssi);
+int ezhal_get_rssi(char *rssi);
 
 typedef enum
 {
@@ -114,13 +114,13 @@ typedef enum
     EZOS_WIFI_STATE_PASSWORD_ERROR  = 106,  // 密码错误
     EZOS_WIFI_STATE_NO_AP_FOUND     = 201,  // app设置路由器ssid未找到
     EZOS_WIFI_STATE_UNKNOW          = 202,  // 未知错误
-} ezos_wifi_state_e;
+} ezhal_wifi_state_e;
 
 /**
  * @brief  获取当前配网或wifi连接状态
  * 
- * @return ezos_wifi_state_e 
+ * @return ezhal_wifi_state_e 
  */
-ezos_wifi_state_e ezos_get_state();
+ezhal_wifi_state_e ezhal_get_wifi_state();
 
 #endif
