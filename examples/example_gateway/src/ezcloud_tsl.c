@@ -73,7 +73,7 @@ static ez_int32_t tsl_things_property2dev(const ez_char_t *sn, const ez_tsl_rsc_
 
 EZ_INT ez_tsl_init(void)
 {
-    ez_tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
+    ez_tsl_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
     return ez_iot_tsl_init(&tsl_things_cbs);
 }
 

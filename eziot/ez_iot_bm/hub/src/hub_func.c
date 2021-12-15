@@ -27,6 +27,8 @@
 #include "ez_iot_hub.h"
 #include "cJSON.h"
 #include "mbedtls/md5.h"
+#include "misc.h"
+#include "eztimer.h"
 //#include "timer/timer.h"
 #include "ezlog.h"
 #include "misc.h"

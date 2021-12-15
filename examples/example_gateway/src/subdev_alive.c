@@ -49,29 +49,32 @@
 static int find_dev_by_sn(cJSON *json_obj, char *sn);
 
 
+size_t length = 0;
 
 ez_int_t get_alivelist_root(cJSON *js_root) //从KV中获取alivelist的json root
 {
     ez_err_t rv = -1;
-    size_t length = 0;
     ez_char_t *pbuf = NULL;
-    ez_char_t temp_data[10] = {0};
+    ez_char_t temp_data[10] = "{}";
         
-    ezos_kv_raw_get((const ez_int8_t *)EZ_SUBDEV_KEY_ALIVELIST, NULL, &length); //获取kv中alivelist的value的字符长度，
+    length = 0;
+    ezos_kv_raw_get((const ez_char_t *)EZ_SUBDEV_KEY_ALIVELIST, NULL, &length); //获取kv中alivelist的value的字符长度，
     
     if(length < 0 || length >= 0xffffffff) //获取alivelist失败，则创建alivelist
     {
-        fdb_kv_set(&ez_kvdb,EZ_SUBDEV_KEY_ALIVELIST, temp_data);
+        ezlog_i(TAG_APP, " creat kv EZ_SUBDEV_KEY_ALIVELIST");
+
+        ezos_kv_raw_set(EZ_SUBDEV_KEY_ALIVELIST, temp_data,strlen(temp_data));
         
-        CHECK_COND_RETURN(ezos_kv_raw_get((const int8_t *)EZ_SUBDEV_KEY_ALIVELIST, NULL, &length), -1);
+        CHECK_COND_RETURN(ezos_kv_raw_get((const ez_char_t *)EZ_SUBDEV_KEY_ALIVELIST, NULL, &length), -1);
     }
         
-    if (0 == length)  //无子设备，不作处理
+    if (2 >= length )  //无子设备，不作处理
     {
         ezlog_i(TAG_APP, "subdev is NULL");
         rv = -1;
     }
-    else if(0 < length)
+    else if(0 > length)
     {
         ezlog_i(TAG_APP, "KV read error");
         
@@ -79,11 +82,11 @@ ez_int_t get_alivelist_root(cJSON *js_root) //从KV中获取alivelist的json roo
     }
     else
     {
-        pbuf = (char *)malloc(length + 1);
+        pbuf = (ez_char_t *)malloc(length + 1);
         CHECK_COND_RETURN(!pbuf, -1);
 
         /* 从kv中取出subdev_alivelist对应的value字符串    */
-        CHECK_COND_RETURN(ezos_kv_raw_get((const ez_int8_t *)EZ_SUBDEV_KEY_ALIVELIST, (ez_int8_t *)pbuf, &length), -1);
+        CHECK_COND_RETURN(ezos_kv_raw_get((const ez_char_t *)EZ_SUBDEV_KEY_ALIVELIST, (ez_int8_t *)pbuf, &length), -1);
 
         /* 将subdev_alivelist对应的value字符串  转化为JSON格式 */
         CHECK_COND_DONE(!(js_root = cJSON_Parse(pbuf)), -1);
@@ -104,10 +107,10 @@ ez_int_t save_alivelist_root(cJSON *js_root)//保存json root到KV的alivelist�
     ez_char_t *pbuf_save = NULL;
 
     /*转化为字符串*/
-    CHECK_COND_RETURN(!(pbuf_save = cJSON_PrintUnformatted(js_root)), -1);
+    pbuf_save = cJSON_PrintUnformatted(js_root);
     
     /* 存入KV */
-    CHECK_COND_RETURN(ezos_kv_raw_set((const ez_int8_t *)EZ_SUBDEV_KEY_ALIVELIST, (ez_int8_t *)pbuf_save, strlen(pbuf_save)), -1);
+    CHECK_COND_RETURN(ezos_kv_raw_set((const ez_char_t *)EZ_SUBDEV_KEY_ALIVELIST, (ez_int8_t *)pbuf_save, strlen(pbuf_save)), -1);
 
 }
 
@@ -383,6 +386,11 @@ ez_int_t ez_subdev_alive_add(const ez_subdev_info_t *subdev_info)
     subdev_alive_info.alive_intervaltime = 30;     //添加子设备时，默认心跳间隔时间为30秒
     
 	get_alivelist_root(js_root);//从KV中获取子设备心跳的json结构体
+
+    if(js_root == NULL)
+    {
+        js_root = cJSON_CreateArray();
+    }
 
 	//查找子设备是否已被添加
     CHECK_COND_DONE(-1 != find_dev_by_sn(js_root, (char *)subdev_info->subdev_sn), EZ_HUB_ERR_SUBDEV_EXISTED);

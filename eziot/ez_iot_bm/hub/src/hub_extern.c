@@ -89,3 +89,29 @@ int hub_extern_finit()
     return 0;
 }
 
+int hub_send_msg_to_platform(const ez_char_t *msg, ez_int_t msg_len, ez_int_t cmd_id, ez_uchar_t msg_response, ez_uint_t msg_seq)
+{
+    ez_kernel_pubmsg_t pubmsg;
+    memset(&pubmsg, 0, sizeof(ez_kernel_pubmsg_t));
+
+    pubmsg.msg_response = msg_response;
+    pubmsg.msg_seq = msg_seq;
+
+    pubmsg.msg_body = (unsigned char *)msg;
+    pubmsg.msg_body_len = msg_len;
+
+    pubmsg.msg_domain_id = hub_module_id;
+    pubmsg.msg_command_id = cmd_id;
+
+    strncpy(pubmsg.command_ver, hub_module_version, version_max_len - 1);
+
+    ez_err_t sdk_error = ez_kernel_send(&pubmsg);
+    if (sdk_error != EZ_HUB_ERR_SUCC)
+    {
+        return -1;
+    }
+
+    return 0;
+
+}
+

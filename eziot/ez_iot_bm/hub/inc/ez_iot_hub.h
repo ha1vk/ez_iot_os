@@ -151,6 +151,9 @@ extern "C"
      */
     EZOS_API ez_err_t ez_iot_hub_deinit(void);
 
+    
+    EZOS_API EZ_INT hub_send_msg_to_platform(const EZ_CHAR *msg, EZ_INT msg_len, EZ_INT cmd_id, EZ_UCHAR msg_response, EZ_UINT msg_seq);
+
 #ifdef __cplusplus
 }
 #endif

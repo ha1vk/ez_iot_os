@@ -11,15 +11,14 @@
 
 #define EZ_SUBDEV_KEY_ALIVELIST   "subdev_alivelist"  //子设备的心跳参数链表
 
-
-#define  SUBDEV_TEST_SN   "ATOAUV0AY9S0"
+#define  SUBDEV_TEST_AUTH_MODE   1
+#define  SUBDEV_TEST_SN   "3A06F838D"
 #define  SUBDEV_TEST_PID  "243671E149854925BF18DD"
-#define  SUBDEV_TEST_LICENSE  "GaxjvGH6tdSPKk3xYfehbG"
+#define  SUBDEV_TEST_LICENSE  "gomD7724KwATNkzH2cw1dC"
 #define  SUBDEV_TEST_VERSION  "V1.2.2 build 210521"
 
 
 void timer_deal(void);
-
 
 EZ_INT subdev_alive_init(void);
 

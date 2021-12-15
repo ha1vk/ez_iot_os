@@ -46,13 +46,16 @@ void add_subdev_example(void)//添加子设备示例
 {
     ez_subdev_info_t subdev_info;
 
-    if(g_addsubdev_UUID == NULL)  //如果未使能添加子设备窗口，则无法添加子设备
-    return ;
+ //   if(g_addsubdev_UUID == NULL)  //如果未使能添加子设备窗口，则无法添加子设备
+ //   return ;
 
     /* 输入 子设备信息 */
+    subdev_info.auth_mode = SUBDEV_TEST_AUTH_MODE;
     strcpy(subdev_info.subdev_sn,SUBDEV_TEST_SN);
     strcpy(subdev_info.subdev_type,SUBDEV_TEST_PID);
     strcpy(subdev_info.subdev_ver,SUBDEV_TEST_VERSION);
+    strcpy(subdev_info.subdev_vcode,SUBDEV_TEST_LICENSE);
+
     subdev_info.sta = true;
 
     int buf_result = ez_iot_hub_add(&subdev_info);  //添加子设备
