@@ -50,6 +50,7 @@ if(CONFIG_EZIOT_COMPONENT_UTEST_ENABLE)
     message(STATUS "CONFIG_EZIOT_COMPONENT_UTEST_ENABLE")
     list(APPEND UT_SRCS ${ENV_UTPORT_PATH}/ut_entry.c)
     list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_hello.c)
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_gateway.c)
 
     list(APPEND UT_INC_DIRS ${ENV_CONFIG_PATH})
     list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/utest/inc)
@@ -128,6 +129,7 @@ if(CONFIG_EZIOT_CORE_ENABLE)
     list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezxml)
     list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/mbedtls)
     list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_core)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/eztimer)
 
     list(APPEND UT_DEPENS -lezos)
     list(APPEND UT_DEPENS -lezlog)
@@ -136,6 +138,8 @@ if(CONFIG_EZIOT_CORE_ENABLE)
     list(APPEND UT_DEPENS -lezxml)
     list(APPEND UT_DEPENS -lmbedtls)
     list(APPEND UT_DEPENS -lez_iot_core)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/eztimer)
+
 endif()
 
 
@@ -157,9 +161,11 @@ if(CONFIG_EZIOT_BASE_ENABLE)
     message(STATUS "CONFIG_EZIOT_BASE_ENABLE")
 
     list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_bm/base/inc)
+    list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_bm/hub/inc)
 
-    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_bind.c)
-
+#    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_bind.c)
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_gateway.c)
+    
     list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_bm)
     list(APPEND UT_DEPENS -lez_iot_bm)
 

@@ -28,10 +28,17 @@ EZOS_API int ezos_kv_raw_set(const char *key, const void *value, size_t length)
     return g_kv_funcs.ezos_kv_raw_set(key, value, length);
 }
 
+#define KV_BUF_SIZE_DEFAULT 1024 * 8
+
 EZOS_API int ezos_kv_raw_get(const char *key, void *value, size_t *length)
 {
     CHECK_NULL_RETURN(g_kv_funcs.ezos_kv_raw_get, EZ_KV_ERR_NOT_INIT);
     CHECK_NULL_RETURN(length, EZ_KV_ERR_READ);
+
+    if (NULL == value && 0 == *length)
+    {
+        *length = KV_BUF_SIZE_DEFAULT;
+    }
 
     return g_kv_funcs.ezos_kv_raw_get(key, value, length);
 }

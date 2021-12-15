@@ -121,6 +121,12 @@ static ez_char_t *m_test_subdev_type2 = "TYPE_TEST2";
 #define  SUBDEV_TEST_LICENSE  "gomD7724KwATNkzH2cw1dC"
 #define  SUBDEV_TEST_VERSION  "V1.2.2 build 210521"
 
+#define  SUBDEV_TEST_AUTH_MODE2   1
+#define  SUBDEV_TEST_SN2   "9DD82B1DB"
+#define  SUBDEV_TEST_PID2  "243671E149854925BF18DD"
+#define  SUBDEV_TEST_LICENSE2  "axXwFmcHWBWYHnEUG4RdJ8"
+#define  SUBDEV_TEST_VERSION2  "V1.2.2 build 210521"
+
 static ez_subdev_info_t m_subdev1 = {
         .auth_mode = SUBDEV_TEST_AUTH_MODE,            ///< 认证模式：0-SAP设备, 1-licence设备
         .subdev_type =  SUBDEV_TEST_PID, ///< 子设备型号(licence设备为productKey)
@@ -140,7 +146,15 @@ static ez_subdev_info_t m_subdev11 = {
         .subdev_uuid ="",///< 子设备局域部ID，用于直连或者mesh网络通讯，一般为mac地址
         .sta = 0                  ///< 在线状态：0-不在线，1-在线
         };
-static ez_subdev_info_t m_subdev2 = {0};
+static ez_subdev_info_t m_subdev22 = {
+        .auth_mode = SUBDEV_TEST_AUTH_MODE2,            ///< 认证模式：0-SAP设备, 1-licence设备
+        .subdev_type =  SUBDEV_TEST_PID2, ///< 子设备型号(licence设备为productKey)
+        .subdev_sn = SUBDEV_TEST_SN2,   ///< 子设备序列号(licence设备为deviceName)
+        .subdev_vcode = SUBDEV_TEST_LICENSE2, ///< 子设备验证码(对应licence认证中deviceLicense)
+        .subdev_ver = SUBDEV_TEST_VERSION2, ///< 子设备固件版本号
+        .subdev_uuid ="",///< 子设备局域部ID，用于直连或者mesh网络通讯，一般为mac地址
+        .sta = 0                  ///< 在线状态：0-不在线，1-在线
+        };
 
 
 
@@ -225,23 +239,25 @@ void ut_gateway_rw()
     ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid);
     ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func);
 
-    ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func);
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info2, ez_event_notice_func));
 
- //   uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_init(&m_lbs_addr, &m_dev_info, &m_cbs, &m_kv_cbs));
+    ez_tsl_init();
+
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_init(&m_hub_cbs));
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_start());
-    uassert_int_equal(EZ_HUB_ERR_SUBDEV_NOT_FOUND, ez_iot_hub_subdev_query(m_subdev1.subdev_sn, &subdev_temp));
+    uassert_int_equal(EZ_HUB_ERR_SUBDEV_NOT_FOUND, ez_iot_hub_subdev_query(m_subdev11.subdev_sn, &subdev_temp));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev11));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_query(m_subdev11.subdev_sn, &subdev_temp));
+    uassert_int_equal(0, memcmp((void *)&m_subdev11, (void *)&subdev_temp, sizeof(subdev_temp)));
 
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev1));
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_query(m_subdev1.subdev_sn, &subdev_temp));
-    uassert_int_equal(0, memcmp((void *)&m_subdev1, (void *)&subdev_temp, sizeof(subdev_temp)));
-    uassert_int_equal(EZ_HUB_ERR_SUBDEV_EXISTED, ez_iot_hub_add(&m_subdev1));
+    uassert_int_equal(EZ_HUB_ERR_SUBDEV_EXISTED, ez_iot_hub_add(&m_subdev11));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_del(m_subdev11.subdev_sn));
 
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_del(m_subdev1.subdev_sn));
     memset((void *)&subdev_temp, 0, sizeof(subdev_temp));
-    uassert_int_equal(EZ_HUB_ERR_SUBDEV_NOT_FOUND, ez_iot_hub_subdev_query(m_subdev1.subdev_sn, &subdev_temp));
+    uassert_int_equal(EZ_HUB_ERR_SUBDEV_NOT_FOUND, ez_iot_hub_subdev_query(m_subdev11.subdev_sn, &subdev_temp));
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_deinit());
+
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_stop());
     ez_iot_core_deinit();
 }
@@ -257,24 +273,24 @@ void ut_gateway_update()
     ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid);
     ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func);
 
-    ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func);
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info2, ez_event_notice_func));
+    ez_tsl_init();
 
-//    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_init(&m_lbs_addr, &m_dev_info, &m_cbs, &m_kv_cbs));
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_init(&m_hub_cbs));
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_start());
 
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev1));
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_query(m_subdev1.subdev_sn, &subdev_temp));
-    uassert_int_equal(0, memcmp((void *)&m_subdev1, (void *)&subdev_temp, sizeof(subdev_temp)));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev11));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_query(m_subdev11.subdev_sn, &subdev_temp));
+    uassert_int_equal(0, memcmp((void *)&m_subdev11, (void *)&subdev_temp, sizeof(subdev_temp)));
 
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_ver_update(m_subdev1.subdev_sn, temp_subdev_ver));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_ver_update(m_subdev11.subdev_sn, temp_subdev_ver));
     memset((void *)&subdev_temp, 0, sizeof(subdev_temp));
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_query(m_subdev1.subdev_sn, &subdev_temp));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_query(m_subdev11.subdev_sn, &subdev_temp));
     uassert_int_equal(0, strncmp((char *)temp_subdev_ver, (char *)subdev_temp.subdev_ver, sizeof(subdev_temp.subdev_ver) - 1));
 
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_status_update(m_subdev1.subdev_sn, temp_subdev_sta));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_status_update(m_subdev11.subdev_sn, temp_subdev_sta));
     memset((void *)&subdev_temp, 0, sizeof(subdev_temp));
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_query(m_subdev1.subdev_sn, &subdev_temp));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_query(m_subdev11.subdev_sn, &subdev_temp));
     uassert_false(subdev_temp.sta);
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_clean());
@@ -292,17 +308,20 @@ void ut_gateway_clean()
     ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid);
     ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func);
 
-    ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func);
-//    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_init(&m_lbs_addr, &m_dev_info, &m_cbs, &m_kv_cbs));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info2, ez_event_notice_func));
+    ez_tsl_init();
+    
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_init(&m_hub_cbs));
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_start());
 
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev1));
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev2));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev11));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev22));
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_clean());
 
-    uassert_int_equal(EZ_HUB_ERR_SUBDEV_NOT_FOUND, ez_iot_hub_subdev_query(m_subdev1.subdev_sn, &subdev_temp));
-    uassert_int_equal(EZ_HUB_ERR_SUBDEV_NOT_FOUND, ez_iot_hub_subdev_query(m_subdev1.subdev_sn, &subdev_temp));
+    ezlog_i(TAG_AP,"%s %d", __FUNCTION__, __LINE__);
+
+    uassert_int_equal(EZ_HUB_ERR_SUBDEV_NOT_FOUND, ez_iot_hub_subdev_query(m_subdev11.subdev_sn, &subdev_temp));
+    uassert_int_equal(EZ_HUB_ERR_SUBDEV_NOT_FOUND, ez_iot_hub_subdev_query(m_subdev22.subdev_sn, &subdev_temp));
     uassert_int_equal(EZ_HUB_ERR_ENUM_END, ez_iot_hub_subdev_next(&subdev_temp));
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_deinit());
@@ -325,14 +344,14 @@ void ut_gateway_enum()
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_init(&m_hub_cbs));
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_start());
 
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev1));
-    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev2));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev11));
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_add(&m_subdev22));
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_next(&subdev_temp));
-    uassert_int_equal(0, memcmp((void *)&m_subdev1, (void *)&subdev_temp, sizeof(subdev_temp)));
+    uassert_int_equal(0, memcmp((void *)&m_subdev11, (void *)&subdev_temp, sizeof(subdev_temp)));
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_subdev_next(&subdev_temp));
-    uassert_int_equal(0, memcmp((void *)&m_subdev2, (void *)&subdev_temp, sizeof(subdev_temp)));
+    uassert_int_equal(0, memcmp((void *)&m_subdev22, (void *)&subdev_temp, sizeof(subdev_temp)));
     uassert_int_equal(EZ_HUB_ERR_ENUM_END, ez_iot_hub_subdev_next(&subdev_temp));
 
     uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_hub_clean());
@@ -352,8 +371,7 @@ void ut_gateway_full()
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid));
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func));
 
-
-    ez_iot_core_init(&m_lbs_addr, &m_dev_info2, ez_event_notice_func);
+    uassert_int_equal(EZ_HUB_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info2, ez_event_notice_func));
 
     ez_tsl_init();
 
@@ -491,16 +509,16 @@ static long global_init()
     ezos_snprintf(m_dev_info.dev_subserial, sizeof(m_dev_info.dev_subserial) - 1, "%s:%s", CONFIG_EZIOT_UNIT_TEST_DEV_PRODUCT_KEY, CONFIG_EZIOT_UNIT_TEST_DEV_NAME);
     ezos_strncpy(m_dev_info.dev_verification_code, CONFIG_EZIOT_UNIT_TEST_DEV_LICENSE, sizeof(m_dev_info.dev_verification_code) - 1);
 #endif
-
-    m_subdev1.sta = true;
+/*
+    m_subdev11.sta = true;
     strncpy((char *)m_subdev1.subdev_sn, (char *)m_test_subdev_sn1, sizeof(m_subdev1.subdev_sn) - 1);
     strncpy((char *)m_subdev1.subdev_ver, (char *)m_test_subdev_ver1, sizeof(m_subdev1.subdev_ver) - 1);
     strncpy((char *)m_subdev1.subdev_type, (char *)m_test_subdev_type1, sizeof(m_subdev1.subdev_type) - 1);
 
-    m_subdev2.sta = true;
+    m_subdev22.sta = true;
     strncpy((char *)m_subdev2.subdev_sn, (char *)m_test_subdev_sn2, sizeof(m_subdev2.subdev_sn) - 1);
     strncpy((char *)m_subdev2.subdev_ver, (char *)m_test_subdev_ver2, sizeof(m_subdev2.subdev_ver) - 1);
     strncpy((char *)m_subdev2.subdev_type, (char *)m_test_subdev_type2, sizeof(m_subdev2.subdev_type) - 1);
-
+*/
     return 0;
 }
