@@ -97,7 +97,7 @@ int hub_send_msg_to_platform(const ez_char_t *msg, ez_int_t msg_len, ez_int_t cm
     pubmsg.msg_response = msg_response;
     pubmsg.msg_seq = msg_seq;
 
-    pubmsg.msg_body = (unsigned char *)msg;
+    pubmsg.msg_body = (ez_char_t*)msg;
     pubmsg.msg_body_len = msg_len;
 
     pubmsg.msg_domain_id = hub_module_id;
