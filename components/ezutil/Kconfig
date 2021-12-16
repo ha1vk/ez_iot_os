@@ -1,4 +1,1 @@
-
-menu "Component ezutil configuration"
-osource "${EZOS_PATH}/components/ezutil/*/Kconfig"
-endmenu
+source "${EZOS_PATH}/components/ezutil/*/Kconfig"

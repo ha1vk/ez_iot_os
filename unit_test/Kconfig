@@ -74,10 +74,12 @@ config EZIOT_UNIT_TEST_DEV_LICENSE
 config EZIOT_UNIT_TEST_DEV_DISPLAY_NAME
     string ""
     default "IOT_UTEST_DEV"
+    depends on EZIOT_UNIT_TEST_ENABLE
 
 config EZIOT_UNIT_TEST_DEV_FIRMWARE_VERSION
     string ""
     default "V1.2.0 build 201212"
+    depends on EZIOT_UNIT_TEST_ENABLE
 
 config EZIOT_UNIT_TEST_WIFI_SSID
     string "config Wifi ssid (for wifi module)"

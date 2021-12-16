@@ -1,7 +1,7 @@
 
-mainmenu "EZOS Kconfig configuration"
+mainmenu "Ezviz Cloud IoT OS configuration"
 
-menu "Toolchain configuration"
+menu "toolchain configuration"
     config TOOLCHAIN_PATH
         string "toolchain path"
         default ""
@@ -11,19 +11,19 @@ menu "Toolchain configuration"
         default ""
 endmenu
 
-menu "Ez-iot configuration"
+menu "ez-iot configuration"
     osource "${EZOS_PATH}/eziot/ez_iot_core/Kconfig"
     osource "${EZOS_PATH}/eziot/ez_iot_bm/Kconfig"
 endmenu
 
-menu "Ez-os bsp configuration"
+menu "os/bsp configuration"
     osource "${PROJECT_PATH}/Kconfig"
 endmenu
 
-menu "Components configuration"
+menu "components configuration"
     osource "${EZOS_PATH}/components/*/Kconfig"
 endmenu
 
-menu "Unit-Test configuration"
+menu "unit-test configuration"
     osource "${EZOS_PATH}/unit_test/Kconfig"
 endmenu
