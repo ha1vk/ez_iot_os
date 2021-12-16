@@ -1418,7 +1418,9 @@ static int webclient_clean(struct webclient_session *session)
  */
 int webclient_close(struct webclient_session *session)
 {
-    EZ_ASSERT(session);
+    if(session == NULL){
+        return -1;
+    }
 
     webclient_clean(session);
 
@@ -1432,11 +1434,8 @@ int webclient_close(struct webclient_session *session)
         web_free(session->header);
     }
 
-    if (session)
-    {
-        web_free(session);
-        session = NULL;
-    }
+    web_free(session);
+    session = NULL;
 
     return 0;
 }

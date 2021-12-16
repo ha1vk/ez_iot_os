@@ -279,7 +279,7 @@ ez_err_t  ez_ota_file_download(ez_ota_download_info_t *input_info, get_file_cb f
 
         ezos_strncpy(file_info->url, (char*)input_info->url, sizeof(file_info->url)-1);
         ezos_strncpy(file_info->check_sum, (char*)input_info->degist, sizeof(file_info->check_sum)- 1);
-        ezlog_e(TAG_OTA,"ota_file_download_thread create\n");
+        
         if(ezos_thread_create(NULL, "ez_ota_download", ota_file_download_thread, file_info, CONFIG_EZIOT_OTA_TASK_STACK_SIZE, CONFIG_EZIOT_OTA_TASK_PRIORITY))
         {
             ezlog_e(TAG_OTA,"ota_download_tread create error\n");
