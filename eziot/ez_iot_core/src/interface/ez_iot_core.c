@@ -111,7 +111,7 @@ EZOS_API ez_err_t ez_iot_core_stop(ez_void_t)
     ezos_thread_destroy(g_user_thread);
     g_user_thread = NULL;
 #endif
-    ezos_kv_deinit();
+
 done:
     FUNC_OUT();
 
@@ -127,6 +127,7 @@ EZOS_API ez_void_t ez_iot_core_deinit(ez_void_t)
         goto done;
     }
 
+    ezos_kv_deinit();
     ez_kernel_fini();
     g_is_inited = ez_false;
 
