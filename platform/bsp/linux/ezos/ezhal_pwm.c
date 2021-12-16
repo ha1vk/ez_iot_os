@@ -22,7 +22,7 @@
     extern "C" {
 #endif
 
-#include "ezos_pwm.h"
+#include "ezhal_pwm.h"
 /**
  * @brief    This function initializes the PWM hardware channel
  * @param[in] pwm_channal:PWM channel logical
@@ -36,7 +36,7 @@
  * @note
  * @waring
  */
-int ezos_pwm_init(int pwm_channal,int pwm_led_pin,int pwm_period, int pwm_duty_period)
+int ezhal_pwm_init(int pwm_channal,int pwm_led_pin,int pwm_period, int pwm_duty_period)
 {
 	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 	return 0;
@@ -50,7 +50,7 @@ int ezos_pwm_init(int pwm_channal,int pwm_led_pin,int pwm_period, int pwm_duty_p
  * @note
  * @waring
  */
-int ezos_pwm_deinit(int pwm_channal)
+int ezhal_pwm_deinit(int pwm_channal)
 {
 	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 	return 0;
@@ -66,7 +66,7 @@ int ezos_pwm_deinit(int pwm_channal)
  * @note   
  * @waring
  */
-int ezos_pwm_set_duty(int pwm_channal, int pwm_duty_cycle)
+int ezhal_pwm_set_duty(int pwm_channal, int pwm_duty_cycle)
 {
 	printf("\n to_do DEBUG in line (%d) and function (%s)):channal=%d, cycle=%d\n ",__LINE__, __func__,pwm_channal, pwm_duty_cycle);
 	return 0;
@@ -79,7 +79,7 @@ int ezos_pwm_set_duty(int pwm_channal, int pwm_duty_cycle)
  * @note
  * @waring
  */
-int ezos_pwm_start()
+int ezhal_pwm_start()
 {
 	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 	return 0;
@@ -91,7 +91,7 @@ int ezos_pwm_start()
  * @return   
  * @waring
  */
-int ezos_pwm_stop()
+int ezhal_pwm_stop()
 {
 	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 	return 0;

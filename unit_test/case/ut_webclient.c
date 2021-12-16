@@ -1,14 +1,3 @@
-/**
- * @file ut_getway.c
- * @author xurongjun (xurongjun@ezvizlife.com)
- * @brief ceshi 
- * @version 0.1
- * @date 2021-01-28
- * 
- * @copyright Copyright (c) 2021
- * 
- */
-
 #include <stdlib.h>
 #include <string.h>
 #include <ezlog.h>

@@ -6,7 +6,7 @@
 
 ## 软件架构图
 
-![软件架构图](.\figures\sys_arch.png) 
+![软件架构图](.\figures\ez_idf_arch.png) 
 
 
 

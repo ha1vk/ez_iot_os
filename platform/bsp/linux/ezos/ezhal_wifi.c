@@ -170,7 +170,7 @@ int ezhal_get_rssi(char *rssi)
     return 0;
 }
 
-ezhal_wifi_state_e ezhal_get_state()
+ezhal_wifi_state_e ezhal_get_wifi_state()
 {
     return g_wifi_connect_state;
 }

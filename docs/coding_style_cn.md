@@ -86,7 +86,7 @@ ezos_thread.h
 ezos_time.h
 ezos_wifi.h
 ezos_uart.h
-ezos_pwm.h
+ezhal_pwm.h
 ```
 
 ### 3. 函数命名

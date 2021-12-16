@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include "bulb_led_drv_pwm.h"
-#include "ezos_pwm.h"
+#include "ezhal_pwm.h"
 #include "ezlog.h"
 
 static const char *TAG_LED = "[LED]";
@@ -211,7 +211,7 @@ ez_int8_t bulb_leds_gpio_config(led_gpio_config_t led_gpio_config[LEDC_CHANNEL_M
 
     for (i = 0; i < LEDC_CHANNEL_MAX; i++)
     {
-        ezos_pwm_init(i, pwm_led_pin[i], g_led_pwm_cycle_time, pwm_led_duties[i]);
+        ezhal_pwm_init(i, pwm_led_pin[i], g_led_pwm_cycle_time, pwm_led_duties[i]);
     }
     return 0;
 }
@@ -336,10 +336,10 @@ ez_int8_t bulb_leds_cct_config(ez_int16_t cct_value, ez_int16_t led_lm_percentag
 
     for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
     {
-        ezos_pwm_set_duty(i, pwm_led_duties[i]);
+        ezhal_pwm_set_duty(i, pwm_led_duties[i]);
     }
 
-    ezos_pwm_start();
+    ezhal_pwm_start();
 
     return 0;
 }
@@ -389,25 +389,25 @@ ez_int8_t bulb_leds_RGB_config(ez_int32_t color_value, ez_int16_t led_lm_percent
 
     for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
     {
-        ezos_pwm_set_duty(i, pwm_led_duties[i]);
+        ezhal_pwm_set_duty(i, pwm_led_duties[i]);
     }
-    ezos_pwm_start();
+    ezhal_pwm_start();
 
     return 0;
 }
 
 void bulb_led_stop()
 {
-    ezos_pwm_stop();
+    ezhal_pwm_stop();
 }
 
 void bulb_led_start()
 {
-    ezos_pwm_start();
+    ezhal_pwm_start();
 }
 
 void bulb_led_restart()
 {
-    ezos_pwm_stop(0);
-    ezos_pwm_start();
+    ezhal_pwm_stop(0);
+    ezhal_pwm_start();
 }
