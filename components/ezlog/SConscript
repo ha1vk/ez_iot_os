@@ -1,0 +1,10 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/*.c')
+path    = [cwd + '/inc', cwd + '/inc_private']
+
+group = DefineGroup('eziot_components', src, depend = ['EZIOT_COMPONENT_EZLOG_ENABLE'], CPPPATH = path)
+
+Return('group')

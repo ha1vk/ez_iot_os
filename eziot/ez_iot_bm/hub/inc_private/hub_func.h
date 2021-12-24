@@ -36,6 +36,8 @@
 #define s2j_json_set_basic_element(to_json, from_struct, type, element) \
     S2J_JSON_SET_BASIC_ELEMENT(to_json, from_struct, type, element)
 
+#define COMPONENT_HUB_SUBLIST_MAX 64
+
 typedef struct
 {
     ez_int8_t authm;         ///< 认证模式：0-SAP设备, 1-licence设备
@@ -149,19 +151,5 @@ ez_int_t hub_subdev_auth_do(void *subdev_info);
  * @param len 协议报文长度
  */
 void hub_subdev_auth_done(void *buf, ez_int_t len);
-
-/**
- * @brief 注册物模型，模块初始化时调用
- * 
- * @return ez_err_t 
- */
-ez_err_t hub_tsl_reg_all(void);
-
-/**
- * @brief 注销物模型，模块反初始化时调用
- * 
- * @return ez_err_t 
- */
-ez_err_t hub_tsl_unreg_all(void);
 
 #endif

@@ -1,4 +1,4 @@
- /*******************************************************************************
+/*******************************************************************************
  * Copyright © 2017-2021 Ezviz Inc.
  *
  * All rights reserved. This program and the accompanying materials
@@ -17,9 +17,7 @@
  * Date           Author       Notes
  * 2021-11-25    zhangdi29     
  *******************************************************************************/
-#include "ezos_libc.h"
-#include "ezos_gconfig.h"
-#include "ezos_def.h"
+#include "ezos.h"
 #include "ez_iot_hub.h"
 #include "hub_extern.h"
 #include "hub_func.h"
@@ -32,7 +30,11 @@ ez_err_t ez_iot_hub_init(ez_hub_callbacks_t *phub_cbs)
     ezlog_w(TAG_HUB, "init");
     ez_err_t rv = 0;
 
-    CHECK_COND_RETURN(g_hub_inited, EZ_HUB_ERR_SUCC);
+    if (g_hub_inited)
+    {
+        return EZ_HUB_ERR_SUCC;
+    }
+
     CHECK_COND_RETURN(!phub_cbs, EZ_HUB_ERR_PARAM_INVALID);
     CHECK_COND_RETURN(!phub_cbs->recv_event, EZ_HUB_ERR_PARAM_INVALID);
     CHECK_COND_RETURN(hub_extern_init(), EZ_HUB_ERR_INTERNAL);
@@ -48,6 +50,7 @@ ez_err_t ez_iot_hub_add(const ez_subdev_info_t *subdev_info)
 
     hub_subdev_info_internal_t subdev_obj = {0};
 
+    CHECK_COND_RETURN(!g_hub_inited, EZ_HUB_ERR_NOT_INIT);
     CHECK_COND_RETURN(!subdev_info, EZ_HUB_ERR_PARAM_INVALID);
     ezos_memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
 
@@ -58,6 +61,7 @@ ez_err_t ez_iot_hub_del(const ez_char_t *subdev_sn)
 {
     ezlog_w(TAG_HUB, "del");
 
+    CHECK_COND_RETURN(!g_hub_inited, EZ_HUB_ERR_NOT_INIT);
     CHECK_COND_RETURN(!subdev_sn, EZ_HUB_ERR_PARAM_INVALID);
 
     return hub_del_do(subdev_sn);
@@ -67,6 +71,7 @@ ez_err_t ez_iot_hub_ver_update(const ez_char_t *subdev_sn, const ez_char_t *subd
 {
     ezlog_w(TAG_HUB, "ver up");
 
+    CHECK_COND_RETURN(!g_hub_inited, EZ_HUB_ERR_NOT_INIT);
     CHECK_COND_RETURN(!subdev_sn, EZ_HUB_ERR_PARAM_INVALID);
     CHECK_COND_RETURN(!subdev_ver, EZ_HUB_ERR_PARAM_INVALID);
 
@@ -77,6 +82,7 @@ ez_err_t ez_iot_hub_status_update(const ez_char_t *subdev_sn, ez_bool_t online)
 {
     ezlog_w(TAG_HUB, "sta up");
 
+    CHECK_COND_RETURN(!g_hub_inited, EZ_HUB_ERR_NOT_INIT);
     CHECK_COND_RETURN(!subdev_sn, EZ_HUB_ERR_PARAM_INVALID);
 
     return hub_status_update_do(subdev_sn, online);
@@ -87,6 +93,7 @@ ez_err_t ez_iot_hub_subdev_query(const ez_char_t *subdev_sn, ez_subdev_info_t *s
     ez_err_t rv = 0;
     hub_subdev_info_internal_t subdev_obj = {0};
 
+    CHECK_COND_RETURN(!g_hub_inited, EZ_HUB_ERR_NOT_INIT);
     CHECK_COND_RETURN(!subdev_sn, EZ_HUB_ERR_PARAM_INVALID);
     CHECK_COND_RETURN(!subdev_info, EZ_HUB_ERR_PARAM_INVALID);
     ezos_memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
@@ -104,6 +111,7 @@ ez_err_t ez_iot_hub_subdev_next(ez_subdev_info_t *subdev_info)
     ez_err_t rv = 0;
     hub_subdev_info_internal_t subdev_obj = {0};
 
+    CHECK_COND_RETURN(!g_hub_inited, EZ_HUB_ERR_NOT_INIT);
     CHECK_COND_RETURN(!subdev_info, EZ_HUB_ERR_PARAM_INVALID);
     ezos_memcpy(&subdev_obj, subdev_info, sizeof(ez_subdev_info_t));
 
@@ -119,6 +127,8 @@ ez_err_t ez_iot_hub_clean(void)
 {
     ezlog_w(TAG_HUB, "clean");
 
+    CHECK_COND_RETURN(!g_hub_inited, EZ_HUB_ERR_NOT_INIT);
+
     return hub_clean_do();
 }
 
@@ -126,6 +136,7 @@ ez_err_t ez_iot_hub_deinit(void)
 {
     ezlog_w(TAG_HUB, "deinit");
 
+    CHECK_COND_RETURN(!g_hub_inited, EZ_HUB_ERR_NOT_INIT);
     CHECK_COND_RETURN(hub_extern_finit(), EZ_HUB_ERR_INTERNAL);
     hub_func_deinit();
 

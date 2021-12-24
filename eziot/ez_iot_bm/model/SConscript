@@ -1,0 +1,16 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/*.c')
+path    = [cwd + '/inc', cwd + '/src']
+defines = []
+
+if GetDepend(['EZIOT_OTA_TASK_STACK_SIZE']):
+    defines += ['CONFIG_EZIOT_OTA_TASK_STACK_SIZE=EZIOT_OTA_TASK_STACK_SIZE']
+if GetDepend(['EZIOT_OTA_TASK_PRIORITY']):
+    defines += ['CONFIG_EZIOT_OTA_TASK_PRIORITY=EZIOT_OTA_TASK_PRIORITY']
+
+group = DefineGroup('eziot_bm', src, depend = ['EZIOT_MODEL_ENABLE'], CPPPATH = path, CPPDEFINES = defines)
+
+Return('group')

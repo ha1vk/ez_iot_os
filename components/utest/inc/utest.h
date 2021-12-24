@@ -11,6 +11,9 @@
 #ifndef __UTEST_H__
 #define __UTEST_H__
 
+#ifdef CONFIG_EZIOT_OS_RT
+#include <rtthread.h>
+#endif
 #include <stdint.h>
 #include <stdbool.h>
 #include "utest_def.h"

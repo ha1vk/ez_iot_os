@@ -1,0 +1,58 @@
+from building import *
+
+# if GetDepend(['RT_USING_PIN']):
+#     src += ['drv_gpio.c']
+# if GetDepend(['RT_USING_SERIAL']):
+#     src += ['drv_usart.c']
+# if GetDepend(['RT_USING_SPI']):
+#     src += ['drv_spi.c']
+# if GetDepend(['RT_USING_USB_DEVICE']):
+#     src += ['drv_usb.c']
+# if GetDepend(['RT_USING_SDCARD']):
+#     src += ['drv_sdcard.c']
+
+cwd     = GetCurrentDir()
+
+src     = []
+path    = [cwd + '/inc', cwd + 'port/fal/inc']
+defines = []
+
+src += Split("""
+            src/fdb.c
+            src/fdb_utils.c
+            """)
+
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_USING_KVDB']):
+    src += ['src/fdb_kvdb.c']
+    defines += ['FDB_USING_KVDB']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_KV_AUTO_UPDATE']):
+    defines += ['FDB_KV_AUTO_UPDATE']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_USING_TSDB']):
+    src += ['src/fdb_tsdb.c']
+    defines += ['FDB_USING_TSDB']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_USING_FAL_MODE']):
+    src += ['port/fal/src/fal_flash.c']
+    src += ['port/fal/src/fal_partition.c']
+    src += ['port/fal/src/fal_rtt.c']
+    src += ['port/fal/src/fal.c']
+    defines += ['FDB_USING_FAL_MODE']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_USING_FILE_LIBC_MODE']):
+    src += ['src/fdb_file.c']
+    defines += ['FDB_USING_FILE_LIBC_MODE']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_USING_FILE_POSIX_MODE']):
+    src += ['src/fdb_file.c']
+    defines += ['FDB_USING_FILE_POSIX_MODE']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_1BIT']):
+    defines += ['FDB_WRITE_GRAN=1']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_8BIT']):
+    defines += ['FDB_WRITE_GRAN=8']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_WRITE_GRAN_32BIT']):
+    defines += ['FDB_WRITE_GRAN=32']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_BIG_ENDIAN']):
+    defines += ['FDB_BIG_ENDIAN']
+if GetDepend(['EZIOT_COMPONENT_FLASHDB_DEBUG_ENABLE']):
+    defines += ['FDB_DEBUG_ENABLE']
+
+group = DefineGroup('eziot_components', src, depend = ['EZIOT_COMPONENT_FLASHDB_ENABLE'], CPPPATH = path, CPPDEFINES = defines)
+
+Return('group')

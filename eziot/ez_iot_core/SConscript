@@ -1,0 +1,43 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/*.c')
+src    += Glob('src/interface/*.c')
+src    += Glob('src/support/*.c')
+src    += Glob('src/dispatcher/*.c')
+src    += Glob('src/access/*.c')
+
+path    = [cwd + '/inc', 
+           cwd + '/inc_private',
+           cwd + '/src/dispatcher',
+           cwd + '/src/support',
+           cwd + '/src/access',
+           cwd + '/src']
+
+defines = []
+
+if GetDepend(['EZIOT_CORE_MULTI_TASK']):
+    defines += ['CONFIG_EZIOT_CORE_MULTI_TASK']
+if GetDepend(['EZIOT_CORE_ACEESS_TASK_STACK_SIZE']):
+    defines += ['CONFIG_EZIOT_CORE_ACEESS_TASK_STACK_SIZE=EZIOT_CORE_ACEESS_TASK_STACK_SIZE']
+if GetDepend(['EZIOT_CORE_ACEESS_TASK_PRIORITY']):
+    defines += ['CONFIG_EZIOT_CORE_ACEESS_TASK_PRIORITY=EZIOT_CORE_ACEESS_TASK_PRIORITY']
+if GetDepend(['EZIOT_CORE_USER_TASK_STACK_SIZE']):
+    defines += ['CONFIG_EZIOT_CORE_USER_TASK_STACK_SIZE=EZIOT_CORE_USER_TASK_STACK_SIZE']
+if GetDepend(['EZIOT_CORE_USER_TASK_PRIORITY']):
+    defines += ['CONFIG_EZIOT_CORE_USER_TASK_PRIORITY=EZIOT_CORE_USER_TASK_PRIORITY']
+if GetDepend(['EZIOT_CORE_MESSAGE_SIZE_MAX']):
+    defines += ['CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX=EZIOT_CORE_MESSAGE_SIZE_MAX']
+if GetDepend(['EZIOT_CORE_MESSAGE_NUMBER_MAX']):
+    defines += ['CONFIG_EZIOT_CORE_MESSAGE_NUMBER_MAX=EZIOT_CORE_MESSAGE_NUMBER_MAX']
+if GetDepend(['EZIOT_CORE_EXTEND_COUNT']):
+    defines += ['CONFIG_EZIOT_CORE_EXTEND_COUNT=EZIOT_CORE_EXTEND_COUNT']
+if GetDepend(['EZIOT_CORE_RISK_CONTROL_CMD_MAX']):
+    defines += ['CONFIG_EZIOT_CORE_RISK_CONTROL_CMD_MAX=EZIOT_CORE_RISK_CONTROL_CMD_MAX']
+if GetDepend(['EZIOT_CORE_DEFAULT_PUBLISH_RETRY']):
+    defines += ['CONFIG_EZIOT_CORE_DEFAULT_PUBLISH_RETRY=EZIOT_CORE_DEFAULT_PUBLISH_RETRY']
+
+group = DefineGroup('eziot_core', src, depend = ['EZIOT_CORE_ENABLE'], CPPPATH = path, CPPDEFINES = defines)
+
+Return('group')

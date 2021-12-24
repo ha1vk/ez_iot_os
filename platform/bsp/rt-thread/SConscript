@@ -1,0 +1,12 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('ezos/*.c')
+path    = [cwd + '/../../inc']
+
+CPPDEFINES = ['CONFIG_EZIOT_OS_RT']
+
+group = DefineGroup('eziot_os', src, depend = [], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+
+Return('group')

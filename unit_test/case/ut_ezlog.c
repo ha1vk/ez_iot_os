@@ -23,41 +23,36 @@
 #include <ezlog.h>
 
 static void ut_log_init();
-UTEST_TC_EXPORT(ut_log_init, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_lvl_a();
-UTEST_TC_EXPORT(ut_log_lvl_a, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_lvl_e();
-UTEST_TC_EXPORT(ut_log_lvl_e, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_lvl_w();
-UTEST_TC_EXPORT(ut_log_lvl_w, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_lvl_i();
-UTEST_TC_EXPORT(ut_log_lvl_i, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_lvl_d();
-UTEST_TC_EXPORT(ut_log_lvl_d, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_lvl_v();
-UTEST_TC_EXPORT(ut_log_lvl_v, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_tag();
-UTEST_TC_EXPORT(ut_log_tag, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_kw();
-UTEST_TC_EXPORT(ut_log_kw, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_dump16();
-UTEST_TC_EXPORT(ut_log_dump16, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static void ut_log_dump32();
-UTEST_TC_EXPORT(ut_log_dump32, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 static void test_log_lvl(void);
 static void test_log_tag(void);
 static void test_log_kw(void);
+
+static void testcase(void)
+{
+    UTEST_UNIT_RUN(ut_log_init);
+    UTEST_UNIT_RUN(ut_log_lvl_a);
+    UTEST_UNIT_RUN(ut_log_lvl_e);
+    UTEST_UNIT_RUN(ut_log_lvl_w);
+    UTEST_UNIT_RUN(ut_log_lvl_i);
+    UTEST_UNIT_RUN(ut_log_lvl_d);
+    UTEST_UNIT_RUN(ut_log_lvl_v);
+    UTEST_UNIT_RUN(ut_log_tag);
+    UTEST_UNIT_RUN(ut_log_kw);
+    UTEST_UNIT_RUN(ut_log_dump16);
+    UTEST_UNIT_RUN(ut_log_dump32);
+}
+UTEST_TC_EXPORT(testcase, "eziot.ut_ezlog", NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 static void ut_log_init()
 {

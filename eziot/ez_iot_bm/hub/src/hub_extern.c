@@ -17,10 +17,9 @@
  * Date           Author       Notes
  * 2021-11-25    zhangdi29     
  *******************************************************************************/
-#include "ezos_libc.h"
+
+#include "ezos.h"
 #include "hub_extern.h"
-#include "ezos_gconfig.h"
-#include "ezos_def.h"
 #include "ez_iot_core.h"
 #include "ez_iot_core_def.h"
 #include "ez_iot_core_lowlvl.h"

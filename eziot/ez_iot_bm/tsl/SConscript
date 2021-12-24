@@ -1,0 +1,28 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/*.c')
+path    = [cwd + '/inc', cwd + '/inc_private']
+defines = []
+
+if GetDepend(['EZIOT_TSL_SHADOW_SUPPORT']):
+    defines += ['CONFIG_EZIOT_TSL_SHADOW_SUPPORT=EZIOT_TSL_SHADOW_SUPPORT']
+if GetDepend(['EZIOT_TSL_LEGALITY_CHECK_NONE']):
+    defines += ['CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE']
+if GetDepend(['EZIOT_TSL_LEGALITY_CHECK_WEAK']):
+    defines += ['CONFIG_EZIOT_TSL_LEGALITY_CHECK_WEAK']
+if GetDepend(['EZIOT_TSL_LEGALITY_CHECK_STRONG']):
+    defines += ['CONFIG_EZIOT_TSL_LEGALITY_CHECK_STRONG']
+if GetDepend(['EZIOT_TSL_DOWNLOAD_TASK_PRIORITY']):
+    defines += ['CONFIG_EZIOT_TSL_DOWNLOAD_TASK_PRIORITY=EZIOT_TSL_DOWNLOAD_TASK_PRIORITY']
+if GetDepend(['EZIOT_TSL_DOWNLOAD_STACK_SIZE']):
+    defines += ['CONFIG_EZIOT_TSL_DOWNLOAD_STACK_SIZE=EZIOT_TSL_DOWNLOAD_STACK_SIZE']
+if GetDepend(['EZIOT_TSL_PROFILE_MAP_SIZE']):
+    defines += ['CONFIG_EZIOT_TSL_PROFILE_MAP_SIZE=EZIOT_TSL_PROFILE_MAP_SIZE']
+if GetDepend(['EZIOT_TSL_PROFILE_SIZE']):
+    defines += ['CONFIG_EZIOT_TSL_PROFILE_SIZE=EZIOT_TSL_PROFILE_SIZE']
+
+group = DefineGroup('eziot_bm', src, depend = ['EZIOT_TSL_ENABLE'], CPPPATH = path, CPPDEFINES = defines)
+
+Return('group')

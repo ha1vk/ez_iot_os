@@ -212,7 +212,7 @@ static void time_out_cb(void)
     return;
 }
 
-int32_t ezconn_adatper_init(ezconn_ap_info_t *ap_info, ezconn_dev_info_t *dev_info, wifi_info_cb cb)
+ez_int32_t ezconn_adatper_init(ezconn_ap_info_t *ap_info, ezconn_dev_info_t *dev_info, wifi_info_cb cb)
 {
     if (!g_exit_flag)
     {
@@ -306,7 +306,7 @@ int32_t ezconn_adatper_init(ezconn_ap_info_t *ap_info, ezconn_dev_info_t *dev_in
     return ret;
 }
 
-int32_t ezconn_adapter_deinit(void)
+ez_int32_t ezconn_adapter_deinit(void)
 {
     stop_httpd();
     eztimer_delete(g_conn_ctx.time_out_timer);

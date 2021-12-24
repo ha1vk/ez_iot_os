@@ -1,10 +1,6 @@
+#include "ezos.h"
 #include "eztimer.h"
-#include "ezos_mem.h"
-#include "ezos_thread.h"
-#include "ezos_time.h"
-#include "ezos_libc.h"
 #include "ezlist.h"
-#include "ezos_gconfig.h"
 
 typedef struct
 {

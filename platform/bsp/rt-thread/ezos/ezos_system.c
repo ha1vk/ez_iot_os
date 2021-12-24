@@ -12,24 +12,24 @@
  *
  * Contributors:
  * xurongjun (xurongjun@ezvizlife.com)
+ * 
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-11-25     zoujinwei    first version
 *******************************************************************************/
 
-#ifndef _EZOS_H_
-#define _EZOS_H_
+#include <stdlib.h>
+#include <unistd.h>
+#include "ezos_system.h"
 
-#ifdef CONFIG_EZIOT_OS_RT
-#include <rtconfig.h>
-#else
-#include <ezos_gconfig.h>
-#endif
+long int ezos_rand(void)
+{
+    return rand();
+}
 
-#include <ezos_def.h>
-#include <ezos_thread.h>
-#include <ezos_time.h>
-#include <ezos_sem.h>
-#include <ezos_socket.h>
-#include <ezos_libc.h>
-#include <ezos_kv.h>
-#include <ezos_mem.h> 
-#include <ezos_system.h>
-#endif
+int ezos_get_uuid(char *uuid, short len)
+{
+    //TODO 可以使用MAC或者设备序列号来作为UUID
+
+    return 0;
+}

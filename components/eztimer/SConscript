@@ -1,0 +1,14 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/*.c')
+path    = [cwd + '/inc']
+defines = []
+
+if GetDepend(['EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE']):
+    defines += ['CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE=EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE']
+
+group = DefineGroup('eziot_components', src, depend = ['EZIOT_COMPONENT_EZTIMER_ENABLE'], CPPPATH = path, CPPDEFINES = defines)
+
+Return('group')

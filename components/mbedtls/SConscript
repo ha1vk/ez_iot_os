@@ -1,0 +1,10 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('library/*.c')
+path    = [cwd + '/include']
+
+group = DefineGroup('eziot_components', src, depend = ['EZIOT_COMPONENT_MBEDTLS_ENABLE'], CPPPATH = path)
+
+Return('group')

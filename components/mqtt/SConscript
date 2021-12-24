@@ -1,0 +1,11 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/*.c')
+path    = [cwd + '/inc']
+defines = ['MQTTCLIENT_PLATFORM_HEADER=MQTTPorting.h']
+
+group = DefineGroup('eziot_components', src, depend = ['EZIOT_COMPONENT_MQTT_ENABLE'], CPPPATH = path, CPPDEFINES = defines)
+
+Return('group')

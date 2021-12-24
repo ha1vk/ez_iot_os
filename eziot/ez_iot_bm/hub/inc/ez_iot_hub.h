@@ -16,8 +16,6 @@
 #include "ez_iot_base.h"
 #define HUB_MODULE_ERRNO_BASE 0x00030000
 
-#define COMPONENT_HUB_SUBLIST_MAX 64
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -57,7 +55,7 @@ extern "C"
     typedef struct
     {
         /* 接收来自本地的事件 */
-        ez_int32_t (*recv_event)(ez_subdev_event_e event_type, void *data, ez_int_t len);
+        ez_int32_t (*recv_event)(ez_subdev_event_e event_type, ez_void_t *data, ez_int32_t len);
     } ez_hub_callbacks_t;
 
     /**
@@ -150,9 +148,6 @@ extern "C"
      * @return ez_hub_err_e 
      */
     EZOS_API ez_err_t ez_iot_hub_deinit(void);
-
-    
-    EZOS_API int hub_send_msg_to_platform(const ez_char_t *msg, ez_int_t msg_len, ez_int_t cmd_id, ez_uchar_t msg_response, ez_uint_t msg_seq);
 
 #ifdef __cplusplus
 }

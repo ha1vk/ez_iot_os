@@ -1,18 +1,12 @@
 
 #include "utest.h"
 
-static void ut_hello();
-UTEST_TC_EXPORT(ut_hello, NULL, NULL, 10);
-
-static void ut_hello()
+static void ut_hello(void)
 {
     char a[10] = {0};
     char b[10] = {0};
     char c[10] = {2};
 
-    uassert_true(true);
-    uassert_false(false);
-    uassert_null(NULL);
     uassert_not_null(!NULL);
     uassert_int_equal(1, 1);
     uassert_int_not_equal(1, 2);
@@ -25,6 +19,12 @@ static void ut_hello()
     uassert_in_range(1, 0, 2);
     uassert_not_in_range(3, 0, 2);
 }
+
+static void testcase(void)
+{
+    UTEST_UNIT_RUN(ut_hello);
+}
+UTEST_TC_EXPORT(testcase, "eziot.ut_hello", NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 // utest_log_lv_set(1)
 // [==========] [ utest    ] loop 1/1

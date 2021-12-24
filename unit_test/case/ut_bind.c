@@ -29,14 +29,8 @@ void ut_base_bind_by_challenge();
 void ut_base_bind_status_query();
 
 static long global_init();
-
-UTEST_TC_EXPORT(ut_base_bind_by_near, global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-UTEST_TC_EXPORT(ut_base_bind_by_challenge, global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-UTEST_TC_EXPORT(ut_base_bind_status_query, global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
-
 static ez_int32_t ez_event_notice_func(ez_event_e event_type, ez_void_t *data, ez_int32_t len);
 static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *data, ez_int32_t len);
-
 static int dev_event_waitfor(int event_id, int time_ms);
 static int dev_contact_bind_waitfor(int32_t *challenge_code, int time_ms);
 static int dev_bind_stauts(int time_ms);
@@ -58,13 +52,21 @@ static ez_kv_func_t g_kv_func = {
     .ezos_kv_deinit = kv_deinit,
 };
 
+static void testcase(void)
+{
+    UTEST_UNIT_RUN(ut_base_bind_by_near);
+    UTEST_UNIT_RUN(ut_base_bind_by_challenge);
+    UTEST_UNIT_RUN(ut_base_bind_status_query);
+}
+UTEST_TC_EXPORT(testcase, "eziot.ut_bind", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+
 void ut_base_bind_by_near()
 {
     ez_byte_t devid[32] = {0};
 
     ///< 通过ap配网或者蓝牙配网从app获取token
     ez_char_t *dev_token = "68b8efe8246f461691971c95eb8ba725";
- 
+
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_DEVID_SET, (ez_void_t *)devid));
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_ctrl(EZ_CMD_KVIMPL_SET, (ez_void_t *)&g_kv_func));
     uassert_int_equal(EZ_CORE_ERR_SUCC, ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func));

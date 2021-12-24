@@ -18,8 +18,7 @@
  * 2021-11-25    zhangdi29     
  *******************************************************************************/
 #include <stdlib.h>
-#include "ezos_gconfig.h"
-#include "ezos_def.h"
+#include "ezos.h"
 #include "hub_func.h"
 #include "hub_extern.h"
 #include "ez_iot_hub.h"
@@ -39,6 +38,7 @@
 #define SUBLIST_JSON_KEY_TYPE "type"
 #define SUBLIST_JSON_KEY_ACCESS "access"
 #define HUB_AUTH_SALT "www.88075998.com"
+#define EZIOT_HUB_LIST_SIZE 1024 * 8
 
 typedef struct
 {
@@ -67,16 +67,6 @@ static void subdev_to_status_lst(cJSON *json_status_lst, void *struct_obj);
 
 static EZ_INT find_dev_by_sn(cJSON *json_obj, ez_char_t *sn);
 
-static ez_err_t hub_tsl_reg(const hub_subdev_info_internal_t *subdev_info);
-
-static ez_err_t hub_tsl_unreg(const hub_subdev_info_internal_t *subdev_info);
-
-static void hub_tsl_profile_del(const ez_char_t *subdev_sn);
-
-static void hub_tsl_clean(void);
-
-static void hub_tsl_checkupdate();
-
 static ez_hub_callbacks_t *hub_callbacks_get(void);
 
 static void hub_subdev_auth_passed(ez_char_t *subdev_sn);
@@ -104,11 +94,6 @@ ez_int_t hub_func_init(const ez_hub_callbacks_t *phub_cbs)
         return EZ_HUB_ERR_INTERNAL;
     }
 
-    if (0 != hub_tsl_reg_all())
-    {
-        return EZ_HUB_ERR_INTERNAL;
-    }
-
     g_auth_timer = eztimer_create("auth_retry_timer", (2 * 1000 * 60), ez_false, auth_retry_timer_cb);
     if (g_auth_timer <= 0)
     {
@@ -121,7 +106,6 @@ ez_int_t hub_func_init(const ez_hub_callbacks_t *phub_cbs)
 void hub_func_deinit()
 {
     ezos_memset((void *)&g_phub_cbs, 0, sizeof(g_phub_cbs));
-    hub_tsl_unreg_all();
     eztimer_delete(g_auth_timer);
 
     ezos_mutex_destroy(g_hlock);
@@ -130,7 +114,7 @@ void hub_func_deinit()
 ez_err_t hub_add_do(const hub_subdev_info_internal_t *subdev_info)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -165,7 +149,7 @@ ez_err_t hub_add_do(const hub_subdev_info_internal_t *subdev_info)
     cJSON_AddItemToArray(js_root, js_subdev);
     CHECK_COND_DONE(!(pbuf_save = cJSON_PrintUnformatted(js_root)), EZ_HUB_ERR_MEMORY);
     CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, ezos_strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
-
+    ezos_kv_print();
     g_unauth_count++;
     hub_subdev_auth_do((void *)subdev_info);
 
@@ -187,7 +171,7 @@ done:
 ez_err_t hub_del_do(const ez_char_t *subdev_sn)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -220,8 +204,6 @@ ez_err_t hub_del_do(const ez_char_t *subdev_sn)
         goto done;
     }
 
-    hub_tsl_unreg(&subdev_info);
-    hub_tsl_profile_del(subdev_info.sn);
 done:
 
     ezos_mutex_unlock(g_hlock);
@@ -244,7 +226,7 @@ done:
 ez_err_t hub_ver_update_do(const ez_char_t *subdev_sn, const ez_char_t *subdev_ver)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -273,8 +255,6 @@ ez_err_t hub_ver_update_do(const ez_char_t *subdev_sn, const ez_char_t *subdev_v
     CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, ezos_strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
     json_to_subdev(js_item, (void *)&subdev_info_new);
 
-    hub_tsl_unreg(&subdev_info_old);
-    hub_tsl_reg(&subdev_info_new);
 done:
 
     ezos_mutex_unlock(g_hlock);
@@ -297,7 +277,7 @@ done:
 ez_err_t hub_status_update_do(const ez_char_t *subdev_sn, ez_bool_t online)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -343,7 +323,7 @@ done:
 ez_err_t hub_subdev_query(const ez_char_t *subdev_sn, hub_subdev_info_internal_t *subdev_info)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -383,7 +363,7 @@ done:
 ez_err_t hub_subdev_next(hub_subdev_info_internal_t *subdev_info)
 {
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -444,9 +424,6 @@ ez_err_t hub_clean_do(void)
 {
     int32_t rv = EZ_HUB_ERR_SUCC;
 
-    hub_tsl_unreg_all();
-    hub_tsl_clean();
-
     ezos_mutex_lock(g_hlock);
     CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)"", 0), EZ_HUB_ERR_STORAGE);
     ezos_mutex_unlock(g_hlock);
@@ -488,7 +465,7 @@ static EZ_INT find_dev_by_sn(cJSON *json_obj, ez_char_t *sn)
 EZ_INT hub_subdev_list_report(void)
 {
     EZ_INT rv = 0;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_report = NULL;
     cJSON *js_root = NULL;
@@ -549,7 +526,7 @@ done:
 EZ_INT hub_subdev_sta_report(void)
 {
     EZ_INT rv = 0;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_report = NULL;
     cJSON *js_root = NULL;
@@ -712,155 +689,6 @@ done:
     CJSON_SAFE_DELETE(js_root);
 }
 
-static ez_err_t hub_tsl_reg(const hub_subdev_info_internal_t *subdev_info)
-{
-    ez_err_t rv = EZ_HUB_ERR_SUCC;
-#ifdef COMPONENT_TSL_ENABLE
-    extern ez_err_t ez_iot_tsl_reg(tsl_devinfo_t * pevinfo);
-    tsl_devinfo_t dev_info = {.dev_subserial = (ez_char_t *)subdev_info->sn, .dev_type = (ez_char_t *)subdev_info->type, .dev_firmwareversion = (ez_int8_t *)subdev_info->ver};
-    rv = ez_iot_tsl_reg(&dev_info);
-#endif
-
-    return rv;
-}
-
-static ez_err_t hub_tsl_unreg(const hub_subdev_info_internal_t *subdev_info)
-{
-    ez_err_t rv = EZ_HUB_ERR_SUCC;
-#ifdef COMPONENT_TSL_ENABLE
-    extern ez_err_t ez_iot_tsl_unreg(tsl_devinfo_t * pevinfo);
-    tsl_devinfo_t dev_info = {.dev_subserial = (ez_char_t *)subdev_info->sn, .dev_type = (ez_char_t *)subdev_info->type, .dev_firmwareversion = (ez_int8_t *)subdev_info->ver};
-    rv = ez_iot_tsl_unreg(&dev_info);
-#endif
-    return rv;
-}
-
-void hub_tsl_profile_del(const ez_char_t *subdev_sn)
-{
-#ifdef COMPONENT_TSL_ENABLE
-    /* 删除子设备profile */
-    extern ez_bool_t ez_iot_tsl_adapter_profile_del(const ez_char_t *dev_subserial);
-    ez_iot_tsl_adapter_profile_del(subdev_sn);
-#endif
-}
-
-static void hub_tsl_checkupdate()
-{
-#ifdef COMPONENT_TSL_ENABLE
-    extern void ez_iot_tsl_checkupdate();
-    ez_iot_tsl_checkupdate();
-#endif
-}
-
-ez_err_t hub_tsl_reg_all(void)
-{
-    ez_err_t rv = EZ_HUB_ERR_SUCC;
-    int32_t unauth_count = 0;
-    hub_subdev_info_internal_t subdev_info = {0};
-
-    do
-    {
-        rv = hub_subdev_next(&subdev_info);
-        if (EZ_HUB_ERR_ENUM_END == rv)
-        {
-            ezlog_v(TAG_HUB, "tsl reg, hub enum end!");
-            rv = EZ_HUB_ERR_SUCC;
-            break;
-        }
-        else if (EZ_HUB_ERR_SUCC != rv)
-        {
-            ezlog_e(TAG_HUB, "err occur in subdev enum, rv = 0x%08x", rv);
-            break;
-        }
-
-        /* 未认证，不注册物模型 */
-        if (0 == subdev_info.access)
-        {
-            unauth_count++;
-            continue;
-        }
-
-        rv = hub_tsl_reg(&subdev_info);
-        if (EZ_HUB_ERR_SUCC != rv)
-        {
-            ezlog_e(TAG_HUB, "tsl reg, err occur, rv = 0x%08x", rv);
-            break;
-        }
-    } while (0 == rv);
-
-    ezos_mutex_lock(g_hlock);
-    g_unauth_count = unauth_count;
-    ezos_mutex_unlock(g_hlock);
-
-    if (EZ_HUB_ERR_SUCC == rv)
-    {
-        hub_tsl_checkupdate();
-    }
-
-    return rv;
-}
-
-ez_err_t hub_tsl_unreg_all(void)
-{
-    ez_err_t rv = EZ_HUB_ERR_SUCC;
-    hub_subdev_info_internal_t subdev_info = {0};
-
-    do
-    {
-        rv = hub_subdev_next(&subdev_info);
-        if (EZ_HUB_ERR_ENUM_END == rv)
-        {
-            ezlog_v(TAG_HUB, "tsl unreg, hub enum end!");
-            rv = EZ_HUB_ERR_SUCC;
-            break;
-        }
-        else if (EZ_HUB_ERR_SUCC != rv)
-        {
-            ezlog_e(TAG_HUB, "err occur in subdev enum, rv = 0x%08x", rv);
-            break;
-        }
-
-        /* 未完成认证，未注册物模型 */
-        if (0 == subdev_info.access)
-        {
-            continue;
-        }
-
-        hub_tsl_unreg(&subdev_info);
-    } while (0 == rv);
-
-    if (EZ_HUB_ERR_SUCC == rv)
-    {
-        hub_tsl_checkupdate();
-    }
-
-    return rv;
-}
-
-static void hub_tsl_clean(void)
-{
-    ez_err_t rv = EZ_HUB_ERR_SUCC;
-    hub_subdev_info_internal_t subdev_info = {0};
-
-    do
-    {
-        rv = hub_subdev_next(&subdev_info);
-        if (EZ_HUB_ERR_ENUM_END == rv)
-        {
-            ezlog_v(TAG_HUB, "tsl unreg, hub enum end!");
-            rv = EZ_HUB_ERR_SUCC;
-            break;
-        }
-        else if (EZ_HUB_ERR_SUCC != rv)
-        {
-            ezlog_e(TAG_HUB, "err occur in subdev enum, rv = 0x%08x", rv);
-            break;
-        }
-
-        hub_tsl_profile_del(subdev_info.sn);
-    } while (0 == rv);
-}
-
 static cJSON *subdev_to_json(void *struct_obj)
 {
     hub_subdev_info_internal_t *subdev_obj = (hub_subdev_info_internal_t *)struct_obj;
@@ -975,7 +803,7 @@ static void hub_subdev_auth_passed(ez_char_t *subdev_sn)
     ezlog_w(TAG_HUB, "auth_passed");
 
     ez_err_t rv = EZ_HUB_ERR_SUCC;
-    size_t length = 0;
+    size_t length = EZIOT_HUB_LIST_SIZE;
     ez_char_t *pbuf = NULL;
     ez_char_t *pbuf_save = NULL;
     cJSON *js_root = NULL;
@@ -1004,7 +832,6 @@ static void hub_subdev_auth_passed(ez_char_t *subdev_sn)
     CHECK_COND_DONE(ezos_kv_raw_set((const ez_char_t *)EZ_KV_DEFALUT_KEY_HUBLIST, (ez_char_t *)pbuf_save, ezos_strlen(pbuf_save)), EZ_HUB_ERR_STORAGE);
 
     hub_callbacks_get()->recv_event(EZ_EVENT_SUBDEV_ADD_SUCC, (void *)subdev_info.sn, ezos_strlen(subdev_info.sn));
-    hub_tsl_reg(&subdev_info);
 
 done:
     ezos_mutex_unlock(g_hlock);

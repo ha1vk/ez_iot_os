@@ -1,0 +1,12 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/*.c')
+path    = [cwd + '/inc']
+
+CPPDEFINES = ['CONFIG_EZIOT_OS_RT']
+
+group = DefineGroup('eziot_components', src, depend = ['EZIOT_COMPONENT_UTEST_ENABLE'], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+
+Return('group')

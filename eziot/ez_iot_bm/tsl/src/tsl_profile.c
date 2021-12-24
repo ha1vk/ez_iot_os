@@ -71,7 +71,7 @@ const char *tsl_key_schema_properties = "prop";
 typedef struct
 {
     ez_node_t node;
-    ez_char_t dev_sn[32];
+    ez_char_t dev_sn[48];
 } node_dev_t;
 
 typedef struct

@@ -1,0 +1,22 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/*.c')
+path    = [cwd + '/inc', cwd + '/inc_private']
+defines = []
+
+if GetDepend(['EZIOT_SHADOW_TASK_PRIORITY']):
+    defines += ['CONFIG_EZIOT_SHADOW_TASK_PRIORITY=EZIOT_SHADOW_TASK_PRIORITY']
+if GetDepend(['EZIOT_SHADOW_STACK_SIZE']):
+    defines += ['CONFIG_EZIOT_SHADOW_STACK_SIZE=EZIOT_SHADOW_STACK_SIZE']
+if GetDepend(['EZIOT_SHADOW_FULL_SYNC_RETRY_MAX']):
+    defines += ['CONFIG_EZIOT_SHADOW_FULL_SYNC_RETRY_MAX=EZIOT_SHADOW_FULL_SYNC_RETRY_MAX']
+if GetDepend(['EZIOT_SHADOW_FULL_SYNC_RETRY_INTERVAL']):
+    defines += ['CONFIG_EZIOT_SHADOW_FULL_SYNC_RETRY_INTERVAL=EZIOT_SHADOW_FULL_SYNC_RETRY_INTERVAL']
+if GetDepend(['EZIOT_SHADOW_FORCE_FULL_SYNC_INTERVAL']):
+    defines += ['CONFIG_EZIOT_SHADOW_FORCE_FULL_SYNC_INTERVAL=EZIOT_SHADOW_FORCE_FULL_SYNC_INTERVAL']
+
+group = DefineGroup('eziot_bm', src, depend = ['EZIOT_SHADOW_ENABLE'], CPPPATH = path, CPPDEFINES = defines)
+
+Return('group')
