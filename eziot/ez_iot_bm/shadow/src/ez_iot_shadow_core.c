@@ -275,7 +275,7 @@ static ez_void_t shadow_core_yeild(ez_void_t *pparam)
                 shadow_status_reset();
             }
 
-            ezlog_d(TAG_SHD, "get semaphore");
+            ezlog_v(TAG_SHD, "get semaphore");
         }
 
         proc_result = shadow_proc_do();
@@ -424,8 +424,6 @@ static ez_int32_t shadow_proc_report()
     node_domain_t *pnode_domain = NULL;
     node_key_t *pnode_key = NULL;
 
-    ezlog_w(TAG_SHD, "func report");
-
     shadow_module_lock();
 
     while (NULL != (node_dev = shadow_module_get_next(&g_shaodw_modules, node_dev)))
@@ -557,7 +555,7 @@ static ez_int32_t shadow_proc_sync()
                 }
 
                 total_remaining++;
-                time_countdown(&pnode_index->sync_timer, CONFIG_EZIOT_SHADOW_FULL_SYNC_RETRY_INTERVAL);
+                time_countdown(&pnode_index->sync_timer, CONFIG_EZIOT_SHADOW_FULL_SYNC_RETRY_INTERVAL * 1000);
             }
         }
     }
@@ -729,12 +727,6 @@ static ez_int32_t do_report(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t in
 
             tlv.value = g_p2c_buf;
             tlv.length = SHADOW_PUSH_BUF_MAX;
-            if (NULL == tlv.value)
-            {
-                ezlog_e(TAG_SHD, "do_report malloc");
-                rv = -1;
-                break;
-            }
 
             ezos_memset(tlv.value, 0, SHADOW_PUSH_BUF_MAX);
             if (0 != node_key->dev2cloud(&tlv, &stGenParam))
@@ -755,14 +747,14 @@ static ez_int32_t do_report(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t in
         ez_uint32_t seq = 0;
         if (shadow_protocol_report(devsn, res_type, index, domain, node_key->key, json_value, node_key->stat_ver, &seq))
         {
-            ezlog_e(TAG_SHD, "report v3%d", rv);
+            ezlog_e(TAG_SHD, "report v3:%d", rv);
             rv = -1;
             break;
         }
 
         ezlog_v(TAG_SHD, "send seq:%d", seq);
         node_key->msg_seq = seq;
-        time_countdown(&node_key->report_timer, CONFIG_EZIOT_SHADOW_FULL_SYNC_RETRY_INTERVAL);
+        time_countdown(&node_key->report_timer, CONFIG_EZIOT_SHADOW_FULL_SYNC_RETRY_INTERVAL * 1000);
     } while (0);
 
     return rv;
@@ -1362,10 +1354,6 @@ static cJSON *tlv2json(ez_shadow_value_t *ptlv)
     cJSON *json_value = NULL;
     if (!ptlv || 0 == ptlv->length)
         return NULL;
-
-    ezlog_d(TAG_SHD, "tlv type:%d", ptlv->type);
-    ezlog_d(TAG_SHD, "tlv size:%d", ptlv->length);
-    ezlog_d(TAG_SHD, "tlv value:%d", ptlv->value_int);
 
     switch (ptlv->type)
     {
