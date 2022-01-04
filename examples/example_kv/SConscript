@@ -1,0 +1,13 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+src     = Glob('src/example_kv.c')
+src    += Glob('src/kv_imp_using_kvdb.c')
+
+# path    = [cwd + '/inc']
+path    = []
+
+group = DefineGroup('eziot_examples', src, depend = [], CPPPATH = path)
+
+Return('group')

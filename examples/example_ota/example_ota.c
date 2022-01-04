@@ -1,61 +1,75 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "ezos.h"
 #include "ez_iot_ota.h"
-#include "ez_iot_log.h"
-#include "hal_thread.h"
-
-#ifdef RT_THREAD
-#include <rtthread.h>
-#include <finsh.h>
-#endif
+#include "ezlog.h"
 
 extern int ez_cloud_init();
-extern const char *ez_cloud_get_sn();
-extern const char *ez_cloud_get_ver();
-extern const char *ez_cloud_get_type();
-extern int ez_cloud_start();
-extern void ez_cloud_deint();
+static int ez_cloud_ota_init();
 
-static int ota_event_notify(ota_res_t *pres, ota_event_e event, void *data, int len);
-
-static int download_data_cb(uint32_t total_len, uint32_t offset, void *data, uint32_t len, void *user_data);
-
-static void download_result_cb(ota_cb_result_e result, void *user_data);
-
-static void show_upgrade_info(ota_upgrade_info_t *upgrade_infos);
+static ez_int32_t ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, ez_void_t *data, ez_int32_t len);
+static ez_int32_t download_data_cb(ez_int32_t total_len, ez_int32_t offset, ez_void_t *data, ez_int32_t len, ez_void_t *user_data);
+static ez_void_t download_result_cb(ez_ota_cb_result_e result, ez_void_t *user_data);
+static ez_void_t show_upgrade_info(ez_ota_upgrade_info_t *upgrade_infos);
 
 static char g_devsn[72] = {0};
+static ez_bool_t g_is_inited = ez_false;
+#if defined(CONFIG_EZIOT_EXAMPLES_DEV_AUTH_MODE_SAP)
+ez_int8_t *g_module_name = (ez_int8_t *)CONFIG_EZIOT_EXAMPLES_DEV_TYPE;
+#elif defined(CONFIG_EZIOT_EXAMPLES_DEV_AUTH_MODE_LICENCE)
+ez_int8_t *g_module_name = (ez_int8_t *)CONFIG_EZIOT_EXAMPLES_DEV_PRODUCT_KEY;
+#endif
 
-int ez_ota_init()
+int example_ota(int argc, char **argv)
 {
-    ota_init_t init_info = {.cb.ota_recv_msg = ota_event_notify};
+    ezlog_init();
+    ezlog_start();
+    ezlog_filter_lvl(CONFIG_EZIOT_EXAMPLES_SDK_LOGLVL);
 
-    ez_iot_ota_init(&init_info);
-}
-
-int ez_ota_start()
-{
-    ota_res_t ota_res = {0};
-    ota_module_t module = {ez_cloud_get_type(), ez_cloud_get_ver()};
-    ota_modules_t modules = {1, &module};
-
-    ez_iot_ota_modules_report(&ota_res, &modules, 5000);
-    ez_iot_ota_status_ready(&ota_res, NULL);
+    ez_cloud_init();
+    ez_cloud_ota_init();
 
     return 0;
 }
 
-static int ota_event_notify(ota_res_t *pres, ota_event_e event, void *data, int len)
+#ifdef FINSH_USING_MSH
+MSH_CMD_EXPORT(example_ota, eziot example ota);
+#else
+// int main(int argc, char **argv)
+// {
+//     return example_kv(argc, argv);
+// }
+#endif
+
+static int ez_cloud_ota_init()
 {
-    int rv = -1;
+
+    ez_ota_init_t init_info = {.cb.ota_recv_msg = ota_event_notify};
+    ez_ota_res_t ota_res = {0};
+    ez_ota_module_t module = {g_module_name, (ez_int8_t *)CONFIG_EZIOT_EXAMPLES_DEV_FIRMWARE_VERSION};
+    ez_ota_modules_t modules = {1, &module};
+
+    if (g_is_inited)
+    {
+        return 0;
+    }
+
+    ez_iot_ota_init(&init_info);
+    ez_iot_ota_modules_report(&ota_res, &modules, 5000);
+    ez_iot_ota_status_ready(&ota_res, g_module_name);
+    g_is_inited = ez_true;
+
+    return 0;
+}
+
+static ez_int32_t ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, ez_void_t *data, ez_int32_t len)
+{
+    ez_int32_t rv = -1;
 
     switch (event)
     {
-    case start_upgrade:
+    case START_UPGRADE:
     {
-        ota_upgrade_info_t *upgrade_infos = (ota_upgrade_info_t *)data;
-        if (NULL == upgrade_infos || sizeof(ota_upgrade_info_t) != len)
+        ez_ota_upgrade_info_t *upgrade_infos = (ez_ota_upgrade_info_t *)data;
+        if (NULL == upgrade_infos || sizeof(ez_ota_upgrade_info_t) != len)
         {
             break;
         }
@@ -67,28 +81,28 @@ static int ota_event_notify(ota_res_t *pres, ota_event_e event, void *data, int 
         }
 
         /* 正在升级中 */
-        if (0 != strlen(g_devsn))
+        if (0 != ezos_strlen(g_devsn))
         {
             break;
         }
 
         show_upgrade_info(upgrade_infos);
-        strncpy(g_devsn, pres->dev_serial, sizeof(g_devsn) - 1);
+        ezos_strncpy(g_devsn, (char *)pres->dev_serial, sizeof(g_devsn) - 1);
 
-        ota_download_info_t download_info = {0};
-        snprintf(download_info.url, sizeof(download_info.url) - 1, "http://%s", upgrade_infos->pota_files[0].url);
-        strncpy(download_info.degist, upgrade_infos->pota_files[0].degist, sizeof(download_info.degist) - 1);
+        ez_ota_download_info_t download_info = {0};
+        ezos_snprintf((ez_char_t *)download_info.url, sizeof(download_info.url) - 1, "http://%s", (ez_char_t *)upgrade_infos->pota_files[0].url);
+        ezos_strncpy((ez_char_t *)download_info.degist, (ez_char_t *)upgrade_infos->pota_files[0].degist, sizeof(download_info.degist) - 1);
         download_info.block_size = 1024 * 5;
         download_info.timeout_s = 60 * 5;
         download_info.retry_max = upgrade_infos->retry_max;
         download_info.total_size = upgrade_infos->pota_files[0].size;
 
+        /* 0. 开始下载 */
         rv = ez_iot_ota_download(&download_info, download_data_cb, download_result_cb, (void *)g_devsn);
         if (0 == rv)
         {
-            /* 0. ota begin */
-            ota_res_t pres = {0};
-            ez_iot_ota_progress_report(&pres, NULL, ota_state_starting, 0);
+            ez_ota_res_t pres = {0};
+            ez_iot_ota_progress_report(&pres, g_module_name, OTA_STATE_STARTING, 0);
         }
     }
     break;
@@ -99,95 +113,79 @@ static int ota_event_notify(ota_res_t *pres, ota_event_e event, void *data, int 
     return rv;
 }
 
-static void show_upgrade_info(ota_upgrade_info_t *upgrade_infos)
+static ez_int32_t download_data_cb(ez_int32_t total_len, ez_int32_t offset, ez_void_t *data, ez_int32_t len, ez_void_t *user_data)
 {
-    ez_log_i(TAG_APP, "file_num:%d", upgrade_infos->file_num);
-    ez_log_i(TAG_APP, "retry_max:%d", upgrade_infos->retry_max);
-    ez_log_i(TAG_APP, "interval:%d", upgrade_infos->interval);
+    ez_ota_res_t pres = {0};
+    ez_int16_t progress = ((offset + len) * (100 / 2) / total_len);
 
-    for (int i = 0; i < upgrade_infos->file_num; i++)
-    {
-        ez_log_i(TAG_APP, "pota_files[%d]->module:%s", i, upgrade_infos->pota_files[i].mod_name);
-        ez_log_i(TAG_APP, "pota_files[%d]->url:%s", i, upgrade_infos->pota_files[i].url);
-        ez_log_i(TAG_APP, "pota_files[%d]->fw_ver:%s", i, upgrade_infos->pota_files[i].fw_ver);
-        ez_log_i(TAG_APP, "pota_files[%d]->degist:%s", i, upgrade_infos->pota_files[i].degist);
-        ez_log_i(TAG_APP, "pota_files[%d]->size:%d", i, upgrade_infos->pota_files[i].size);
-        if (upgrade_infos->pota_files[i].pdiffs)
-        {
-            ez_log_i(TAG_APP, "pdiffs.degist: %s", upgrade_infos->pota_files[i].pdiffs->degist);
-            ez_log_i(TAG_APP, "pdiffs.fw_ver_src: %s", upgrade_infos->pota_files[i].pdiffs->fw_ver_dst);
-            ez_log_i(TAG_APP, "pdiffs.url: %s", upgrade_infos->pota_files[i].pdiffs->url);
-            ez_log_i(TAG_APP, "pdiffs.size: %d", upgrade_infos->pota_files[i].pdiffs->size);
-        }
-    }
-}
-
-static int download_data_cb(uint32_t total_len, uint32_t offset, void *data, uint32_t len, void *user_data)
-{
-    ota_res_t pres = {0};
-    ez_log_d(TAG_APP, "download_data_cb, total_len:%d, offset:%d, len:%d", total_len, offset, len);
-
-    /* 1. downloading */
+    /* 1. 下载中 */
     if (total_len > offset + len)
     {
-        ez_iot_ota_progress_report(&pres, NULL, ota_state_downloading, ((offset + len) * (100 / 2) / total_len));
+        /* 防止上报太频繁，每10%上报一次 */
+        if (0 == (progress % 10))
+        {
+            ez_iot_ota_progress_report(&pres, g_module_name, OTA_STATE_DOWNLOADING, progress);
+        }
+
         return 0;
     }
 
-    /* 2. integrity check and signature check */
-    hal_thread_sleep(5000);
+    /* 2. 下载完成 */
+    ez_iot_ota_progress_report(&pres, g_module_name, OTA_STATE_DOWNLOAD_COMPLETED, 50);
 
-    /* 3. burning */
-    ez_iot_ota_progress_report(&pres, NULL, ota_state_burning, 70);
-    hal_thread_sleep(5000);
+    /* 3. 完整性校验和签名校验 */
+    //TODO
+    ezos_delay_ms(5000);
 
-    /* 4. burning completed */
-    ez_iot_ota_progress_report(&pres, NULL, ota_state_burning_completed, 80);
-    hal_thread_sleep(5000);
+    /* 4. 烧录 */
+    ez_iot_ota_progress_report(&pres, g_module_name, OTA_STATE_BURNING, 60);
+    ezos_delay_ms(5000);
 
-    /* 5. reboot */
-    ez_iot_ota_progress_report(&pres, NULL, ota_state_rebooting, 90);
-    hal_thread_sleep(5000);
+    /* 5. 烧录完成 */
+    ez_iot_ota_progress_report(&pres, g_module_name, OTA_STATE_BURNING_COMPLETED, 80);
+    ezos_delay_ms(5000);
 
-    ez_iot_ota_status_succ(&pres, NULL);
+    /* 6. reboot */
+    ez_iot_ota_progress_report(&pres, g_module_name, OTA_STATE_REBOOTING, 90);
+    ezos_delay_ms(5000);
 
-    return 0;
-}
-
-static void download_result_cb(ota_cb_result_e result, void *user_data)
-{
-    ota_res_t pres = {0};
-    memset(g_devsn, 0, sizeof(g_devsn));
-
-    if (result_failed == result)
-    {
-        ez_iot_ota_status_fail(&pres, NULL, "", ota_code_download);
-    }
-    else if (result_suc == result)
-    {
-    }
-
-    ez_log_w(TAG_APP, "download_result_cb, result:%d", result);
-}
-
-int example_ota(int argc, char **argv)
-{
-    if (0 != ez_cloud_init() ||
-        0 != ez_ota_init() ||
-        0 != ez_cloud_start() ||
-        0 != ez_ota_start())
-    {
-        ez_log_e(TAG_APP, "example ota init err");
-    }
+    /* 7. 重启后上报成功+新版本信息 */
+    ez_iot_ota_status_succ(&pres, g_module_name);
+    //TODO 上报新版本信息
 
     return 0;
 }
 
-#ifdef FINSH_USING_MSH
-MSH_CMD_EXPORT(example_ota, run ez-iot-sdk example ota);
-#else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
-#endif
+static ez_void_t download_result_cb(ez_ota_cb_result_e result, ez_void_t *user_data)
+{
+    ez_ota_res_t pres = {0};
+    ezos_memset(g_devsn, 0, sizeof(g_devsn));
+
+    if (RESULT_FAILED == result)
+    {
+        ez_iot_ota_status_fail(&pres, g_module_name, (ez_int8_t *)"", OTA_CODE_DOWNLOAD);
+    }
+}
+
+static void show_upgrade_info(ez_ota_upgrade_info_t *upgrade_infos)
+{
+    ezlog_i(TAG_APP, "file_num:%d", upgrade_infos->file_num);
+    ezlog_i(TAG_APP, "retry_max:%d", upgrade_infos->retry_max);
+    ezlog_i(TAG_APP, "interval:%d", upgrade_infos->interval);
+
+    for (int i = 0; i < upgrade_infos->file_num; i++)
+    {
+        ezlog_i(TAG_APP, "pota_files[%d]->module:%s", i, upgrade_infos->pota_files[i].mod_name);
+        ezlog_i(TAG_APP, "pota_files[%d]->url:%s", i, upgrade_infos->pota_files[i].url);
+        ezlog_i(TAG_APP, "pota_files[%d]->fw_ver:%s", i, upgrade_infos->pota_files[i].fw_ver);
+        ezlog_i(TAG_APP, "pota_files[%d]->degist:%s", i, upgrade_infos->pota_files[i].degist);
+        ezlog_i(TAG_APP, "pota_files[%d]->size:%d", i, upgrade_infos->pota_files[i].size);
+        if (upgrade_infos->pota_files[i].pdiffs)
+        {
+            ezlog_i(TAG_APP, "pdiffs.degist: %s", upgrade_infos->pota_files[i].pdiffs->degist);
+            ezlog_i(TAG_APP, "pdiffs.fw_ver_src: %s", upgrade_infos->pota_files[i].pdiffs->fw_ver_dst);
+            ezlog_i(TAG_APP, "pdiffs.url: %s", upgrade_infos->pota_files[i].pdiffs->url);
+            ezlog_i(TAG_APP, "pdiffs.size: %d", upgrade_infos->pota_files[i].pdiffs->size);
+        }
+    }
+}

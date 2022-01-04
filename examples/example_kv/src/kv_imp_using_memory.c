@@ -2,12 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "ez_iot_core.h"
-#include "ez_iot_log.h"
-
-#ifdef RT_THREAD
-#include <rtthread.h>
-#include <finsh.h>
-#endif
 
 #define KV_NODE_MAX 20
 #define KV_BLOB_NAME "kv_blob_test"
@@ -234,80 +228,3 @@ static int find_freespace(void)
 
     return index;
 }
-
-int example_kv(int argc, char **argv)
-{
-    int rv = 0;
-
-    ez_iot_kv_t default_kv;
-    default_kv.kvs = default_kv_set;
-    default_kv.num = sizeof(default_kv_set) / sizeof(ez_iot_kv_node_t);
-
-    example_kv_init(&default_kv);
-
-    /**
-     * @brief Test int
-     */
-    {
-        int isrc = 4;
-        int idst = 0;
-        int length = sizeof(idst);
-        example_kv_raw_set(KV_NAME_INT, &isrc, sizeof(isrc));
-        example_kv_raw_get(KV_NAME_INT, &idst, &length);
-        if (isrc != idst)
-        {
-            rv = -1;
-            ez_log_e(TAG_APP, "kv int test err");
-        }
-    }
-
-    /**
-     * @brief Test string
-     */
-    {
-        char *ssrc = "ezapp, easy your life!";
-        char sdst[24] = {0};
-        int length = strlen(ssrc);
-        example_kv_raw_set(KV_NAME_STR, ssrc, strlen(ssrc));
-        example_kv_raw_get(KV_NAME_STR, sdst, &length);
-        if (0 != strcmp(ssrc, sdst))
-        {
-            rv = -1;
-            ez_log_e(TAG_APP, "kv string test err");
-        }
-    }
-
-    /**
-     * @brief Test Raw
-     */
-    {
-        char rsrc[24] = {0x00, 0x11, 0x22, 0x33, 0x00, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00, 0xff, 0xee};
-        char rdst[24] = {0};
-        int length = sizeof(rsrc);
-        example_kv_raw_set(KV_NAME_STR, rsrc, length);
-        example_kv_raw_get(KV_NAME_STR, rdst, &length);
-        if (0 != memcmp(rsrc, rdst, sizeof(rsrc)))
-        {
-            rv = -1;
-            ez_log_e(TAG_APP, "kv raw test err");
-        }
-    }
-
-    example_kv_deinit();
-
-    if (0 == rv)
-    {
-        ez_log_d(TAG_APP, "example kv test succ");
-    }
-
-    return 0;
-}
-
-#ifdef FINSH_USING_MSH
-MSH_CMD_EXPORT(example_kv, run ez - iot - sdk example kv mock);
-#else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
-#endif

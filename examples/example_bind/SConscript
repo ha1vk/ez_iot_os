@@ -1,0 +1,12 @@
+from building import *
+
+cwd     = GetCurrentDir()
+
+# src     = Glob('src/*.c')
+# path    = [cwd + '/inc']
+src     = Glob('*.c')
+path    = []
+
+group = DefineGroup('eziot_examples', src, depend = [], CPPPATH = path)
+
+Return('group')

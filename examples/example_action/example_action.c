@@ -1,130 +1,97 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "ezos.h"
 #include "ez_iot_core.h"
 #include "ez_iot_tsl.h"
-#include "ez_iot_log.h"
-#include "hal_thread.h"
-
-#ifdef RT_THREAD
-#include <rtthread.h>
-#include <finsh.h>
-#endif
-
-#define NEWLINE_SIGN "\r\n"
+#include "ezlog.h"
 
 extern int ez_cloud_init();
-extern int ez_cloud_start();
-extern void ez_cloud_deint();
+extern int ez_cloud_base_init();
+static int ez_cloud_tsl_init();
+static ez_int32_t tsl_notice(ez_tsl_event_e event_type, ez_void_t *data, ez_int32_t len);
+static ez_int32_t tsl_action2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out);
+static ez_int32_t tsl_property2cloud(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out);
+static ez_int32_t tsl_property2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value);
 
-/**
- * @brief 处理云端下发的操作命令
- * 
- */
-static int32_t tsl_things_action2dev(const int8_t *sn, const tsl_rsc_info_t *rsc_info, const tsl_key_info_t *key_info,
-                                     const tsl_value_t *value_in, tsl_value_t *value_out)
+static ez_bool_t g_is_inited = ez_false;
+
+static int example_action(int argc, char **argv)
 {
-    int32_t rv = -1;
-    printf("recv action%s", NEWLINE_SIGN);
+    ezlog_init();
+    ezlog_start();
+    ezlog_filter_lvl(CONFIG_EZIOT_EXAMPLES_SDK_LOGLVL);
 
-    printf("device uuid:%s%s", sn, NEWLINE_SIGN);                      // 非网关类的单品设备，序列号就是设备本身
-    printf("resourceCategory:%s%s", rsc_info->res_type, NEWLINE_SIGN); // 资源类型, 参考device_feautre->4LYV8SK7UKLBOUOVS6HXVX_V1.2.0_build_201201.bin
-    printf("localIndex:%s%s", rsc_info->local_index, NEWLINE_SIGN);    // 通道号, 参考device_feautre->4LYV8SK7UKLBOUOVS6HXVX_V1.2.0_build_201201.bin
-
-    if (0 == strcmp("action_test", key_info->domain))
-    {
-        if (0 == strcmp("action_null", key_info->key))
-        {
-            //TODO 设备执行操作
-            printf("action_null input:null%s", NEWLINE_SIGN);
-            rv = 0;
-        }
-        else if (0 == strcmp("action_int", key_info->key))
-        {
-            //TODO 设备执行操作
-            printf("action_int input:%d%s", value_in->value_int, NEWLINE_SIGN);
-            rv = 0;
-        }
-        else if (0 == strcmp("action_str", key_info->key))
-        {
-            //TODO 设备执行操作
-            printf("action_str input:%s%s", (char *)value_in->value, NEWLINE_SIGN);
-            rv = 0;
-        }
-        else if (0 == strcmp("action_num", key_info->key))
-        {
-            //TODO 设备执行操作
-            if (tsl_data_type_int == value_in->type)
-            {
-                printf("action_num input:%d%s", value_in->value_int, NEWLINE_SIGN);
-            }
-            else
-            {
-                printf("action_num input:%ld%s", value_in->value_double, NEWLINE_SIGN);
-            }
-
-            rv = 0;
-        }
-        else if (0 == strcmp("action_bool", key_info->key))
-        {
-            //TODO 设备执行操作
-            printf("action_bool input:%d%s", value_in->value_int, NEWLINE_SIGN);
-            rv = 0;
-        }
-        else if (0 == strcmp("action_obj", key_info->key))
-        {
-            //TODO 设备执行操作
-            printf("action_obj input:%s%s", (char *)value_in->value, NEWLINE_SIGN);
-            rv = 0;
-        }
-        else if (0 == strcmp("action_array", key_info->key))
-        {
-            //TODO 设备执行操作
-            printf("action_array input:%s%s", (char *)value_in->value, NEWLINE_SIGN);
-            rv = 0;
-        }
-    }
-
-    return rv;
-}
-
-static int32_t tsl_things_property2cloud(const int8_t *sn, const tsl_rsc_info_t *rsc_info, const tsl_key_info_t *key_info, tsl_value_t *value_out)
-{
-    return -1;
-}
-
-static int32_t tsl_things_property2dev(const int8_t *sn, const tsl_rsc_info_t *rsc_info, const tsl_key_info_t *key_info, const tsl_value_t *value)
-{
-    return 1;
-}
-
-static int ez_tsl_init()
-{
-    tsl_things_callbacks_t tsl_things_cbs = {tsl_things_action2dev, tsl_things_property2cloud, tsl_things_property2dev};
-    return ez_iot_tsl_init(&tsl_things_cbs);
-}
-
-int example_action(int argc, char **argv)
-{
-    /**
-     * @brief 订阅设备上线事件，设备上线后再发送事件
-     * 
-     */
-    if (0 != ez_cloud_init() ||
-        0 != ez_tsl_init() ||
-        0 != ez_cloud_start())
-    {
-        ez_log_e(TAG_APP, "example event init err");
-    }
+    ez_cloud_init();
+    ez_cloud_base_init();
+    ez_cloud_tsl_init();
 
     return 0;
 }
 
 #ifdef FINSH_USING_MSH
-MSH_CMD_EXPORT(example_action, run ez - iot - sdk example action);
+MSH_CMD_EXPORT(example_action, eziot example action);
 #else
 // int main(int argc, char **argv)
 // {
 //     return example_kv(argc, argv);
 // }
 #endif
+
+static int ez_cloud_tsl_init()
+{
+    ez_tsl_callbacks_t tsl_things_cbs = {tsl_notice, tsl_action2dev, tsl_property2cloud, tsl_property2dev};
+
+    if (g_is_inited)
+    {
+        return 0;
+    }
+
+    ez_iot_tsl_init(&tsl_things_cbs);
+    ez_iot_tsl_reg(NULL, NULL);
+
+    g_is_inited = ez_true;
+    return 0;
+}
+
+/**
+ * @brief 处理云端下发的操作命令
+ * 
+ */
+static ez_int32_t tsl_action2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info,
+                                 const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out)
+{
+    ez_int32_t rv = 0;
+
+    ezlog_w(TAG_APP, "recv action");
+    ezlog_d(TAG_APP, "serial number:%s", sn);                  //global表示单品或网关，子设备为对应序列号
+    ezlog_d(TAG_APP, "resource type:%s", rsc_info->res_type);  //资源类型，多用于复合类设备，如灯+视频，插座+灯
+    ezlog_d(TAG_APP, "local index:%s", rsc_info->local_index); //通道号，如多开关0\1\2\3
+    ezlog_d(TAG_APP, "domain:%s", key_info->domain);           //功能点领域，功能点的分类或域名空间
+    ezlog_d(TAG_APP, "identifier:%s", key_info->key);          //具体功能点
+
+    if (0 == ezos_strcmp("action_null", key_info->key))
+    {
+        //TODO 设备执行操作, 成功rv=0, 失败rv=-1
+        ezlog_d(TAG_APP, "value:null");
+    }
+    else if (0 == ezos_strcmp("action_int", key_info->key))
+    {
+        ezlog_d(TAG_APP, "value:%d", value_in->value_int);
+        //TODO 设备执行操作, 成功rv=0, 失败rv=-1
+    }
+
+    return rv;
+}
+
+static ez_int32_t tsl_property2cloud(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out)
+{
+    return -1;
+}
+
+static ez_int32_t tsl_property2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value)
+{
+    return -1;
+}
+
+static ez_int32_t tsl_notice(ez_tsl_event_e event_type, ez_void_t *data, ez_int32_t len)
+{
+    return 0;
+}
