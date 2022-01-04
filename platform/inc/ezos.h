@@ -18,7 +18,7 @@
 #define _EZOS_H_
 
 #ifdef CONFIG_EZIOT_OS_RT
-#include <rtconfig.h>
+#include <rtthread.h>
 #else
 #include <ezos_gconfig.h>
 #endif

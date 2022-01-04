@@ -62,7 +62,6 @@ int ezos_sem_destroy(ez_sem_t sem)
 
 int ezos_sem_wait(ez_sem_t sem, int timewait_ms)
 {
-    int ret = -1;
     sem_data_t *psem_data = (sem_data_t *)sem;
     if (psem_data == NULL)
     {
@@ -75,7 +74,7 @@ int ezos_sem_wait(ez_sem_t sem, int timewait_ms)
         return -1;
     }
 
-    return ret;
+    return 0;
 }
 
 int ezos_sem_post(ez_sem_t sem)
