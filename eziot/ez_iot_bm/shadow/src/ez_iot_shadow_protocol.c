@@ -80,7 +80,7 @@ ez_err_t shadow_protocol_report(ez_char_t *devsn, ez_char_t *res_type, ez_uint16
         if (0 != ez_kernel_send_v3(&pubmsg))
         {
             rv = EZ_SHD_ERR_GENERAL;
-            ezlog_e(TAG_SHD, "kernel send v3%d", rv);
+            ezlog_e(TAG_SHD, "kernel send v3:%d", rv);
             break;
         }
 
@@ -117,7 +117,7 @@ ez_err_t shadow_protocol_set_reply(ez_char_t *devsn, ez_char_t *res_type, ez_int
     ezos_strncpy(pubmsg.resource_type, res_type, sizeof(pubmsg.resource_type) - 1);
     ezos_strncpy(pubmsg.module, SHADOW_MODULE_NAME, sizeof(pubmsg.module) - 1);
     ezos_strncpy(pubmsg.method, SHADOW_METHOD_NAME, sizeof(pubmsg.module) - 1);
-    ezos_strncpy(pubmsg.msg_type, SHADOW_MSG_TYPE_QUERY_REPLY, sizeof(pubmsg.msg_type) - 1);
+    ezos_strncpy(pubmsg.msg_type, SHADOW_MSG_TYPE_SET_REPLY, sizeof(pubmsg.msg_type) - 1);
     ezos_sprintf(pubmsg.resource_id, "%d", index);
 
     if (0 != ez_kernel_send_v3(&pubmsg))
