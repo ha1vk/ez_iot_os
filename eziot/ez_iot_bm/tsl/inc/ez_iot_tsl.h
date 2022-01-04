@@ -76,7 +76,7 @@ extern "C"
         {
             ez_bool_t value_bool;
             ez_int_t value_int;
-            ez_int64_t value_double;
+            ez_double_t value_double;
             ez_void_t *value; /* 复杂类型的数据 */
         };
     } ez_tsl_value_t;

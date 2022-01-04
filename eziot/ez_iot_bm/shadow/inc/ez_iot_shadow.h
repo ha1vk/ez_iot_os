@@ -48,7 +48,7 @@ extern "C"
 
     typedef struct
     {
-        ez_char_t dev_serial[32]; ///< 设备序列号
+        ez_char_t dev_serial[48]; ///< 设备序列号
         ez_char_t res_type[32];   ///< 通道类型（某种类型通道的集合，视频通道集合或者报警通道集合）
         ez_int16_t local_index;   ///< 通道号（例如报警通道0或者报警通道1）
     } ez_shadow_res_t;
@@ -88,7 +88,7 @@ extern "C"
         {
             ez_bool_t value_bool;
             ez_int32_t value_int;
-            ez_uint64_t value_double;
+            ez_double_t value_double;
             ez_void_t *value; /* 复杂类型的数据 */
         };
     } ez_shadow_value_t;

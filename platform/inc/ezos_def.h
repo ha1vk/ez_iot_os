@@ -49,6 +49,8 @@ typedef int             EZ_INT;
 typedef unsigned int    EZ_UINT;
 typedef long            EZ_LONG;
 typedef unsigned long   EZ_ULONG;
+typedef float           EZ_FLOAT;
+typedef double          EZ_DOUBLE;
 
 #if defined(ARCH_CPU_64BIT) || defined(_WIN64)
 typedef long unsigned int EZ_SIZE;
@@ -93,6 +95,8 @@ typedef EZ_LONG     ez_long_t;
 typedef EZ_ULONG    ez_ulong_t;
 typedef EZ_SIZE     ez_size_t;
 typedef EZ_SSIZE    ez_ssize_t;
+typedef EZ_FLOAT    ez_float_t;
+typedef EZ_DOUBLE   ez_double_t;
 
 typedef EZ_BOOL     ez_bool_t;
 typedef EZ_ERR      ez_err_t;
