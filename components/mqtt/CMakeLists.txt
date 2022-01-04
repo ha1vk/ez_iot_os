@@ -16,6 +16,7 @@ if(CONFIG_EZIOT_COMPONENT_MQTT_ENABLE)
 
     ###### Add required/dependent components ######
     list(APPEND ADD_REQUIREMENTS ezos)
+    list(APPEND ADD_REQUIREMENTS ezlog)
     ###############################################
 
     ############ Add static libs ##################

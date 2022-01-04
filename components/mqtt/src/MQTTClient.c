@@ -16,6 +16,7 @@
 
 #include <string.h>
 #include "MQTTClient.h"
+#include "ezlog.h"
 
 static void NewMessageData(MessageData *md, MQTTString *aTopicName, MQTTMessage *aMessage)
 {
@@ -229,6 +230,7 @@ int keepalive(MQTTClient *c)
         len = MQTTSerialize_pingreq(c->buf, c->buf_size);
         if (len > 0 && (rc = sendPacket(c, len, &timer)) == SUCCESS) // send the ping packet
         {
+            ezlog_v(TAG_CORE, "keep alive");
             c->ping_outstanding = 1;
             TimerCountdown(&c->ping_timer, c->keepAliveInterval); // record the fact that we have successfully sent the packet
         }
@@ -306,6 +308,7 @@ int cycle(MQTTClient *c, Timer *timer)
     case PUBCOMP:
         break;
     case PINGRESP:
+        ezlog_d(TAG_CORE, "alive");
         c->ping_outstanding = 0;
         break;
     }
