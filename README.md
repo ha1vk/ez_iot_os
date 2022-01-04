@@ -47,5 +47,5 @@ make
 | [principle.md](principle.md)       | 工作原理 |
 | [user-guide.md](user-guide.md)     | 使用指南 |
 | [api.md](api.md)                   | API 说明 |
-| [samples.md](samples.md)           | 示例说明 |
+| [examples.md](./docs/examples.md)  | 示例说明 |
 | [port.md](./docs/.md)              | 移植文档 |
