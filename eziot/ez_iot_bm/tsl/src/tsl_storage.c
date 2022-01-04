@@ -105,7 +105,7 @@ ez_err_t tsl_storage_save(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev
     ez_char_t handle_curr[32] = {0};
     ez_int32_t index = -1;
     tslmap_metadata_t tsl_metadata = {0};
-    size_t tslmap_len = 0;
+    size_t tslmap_len = CONFIG_EZIOT_TSL_PROFILE_MAP_SIZE;
 
     CHECK_COND_DONE(len > CONFIG_EZIOT_TSL_PROFILE_SIZE, EZ_KV_ERR_SAVED_FULL);
     storage_devinfo2index(dev_sn, dev_type, dev_fwver, handle_curr);

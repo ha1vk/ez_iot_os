@@ -91,7 +91,7 @@ static ez_int32_t tsl_action_process(ez_kernel_submsg_v3_t *submsg)
     ezlog_i(TAG_TSL, "seq in: %d", submsg->msg_seq);
 
     // example "domain/identifier"
-    ez_int32_t num = ezos_sscanf(submsg->ext_msg, "%32[^/]/%32", domain, identifier);
+    ez_int32_t num = ezos_sscanf(submsg->ext_msg, "%32[^/]/%s", domain, identifier);
     if (2 != num)
     {
         ezlog_e(TAG_TSL, "tsl key is illegal., msg:%s", submsg->ext_msg);
@@ -119,7 +119,6 @@ static ez_int32_t tsl_action_process(ez_kernel_submsg_v3_t *submsg)
     ezos_strncpy(pubmsg.ext_msg, submsg->ext_msg, sizeof(pubmsg.ext_msg) - 1);
     ezos_strncpy(pubmsg.sub_serial, submsg->sub_serial, sizeof(pubmsg.sub_serial) - 1);
 
-    rv = ez_kernel_send_v3(&pubmsg);
     CHECK_COND_DONE(ez_kernel_send_v3(&pubmsg), EZ_TSL_ERR_GENERAL);
 
 done:
@@ -176,10 +175,6 @@ static ez_err_t business2cloud_imp(ez_shadow_value_t *pvalue, ez_shadow_business
 
     ezlog_d(TAG_TSL, "busi to cloud. dev_sn: %s", ppram->pres.dev_serial);
     rv = g_tsl_things_cbs.property2cloud(ppram->pres.dev_serial, &rsc_info, &key_info, tsl_value);
-    if (0 != rv)
-    {
-        ezlog_e(TAG_TSL, "property2cloud failed.");
-    }
 
     return rv;
 }
