@@ -38,18 +38,18 @@ extern "C"
         }
         if (!pota_init->cb.ota_recv_msg)
         {
-            ezlog_e(TAG_OTA, "ota_init, cb recv_msg err\n");
+            ezlog_e(TAG_OTA, "ota_init, cb recv_msg err");
             return EZ_OTA_ERR_PARAM_INVALID;
         }
         ez_ota_user_init(pota_init->cb);
         suc = ez_ota_extern_init();
         if (EZ_OTA_ERR_SUCC != suc)
         {
-            ezlog_e(TAG_OTA, "ota_extern_init err\n");
+            ezlog_e(TAG_OTA, "ota_extern_init err");
             return suc;
         }
         g_ota_inited = 1;
-        ezlog_d(TAG_OTA, "ez_ota_init success\n");
+        ezlog_d(TAG_OTA, "ez_ota_init success");
 
         return suc;
     }

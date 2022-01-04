@@ -43,14 +43,14 @@ static int ez_ota_upgrade_to_device(ez_ota_res_t* pres, unsigned int seq, void* 
     {
         if(NULL == buf)
         {
-            ezlog_e(TAG_OTA, "upgrade_to_device,input null \n"); 
+            ezlog_e(TAG_OTA, "upgrade_to_device,input null "); 
             break;
         }
-        ezlog_d(TAG_OTA,"upgrade req: %s \n",(const char*)buf); 
+        ezlog_d(TAG_OTA,"upgrade req: %s ",(const char*)buf); 
         proot = cJSON_Parse((const char*)buf);
         if(NULL == proot)
         {
-            ezlog_e(TAG_OTA,"parse PacketRsp err\n"); 
+            ezlog_e(TAG_OTA,"parse PacketRsp err"); 
             break;
         }
         cJSON* pJSmaxtry = cJSON_GetObjectItem(proot,"maxtry");
@@ -62,22 +62,22 @@ static int ez_ota_upgrade_to_device(ez_ota_res_t* pres, unsigned int seq, void* 
         if(NULL != pJSinterval && cJSON_Number==pJSinterval->type)
         {
             ez_upgrade_info.interval = pJSinterval->valueint;
-            ezlog_d(TAG_OTA,"ota prograss report interval:%d\n", ez_upgrade_info.interval); 
+            ezlog_d(TAG_OTA,"ota prograss report interval:%d", ez_upgrade_info.interval); 
         }
        
         cJSON* pJSfile_info = cJSON_GetObjectItem(proot,"file_info");
         if(NULL == pJSfile_info||cJSON_Array!=pJSfile_info->type)
         {
-            ezlog_e(TAG_OTA,"file_info is not array\n"); 
+            ezlog_e(TAG_OTA,"file_info is not array"); 
             break;
         }
         int array_size = cJSON_GetArraySize(pJSfile_info);
-        ezlog_d(TAG_OTA,"ota upgrade file num:%d\n", array_size); 
+        ezlog_d(TAG_OTA,"ota upgrade file num:%d", array_size); 
         ez_upgrade_info.file_num = array_size;
         ez_upgrade_info.pota_files = (ez_ota_file_info_t*)ezos_malloc(sizeof(ez_ota_file_info_t)*array_size);
         if(NULL == ez_upgrade_info.pota_files)
         {
-            ezlog_e(TAG_OTA,"pota_files malloc err\n"); 
+            ezlog_e(TAG_OTA,"pota_files malloc err"); 
             break;
         }
         ezos_memset(ez_upgrade_info.pota_files, 0, sizeof(ez_ota_file_info_t)*array_size);
@@ -86,7 +86,7 @@ static int ez_ota_upgrade_to_device(ez_ota_res_t* pres, unsigned int seq, void* 
            cJSON* tmp = cJSON_GetArrayItem(pJSfile_info,i);
            if(NULL == tmp)
            {
-               ezlog_e(TAG_OTA,"GetArrayItem err, i:%d\n", i); 
+               ezlog_e(TAG_OTA,"GetArrayItem err, i:%d", i); 
                break;
            }
            cJSON* pJSmodule = cJSON_GetObjectItem(tmp, "module");
@@ -120,7 +120,7 @@ static int ez_ota_upgrade_to_device(ez_ota_res_t* pres, unsigned int seq, void* 
                 ez_upgrade_info.pota_files[i].pdiffs = (ez_ota_file_diff_t*)ezos_malloc(sizeof(ez_ota_file_diff_t));
                 if(NULL == ez_upgrade_info.pota_files[i].pdiffs)
                 {
-                    ezlog_e(TAG_OTA,"pdiffs malloc err\n"); 
+                    ezlog_e(TAG_OTA,"pdiffs malloc err"); 
                     break;
                 }
                 ezos_memset(ez_upgrade_info.pota_files[i].pdiffs, 0, sizeof(ez_ota_file_diff_t));
@@ -142,7 +142,7 @@ static int ez_ota_upgrade_to_device(ez_ota_res_t* pres, unsigned int seq, void* 
                 cJSON*diffs_size = cJSON_GetObjectItem(pJSdiffs,"size");
                 if(diffs_size)
                 {
-                    ezlog_d(TAG_OTA,"diffs_size:%d\n", diffs_size->valueint); 
+                    ezlog_d(TAG_OTA,"diffs_size:%d", diffs_size->valueint); 
                     ez_upgrade_info.pota_files[i].pdiffs->size = diffs_size->valueint;
                 }
            }
@@ -164,7 +164,7 @@ static int ez_ota_upgrade_to_device(ez_ota_res_t* pres, unsigned int seq, void* 
         }
         else
         {
-            ezlog_e(TAG_OTA,"reply upgrade rsp to das ,json create err\n"); 
+            ezlog_e(TAG_OTA,"reply upgrade rsp to das ,json create err"); 
         }
     }
     else
@@ -182,11 +182,11 @@ static int ez_ota_upgrade_to_device(ez_ota_res_t* pres, unsigned int seq, void* 
         {
             len = ezos_strlen(response);
             ez_err_t ota_err = ez_ota_send_msg_to_platform((unsigned char*)response, len, pres, "operate_reply", "upgrade", EZ_OTA_RSP, &seq, 0); 
-            ezlog_d(TAG_OTA,"reply upgrade rsp to das,result:%d,seq:%d rsp:%s\n", ota_err, seq, response);
+            ezlog_d(TAG_OTA,"reply upgrade rsp to das,result:%d,seq:%d rsp:%s", ota_err, seq, response);
         }
         else
         {
-            ezlog_e(TAG_OTA,"reply upgrade rsp to das ,json format err\n");
+            ezlog_e(TAG_OTA,"reply upgrade rsp to das ,json format err");
         }
     }
    
@@ -226,15 +226,15 @@ static void ez_ota_data_route_cb(ez_kernel_submsg_v3_t* ptr_submsg)
     ez_ota_res_t res;
 	if (ptr_submsg == NULL||NULL == ptr_submsg->buf)
 	{
-        ezlog_e(TAG_OTA,"ez_ota_data_route_cb input NULL\n");
+        ezlog_e(TAG_OTA,"ez_ota_data_route_cb input NULL");
 		return;
 	}
     
-    ezlog_d(TAG_OTA,"ota recv buf:%s\n", (const char*)ptr_submsg->buf);
+    ezlog_d(TAG_OTA,"ota recv buf:%s", (const char*)ptr_submsg->buf);
     ezos_memset(&res, 0, sizeof(ez_ota_res_t));
     ezos_strncpy((char*)res.dev_serial, ptr_submsg->sub_serial, ezdev_sdk_max_serial_len-1); 
 
-    ezlog_d(TAG_OTA,"ota recv msg,child_id: %s,res_id:%s,res_type:%s,method:%s\n",res.dev_serial,\
+    ezlog_d(TAG_OTA,"ota recv msg,child_id: %s,res_id:%s,res_type:%s,method:%s",res.dev_serial,\
              ptr_submsg->resource_id, ptr_submsg->resource_type, ptr_submsg->method);
     if(0 == ezos_strcmp(ptr_submsg->method, "inform"))
     {
@@ -245,35 +245,12 @@ static void ez_ota_data_route_cb(ez_kernel_submsg_v3_t* ptr_submsg)
         result_code = ez_ota_upgrade_to_device(&res, ptr_submsg->msg_seq, ptr_submsg->buf);
     }
 
-	ezlog_i(TAG_OTA,"ota notify :result_code %d,msg_type:%s,seq:%d\n", result_code, ptr_submsg->msg_type, ptr_submsg->msg_seq);
+	ezlog_i(TAG_OTA,"ota notify :result_code %d,msg_type:%s,seq:%d", result_code, ptr_submsg->msg_type, ptr_submsg->msg_seq);
     return;
 }
 
 static void ez_ota_event_route_cb(ez_kernel_event_t* ptr_event)
 {
-	ezlog_i(TAG_OTA,"ota event router,type: %d\n", ptr_event->event_type);
-    switch(ptr_event->event_type)
-    {
-        case SDK_KERNEL_EVENT_ONLINE:
-        case SDK_KERNEL_EVENT_RECONNECT:
-            {
-                ezlog_d(TAG_OTA,"ota login\n");
-            }
-            break;
-        case SDK_KERNEL_EVENT_BREAK:
-            {
-                ezlog_d(TAG_OTA,"ota offline\n");
-            }
-            break;
-        case SDK_KERNEL_EVENT_PUBLISH_ACK:
-            {
-                ez_kernel_publish_ack_t *err_ctx = (ez_kernel_publish_ack_t *)ptr_event->event_context;
-                ezlog_d(TAG_OTA,"ez ota_run_time err: code:%d, seq:%d \n", err_ctx->last_error, err_ctx->msg_seq);
-            }
-            break;
-        default:
-            break;
-    }
 }
 
 ez_err_t ezdev_ota_module_info_report(const ez_ota_res_t *pres, const ez_ota_modules_t* pmodules, const unsigned int timeout_ms)
@@ -289,14 +266,14 @@ ez_err_t ezdev_ota_module_info_report(const ez_ota_res_t *pres, const ez_ota_mod
         pJsRoot = cJSON_CreateObject();
         if(NULL == pJsRoot)
         {
-            ezlog_e(TAG_OTA,"report pJsRoot Create err\n");
+            ezlog_e(TAG_OTA,"report pJsRoot Create err");
             ota_err = EZ_OTA_ERR_JSON_CREATE_ERR;
             break;
         }
         pJsModule_array = cJSON_AddArrayToObject(pJsRoot, "modules");
         if(NULL == pJsModule_array)
         {
-            ezlog_e(TAG_OTA,"pJsModule_array Create err\n");
+            ezlog_e(TAG_OTA,"pJsModule_array Create err");
             ota_err = EZ_OTA_ERR_JSON_CREATE_ERR;
             break;
         }
@@ -305,7 +282,7 @@ ez_err_t ezdev_ota_module_info_report(const ez_ota_res_t *pres, const ez_ota_mod
             cJSON* item = cJSON_CreateObject();
             if(NULL == item)
             {
-                ezlog_e(TAG_OTA," CreateObject err,i:%d\n", i);
+                ezlog_e(TAG_OTA," CreateObject err,i:%d", i);
                 continue;
             }
             cJSON_AddNumberToObject(item, "index", 0);
@@ -318,20 +295,20 @@ ez_err_t ezdev_ota_module_info_report(const ez_ota_res_t *pres, const ez_ota_mod
         sz_pmodules = cJSON_PrintUnformatted(pJsRoot);
         if(NULL == sz_pmodules)
         {
-            ezlog_e(TAG_OTA,"sz_pmodules PrintUnformatted err\n");
+            ezlog_e(TAG_OTA,"sz_pmodules PrintUnformatted err");
             ota_err = EZ_OTA_ERR_JSON_FORAMT_ERR;
             break;
         }
-        ezlog_d(TAG_OTA,"module report PrintUnformatted :%s \n", sz_pmodules);
+        ezlog_d(TAG_OTA,"module report PrintUnformatted :%s ", sz_pmodules);
         int msg_len = ezos_strlen(sz_pmodules);
         ota_err = ez_ota_send_msg_to_platform((unsigned char*)sz_pmodules, msg_len, pres, "report", "inform", EZ_OTA_REQ, &msg_seq, 0);
         if(EZ_OTA_ERR_SUCC != ota_err)
         {
-            ezlog_e(TAG_OTA," module report send_msg_to_platform err\n");  
+            ezlog_e(TAG_OTA," module report send_msg_to_platform err");  
             ota_err = EZ_OTA_ERR_SEND_MSG_ERR;
             break;
         } 
-        ezlog_d(TAG_OTA,"module report seq :%d \n", msg_seq);
+        ezlog_d(TAG_OTA,"module report seq :%d ", msg_seq);
     }while(0); 
 
     if(pJsRoot)
@@ -349,7 +326,7 @@ ez_err_t ezdev_ota_module_info_report(const ez_ota_res_t *pres, const ez_ota_mod
 ez_err_t ez_ota_extern_init()
 {
     g_quit = 0;
-	ezlog_d(TAG_OTA,"ota_extern_init enter\n");
+	ezlog_d(TAG_OTA,"ota_extern_init enter");
 	ez_err_t sdk_error = EZ_OTA_ERR_SUCC;
 	ez_kernel_extend_v3_t extern_info_v3;
 	ezos_memset(&extern_info_v3, 0, sizeof(ez_kernel_extend_v3_t));
@@ -361,7 +338,7 @@ ez_err_t ez_ota_extern_init()
 	sdk_error = ez_kernel_extend_load_v3(&extern_info_v3);
 	if (EZ_CORE_ERR_SUCC != sdk_error)
 	{
-        ezlog_e(TAG_OTA,"ezdev_sdk_kernel_extend_load ota module err:%#x\n", sdk_error);
+        ezlog_e(TAG_OTA,"ezdev_sdk_kernel_extend_load ota module err:%#x", sdk_error);
 		return EZ_OTA_ERR_REGISTER_ERR;
     }
     return EZ_OTA_ERR_SUCC;

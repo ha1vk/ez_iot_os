@@ -34,7 +34,7 @@ ez_err_t ez_ota_send_msg_to_platform(unsigned char *msg, int msg_len, const ez_o
 
 	if (NULL == msg || msg_len <= 0 || NULL == method || NULL == msg_type)
 	{
-		ezlog_e(TAG_OTA, "ota_send to_platform, input null \n");
+		ezlog_e(TAG_OTA, "ota_send to_platform, input null ");
 		return EZ_OTA_ERR_PARAM_INVALID;
 	}
 	if (EZ_OTA_RSP == response)
@@ -50,25 +50,25 @@ ez_err_t ez_ota_send_msg_to_platform(unsigned char *msg, int msg_len, const ez_o
 	ezos_strncpy(pubmsg.resource_id, "0", sizeof(pubmsg.resource_id) - 1);
 	if (pres && ezos_strlen((char *)pres->dev_serial) > 0)
 	{
-		ezlog_d(TAG_OTA, "ota dev_serial:%s \n", pres->dev_serial);
+		ezlog_d(TAG_OTA, "ota dev_serial:%s ", pres->dev_serial);
 		ezos_strncpy(pubmsg.sub_serial, (char *)pres->dev_serial, sizeof(pubmsg.sub_serial) - 1);
 	}
 	ezos_strncpy(pubmsg.module, ota_module_name, sizeof(pubmsg.module) - 1);
 	ezos_strncpy(pubmsg.method, method, sizeof(pubmsg.method) - 1);
 	ezos_strncpy(pubmsg.msg_type, msg_type, sizeof(pubmsg.msg_type) - 1);
 
-	ezlog_i(TAG_OTA, "ota_send: type:%s, seq:%d \n", msg_type, *msg_seq);
-	ezlog_d(TAG_OTA, "msg: %s\n", msg);
+	ezlog_i(TAG_OTA, "ota_send: type:%s, seq:%d ", msg_type, *msg_seq);
+	ezlog_d(TAG_OTA, "msg: %s", msg);
 	sdk_error = ez_kernel_send_v3(&pubmsg);
 	if (sdk_error != EZ_CORE_ERR_SUCC)
 	{
-		ezlog_e(TAG_OTA, "ota_send_msg_to_platform failed: %#02x\n", sdk_error);
+		ezlog_e(TAG_OTA, "ota_send_msg_to_platform failed: %#02x", sdk_error);
 		return EZ_OTA_ERR_SEND_MSG_ERR;
 	}
 
 	if (EZ_OTA_REQ == response)
 	{
-		ezlog_d(TAG_OTA, "ota_send_msg_to_platform seq: %d\n", pubmsg.msg_seq);
+		ezlog_d(TAG_OTA, "ota_send_msg_to_platform seq: %d", pubmsg.msg_seq);
 		*msg_seq = pubmsg.msg_seq;
 	}
 

@@ -55,13 +55,13 @@ ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, 
     ez_uint32_t msg_seq  = 0;
 
     cJSON* pJsRoot  = cJSON_CreateObject();
-    ezlog_d(TAG_OTA, "ez_progress_report, status:%d code:%d, process:%d\n",status, errcode, progress);
+    ezlog_d(TAG_OTA, "ez_progress_report, status:%d code:%d, process:%d",status, errcode, progress);
     ezos_sprintf(err_code,"0x%08x", errcode);
     do
     {
         if(NULL== pJsRoot)
         {
-            ezlog_e(TAG_OTA, "ez_progress_report json create err \n");
+            ezlog_e(TAG_OTA, "ez_progress_report json create err ");
             ota_err = EZ_OTA_ERR_JSON_CREATE_ERR;
             break;
         }
@@ -70,7 +70,7 @@ ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, 
         cJSON_AddStringToObject(pJsRoot,"code", err_code);
         if(perr_msg)
         {
-            ezlog_d(TAG_OTA,"ez_progress_report, errorMsg:%s\n", (const char*)perr_msg);
+            ezlog_d(TAG_OTA,"ez_progress_report, errorMsg:%s", (const char*)perr_msg);
             cJSON_AddStringToObject(pJsRoot,"errorMsg", (const char*)perr_msg);
         }
         else
@@ -79,7 +79,7 @@ ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, 
         }
         if(pmodule)
         {
-            ezlog_d(TAG_OTA, "ez_progress_report, module:%s\n", (const char*)pmodule);
+            ezlog_d(TAG_OTA, "ez_progress_report, module:%s", (const char*)pmodule);
             cJSON_AddStringToObject(pJsRoot,"module", (const char*)pmodule);
         }
         else
@@ -89,7 +89,7 @@ ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, 
         sz_progress = cJSON_PrintUnformatted(pJsRoot);
         if(NULL == sz_progress)
         {
-            ezlog_e(TAG_OTA, "query_packet cJSON_Print err\n");
+            ezlog_e(TAG_OTA, "query_packet cJSON_Print err");
             ota_err = EZ_OTA_ERR_JSON_FORAMT_ERR;
             break;
         }
@@ -97,7 +97,7 @@ ez_err_t ez_progress_report(const ez_ota_res_t *pres, const ez_int8_t* pmodule, 
         ota_err = ez_ota_send_msg_to_platform((unsigned char*)sz_progress, msg_len, pres, "report", "progress", EZ_OTA_REQ, &msg_seq, 0);
         if(EZ_OTA_ERR_SUCC != ota_err)
         {
-            ezlog_e(TAG_OTA,"ez_progress_report failed, status:%d\n",status);
+            ezlog_e(TAG_OTA,"ez_progress_report failed, status:%d",status);
             break;  
         }
 
@@ -125,27 +125,27 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
     char* recvbuffer = (char*)ezos_malloc(readlen);
     int status = 0;
     unsigned int content_len = 0;
-    ezlog_d(TAG_OTA,"file_download: total_len:%d, readlen:%d, offset:%d\n", *total_len, readlen, *offset);
+    ezlog_d(TAG_OTA,"file_download: total_len:%d, readlen:%d, offset:%d", *total_len, readlen, *offset);
     do
     {
         if(NULL == recvbuffer)
         {
-            ezlog_e(TAG_OTA,"malloc recvbuffer err\n");
+            ezlog_e(TAG_OTA,"malloc recvbuffer err");
             break;
         }
         h_client = webclient_session_create(1024);
         if(NULL == h_client)
         {
-            ezlog_e(TAG_OTA,"webclient_session_create failed\n");
+            ezlog_e(TAG_OTA,"webclient_session_create failed");
             break;
         }
-        ezlog_d(TAG_OTA,"url:%s\n", url);
+        ezlog_d(TAG_OTA,"url:%s", url);
         if(0!=retry_flg)
         {
             status = webclient_get_position(h_client, url, (int)*offset);
             if(status!=200 && 206!=status)
             {
-                ezlog_e(TAG_OTA,"webclient_get_position faield,status:%d, offset:%d\n",status, *offset);
+                ezlog_e(TAG_OTA,"webclient_get_position faield,status:%d, offset:%d",status, *offset);
                 break;
             }
         }
@@ -154,17 +154,17 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
             status = webclient_get(h_client, url);
             if(status!=200)
             {
-                ezlog_e(TAG_OTA,"webclient_get faield,status:%d\n", *offset);
+                ezlog_e(TAG_OTA,"webclient_get faield,status:%d", *offset);
                 break;
             }
         }
         content_len = webclient_content_length_get(h_client);
         if(content_len!=*total_len-*offset)
         {
-            ezlog_d(TAG_OTA,"content_len not match,content_len:%d,real:%d\n",content_len, *total_len-*offset);
+            ezlog_d(TAG_OTA,"content_len not match,content_len:%d,real:%d",content_len, *total_len-*offset);
             break;
         }
-        ezlog_d(TAG_OTA,"content_len :%d\n",content_len);
+        ezlog_d(TAG_OTA,"content_len :%d",content_len);
         ezos_memset(recvbuffer, 0, readlen);
         while(need_readlen > 0)
         {
@@ -172,7 +172,7 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
             readlen = (need_readlen <= readlen) ? need_readlen:readlen;
             if (webclient_read(h_client, recvbuffer, readlen)!=(int)readlen)
             {
-                ezlog_d(TAG_OTA,"read file err:readlen:%d, need_readlen:%d, offset:%d\n",readlen, need_readlen, *offset);
+                ezlog_d(TAG_OTA,"read file err:readlen:%d, need_readlen:%d, offset:%d",readlen, need_readlen, *offset);
                 ret = -1;
                 break;
             }
@@ -193,7 +193,7 @@ static int file_download(char* url, unsigned int* total_len, unsigned int readle
         }
     }while(0);
    
-    ezlog_d(TAG_OTA,"download,ret: %d\n", ret);
+    ezlog_d(TAG_OTA,"download,ret: %d", ret);
     if(recvbuffer)
     {
         ezos_free(recvbuffer);
@@ -214,7 +214,7 @@ static void ota_file_download_thread(void *arg)
     unsigned int offset = 0;
     int max_try_time = 0;
     int retry_flag = 0;
-    ezlog_e(TAG_OTA,"ota_file_download_thread start\n");
+    ezlog_e(TAG_OTA,"ota_file_download_thread start");
     ez_ota_info_t*  file_info = (ez_ota_info_t*)arg;
     max_try_time = file_info->retry_max;
     unsigned int total_len = file_info->total_size;
@@ -225,14 +225,14 @@ static void ota_file_download_thread(void *arg)
         {
             if(++retry_times > max_try_time)
             {
-                ezlog_e(TAG_OTA,"download retry\n");
+                ezlog_e(TAG_OTA,"download retry");
                 break;
             }
             if(1 == ez_get_exit_status())
             {
                 break;
             }
-            ezlog_e(TAG_OTA,"get ota file fialed retry_times:%d \n", retry_times);
+            ezlog_e(TAG_OTA,"get ota file fialed retry_times:%d ", retry_times);
             retry_flag = 1;
         }
 
@@ -240,7 +240,7 @@ static void ota_file_download_thread(void *arg)
     
     if(0!=ret)
     {
-        ezlog_e(TAG_OTA,"http_upgrade_download return err,ret:%d, retry_times:%d \n", ret, retry_times);
+        ezlog_e(TAG_OTA,"http_upgrade_download return err,ret:%d, retry_times:%d ", ret, retry_times);
         file_info->notify(RESULT_FAILED, file_info->user_data);
     }
     ezos_free(file_info);
@@ -253,7 +253,7 @@ ez_err_t  ez_ota_file_download(ez_ota_download_info_t *input_info, get_file_cb f
     ez_err_t err = EZ_OTA_ERR_SUCC;
     ez_ota_info_t *file_info = NULL;
 
-    ezlog_d(TAG_OTA, "ezdev_ota_download start!\n");
+    ezlog_d(TAG_OTA, "ezdev_ota_download start!");
     if(0!=g_download_status)
     {
         return EZ_OTA_ERR_DOWNLOAD_ALREADY;
@@ -263,7 +263,7 @@ ez_err_t  ez_ota_file_download(ez_ota_download_info_t *input_info, get_file_cb f
         file_info = (ez_ota_info_t*)ezos_malloc(sizeof(ez_ota_info_t));
         if(NULL == file_info)
         {
-            ezlog_e(TAG_OTA,"malloc download_param failed!\n");
+            ezlog_e(TAG_OTA,"malloc download_param failed!");
             err = EZ_OTA_ERR_MEM_ERROR;
             break;
         }
@@ -282,7 +282,7 @@ ez_err_t  ez_ota_file_download(ez_ota_download_info_t *input_info, get_file_cb f
         
         if(ezos_thread_create(NULL, "ez_ota_download", ota_file_download_thread, file_info, CONFIG_EZIOT_OTA_TASK_STACK_SIZE, CONFIG_EZIOT_OTA_TASK_PRIORITY))
         {
-            ezlog_e(TAG_OTA,"ota_download_tread create error\n");
+            ezlog_e(TAG_OTA,"ota_download_tread create error");
             err = EZ_OTA_ERR_MEM_ERROR;
             break;
         }
