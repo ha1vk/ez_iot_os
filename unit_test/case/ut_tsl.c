@@ -69,7 +69,7 @@ static ez_kv_func_t g_kv_func = {
     .ezos_kv_deinit = kv_deinit,
 };
 
-static void testcase(void)
+static void eziot_ut_tsl(void)
 {
     UTEST_UNIT_RUN(ut_tsl_errcode);
     UTEST_UNIT_RUN(ut_tsl_prop_report_bool);
@@ -90,7 +90,7 @@ static void testcase(void)
     UTEST_UNIT_RUN(ut_tsl_profile_event_report_null);
     UTEST_UNIT_RUN(ut_tsl_profile_event_report_obj);
 }
-UTEST_TC_EXPORT(testcase, "eziot.ut_tsl", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(eziot_ut_tsl, "eziot.ut_tsl", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 void ut_tsl_errcode()
 {

@@ -20,11 +20,11 @@ static void ut_hello(void)
     uassert_not_in_range(3, 0, 2);
 }
 
-static void testcase(void)
+static void eziot_ut_hello(void)
 {
     UTEST_UNIT_RUN(ut_hello);
 }
-UTEST_TC_EXPORT(testcase, "eziot.ut_hello", NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(eziot_ut_hello, "eziot.ut_hello", NULL, NULL, 0);
 
 // utest_log_lv_set(1)
 // [==========] [ utest    ] loop 1/1

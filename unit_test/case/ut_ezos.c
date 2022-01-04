@@ -11,13 +11,16 @@ static void ut_ezos_time(void);
 static void ut_ezos_mem(void);
 static void ut_ezos_libc(void);
 
-UTEST_TC_EXPORT(ut_ezos_libc, NULL, NULL, 10);
-UTEST_TC_EXPORT(ut_ezos_mem, NULL, NULL, 10);
-UTEST_TC_EXPORT(ut_ezos_time, NULL, NULL, 10);
-UTEST_TC_EXPORT(ut_ezos_thread, NULL, NULL, 10);
-UTEST_TC_EXPORT(ut_ezos_sem, NULL, NULL, 10);
-UTEST_TC_EXPORT(ut_ezos_socket, NULL, NULL, 10);
-
+static void eziot_ut_ezos(void)
+{
+    UTEST_UNIT_RUN(ut_ezos_libc);
+    UTEST_UNIT_RUN(ut_ezos_mem);
+    UTEST_UNIT_RUN(ut_ezos_time);
+    UTEST_UNIT_RUN(ut_ezos_thread);
+    UTEST_UNIT_RUN(ut_ezos_sem);
+    UTEST_UNIT_RUN(ut_ezos_socket);
+}
+UTEST_TC_EXPORT(eziot_ut_ezos, "eziot.ut_ezos", NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 
 

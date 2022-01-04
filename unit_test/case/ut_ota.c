@@ -19,7 +19,11 @@ ez_ota_download_info_t download_info;
 static long global_init();
 
 void ut_ota_test();
-UTEST_TC_EXPORT(ut_ota_test, global_init, NULL, 60);
+static void eziot_ut_ota(void)
+{
+    UTEST_UNIT_RUN(ut_ota_test);
+}
+UTEST_TC_EXPORT(eziot_ut_ota, "eziot.ut_ota", global_init, NULL, 60);
 
 static int m_event_id = -1;
 static ez_server_info_t m_lbs_addr = {CONFIG_EZIOT_UNIT_TEST_CLOUD_HOST, CONFIG_EZIOT_UNIT_TEST_CLOUD_PORT};

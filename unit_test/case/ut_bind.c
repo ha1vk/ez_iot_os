@@ -52,13 +52,13 @@ static ez_kv_func_t g_kv_func = {
     .ezos_kv_deinit = kv_deinit,
 };
 
-static void testcase(void)
+static void eziot_ut_bind(void)
 {
     UTEST_UNIT_RUN(ut_base_bind_by_near);
     UTEST_UNIT_RUN(ut_base_bind_by_challenge);
     UTEST_UNIT_RUN(ut_base_bind_status_query);
 }
-UTEST_TC_EXPORT(testcase, "eziot.ut_bind", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(eziot_ut_bind, "eziot.ut_bind", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 void ut_base_bind_by_near()
 {

@@ -93,7 +93,7 @@ static ez_char_t *m_test_subdev2_uuid = "AABBCCDDEEFF";
 static ez_subdev_info_t m_subdev1 = {0};
 static ez_subdev_info_t m_subdev2 = {0};
 
-static void testcase(void)
+static void eziot_ut_gateway(void)
 {
     UTEST_UNIT_RUN(ut_gateway_errcode);  ///< 测试接口返回错误码
     UTEST_UNIT_RUN(ut_gateway_authsap); ///< 测试序列号验证添加
@@ -105,7 +105,7 @@ static void testcase(void)
     UTEST_UNIT_RUN(ut_gateway_clean);    ///< 测试清空功能
     UTEST_UNIT_RUN(ut_gateway_stress);   ///< 压力测试
 }
-UTEST_TC_EXPORT(testcase, "eziot.ut_gateway", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(eziot_ut_gateway, "eziot.ut_gateway", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 void ut_gateway_errcode()
 {

@@ -11,9 +11,12 @@ static char *url = "http://test15fdfs.ys7.com/group1/M00/07/45/rBThLWGnY5SAfQojA
 static long global_init();
 
 void ut_webclient_test();
-UTEST_TC_EXPORT(ut_webclient_test, global_init, NULL, 60);
 
-
+static void eziot_ut_webclient(void)
+{
+    UTEST_UNIT_RUN(ut_webclient_test);
+}
+UTEST_TC_EXPORT(eziot_ut_webclient, "eziot.ut_webclient", global_init, NULL, 0);
 
 void ut_webclient_test(void)
 {

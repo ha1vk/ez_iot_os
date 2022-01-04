@@ -56,7 +56,7 @@ static ez_kv_func_t g_kv_func = {
     .ezos_kv_deinit = kv_deinit,
 };
 
-static void testcase(void)
+static void eziot_ut_kv(void)
 {
     UTEST_UNIT_RUN(ut_kv_default);
     UTEST_UNIT_RUN(ut_kv_string);
@@ -65,7 +65,7 @@ static void testcase(void)
     UTEST_UNIT_RUN(ut_kv_raw8K);
     UTEST_UNIT_RUN(ut_kv_raw16k_less);
 }
-UTEST_TC_EXPORT(testcase, "eziot.ut_ezos_kv", buf_init, buf_deinit, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(eziot_ut_kv, "eziot.ut_kv", buf_init, buf_deinit, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 void ut_kv_default()
 {

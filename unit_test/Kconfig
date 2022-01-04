@@ -44,32 +44,32 @@ endchoice
 config EZIOT_UNIT_TEST_DEV_TYPE
     string "Device model"
     default "4LYV8SK7UKLBOUOVS6HXVX"
-    depends on EZIOT_UNIT_TEST_DEV_AUTH_MODE_SAP
+    depends on EZIOT_UNIT_TEST_ENABLE && EZIOT_UNIT_TEST_DEV_AUTH_MODE_SAP
 
 config EZIOT_UNIT_TEST_DEV_SERIAL_NUMBER
     string "Device serial number"
     default "Z88889999"
-    depends on EZIOT_UNIT_TEST_DEV_AUTH_MODE_SAP
+    depends on EZIOT_UNIT_TEST_ENABLE && EZIOT_UNIT_TEST_DEV_AUTH_MODE_SAP
 
 config EZIOT_UNIT_TEST_DEV_VERIFICATION_CODE
     string "Device verification code"
     default "QWERTY"
-    depends on EZIOT_UNIT_TEST_DEV_AUTH_MODE_SAP
+    depends on EZIOT_UNIT_TEST_ENABLE && EZIOT_UNIT_TEST_DEV_AUTH_MODE_SAP
 
 config EZIOT_UNIT_TEST_DEV_PRODUCT_KEY
     string "Product key"
     default "4LYV8SK7UKLBOUOVS6HXVX"
-    depends on EZIOT_UNIT_TEST_DEV_AUTH_MODE_LICENCE
+    depends on EZIOT_UNIT_TEST_ENABLE && EZIOT_UNIT_TEST_DEV_AUTH_MODE_LICENCE
 
 config EZIOT_UNIT_TEST_DEV_NAME
     string "Device name"
     default "A532NO6K0Q2O"
-    depends on EZIOT_UNIT_TEST_DEV_AUTH_MODE_LICENCE
+    depends on EZIOT_UNIT_TEST_ENABLE && EZIOT_UNIT_TEST_DEV_AUTH_MODE_LICENCE
 
 config EZIOT_UNIT_TEST_DEV_LICENSE
     string "Licence"
     default "J7Fv5gCsTczVe38aNLe4ev"
-    depends on EZIOT_UNIT_TEST_DEV_AUTH_MODE_LICENCE
+    depends on EZIOT_UNIT_TEST_ENABLE && EZIOT_UNIT_TEST_DEV_AUTH_MODE_LICENCE
 
 config EZIOT_UNIT_TEST_DEV_DISPLAY_NAME
     string ""

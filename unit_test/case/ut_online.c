@@ -50,13 +50,13 @@ static ez_kv_func_t g_kv_func = {
     .ezos_kv_deinit = kv_deinit,
 };
 
-static void testcase(void)
+static void eziot_ut_online(void)
 {
     UTEST_UNIT_RUN(ut_online_errcode);
     UTEST_UNIT_RUN(ut_online_access);
     UTEST_UNIT_RUN(ut_online_restart);
 }
-UTEST_TC_EXPORT(testcase, "eziot.ut_online", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(eziot_ut_online, "eziot.ut_online", global_init, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 void ut_online_errcode()
 {

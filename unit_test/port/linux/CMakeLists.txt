@@ -163,9 +163,9 @@ if(CONFIG_EZIOT_BASE_ENABLE)
     list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_bm/base/inc)
     list(APPEND UT_INC_DIRS ${ENV_EZIOT_PATH}/ez_iot_bm/hub/inc)
 
-#    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_bind.c)
+    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_bind.c)
     list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_gateway.c)
-    
+
     list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ez_iot_bm)
     list(APPEND UT_DEPENS -lez_iot_bm)
 

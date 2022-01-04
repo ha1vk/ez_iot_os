@@ -38,7 +38,7 @@ static void test_log_lvl(void);
 static void test_log_tag(void);
 static void test_log_kw(void);
 
-static void testcase(void)
+static void eziot_ut_ezlog(void)
 {
     UTEST_UNIT_RUN(ut_log_init);
     UTEST_UNIT_RUN(ut_log_lvl_a);
@@ -52,7 +52,7 @@ static void testcase(void)
     UTEST_UNIT_RUN(ut_log_dump16);
     UTEST_UNIT_RUN(ut_log_dump32);
 }
-UTEST_TC_EXPORT(testcase, "eziot.ut_ezlog", NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+UTEST_TC_EXPORT(eziot_ut_ezlog, "eziot.ut_ezlog", NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 static void ut_log_init()
 {

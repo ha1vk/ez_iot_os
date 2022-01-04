@@ -164,10 +164,10 @@ utest_t utest_handle_get(void);
 typedef rt_err_t (*tc_con_t)(void);
 typedef void (*tc_fun_t)(void);
 extern void uctest_insert_table(tc_fun_t testcase, const char *name, tc_con_t init, tc_con_t cleanup, uint32_t timeout);
-#define UTEST_TC_EXPORT(testcase, init, cleanup, timeout)                       \
-    __attribute__((constructor(UTEST_CASE_CONSTRUCTOR_EXPORT))) void __unit_##testcase##init##cleanup##timeout()  \
-    {                                                                                 \
-        uctest_insert_table(testcase, #testcase, init, cleanup, timeout);                  \
+#define UTEST_TC_EXPORT(testcase, name, init, cleanup, timeout)                          \
+    __attribute__((constructor(UTEST_CASE_CONSTRUCTOR_EXPORT))) void _utest_##testcase() \
+    {                                                                                    \
+        uctest_insert_table(testcase, name, init, cleanup, timeout);                     \
     }
 #endif
 

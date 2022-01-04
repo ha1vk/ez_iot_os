@@ -6,7 +6,11 @@
 #include <string.h>
 
 void ut_ap_test();
-UTEST_TC_EXPORT(ut_ap_test, NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
+static void eziot_ut_ap(void)
+{
+    UTEST_UNIT_RUN(ut_ap_test);
+}
+UTEST_TC_EXPORT(eziot_ut_ap, "eziot.ut_ap", NULL, NULL, CONFIG_EZIOT_UNIT_TEST_CASE_TIEMOUT_SECONDS);
 
 const char *TAG_DEMO = "T_DEMO";
 

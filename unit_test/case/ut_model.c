@@ -34,7 +34,11 @@
 static long global_init();
 
 void ut_model_test();
-UTEST_TC_EXPORT(ut_model_test, global_init, NULL, 60);
+static void eziot_ut_model(void)
+{
+    UTEST_UNIT_RUN(ut_model_test);
+}
+UTEST_TC_EXPORT(eziot_ut_model, "eziot.ut_model", global_init, NULL, 60);
 
 static int m_event_id = -1;
 static ez_server_info_t m_lbs_addr = {CONFIG_EZIOT_UNIT_TEST_CLOUD_HOST, CONFIG_EZIOT_UNIT_TEST_CLOUD_PORT};
