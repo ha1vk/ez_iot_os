@@ -73,11 +73,6 @@ function(register_component)
         list(APPEND depens_com "${component_name}")
         set(g_depens_com ${depens_com}  CACHE INTERNAL "g_depens_com")
 
-        set(inc_dirs ${g_inc_dirs})
-        list(APPEND inc_dirs "${component_dir}/inc")
-        set(g_inc_dirs ${inc_dirs}  CACHE INTERNAL "g_inc_dirs")
-        # message("################## ${g_inc_dirs}")
-
         set(depens_dirs ${g_depens_dirs})
         list(APPEND depens_dirs "${PROJECT_PATH}/build/${component_name}")
         set(g_depens_dirs ${depens_dirs}  CACHE INTERNAL "g_depens_dirs")
@@ -110,6 +105,12 @@ function(register_component)
         if(NOT IS_DIRECTORY ${abs_dir})
             message(FATAL_ERROR "${CMAKE_CURRENT_LIST_FILE}: ${include_dir} not found!")
         endif()
+
+        set(inc_dirs ${g_inc_dirs})
+        list(APPEND inc_dirs "${abs_dir}")
+        set(g_inc_dirs ${inc_dirs} CACHE INTERNAL "g_inc_dirs")
+        # message("################## ${g_inc_dirs}")
+
         target_include_directories(${component_name} ${include_type} ${abs_dir})
     endforeach()
 
@@ -122,6 +123,11 @@ function(register_component)
         if(NOT IS_DIRECTORY ${abs_dir})
             message(FATAL_ERROR "${CMAKE_CURRENT_LIST_FILE}: ${include_dir} not found!")
         endif()
+
+        set(inc_dirs ${g_inc_dirs})
+        list(APPEND inc_dirs "${abs_dir}")
+        set(g_inc_dirs ${inc_dirs} CACHE INTERNAL "g_inc_dirs")
+
         target_include_directories(${component_name} PRIVATE ${abs_dir})
     endforeach()
 
@@ -656,6 +662,10 @@ macro(do_project_building name)
 
     aux_source_directory(. exe_src)
     message(STATUS "exe_src: ${exe_src}")
+
+    set(inc_dirs ${g_inc_dirs})
+    list(APPEND inc_dirs "${ezos_gconfig_dir}")
+    set(g_inc_dirs ${inc_dirs} CACHE INTERNAL "g_inc_dirs")
 
     message(STATUS "inc_dirs: ${g_inc_dirs}")
     INCLUDE_DIRECTORIES(${g_inc_dirs})

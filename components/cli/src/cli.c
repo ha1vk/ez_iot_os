@@ -97,7 +97,8 @@ int proc_onecmd(int argc, char *argv[])
         return 0;
     }
 
-    if (!cli->echo_disabled) {
+    // if (!cli->echo_disabled) 
+    {
         csp_printf("\r\n");
         fflush(stdout);
     }
@@ -272,9 +273,9 @@ static void tab_complete(char *inbuf, unsigned int *bp)
                 if (m == 1) {
                     fm = cmd->name;
                 } else if (m == 2)
-                    aos_cli_printf("%s %s ", fm, cmd->name);
+                    aos_cli_printf("%s  %s  ", fm, cmd->name);
                 else
-                    aos_cli_printf("%s ", cmd->name);
+                    aos_cli_printf("%s  ", cmd->name);
             }
             n++;
         }
@@ -396,165 +397,6 @@ static void cli_down_history(char *inaddr)
 }
 #endif
 
-/* Get an input line.
- *
- * Returns: 1 if there is input, 0 if the line should be ignored.
- */
-// static int get_input(char *inbuf, unsigned int *bp)
-// {
-//     char c;
-//     static int8_t  esc = 0, key1 = -1, key2 = -1;
-//     if (inbuf == NULL) {
-//         aos_cli_printf("inbuf_null\r\n");
-//         return 0;
-//     }
-
-//     /*return data from buffer_cb or get data from cli_getchar*/
-//     while (1 == cli_getchar(&c)) {
-//         if (c == RET_CHAR || c == END_CHAR) { /* end of input line */
-//             inbuf[*bp] = '\0';
-//             *bp        = 0;
-//             return 1;
-//         }
-
-//         if (c == 0x1b) { /* escape sequence */
-//             esc  = 1;
-//             key1 = -1;
-//             key2 = -1;
-//             continue;
-//         }
-
-//         if (esc) {
-//             if (key1 < 0) {
-//                 key1 = c;
-//                 if (key1 != 0x5b) {
-//                     /* not '[' */
-//                     inbuf[(*bp)] = 0x1b;
-//                     (*bp)++;
-//                     inbuf[*bp] = key1;
-//                     (*bp)++;
-//                     if (!cli->echo_disabled) {
-//                         csp_printf("\x1b%c", key1);
-//                         fflush(stdout);
-//                     }
-//                     esc = 0; /* quit escape sequence */
-//                 }
-//                 continue;
-//             }
-
-//             if (key2 < 0) {
-//                 key2 = c;
-//                 if (key2 == 't') {
-//                     esc_tag[0]  = 0x1b;
-//                     esc_tag[1]  = key1;
-//                     esc_tag_len = 2;
-//                 }
-//             }
-
-//             if (key2 != 0x41 && key2 != 0x42 && key2 != 't') {
-//                 /*unsupported esc sequence*/
-//                 inbuf[(*bp)] = 0x1b;
-//                 (*bp)++;
-//                 inbuf[*bp] = key1;
-//                 (*bp)++;
-//                 inbuf[*bp] = key2;
-//                 (*bp)++;
-//                 if (!cli->echo_disabled) {
-//                     csp_printf("\x1b%c%c", key1, key2);
-//                     fflush(stdout);
-//                 }
-//                 esc_tag[0]  = '\x0';
-//                 esc_tag_len = 0;
-//                 esc         = 0; /* quit escape sequence */
-//                 continue;
-//             }
-
-// #if (AOS_CLI_MINI_SIZE > 0)
-//             if (key2 == 0x41 || key2 == 0x42) {
-//                 csp_printf(
-//                   "\r\n" PROMPT
-//                   "Warning! mini cli mode do not support history cmds!");
-//             }
-
-// #else
-//             if (key2 == 0x41) { /* UP */
-//                 cli_up_history(inbuf);
-//                 csp_printf("\r\n" PROMPT "%s", inbuf);
-//                 *bp         = ezos_strlen(inbuf);
-//                 esc_tag[0]  = '\x0';
-//                 esc_tag_len = 0;
-//                 esc         = 0; /* quit escape sequence */
-//                 continue;
-//             }
-
-//             if (key2 == 0x42) { /* DOWN */
-//                 cli_down_history(inbuf);
-//                 csp_printf("\r\n" PROMPT "%s", inbuf);
-//                 *bp         = ezos_strlen(inbuf);
-//                 esc_tag[0]  = '\x0';
-//                 esc_tag_len = 0;
-//                 esc         = 0; /* quit escape sequence */
-//                 continue;
-//             }
-// #endif
-
-//             /* ESC_TAG */
-//             if (esc_tag_len >= sizeof(esc_tag)) {
-//                 esc_tag[0]  = '\x0';
-//                 esc_tag_len = 0;
-//                 esc         = 0; /* quit escape sequence */
-//                 csp_printf("Error: esc_tag buffer overflow\r\n");
-//                 fflush(stdout);
-//                 continue;
-//             }
-//             esc_tag[esc_tag_len++] = c;
-//             if (c == 'm') {
-//                 esc_tag[esc_tag_len++] = '\x0';
-//                 if (!cli->echo_disabled) {
-//                     csp_printf("%s", esc_tag);
-//                     fflush(stdout);
-//                 }
-//                 esc = 0; /* quit escape sequence */
-//             }
-//             continue;
-//         }
-
-//         inbuf[*bp] = c;
-//         if ((c == 0x08) || /* backspace */
-//             (c == 0x7f)) { /* DEL */
-//             if (*bp > 0) {
-//                 (*bp)--;
-//                 if (!cli->echo_disabled) {
-//                     csp_printf("%c %c", 0x08, 0x08);
-//                     fflush(stdout);
-//                 }
-//             }
-//             continue;
-//         }
-
-//         if (c == '\t') {
-//             inbuf[*bp] = '\0';
-//             tab_complete(inbuf, bp);
-//             continue;
-//         }
-
-//         if (!cli->echo_disabled) {
-//             csp_printf("%c", c);
-//             fflush(stdout);
-//         }
-
-//         (*bp)++;
-//         if (*bp >= INBUF_SIZE) {
-//             aos_cli_printf("Error: input buffer overflow\r\n");
-//             aos_cli_printf(PROMPT);
-//             *bp = 0;
-//             return 0;
-//         }
-//     }
-
-//     return 0;
-// }
-
 static int get_input(char *inbuf, unsigned int *bp)
 {
     char c;
@@ -602,7 +444,7 @@ static int get_input(char *inbuf, unsigned int *bp)
                     inbuf[*bp] = key1;
                     (*bp)++;
 
-                    if (!cli->echo_disabled)
+                    // if (!cli->echo_disabled)
                     {
                         aos_cli_printf("\x1b%c", key1); /* Ignore the cli tag */
                     }
@@ -638,7 +480,7 @@ static int get_input(char *inbuf, unsigned int *bp)
                 cli_tag_len = 0;
                 esc = 0;
 
-                if (!cli->echo_disabled)
+                // if (!cli->echo_disabled)
                 {
                     aos_cli_printf("\x1b%c%c", key1, key2);
                 }
@@ -692,7 +534,7 @@ static int get_input(char *inbuf, unsigned int *bp)
                 {
                     esc_tag[cli_tag_len++] = '\x0';
 
-                    if (!cli->echo_disabled)
+                    // if (!cli->echo_disabled)
                     {
                         aos_cli_printf("%s", esc_tag);
                     }
@@ -709,7 +551,7 @@ static int get_input(char *inbuf, unsigned int *bp)
             {
                 (*bp)--;
 
-                if (!cli->echo_disabled)
+                // if (!cli->echo_disabled)
                 {
                     aos_cli_printf("%c %c", 0x08, 0x08);
                 }
@@ -724,7 +566,7 @@ static int get_input(char *inbuf, unsigned int *bp)
             continue;
         }
 
-        if (!cli->echo_disabled)
+        // if (!cli->echo_disabled)
         {
             aos_cli_printf("%c", c);
         }
@@ -761,17 +603,17 @@ static void cli_main_input()
     if (get_input(cli->inbuf, &cli->bp)) {
         msg = cli->inbuf;
 
-    if (ezos_strcmp(msg, EXIT_MSG) == 0) {
-        cliexit = 1;
-        return;
-        }
+    // if (ezos_strcmp(msg, EXIT_MSG) == 0) {
+    //     cliexit = 1;
+    //     return;
+    //     }
 
 #if (AOS_CLI_MINI_SIZE <= 0)
         if (ezos_strlen(cli->inbuf) > 0) {
             cli_history_input();
         }
 #endif
-
+        // aos_cli_printf("\r\n");
         ret = handle_input(msg);
         if (ret == 1) {
             print_bad_command(msg);
@@ -795,7 +637,6 @@ int aos_cli_main(void)
 static void help_cmd(char *buf, int len, int argc, char **argv);
 #if (AOS_CLI_MINI_SIZE <= 0)
 
-static void echo_cmd(char *buf, int len, int argc, char **argv);
 static void exit_cmd(char *buf, int len, int argc, char **argv);
 static void devname_cmd(char *buf, int len, int argc, char **argv);
 static void pmem_cmd(char *buf, int len, int argc, char **argv);
@@ -812,7 +653,6 @@ const struct cli_command built_ins[] = {
 
     { "p", "print memory", pmem_cmd },
     { "m", "modify memory", mmem_cmd },
-    { "echo", "echo for command", echo_cmd },
     { "exit", "close CLI", exit_cmd },
     { "devname", "print device name", devname_cmd },
 #endif
@@ -857,23 +697,6 @@ static void help_cmd(char *buf, int len, int argc, char **argv)
 
 
 #if (AOS_CLI_MINI_SIZE <= 0)
-
-static void echo_cmd(char *buf, int len, int argc, char **argv)
-{
-    if (argc == 1) {
-        aos_cli_printf("Usage: echo on/off. Echo is currently %s\r\n",
-                       cli->echo_disabled ? "Disabled" : "Enabled");
-        return;
-    }
-
-    if (!ezos_strcmp(argv[1], "on")) {
-        aos_cli_printf("Enable echo\r\n");
-        cli->echo_disabled = 0;
-    } else if (!ezos_strcmp(argv[1], "off")) {
-        aos_cli_printf("Disable echo\r\n");
-        cli->echo_disabled = 1;
-    }
-}
 
 static void exit_cmd(char *buf, int len, int argc, char **argv)
 {
@@ -1163,6 +986,8 @@ int aos_cli_stop(void)
 
 static void cli_main()
 {
+    aos_cli_printf("\r\n");
+    aos_cli_printf(PROMPT);
     while(!cliexit)
     {
         cli_main_input();
@@ -1251,7 +1076,7 @@ int aos_cli_printf(const char *msg, ...)
 
 int cli_getchar(char *inbuf)
 {
-    *inbuf = (char)ezos_getchar();
+    *inbuf = (char)ezos_cli_getchar();
     return 1;
 }
 
