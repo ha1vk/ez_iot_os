@@ -1,0 +1,8 @@
+menuconfig EZIOT_COMPONENT_CLI_ENABLE
+    bool "Enable cli"
+    default y
+
+config EZIOT_COMPONENT_CLI_USE_CONSTRUCTOR
+    bool "use attribute constructor"
+    default y
+    depends on EZIOT_COMPONENT_CLI_ENABLE

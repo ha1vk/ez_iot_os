@@ -50,20 +50,33 @@ if(CONFIG_EZIOT_COMPONENT_UTEST_ENABLE)
     message(STATUS "CONFIG_EZIOT_COMPONENT_UTEST_ENABLE")
     list(APPEND UT_SRCS ${ENV_UTPORT_PATH}/ut_entry.c)
     list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_hello.c)
-    list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_gateway.c)
+    # list(APPEND UT_SRCS ${ENV_UTCASE_PATH}/ut_gateway.c)
 
     list(APPEND UT_INC_DIRS ${ENV_CONFIG_PATH})
     list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/utest/inc)
+    list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/ezlog/inc)
     list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/utest)
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/cli)
 
     list(APPEND UT_DEPENS -lrt)
     list(APPEND UT_DEPENS -lm)
     list(APPEND UT_DEPENS -lpthread)
     list(APPEND UT_DEPENS -lutest)
+    list(APPEND UT_DEPENS -lcli)
 
     list(APPEND UT_DEFINITIONS -DUTEST_TC_USE_CONSTRUCTOR)
 else()
     message(FATAL_ERROR "The utest component must be enabled!")
+endif()
+
+if(CONFIG_EZIOT_COMPONENT_CLI_ENABLE)
+    message(STATUS "CONFIG_EZIOT_COMPONENT_CLI_ENABLE")
+    list(APPEND UT_DEPENDS -lcli)
+
+    list(APPEND UT_DEPEN_DIRS ${ENV_LIB_PATH}/ezos)
+    list(APPEND UT_INC_DIRS ${ENV_COMPONENT_PATH}/cli/inc)
+    list(APPEND UT_INC_DIRS ${ENV_PLATFORM_PATH}/inc)
+    list(APPEND UT_DEPENS -lezos)
 endif()
 
 if(CONFIG_EZIOT_COMPONENT_EZLOG_ENABLE)
@@ -170,8 +183,6 @@ if(CONFIG_EZIOT_BASE_ENABLE)
     list(APPEND UT_DEPENS -lez_iot_bm)
 
 endif()
-
-
 
 if(CONFIG_EZIOT_OTA_ENABLE)
      message(STATUS "CONFIG_EZIOT_OTA_ENABLE")
@@ -297,7 +308,13 @@ LINK_DIRECTORIES(${UT_DEPEN_DIRS})
 #源文件
 ADD_EXECUTABLE(ut_iotsdk ${UT_SRCS})
 
+list(REVERSE UT_DEPEN_DIRS)
+# list(REMOVE_DUPLICATES UT_DEPEN_DIRS)
+message(STATUS "${UT_DEPEN_DIRS}")
 list(REVERSE UT_DEPENS)
+list(REMOVE_DUPLICATES UT_DEPENS)
 message(STATUS "${UT_DEPENS}")
-#链接依赖库
-target_link_libraries(ut_iotsdk ${UT_DEPENS})
+
+# #链接依赖库
+target_link_libraries(ut_iotsdk PUBLIC "-Wl,--whole-archive ${UT_DEPENS} -Wl,--no-whole-archive")
+# target_link_libraries(ut_iotsdk PUBLIC "-Wl,--whole-archive,--start-group ${UT_DEPENS} -Wl,--end-group,--no-whole-archive")

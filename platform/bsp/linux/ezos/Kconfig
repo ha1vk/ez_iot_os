@@ -1,27 +1,38 @@
+config EZIOT_EZOS_ENABLE
+    bool "Enable ezos enable"
+    default n
+
 config EZOS_KV_ENABLE
     bool "Enable ez-os interface kv"
     default y
+    depends on EZIOT_EZOS_ENABLE
 
 config EZOS_LIBC_ENABLE
     bool "Enable ez-os interface libc"
     default y
+    depends on EZIOT_EZOS_ENABLE
 
 config EZOS_MEM_ENABLE
     bool "Enable ez-os interface memory"
     default y
+    depends on EZIOT_EZOS_ENABLE
 
 config EZOS_SOCKET_ENABLE
     bool "Enable ez-os interface socket"
     default y
+    depends on EZIOT_EZOS_ENABLE
 
 config EZOS_SYSTEM_ENABLE
     bool "Enable ez-os interface system"
     default y
+    depends on EZIOT_EZOS_ENABLE
 
 config EZOS_THREAD_ENABLE
     bool "Enable ez-os interface thread"
     default y
+    depends on EZIOT_EZOS_ENABLE
 
 config EZOS_TIME_ENABLE
     bool "Enable ez-os interface time"
     default y
+    depends on EZIOT_EZOS_ENABLE

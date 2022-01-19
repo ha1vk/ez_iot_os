@@ -1,7 +1,8 @@
 #include "ezos.h"
 #include "ezlog.h"
+#include "cli.h"
 
-static void example_hello(void)
+static void example_hello(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -20,8 +21,5 @@ static void example_hello(void)
 #ifdef FINSH_USING_MSH
 MSH_CMD_EXPORT(example_hello, eziot example helloworld);
 #else
-// int main(int argc, char **argv)
-// {
-//     return example_hello(argc, argv);
-// }
+EZOS_CLI_EXPORT("example_helloworld", "helloworld test", example_hello);
 #endif

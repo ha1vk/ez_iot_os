@@ -2,6 +2,7 @@
 #include "ez_iot_core.h"
 #include "ez_iot_core_def.h"
 #include "ezlog.h"
+#include "cli.h"
 
 #define EZAPP_DEVID_KEY "ezapp_devid"
 
@@ -87,7 +88,7 @@ static ez_int32_t ez_event_notice_func(ez_event_e event_type, ez_void_t *data, e
     return 0;
 }
 
-static void example_online(void)
+static void example_online(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -102,8 +103,5 @@ static void example_online(void)
 #ifdef FINSH_USING_MSH
 MSH_CMD_EXPORT(example_online, eziot example online);
 #else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
+EZOS_CLI_EXPORT("example_online", "online test", example_online);
 #endif

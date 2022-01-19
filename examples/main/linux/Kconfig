@@ -80,3 +80,4 @@ config EZIOT_EXAMPLES_DEV_FIRMWARE_VERSION
 #    config EZIOT_EXAMPLES_KV_USING_KVDB
 #        bool "22222"
 #endchoice
+osource "${EZOS_PATH}/examples/*/Kconfig"

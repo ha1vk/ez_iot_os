@@ -17,7 +17,7 @@ menu "ez-iot configuration"
 endmenu
 
 menu "os/bsp configuration"
-    osource "${PROJECT_PATH}/Kconfig"
+    source "${EZOS_PATH}/platform/bsp/${PROJECT_NAME}/ezos/Kconfig"
 endmenu
 
 menu "components configuration"
@@ -27,3 +27,11 @@ endmenu
 menu "unit-test configuration"
     osource "${EZOS_PATH}/unit_test/Kconfig"
 endmenu
+
+if $(EXAMPLE_ENABLE)=1
+
+    menu "examples configuration"
+        source "${EZOS_PATH}/examples/main/${PROJECT_NAME}/Kconfig"
+    endmenu
+
+endif

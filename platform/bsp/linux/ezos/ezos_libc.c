@@ -145,3 +145,18 @@ EZOS_API char *ezos_strdup(const char *s)
 {
     return strdup(s);
 }
+
+EZOS_API long int ezos_strtol(const char *nptr, char **endptr, int base)
+{
+    return strtol(nptr, endptr, base);
+}
+
+EZOS_API int ezos_getchar(void)
+{
+    return getchar();
+}
+
+EZOS_API int ezos_putchar(int c)
+{
+    return putchar(c);
+}

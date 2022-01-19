@@ -51,7 +51,7 @@ if(CONFIG_EZIOT_TSL_ENABLE)
 
     ############ Add static libs ##################
     #### Update parent's variables like CMAKE_C_LINK_FLAGS
-    set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group ${module_name}/libmaix/libtest.a -ltest2 -Wl,--end-group" PARENT_SCOPE)
+    # set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group ${module_name}/libmaix/libtest.a -ltest2 -Wl,--end-group" PARENT_SCOPE)
     ###############################################
 
 endif()

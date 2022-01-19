@@ -1,5 +1,6 @@
 #include "ezos.h"
 #include "ezlog.h"
+#include "cli.h"
 
 #define KV_NAME_COUNTER "kv_init_counter"
 #define KV_NAME_STR "kv_str_data"
@@ -36,7 +37,7 @@ static ez_kv_default_t default_kvs = {
     .num = sizeof(default_node_table) / sizeof(ez_kv_default_node_t),
 };
 
-static void example_kv(void)
+static void example_kv(char *r_buf, int len, int argc, char **argv)
 {
     char buf[32] = {0};
     int counter = 0;
@@ -78,8 +79,5 @@ static void example_kv(void)
 #ifdef FINSH_USING_MSH
 MSH_CMD_EXPORT(example_kv, eziot example kv);
 #else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
+EZOS_CLI_EXPORT("example_kv", "kv test", example_kv);
 #endif

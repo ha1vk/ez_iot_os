@@ -1,0 +1,4 @@
+menuconfig EZIOT_EXAMPLES_ONLINE_ENABLE
+    bool "Enable example online"
+    default n
+    depends on EZIOT_EXAMPLES_ENABLE

@@ -1,39 +1,35 @@
-if(CONFIG_EZIOT_MODEL_ENABLE)
+if(CONFIG_EZIOT_EXAMPLES_HELLOWORLD_ENABLE)
 
     ################# Add include #################
-    list(APPEND ADD_INCLUDE "${module_name}/inc"
-        )
-    # list(APPEND ADD_PRIVATE_INCLUDE "${module_name}/inc_private")
+    # list(APPEND ADD_INCLUDE "inc"
+        # )
+    # list(APPEND ADD_PRIVATE_INCLUDE "inc_private")
     ###############################################
 
     ############## Add source files ###############
-    # list(APPEND ADD_SRCS  "${module_name}/src/lib1.c"
-        # )
-    # aux_source_directory(${module_name}/src ADD_SRCS)  # collect all source file in src dir, will set var ADD_SRCS
-    # append_srcs_dir(ADD_SRCS "${module_name}/src")     # append source file in src dir to var ADD_SRCS
-    append_srcs_dir(ADD_SRCS "${module_name}/src")     # append source file in src dir to var ADD_SRCS
+    # list(APPEND ADD_SRCS  "src/lib1.c"
+    #     )
+    # aux_source_directory(src ADD_SRCS)  # collect all source file in src dir, will set var ADD_SRCS
+    append_srcs_dir(ADD_SRCS "./")     # append source file in src dir to var ADD_SRCS
     # list(REMOVE_ITEM COMPONENT_SRCS "src/test.c")
     ###############################################
 
     ###### Add required/dependent components ######
-    
-    list(APPEND ADD_REQUIREMENTS cJSON)
-    list(APPEND ADD_REQUIREMENTS ezlog)
-    list(APPEND ADD_REQUIREMENTS ez_iot_core)
-    list(APPEND ADD_REQUIREMENTS ezlist)
+    # list(APPEND ADD_REQUIREMENTS component1)
     list(APPEND ADD_REQUIREMENTS ezos)
-    
+    list(APPEND ADD_REQUIREMENTS ezlog)
+    list(APPEND ADD_REQUIREMENTS cli)
     ###############################################
 
     ############ Add static libs ##################
     # if(CONFIG_COMPONENT1_INCLUDE_STATIC_LIB)
-    #     list(APPEND ADD_STATIC_LIB "${module_name}/lib/libtest.a")
+    #     list(APPEND ADD_STATIC_LIB "lib/libtest.a")
     # endif()
     ###############################################
 
     ############ Add dynamic libs ##################
-    # list(APPEND ADD_DYNAMIC_LIB "${module_name}/lib/arch/v831/libmaix_nn.so"
-    #                             "${module_name}/lib/arch/v831/libmaix_cam.so"
+    # list(APPEND ADD_DYNAMIC_LIB "lib/arch/v831/libmaix_nn.so"
+    #                             "lib/arch/v831/libmaix_cam.so"
     # )
     ###############################################
 
@@ -45,13 +41,15 @@ if(CONFIG_EZIOT_MODEL_ENABLE)
 
     #### Add compile option for this component
     #### and components denpend on this component
-    # list(APPEND ADD_DEFINITIONS -DAAAAA222=1
-    #                             -DAAAAA333=1)
+    # list(APPEND ADD_DEFINITIONS -DAAAAA222=1 -DAAAAA333=1)
     ###############################################
 
     ############ Add static libs ##################
     #### Update parent's variables like CMAKE_C_LINK_FLAGS
-    # set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group ${module_name}/libmaix/libtest.a -ltest2 -Wl,--end-group" PARENT_SCOPE)
+    # set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--whole-archive,--start-group libexample_online.a -lexample_online -Wl,--end-group,--no-whole-archive" PARENT_SCOPE)
     ###############################################
+
+    # register component, DYNAMIC or SHARED flags will make component compiled to dynamic(shared) lib
+    register_component()
 
 endif()

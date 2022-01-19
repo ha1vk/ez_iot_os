@@ -1,3 +1,4 @@
+if(EZIOT_EXAMPLES_BULB_ENABLE)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 ####### Prepare building environment ##########
@@ -116,3 +117,4 @@ list(REVERSE BULB_DEPENS)
 message(STATUS "${BULB_DEPENS}")
 #链接依赖库
 target_link_libraries(bulb_app ${BULB_DEPENS})
+endif()
