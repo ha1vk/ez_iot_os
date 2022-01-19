@@ -1,6 +1,7 @@
 #include "ezos.h"
 #include "ez_iot_ota.h"
 #include "ezlog.h"
+#include "cli.h"
 
 extern int ez_cloud_init();
 static int ez_cloud_ota_init();
@@ -18,7 +19,7 @@ ez_int8_t *g_module_name = (ez_int8_t *)CONFIG_EZIOT_EXAMPLES_DEV_TYPE;
 ez_int8_t *g_module_name = (ez_int8_t *)CONFIG_EZIOT_EXAMPLES_DEV_PRODUCT_KEY;
 #endif
 
-int example_ota(int argc, char **argv)
+void example_ota(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -26,17 +27,12 @@ int example_ota(int argc, char **argv)
 
     ez_cloud_init();
     ez_cloud_ota_init();
-
-    return 0;
 }
 
 #ifdef FINSH_USING_MSH
 MSH_CMD_EXPORT(example_ota, eziot example ota);
 #else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
+EZOS_CLI_EXPORT("example_ota", "ota test", example_ota);
 #endif
 
 static int ez_cloud_ota_init()

@@ -1,0 +1,4 @@
+menuconfig EZIOT_EXAMPLES_PROP_ENABLE
+    bool "Enable example prop"
+    default n
+    depends on EZIOT_EXAMPLES_ENABLE

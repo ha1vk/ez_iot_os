@@ -1,0 +1,4 @@
+menuconfig EZIOT_EXAMPLES_OTA_ENABLE
+    bool "Enable example ota"
+    default n
+    depends on EZIOT_EXAMPLES_ENABLE

@@ -2,6 +2,7 @@
 #include "ez_iot_core.h"
 #include "ez_iot_tsl.h"
 #include "ezlog.h"
+#include "cli.h"
 
 extern int ez_cloud_init();
 extern int ez_cloud_base_init();
@@ -13,7 +14,7 @@ static ez_int32_t tsl_property2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_
 
 static ez_bool_t g_is_inited = ez_false;
 
-static int example_action(int argc, char **argv)
+static void example_action(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -22,17 +23,12 @@ static int example_action(int argc, char **argv)
     ez_cloud_init();
     ez_cloud_base_init();
     ez_cloud_tsl_init();
-
-    return 0;
 }
 
 #ifdef FINSH_USING_MSH
 MSH_CMD_EXPORT(example_action, eziot example action);
 #else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
+EZOS_CLI_EXPORT("example_action", "action test", example_action);
 #endif
 
 static int ez_cloud_tsl_init()

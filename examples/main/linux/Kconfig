@@ -1,6 +1,7 @@
 config EZIOT_EXAMPLES_ENABLE
     bool "Enable examples"
     default n
+    osource "${EZOS_PATH}/examples/*/Kconfig"
 
 config EZIOT_EXAMPLES_CLOUD_HOST
     string "Ezviz cloud server address"
@@ -80,4 +81,3 @@ config EZIOT_EXAMPLES_DEV_FIRMWARE_VERSION
 #    config EZIOT_EXAMPLES_KV_USING_KVDB
 #        bool "22222"
 #endchoice
-osource "${EZOS_PATH}/examples/*/Kconfig"

@@ -2,6 +2,7 @@
 #include "ez_iot_core.h"
 #include "ez_iot_tsl.h"
 #include "ezlog.h"
+#include "cli.h"
 
 extern int ez_cloud_init();
 extern int ez_cloud_base_init();
@@ -15,7 +16,7 @@ static void example_event_report_obj();
 
 static ez_bool_t g_is_inited = ez_false;
 
-static int example_event(int argc, char **argv)
+static void example_event(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -27,17 +28,12 @@ static int example_event(int argc, char **argv)
 
     example_event_report_null();
     example_event_report_obj();
-
-    return 0;
 }
 
 #ifdef FINSH_USING_MSH
 MSH_CMD_EXPORT(example_event, eziot example event);
 #else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
+EZOS_CLI_EXPORT("example_event", "eziot example event", example_event);
 #endif
 
 static void example_event_report_null()

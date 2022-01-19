@@ -2,6 +2,7 @@
 #include "ez_iot_core.h"
 #include "ez_iot_tsl.h"
 #include "ezlog.h"
+#include "cli.h"
 
 #define KV_RSCC "PetDryerRes"
 #define KV_LOCALINDEX "0"
@@ -98,7 +99,7 @@ static kv_type_t default_kv_set_1[] = {
     {{KV_NAME15, "enum2", 5}, EZ_TSL_DATA_TYPE_STRING},
 };
 
-int example_prop(int argc, char **argv)
+void example_prop(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -107,11 +108,9 @@ int example_prop(int argc, char **argv)
     ez_cloud_init();
     ez_cloud_base_init();
     ez_cloud_tsl_init();
-
-    return 0;
 }
 
-int example_prop_chg(int argc, char **argv)
+void example_prop_chg(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -122,18 +121,15 @@ int example_prop_chg(int argc, char **argv)
     ez_cloud_tsl_init();
 
     example_prop_changed();
-
-    return 0;
 }
 
 #ifdef FINSH_USING_MSH
 MSH_CMD_EXPORT(example_prop, eziot example property sync);
 MSH_CMD_EXPORT(example_prop_chg, eziot example property changed and report);
 #else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
+EZOS_CLI_EXPORT("example_prop", "prop test", example_prop);
+EZOS_CLI_EXPORT("example_prop_chg", "prop change test", example_prop_chg);
+
 #endif
 
 static int find_index_by_key(const char *key)

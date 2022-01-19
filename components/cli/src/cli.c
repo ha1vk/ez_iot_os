@@ -744,7 +744,7 @@ static void pmem_cmd(char *buf, int len, int argc, char **argv)
         case 1:
             for (i = 0; i < nunits; i++) {
                 if (i % 16 == 0) {
-                    aos_cli_printf("0x%08x:", (unsigned int)addr);
+                    aos_cli_printf("%p:", addr);
                 }
                 aos_cli_printf(" %02x", *(unsigned char *)addr);
                 addr += 1;
@@ -756,7 +756,7 @@ static void pmem_cmd(char *buf, int len, int argc, char **argv)
         case 2:
             for (i = 0; i < nunits; i++) {
                 if (i % 8 == 0) {
-                    aos_cli_printf("0x%08x:", (unsigned int)addr);
+                    aos_cli_printf("%p:", addr);
                 }
                 aos_cli_printf(" %04x", *(unsigned short *)addr);
                 addr += 2;
@@ -768,7 +768,7 @@ static void pmem_cmd(char *buf, int len, int argc, char **argv)
         default:
             for (i = 0; i < nunits; i++) {
                 if (i % 4 == 0) {
-                    aos_cli_printf("0x%08x:", (unsigned int)addr);
+                    aos_cli_printf("%p:", addr);
                 }
                 aos_cli_printf(" %08x", *(unsigned int *)addr);
                 addr += 4;
@@ -829,7 +829,7 @@ static void mmem_cmd(char *buf, int len, int argc, char **argv)
             new_value                      = *(unsigned int volatile *)addr;
             break;
     }
-    aos_cli_printf("value on 0x%x change from 0x%x to 0x%x.\r\n", (unsigned int)addr,
+    aos_cli_printf("value on %p change from 0x%x to 0x%x.\r\n", addr,
                    old_value, new_value);
 }
 

@@ -2,6 +2,7 @@
 #include "ezlog.h"
 #include "eztimer.h"
 #include "ez_iot_base.h"
+#include "cli.h"
 
 extern int ez_cloud_init();
 int ez_cloud_base_init();
@@ -9,7 +10,7 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
 static ez_bool_t g_is_inited = ez_false;
 static int m_challenge_code = -1;
 
-int example_bind(int argc, char **argv)
+void example_bind(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -21,11 +22,9 @@ int example_bind(int argc, char **argv)
     {
         ez_iot_base_bind_near(argv[1]);
     }
-
-    return 0;
 }
 
-static void example_bind_sta(void)
+static void example_bind_sta(char *buf, int len, int argc, char **argv)
 {
     ezlog_init();
     ezlog_start();
@@ -42,10 +41,8 @@ static void example_bind_sta(void)
 MSH_CMD_EXPORT(example_bind, eziot example bind param : <token> e.g example_bind cf08393f8581407fad8c3d55dae434ff);
 MSH_CMD_EXPORT(example_bind_sta, eziot example bind status query);
 #else
-// int main(int argc, char **argv)
-// {
-//     return example_kv(argc, argv);
-// }
+EZOS_CLI_EXPORT("example_bind", "eziot example bind param : <token> e.g example_bind cf08393f8581407fad8c3d55dae434ff", example_bind);
+EZOS_CLI_EXPORT("example_bind_sta", "eziot example bind status query", example_bind_sta);
 #endif
 
 void wait_for_button_confirm(void)

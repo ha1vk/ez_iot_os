@@ -1,0 +1,4 @@
+menuconfig EZIOT_EXAMPLES_EVENT_ENABLE
+    bool "Enable example event"
+    default n
+    depends on EZIOT_EXAMPLES_ENABLE

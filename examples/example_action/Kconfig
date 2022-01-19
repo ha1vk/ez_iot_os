@@ -1,0 +1,4 @@
+menuconfig EZIOT_EXAMPLES_ACTION_ENABLE
+    bool "Enable example action"
+    default n
+    depends on EZIOT_EXAMPLES_ENABLE
