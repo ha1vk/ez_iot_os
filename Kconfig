@@ -44,9 +44,6 @@ menu "unit-test configuration"
     osource "${EZOS_PATH}/unit_test/Kconfig"
 endmenu
 
-if $(EXAMPLE_ENABLE)=1
-    menu "examples configuration"
-        source "${EZOS_PATH}/examples/main/${PROJECT_NAME}/Kconfig"
-    endmenu
-
-endif
+menu "examples configuration"
+    source "${EZOS_PATH}/examples/Kconfig"
+endmenu

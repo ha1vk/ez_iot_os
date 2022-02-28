@@ -266,23 +266,6 @@ macro(do_lib_building name)
         endif()
     endforeach()
 
-    if(EZOS_EXAMPLES_ENABLE)
-        file(GLOB project_component_dirs ${EZOS_PATH}/examples/*)
-        foreach(component_dir ${project_component_dirs})
-            is_path_component(is_component ${component_dir})
-            if(is_component)
-                message(STATUS "find component: ${component_dir}")
-                get_filename_component(base_dir ${component_dir} NAME)
-                list(APPEND components_dirs ${component_dir})
-
-                if(EXISTS ${component_dir}/Kconfig)
-                    message(STATUS "Find component Kconfig of ${base_dir}")
-                    list(APPEND components_kconfig_files ${component_dir}/Kconfig)
-                endif()
-            endif()
-        endforeach()
-    endif()
-
     # Find components in bsp folder
     file(GLOB project_component_dirs ${EZOS_PATH}/platform/bsp/${name}/ezos)
     foreach(component_dir ${project_component_dirs})
@@ -320,12 +303,6 @@ macro(do_lib_building name)
     string(REPLACE ";" " " components_kconfig_files "${kconfig_defaults_files_args}")
     string(REPLACE ";" " " components_kconfig_files "${components_kconfig_files}")
 
-    if(${EZOS_EXAMPLES_ENABLE})
-        set(exam_en ${EZOS_EXAMPLES_ENABLE})
-    else()
-        set(exam_en 0)
-    endif()
-
     set(generate_config_cmd ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
                         --kconfig "${EZOS_PATH}/Kconfig"
                         ${kconfig_defaults_files_args}
@@ -333,7 +310,6 @@ macro(do_lib_building name)
                         --env "EZOS_PATH=${EZOS_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${name}"
-                        --env "EXAMPLE_ENABLE=${exam_en}"
                         --output config ${PROJECT_PATH}/config/.config
                         --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
                         --output header ${PROJECT_PATH}/config/ezos_gconfig.h
@@ -345,7 +321,6 @@ macro(do_lib_building name)
                         --env "EZOS_PATH=${EZOS_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${name}"
-                        --env "EXAMPLE_ENABLE=${exam_en}"
                         --output config ${PROJECT_PATH}/config/.config
                         --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
                         --output header ${PROJECT_PATH}/config/ezos_gconfig.h
@@ -492,22 +467,20 @@ macro(do_project_building name)
 #        message(FATAL_ERROR "=================\nCan not find main component(folder) in project folder!!\n=================")
 #    endif()
 
-    if(EZOS_EXAMPLES_ENABLE)
-        file(GLOB project_component_dirs ${EZOS_PATH}/examples/*)
-        foreach(component_dir ${project_component_dirs})
-            is_path_component(is_component ${component_dir})
-            if(is_component)
-                message(STATUS "find component: ${component_dir}")
-                get_filename_component(base_dir ${component_dir} NAME)
-                list(APPEND components_dirs ${component_dir})
+    file(GLOB project_component_dirs ${EZOS_PATH}/examples/*)
+    foreach(component_dir ${project_component_dirs})
+        is_path_component(is_component ${component_dir})
+        if(is_component)
+            message(STATUS "find component: ${component_dir}")
+            get_filename_component(base_dir ${component_dir} NAME)
+            list(APPEND components_dirs ${component_dir})
 
-                if(EXISTS ${component_dir}/Kconfig)
-                    message(STATUS "Find component Kconfig of ${base_dir}")
-                    list(APPEND components_kconfig_files ${component_dir}/Kconfig)
-                endif()
+            if(EXISTS ${component_dir}/Kconfig)
+                message(STATUS "Find component Kconfig of ${base_dir}")
+                list(APPEND components_kconfig_files ${component_dir}/Kconfig)
             endif()
-        endforeach()
-    endif()
+        endif()
+    endforeach()
 
     # Find components in bsp folder
     file(GLOB project_component_dirs ${EZOS_PATH}/platform/bsp/${name}/ezos)
@@ -545,12 +518,6 @@ macro(do_project_building name)
     string(REPLACE ";" " " components_kconfig_files "${kconfig_defaults_files_args}")
     string(REPLACE ";" " " components_kconfig_files "${components_kconfig_files}")
 
-    if(${EZOS_EXAMPLES_ENABLE})
-        set(exam_en ${EZOS_EXAMPLES_ENABLE})
-    else()
-        set(exam_en 0)
-    endif()
-
     set(generate_config_cmd ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
                         --kconfig "${EZOS_PATH}/Kconfig"
                         ${kconfig_defaults_files_args}
@@ -558,7 +525,6 @@ macro(do_project_building name)
                         --env "EZOS_PATH=${EZOS_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${name}"
-                        --env "EXAMPLE_ENABLE=${exam_en}"
                         --output config ${PROJECT_PATH}/config/.config
                         --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
                         --output header ${PROJECT_PATH}/config/ezos_gconfig.h
@@ -570,7 +536,6 @@ macro(do_project_building name)
                         --env "EZOS_PATH=${EZOS_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${name}"
-                        --env "EXAMPLE_ENABLE=${exam_en}"
                         --output config ${PROJECT_PATH}/config/.config
                         --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
                         --output header ${PROJECT_PATH}/config/ezos_gconfig.h
