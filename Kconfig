@@ -9,6 +9,22 @@ menu "toolchain configuration"
     config TOOLCHAIN_PREFIX
         string "toolchain prefix"
         default ""
+
+    config ADD_PRIVATE_CFLAGS
+        string "compile cflags"
+        default ""
+
+    config ADD_PRIVATE_CXXFLAGS
+        string "compile cxxflags"
+        default ""
+
+    config ADD_PRIVATE_LINK_CFLAGS
+        string "link/ld cflags"
+        default ""
+
+    config ADD_PRIVATE_LINK_CXXFLAGS
+        string "link/ld cxxflags"
+        default ""
 endmenu
 
 menu "ez-iot configuration"

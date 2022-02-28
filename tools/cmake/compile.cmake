@@ -391,6 +391,11 @@ macro(do_lib_building name)
 
     include(${EZOS_PATH}/tools/cmake/compile_flags.cmake)
 
+    message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+    message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+    message(STATUS "CMAKE_C_LINK_FLAGS: ${CMAKE_C_LINK_FLAGS}")
+    message(STATUS "CMAKE_CXX_LINK_FLAGS: ${CMAKE_CXX_LINK_FLAGS}")
+
     # Add dependence: update configfile, append time and git info for global config header file
     # we didn't generate build info for cmake and makefile for if we do, it will always rebuild cmake
     # everytime we execute make
