@@ -32,17 +32,17 @@ extern "C"
 
     typedef enum
     {
-        EZ_BASE_ERR_SUCC = 0x00,                                        ///< Success
-        EZ_BASE_ERR_NOT_INIT = BASE_MODULE_ERRNO_BASE + 0x01,          ///< The module is not initialized
-        EZ_BASE_ERR_NOT_READY = BASE_MODULE_ERRNO_BASE + 0x02,         ///< The sdk core module is not started
-        EZ_BASE_ERR_PARAM_INVALID = BASE_MODULE_ERRNO_BASE + 0x03,     ///< The input parameters is illegal, it may be that some parameters can not be null or out of range
-        EZ_BASE_ERR_GENERAL = BASE_MODULE_ERRNO_BASE + 0x04,           ///< Unknown error
-        EZ_BASE_ERR_MEMORY = BASE_MODULE_ERRNO_BASE + 0x05,            ///< Out of memory
+        EZ_BASE_ERR_SUCC = 0x00,                                   ///< Success
+        EZ_BASE_ERR_NOT_INIT = BASE_MODULE_ERRNO_BASE + 0x01,      ///< The module is not initialized
+        EZ_BASE_ERR_NOT_READY = BASE_MODULE_ERRNO_BASE + 0x02,     ///< The sdk core module is not started
+        EZ_BASE_ERR_PARAM_INVALID = BASE_MODULE_ERRNO_BASE + 0x03, ///< The input parameters is illegal, it may be that some parameters can not be null or out of range
+        EZ_BASE_ERR_GENERAL = BASE_MODULE_ERRNO_BASE + 0x04,       ///< Unknown error
+        EZ_BASE_ERR_MEMORY = BASE_MODULE_ERRNO_BASE + 0x05,        ///< Out of memory
     } ez_base_err_e;
 
     typedef struct
     {
-        ez_char_t user_id[32];   ///< 绑定设备的用户ID
+        ez_char_t user_id[32]; ///< 绑定设备的用户ID
     } ez_bind_info_t;
 
     typedef struct
@@ -51,11 +51,20 @@ extern "C"
         ez_int32_t validity_period; ///< 有效期(秒)
     } ez_bind_challenge_t;
 
+    typedef struct
+    {
+        char host[64];     ///< 校时服务器域名
+        int port;          ///< 校时服务器端口
+        int interval;      ///< 校时间隔(s)
+        char timezone[16]; ///< 设备所处时区
+    } ez_base_ntp_info_t;
+
     typedef enum
     {
         EZ_EVENT_BINDING,           ///< 设备已绑定, msg data: \c ez_bind_info_t
         EZ_EVENT_UNBINDING,         ///< 设备未绑定, msg data: null
         EZ_EVENT_BINDING_CHALLENGE, ///< 绑定挑战, msg data: \c ez_bind_challenge_t
+        EZ_EVENT_NTP_INFO,          ///< 默认校时配置, msg data: \c ez_base_ntp_info_t
     } ez_base_event_e;
 
     typedef ez_int32_t (*ez_base_notice)(ez_base_event_e event_type, ez_void_t *data, ez_int32_t len);

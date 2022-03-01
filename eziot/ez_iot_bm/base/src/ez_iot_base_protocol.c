@@ -41,6 +41,60 @@ static ez_err_t dev2cloud_msg_send(ez_char_t *buf, ez_int32_t domain_id, ez_int3
 
 static profile_query_rsp g_profile_rsp_func = NULL;
 
+void cloud2dev_set_ntpinfo_req(void *buf, ez_int32_t len)
+{
+    cJSON *pRoot = cJSON_Parse(buf);
+    cJSON *NTP = NULL;
+    cJSON *json = NULL;
+    ez_base_ntp_info_t ntp_info = {0};
+
+    do
+    {
+        if (NULL == pRoot)
+        {
+            break;
+        }
+
+        NTP = cJSON_GetObjectItem(pRoot, "NTP");
+        if (NULL == NTP)
+        {
+            break;
+        }
+
+        json = cJSON_GetObjectItem(NTP, "Addr");
+        if (NULL != json)
+        {
+            ezos_strncpy(ntp_info.host, json->valuestring, sizeof(ntp_info.host) - 1);
+        }
+
+        json = cJSON_GetObjectItem(NTP, "Port");
+        if (NULL != json)
+        {
+            ntp_info.port = json->valueint;
+        }
+
+        json = cJSON_GetObjectItem(NTP, "Interval");
+        if (NULL != json)
+        {
+            ntp_info.interval = json->valueint / 60;
+        }
+
+        json = cJSON_GetObjectItem(NTP, "Timezone");
+        if (NULL != json)
+        {
+            ezos_strncpy(ntp_info.timezone, json->valuestring, sizeof(ntp_info.timezone) - 1);
+        }
+
+        base_notice_get()(EZ_EVENT_NTP_INFO, &ntp_info, sizeof(ntp_info));
+
+    } while (0);
+
+    if (NULL != pRoot)
+    {
+        cJSON_Delete(pRoot);
+    }
+}
+
 ez_err_t cloud2dev_xml_req_bushandle(ez_void_t *buf, ez_int32_t len, ez_int32_t rsp_cmd,
                                      ez_uint32_t seq, handle_proc_fun proc_func)
 {

@@ -76,6 +76,9 @@ ez_void_t base_extend_data_route_cb(ez_kernel_submsg_t *ptr_submsg, ez_void_t *p
 
     switch (cmd_id)
     {
+    case kCenPlt2PuDomainConfig:
+        cloud2dev_set_ntpinfo_req(ptr_submsg->buf, ptr_submsg->buf_len);
+        break;
     case kCenPlt2PuSetUserIdReq:
         result_code = cloud2dev_xml_req_bushandle(ptr_submsg->buf, ptr_submsg->buf_len,
                                                   kCenPlt2PuSetUserIdReq, msg_seq, base_protocol_bind_status_notice_req);
