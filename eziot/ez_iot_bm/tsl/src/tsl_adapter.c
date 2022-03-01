@@ -339,7 +339,7 @@ static ez_int32_t profile_downloading(query_info_t *query_info, ez_char_t **buf,
 static void ez_profile_get_thread(void *param)
 {
     query_info_t *query_info = NULL;
-    ez_bool_t need_schema = ez_true;
+    ez_bool_t need_schema = ez_false;
     char *thread_name = (char *)param;
 
 #ifdef EZIOT_TSL_LEGALITY_CHECK_STRONG
