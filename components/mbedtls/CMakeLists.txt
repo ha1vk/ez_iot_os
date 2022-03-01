@@ -38,7 +38,7 @@ if(CONFIG_EZIOT_COMPONENT_MBEDTLS_ENABLE)
 
     #### Add compile option for this component
     #### and components denpend on this component
-    list(APPEND ADD_DEFINITIONS)
+    list(APPEND ADD_DEFINITIONS -DMBEDTLS_AES_ROM_TABLES)
     ###############################################
 
     ############ Add static libs ##################
