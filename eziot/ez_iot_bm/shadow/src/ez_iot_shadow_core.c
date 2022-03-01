@@ -1454,7 +1454,8 @@ static ez_int32_t shadow_set2dev(ez_char_t *devsn, ez_char_t *res_type, ez_int32
     cJSON *json_domain = NULL;
     cJSON *json_identifier = NULL;
     cJSON *json_value = NULL;
-
+    ez_char_t domain[32] = {0};
+    ez_char_t identifier[32] = {0};
     ez_int32_t rv = -1;
 
     do
@@ -1479,12 +1480,16 @@ static ez_int32_t shadow_set2dev(ez_char_t *devsn, ez_char_t *res_type, ez_int32
             break;
         }
 
+        ezos_strncpy(domain, json_domain->valuestring, sizeof(domain) - 1);
+
         if (NULL == (json_identifier = cJSON_GetObjectItem(json_desired, "identifier")))
         {
             break;
         }
 
-        if (NULL == (json_value = cJSON_GetObjectItem(json_desired, "value")))
+        ezos_strncpy(identifier, json_identifier->valuestring, sizeof(json_identifier) - 1);
+
+        if (NULL == (json_value = cJSON_DetachItemFromObject(json_desired, "value")))
         {
             break;
         }
@@ -1498,10 +1503,7 @@ static ez_int32_t shadow_set2dev(ez_char_t *devsn, ez_char_t *res_type, ez_int32
         ezlog_d(TAG_SHD, "reply:%s", payload);
     }
 
-    if (json_root)
-    {
-        cJSON_Delete(json_root);
-    }
+    cJSON_Delete(json_root);
 
     return rv;
 }
@@ -1553,7 +1555,8 @@ static ez_void_t shadow_reply2query(ez_char_t *devsn, ez_char_t *res_type, ez_in
     cJSON *json_domain = NULL;
     cJSON *json_identifier = NULL;
     cJSON *json_value = NULL;
-
+    ez_char_t domain[32] = {0};
+    ez_char_t identifier[32] = {0};
     ez_int32_t rv = 0;
 
     do
@@ -1608,13 +1611,17 @@ static ez_void_t shadow_reply2query(ez_char_t *devsn, ez_char_t *res_type, ez_in
                 continue;
             }
 
+            ezos_strncpy(domain, json_domain->valuestring, sizeof(domain) - 1);
+
             if (NULL == (json_identifier = cJSON_GetObjectItem(json_domain_array, "identifier")))
             {
                 rv = -1;
                 continue;
             }
 
-            if (NULL == (json_value = cJSON_GetObjectItem(json_domain_array, "value")))
+            ezos_strncpy(identifier, json_identifier->valuestring, sizeof(json_identifier) - 1);
+
+            if (NULL == (json_value = cJSON_DetachItemFromObject(json_domain_array, "value")))
             {
                 rv = -1;
                 continue;
@@ -1631,11 +1638,7 @@ static ez_void_t shadow_reply2query(ez_char_t *devsn, ez_char_t *res_type, ez_in
     }
 
     shadow_status_sync_disable(devsn, res_type, index);
-
-    if (json_root)
-    {
-        cJSON_Delete(json_root);
-    }
+    cJSON_Delete(json_root);
 }
 
 static ez_int32_t do_set(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index, ez_char_t *domain, ez_char_t *key, cJSON *value)
@@ -1721,6 +1724,7 @@ static ez_int32_t do_set(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t index
 
     shadow_module_unlock();
 
+    cJSON_Delete(value);
     if (0 == rv && 0 != (rv = cloud2dev_cb(&tlv, &pstParseSync)))
     {
         ezlog_e(TAG_SHD, "cloud2dev err, key=%s", key);
