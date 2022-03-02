@@ -475,6 +475,14 @@ int product_config_init(void)
         memset(buf, 0, PRODUCT_CONFIG_MAX_SIZE);
 
 #ifdef HAL_ESP
+        partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, "factory_data");
+
+        if (NULL == partition)
+        {
+            ezlog_e(TAG_APP, "find fdata part.");
+            break;
+        }
+
         if (ESP_OK != esp_partition_read(partition, PRODUCT_CONFIG_OFFSET, buf, PRODUCT_CONFIG_MAX_SIZE))
         {
             ezlog_e(TAG_APP, "esp_partition_read error!");
@@ -505,13 +513,6 @@ int product_config_init(void)
 
 		memset(buf, 0, PRODUCT_CONFIG_MAX_SIZE);
 	    #ifdef HAL_ESP
-        partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, "factory_data");
-        
-        if (NULL == partition)
-        {
-            ezlog_e(TAG_APP, "find fdata part.");
-            break;
-        }
         
         if (ESP_OK != esp_partition_read(partition, 0, buf, PRODUCT_CONFIG_MAX_SIZE))
         {

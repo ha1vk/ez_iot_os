@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 
 #endif
 {
-
+    printf("ez_app, easy your life.\n");
     ezlog_init();
     ezlog_start();
     ezlog_filter_lvl(5);
