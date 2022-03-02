@@ -103,11 +103,6 @@ typedef struct{
 	product_param_t param;	//mcu产品配置
 }product_config_t;
 
-typedef struct{
-	char dev_productKey[33];          //产品PID
-	char dev_deviceName[13];          //产品序列号
-	char dev_deviceLicense[48];       //产品验证码
-}product_lic_t;
 
 typedef enum
 {	
@@ -135,9 +130,7 @@ char get_product_io_indicator_light_g(void);
 
 char *get_product_country_code(void); 
 void set_product_country_code(char *CountryCode);
-char* get_lic_productKey();
-char* get_lic_deviceName();
-char* get_lic_License();
+
 
 #ifdef BULB_VERSION
 char get_product_reset_switch_times(void);

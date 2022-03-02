@@ -18,6 +18,7 @@
 #include "esp_wifi.h"
 
 #include "dev_init.h"
+#include "dev_info.h"
 
 extern char bind_token[64];
 bool g_need_ap = false;
@@ -347,13 +348,13 @@ void ap_distribution_do()
         return false;
     }
 
-    if (strlen(get_lic_deviceName()) <= 9)
+    if (strlen(get_dev_deviceName()) <= 9)
     {
-        sprintf(ssid, "%s_%s", device_info->ap_prefix, get_lic_deviceName());
+        sprintf(ssid, "%s_%s", device_info->ap_prefix, get_dev_deviceName());
     }
     else
     {
-        sprintf(ssid, "%s_%s", device_info->ap_prefix, get_lic_deviceName() + strlen(get_lic_deviceName()) - 9);
+        sprintf(ssid, "%s_%s", device_info->ap_prefix, get_dev_deviceName() + strlen(get_dev_deviceName()) - 9);
     }
 
     if (ssid[32] != '\0')
@@ -368,8 +369,8 @@ void ap_distribution_do()
     ap_info.ap_timeout = 5;
     ap_info.apsta_coexist = ez_true;
 
-    sprintf(dev_info.dev_serial, "%s:%s", get_lic_productKey(), get_lic_deviceName());
-    strncpy((char *)dev_info.dev_type, get_lic_productKey(), sizeof(dev_info.dev_type)); 
+    sprintf(dev_info.dev_serial, "%s:%s", get_dev_productKey(), get_dev_deviceName());
+    strncpy((char *)dev_info.dev_type, get_dev_productKey(), sizeof(dev_info.dev_type)); 
 
     char dev_version[64];
     mk_soft_version(dev_version);

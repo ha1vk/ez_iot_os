@@ -7,7 +7,9 @@
 #include "ezos_time.h" //延迟需要
 #include "esp_system.h"
 #include "dev_init.h"
+#include "dev_info.h"
 #include "product_config.h"
+
 static int ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, void *data, int len);
 extern ez_int32_t eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void));
 static int download_data_cb(uint32_t total_len, uint32_t offset, void *data, uint32_t len, void *user_data);
@@ -34,11 +36,11 @@ void ez_ota_start()
     memset(&szModules,0,sizeof(szModules));
     ez_ota_modules_t modules = {1, &szModules};
     mk_soft_version(dev_firmwareversion);
-    szModules[0].mod_name = get_lic_productKey();
+    szModules[0].mod_name = get_dev_productKey();
 	szModules[0].fw_ver = dev_firmwareversion;
 
     ez_iot_ota_modules_report(&ota_res, &modules, 5000);                      //上报升级模块的PID和版本信息
-    ez_iot_ota_status_ready(&ota_res, get_lic_productKey());            //上报状态0，清除服务器状态
+    ez_iot_ota_status_ready(&ota_res, get_dev_productKey());            //上报状态0，清除服务器状态
 }
 
 static int ota_download_fun(ota_upgrade_info_t *upgrade_infos,int file_index)

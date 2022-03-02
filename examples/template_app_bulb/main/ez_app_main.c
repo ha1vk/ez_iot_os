@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
     if (0 != product_config_init())
     {
-        ezlog_a(TAG_AP, "global init faild!");
+        ezlog_a(TAG_AP, "global init failed!");
         return 0;
     }
     config_print();

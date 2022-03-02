@@ -147,7 +147,9 @@ int config_reset_factory()
         }
     }
 
-    // TODO read from product config
+    product_config_t *p_config = get_product_config();
+    int default_cct = p_config->param.function.default_cct;
+    config_set_value(COLORTEMPERATURE, &default_cct, sizeof(default_cct));
 
     return ret;
 }

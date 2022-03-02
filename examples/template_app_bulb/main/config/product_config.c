@@ -1,4 +1,5 @@
 #include "product_config.h"
+#include "dev_info.h"
 #ifdef HAL_ESP
 #include "esp_partition.h"
 #endif
@@ -12,7 +13,6 @@
 #define PRODUCT_CONFIG_OFFSET (4 * 1024)
 
 static product_config_t g_product_config = {0};
-static product_lic_t g_product_lic = {0};
 
 void print(void)
 {
@@ -454,60 +454,6 @@ int parse_product_config(cJSON *root)
     return 0;
 }
 
-int parse_lic_config(char *buf, int buf_size)
-{
-    cJSON *cjson_lic = NULL;
-    int rv = -1;
-    cJSON *found = NULL;
-
-    for (size_t i = 0; i < buf_size; i++)
-    {
-        if (buf[i] == 0xff)
-        {
-            buf[i] = 0x0;
-            break;
-        }
-    }
-
-    do
-    {
-        if (NULL == (cjson_lic = cJSON_Parse(buf)))
-        {
-            ezlog_e(TAG_APP, "cjson_lic parse!");
-            break;
-        }
-
-        if (NULL == (found = cJSON_GetObjectItem(cjson_lic, "dev_productKey")) || cJSON_String != found->type)
-        {
-            break;
-        }
-
-        strncpy(g_product_lic.dev_productKey, found->valuestring, sizeof(g_product_lic.dev_productKey) - 1);
-
-        if (NULL == (found = cJSON_GetObjectItem(cjson_lic, "dev_deviceName")) || cJSON_String != found->type)
-        {
-            break;
-        }
-
-        strncpy(g_product_lic.dev_deviceName, found->valuestring, sizeof(g_product_lic.dev_deviceName) - 1);
-
-        if (NULL == (found = cJSON_GetObjectItem(cjson_lic, "dev_deviceLicense")) || cJSON_String != found->type)
-        {
-            break;
-        }
-
-        strncpy(g_product_lic.dev_deviceLicense, found->valuestring, sizeof(g_product_lic.dev_deviceLicense) - 1);
-        rv = 0;
-    } while (0);
-
-    if (cjson_lic)
-    {
-        cJSON_Delete(cjson_lic);
-    }
-
-    return rv;
-}
-
 int product_config_init(void)
 {
     
@@ -522,11 +468,41 @@ int product_config_init(void)
 #endif
     do
     {
-       
-	   	if (NULL == (buf = (char *)malloc(PRODUCT_CONFIG_MAX_SIZE)))
+        if (NULL == (buf = (char *)malloc(PRODUCT_CONFIG_MAX_SIZE)))
         {
             break;
         }
+        memset(buf, 0, PRODUCT_CONFIG_MAX_SIZE);
+
+#ifdef HAL_ESP
+        if (ESP_OK != esp_partition_read(partition, PRODUCT_CONFIG_OFFSET, buf, PRODUCT_CONFIG_MAX_SIZE))
+        {
+            ezlog_e(TAG_APP, "esp_partition_read error!");
+            break;
+        }
+#else
+        fp2 = fopen("product.bin", "r");
+        if (NULL == fp2)
+        {
+            ezlog_e(TAG_APP, "open error.");
+            break;
+        }
+        fread(buf, PRODUCT_CONFIG_MAX_SIZE, 1, fp2);
+#endif
+        ezlog_d(TAG_APP, "get_product_config read : [%s] len[%d]\n", buf, strlen(buf));
+
+        if (NULL == (cjson_product = cJSON_Parse(buf)))
+        {
+            ezlog_e(TAG_APP, "cjson_product parse!");
+            break;
+        }
+
+        if (0 != parse_product_config(cjson_product))
+        {
+            ezlog_e(TAG_APP, "parse_product_config!");
+            break;
+        }
+
 		memset(buf, 0, PRODUCT_CONFIG_MAX_SIZE);
 	    #ifdef HAL_ESP
         partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, "factory_data");
@@ -553,39 +529,9 @@ int product_config_init(void)
         #endif
         
 		ezlog_d(TAG_APP, "get_product_lic read : [%s] len[%d]\n", buf, strlen(buf));
-        if (0 != parse_lic_config(buf, PRODUCT_CONFIG_MAX_SIZE))
+        if (0 != parse_dev_config(buf, PRODUCT_CONFIG_MAX_SIZE))
         {
             ezlog_e(TAG_APP, "parse_lic_config!");
-            break;
-        }
-
-        memset(buf, 0, PRODUCT_CONFIG_MAX_SIZE);
-		#ifdef HAL_ESP
-        if (ESP_OK != esp_partition_read(partition, PRODUCT_CONFIG_OFFSET, buf, PRODUCT_CONFIG_MAX_SIZE))
-        {
-            ezlog_e(TAG_APP, "esp_partition_read error!");
-            break;
-        }
-		#else
-		fp2 = fopen ("product.bin", "r");
-		if(NULL == fp2)
-		{
-			ezlog_e(TAG_APP, "open error.");
-            break; 
-		}
-		fread(buf, PRODUCT_CONFIG_MAX_SIZE, 1, fp2);
-		#endif
-		ezlog_d(TAG_APP, "get_product_config read : [%s] len[%d]\n", buf, strlen(buf));
-
-        if (NULL == (cjson_product = cJSON_Parse(buf)))
-        {
-            ezlog_e(TAG_APP, "cjson_product parse!");
-            break;
-        }
-
-        if (0 != parse_product_config(cjson_product))
-        {
-            ezlog_e(TAG_APP, "parse_product_config!");
             break;
         }
 
@@ -688,26 +634,6 @@ char *get_user_defined_type(void)
 int get_ap_timval(void)
 {
     return g_product_config.ap_timval;
-}
-
-char *get_lic_productKey()
-{
-printf("\n to_do DEBUG in line (%d) and function (%s)): %s\n "
-,__LINE__, __func__,g_product_lic.dev_productKey);
-
-    return g_product_lic.dev_productKey;
-}
-
-char *get_lic_deviceName()
-{
-printf("\n to_do DEBUG in line (%d) and function (%s)): %s\n ",__LINE__, __func__,g_product_lic.dev_deviceName);
-
-    return g_product_lic.dev_deviceName;
-}
-
-char *get_lic_License()
-{
-    return g_product_lic.dev_deviceLicense;
 }
 
 #ifdef BULB_VERSION

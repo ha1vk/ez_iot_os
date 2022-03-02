@@ -43,6 +43,7 @@ event_$(KEY)_up     设备主动上报事件调用此函数
 #include "bulb_protocol_tsl_parse.h"
 
 #include "product_config.h"    //获取设备序列号用
+#include "dev_info.h"
 
 #ifdef HAL_ESP
 #include "esp_heap_caps.h"
@@ -677,7 +678,7 @@ int user_property_report(char *key)
         return -1;
     }
 
-    sprintf(dev_serial, "%s:%s", get_lic_productKey(), get_lic_deviceName());
+    sprintf(dev_serial, "%s:%s", get_dev_productKey(), get_dev_deviceName());
 
     for (i = 0; property_cmd[i].identify != NULL; i++)
     {

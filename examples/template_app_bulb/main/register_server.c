@@ -24,6 +24,7 @@
 #include "product_config.h"
 #include "dev_init.h"
 #include "ezcloud_ota.h"
+#include "dev_info.h"
 #ifdef SUPPORT_ESP_LWIP_NTP
 #include "lwip/apps/sntp.h"
 extern char g_time_zone[8];//tsl 需要用
@@ -83,7 +84,7 @@ int report_wifi_info(ez_tsl_value_t *value_out)
     do
     {
 		char dev_serial[72] = {0};
-        sprintf(dev_serial, "%s:%s", get_lic_productKey(), get_lic_deviceName());
+        sprintf(dev_serial, "%s:%s", get_dev_productKey(), get_dev_deviceName());
 
         char dev_firmwareversion[64] = {0};
         mk_soft_version(dev_firmwareversion);
@@ -520,16 +521,16 @@ void online_access()
     ezos_strncpy((char*)lbs_addr.host, domain, sizeof(lbs_addr.host) - 1);
 
 #if 0
-    dev_info.auth_mode = 0;
+    dev_info.auth_mode = get_dev_auth_mode();
     ezos_strncpy(dev_info.dev_type, BULB_EZIOT_TEST_DEV_TYPE, sizeof(dev_info.dev_type) - 1);
     ezos_strncpy(dev_info.dev_subserial, BULB_EZIOT_TEST_DEV_SERIAL_NUMBER, sizeof(dev_info.dev_subserial) - 1);
     ezos_strncpy(dev_info.dev_verification_code, BULB_EZIOT_TEST_DEV_VERIFICATION_CODE, sizeof(dev_info.dev_verification_code) - 1);
 #else
-    dev_info.auth_mode = 1;
-    ezos_strncpy((char*)dev_info.dev_type, get_lic_productKey(), sizeof(dev_info.dev_type) - 1);
-    ezos_snprintf((char*)dev_info.dev_subserial, sizeof(dev_info.dev_subserial),"%s:%s", get_lic_productKey(), get_lic_deviceName());
+    dev_info.auth_mode = get_dev_auth_mode();
+    ezos_strncpy((char*)dev_info.dev_type, get_dev_productKey(), sizeof(dev_info.dev_type) - 1);
+    ezos_snprintf((char*)dev_info.dev_subserial, sizeof(dev_info.dev_subserial),"%s:%s", get_dev_productKey(), get_dev_deviceName());
 
-    ezos_strncpy((char*)dev_info.dev_verification_code, get_lic_License(), sizeof(dev_info.dev_verification_code) - 1);
+    ezos_strncpy((char*)dev_info.dev_verification_code, get_dev_License(), sizeof(dev_info.dev_verification_code) - 1);
 #endif
     /*you can get the lbs addres from the ap distribution or from the flash storage*/
     if (EZ_CORE_ERR_SUCC != ez_iot_core_init(&lbs_addr, &dev_info, ez_event_notice_func))
