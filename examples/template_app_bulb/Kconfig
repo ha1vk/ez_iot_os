@@ -1,4 +1,0 @@
-menuconfig EZIOT_EXAMPLES_BULB_ENABLE
-    bool "Enable example bulb"
-    default n
-    depends on EZIOT_EXAMPLES_ENABLE

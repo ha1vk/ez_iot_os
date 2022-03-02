@@ -22,10 +22,12 @@
 #include "bulb_led_drv_pwm.h"
 #include "ezhal_pwm.h"
 #include "ezlog.h"
-
+#ifdef HAL_ESP
+#include "driver/pwm.h"
+#endif
 static const char *TAG_LED = "[LED]";
 
-static ez_uint32_t g_led_pwm_cycle_time = 1000;
+static ez_uint32_t g_led_pwm_cycle_time = 1000;  //us
 
 static ez_uint8_t g_led_white_control_mode = WHITE_CONTROL_CW; //球泡灯的白光控制方式
 
@@ -146,13 +148,15 @@ static const char *TAG_GPIO = "[GPIO]";
  * @note     针对球泡灯（1路，2路冷暖可调，3路rgb彩灯可调，5路rgb彩+冷暖灯可调）的gpio通用配置方法
  * @waring
  */
-ez_int8_t bulb_leds_gpio_config(led_gpio_config_t led_gpio_config[LEDC_CHANNEL_MAX], int frequency, int led_white_control_mode)
+ez_int8_t bulb_leds_gpio_config(led_gpio_init_t * led_gpio_init)
 {
     int i = 0;
     ez_uint32_t pwm_led_duties[5] = {100, 100, 100, 100, 100}; //初始的占空比（亮度），频率为1000的情况下，占空比10%
     ez_uint32_t pwm_led_pin[5] = {0, 0, 0, 0, 0};              //r,g,b,w,c 五路灯珠的实际引脚
 
-    if (led_gpio_config == NULL)
+    float  pwm_led_phase[5] = {0, 0, 0, 0, 0};   //设置相位
+    
+    if (led_gpio_init == NULL)
     {
         ezlog_e(TAG_GPIO, "%s  gpio config fail  %d!!!", __FUNCTION__);
         return -1;
@@ -160,41 +164,46 @@ ez_int8_t bulb_leds_gpio_config(led_gpio_config_t led_gpio_config[LEDC_CHANNEL_M
 
     for (i = 0; i < LEDC_CHANNEL_MAX; i++)
     {
+        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): %d,%d\n ",__LINE__, __func__
+            ,led_gpio_init->led_gpio_config[i].led_gpio_name,
+             led_gpio_init->led_gpio_config[i].led_color_name);
+        
 
-        switch (led_gpio_config[i].led_color_name)
+        switch (led_gpio_init->led_gpio_config[i].led_color_name)
         {
         case CONFIG_COLOR_RED:
-            pwm_led_pin[LED_COLOR_RED] = led_gpio_config[i].led_gpio_name;
-            g_led_gpios_level.led_r = led_gpio_config[i].led_gpio_level;
+  
+            pwm_led_pin[LED_COLOR_RED] = led_gpio_init->led_gpio_config[i].led_gpio_name;
+            g_led_gpios_level.led_r = led_gpio_init->led_gpio_config[i].led_gpio_level;
             break;
         case CONFIG_COLOR_GREEN:
-            pwm_led_pin[LED_COLOR_GREEN] = led_gpio_config[i].led_gpio_name;
-            g_led_gpios_level.led_g = led_gpio_config[i].led_gpio_level;
+            pwm_led_pin[LED_COLOR_GREEN] = led_gpio_init->led_gpio_config[i].led_gpio_name;
+            g_led_gpios_level.led_g = led_gpio_init->led_gpio_config[i].led_gpio_level;
             break;
         case CONFIG_COLOR_BLUE:
-            pwm_led_pin[LED_COLOR_BLUE] = led_gpio_config[i].led_gpio_name;
-            g_led_gpios_level.led_b = led_gpio_config[i].led_gpio_level;
+            pwm_led_pin[LED_COLOR_BLUE] = led_gpio_init->led_gpio_config[i].led_gpio_name;
+            g_led_gpios_level.led_b = led_gpio_init->led_gpio_config[i].led_gpio_level;
             break;
         case CONFIG_COLOR_WARM:
             ezlog_w(TAG_GPIO, "LED_COLOR_WARM init!!!");
-            pwm_led_pin[LED_COLOR_WARM] = led_gpio_config[i].led_gpio_name;
-            g_led_gpios_level.led_w = led_gpio_config[i].led_gpio_level;
+            pwm_led_pin[LED_COLOR_WARM] = led_gpio_init->led_gpio_config[i].led_gpio_name;
+            g_led_gpios_level.led_w = led_gpio_init->led_gpio_config[i].led_gpio_level;
             break;
 
         case CONFIG_COLOR_COOL:
             ezlog_w(TAG_GPIO, "LED_COLOR_COOL init!!!");
-            pwm_led_pin[LED_COLOR_COOL] = led_gpio_config[i].led_gpio_name;
-            g_led_gpios_level.led_c = led_gpio_config[i].led_gpio_level;
+            pwm_led_pin[LED_COLOR_COOL] = led_gpio_init->led_gpio_config[i].led_gpio_name;
+            g_led_gpios_level.led_c = led_gpio_init->led_gpio_config[i].led_gpio_level;
             break;
         case CONFIG_CCT:
             ezlog_w(TAG_GPIO, "LED_COLOR_WARM init!!!");
-            pwm_led_pin[LED_CCT] = led_gpio_config[i].led_gpio_name;
-            g_led_gpios_level.led_cct = led_gpio_config[i].led_gpio_level;
+            pwm_led_pin[LED_CCT] = led_gpio_init->led_gpio_config[i].led_gpio_name;
+            g_led_gpios_level.led_cct = led_gpio_init->led_gpio_config[i].led_gpio_level;
             break;
         case CONFIG_CCT_LIGHT:
             ezlog_w(TAG_GPIO, "LED_COLOR_COOL init!!!");
-            pwm_led_pin[LED_CCT_LIGHT] = led_gpio_config[i].led_gpio_name;
-            g_led_gpios_level.led_cct_light = led_gpio_config[i].led_gpio_level;
+            pwm_led_pin[LED_CCT_LIGHT] = led_gpio_init->led_gpio_config[i].led_gpio_name;
+            g_led_gpios_level.led_cct_light = led_gpio_init->led_gpio_config[i].led_gpio_level;
             break;
 
         default:
@@ -205,14 +214,21 @@ ez_int8_t bulb_leds_gpio_config(led_gpio_config_t led_gpio_config[LEDC_CHANNEL_M
 
     ezlog_i(TAG_GPIO, "pin[0] =%d,pin[1] =%d,pin[2] =%d,pin[3] =%d,pin[4] =%d!", pwm_led_pin[0], pwm_led_pin[1], pwm_led_pin[2], pwm_led_pin[3], pwm_led_pin[4]);
 
-    g_led_pwm_cycle_time = 1000 * 1000 / frequency;
+    g_led_pwm_cycle_time = 1000 * 1000 / led_gpio_init->driver_config.pwm_frequency;
 
-    g_led_white_control_mode = led_white_control_mode;
+    g_led_white_control_mode = led_gpio_init->white_control_mode;
 
+    #ifdef HAL_ESP
+    pwm_init(g_led_pwm_cycle_time, pwm_led_duties, 5, pwm_led_pin);
+
+    pwm_set_phases(pwm_led_phase);
+
+    #else
     for (i = 0; i < LEDC_CHANNEL_MAX; i++)
     {
         ezhal_pwm_init(i, pwm_led_pin[i], g_led_pwm_cycle_time, pwm_led_duties[i]);
     }
+    #endif
     return 0;
 }
 
@@ -332,7 +348,7 @@ ez_int8_t bulb_leds_cct_config(ez_int16_t cct_value, ez_int16_t led_lm_percentag
         }
     }
 
-    //ezlog_e(TAG_LED, "mode =  %d duties[3] = %d  duties[4]= %d",g_led_cct_control_mode_flag, pwm_led_duties[3], pwm_led_duties[4]);
+    ezlog_e(TAG_LED, "mduties[3] %d duties[4] = %d  duties[5]= %d", pwm_led_duties[3], pwm_led_duties[4],pwm_led_duties[5]);
 
     for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
     {
@@ -385,7 +401,8 @@ ez_int8_t bulb_leds_RGB_config(ez_int32_t color_value, ez_int16_t led_lm_percent
         pwm_led_duties[LED_COLOR_BLUE] = g_led_pwm_cycle_time - pwm_led_duties[LED_COLOR_BLUE];
     }
 
-    //ezlog_d(TAG_LED, "%s g_led_current_RGB_light=%d red=%d  green=%d  blue=%d!!!", __FUNCTION__, g_led_current_RGB_light,pwm_led_duties[0], pwm_led_duties[1], pwm_led_duties[2]);
+    ezlog_v(TAG_LED, " red=%d  green=%d  blue=%d!!!",  
+        pwm_led_duties[0], pwm_led_duties[1], pwm_led_duties[2]);
 
     for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
     {

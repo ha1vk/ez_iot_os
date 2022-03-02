@@ -18,6 +18,7 @@ extern "C"
         CONFIG_CCT_LIGHT,
     } config_led_color_name_e;
 
+    /*灯控逻辑口*/
     typedef enum
     {
         LED_COLOR_RED,
@@ -94,6 +95,7 @@ extern "C"
     {
         led_gpio_config_t led_gpio_config[5];
         led_gpio_driver_mode_e led_gpio_driver_mode;
+        ez_uint8_t white_control_mode;    //cct or cw 驱动
         union
         {
             ez_uint32_t pwm_frequency;
@@ -162,7 +164,7 @@ extern "C"
  * @note     针对球泡灯（1路，2路冷暖可调，3路rgb彩灯可调，5路rgb彩+冷暖灯可调）的gpio通用配置方法
  * @waring
  */
-    ez_int8_t bulb_leds_gpio_config(led_gpio_config_t led_gpio_config[LEDC_CHANNEL_MAX], int frequency, int led_white_control_mode);
+    ez_int8_t bulb_leds_gpio_config(led_gpio_init_t * led_gpio_init);
 
     /**@fn		  
  * @brief		  点亮cct灯

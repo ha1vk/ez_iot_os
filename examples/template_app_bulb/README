@@ -1,0 +1,5 @@
+compile for ESP32-WROOM-E or ESP32-WROOM-UE
+type "make" or "make -j5" direct;
+
+compile for ESP32-SOLO-1
+type "make TYPE_SOLO=true" or "make -j5 TYPE_SOLO=true"

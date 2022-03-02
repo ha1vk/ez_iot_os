@@ -1,0 +1,45 @@
+/*******************************************************************************
+ * Copyright © 2017-2021 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * 
+ * Contributors:
+ * liwei (liwei@ezvizlife.com)
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2021-11-25     liwei    first version 
+ *******************************************************************************/
+
+
+/*此文件解析物模型传上来的协议，分action，属性，属性上报，此文件针对单芯片设备设计为统一格式文件.
+物模型的功能点在此处以
+
+property_$(key)_up,   设备主动上报的属性值调用此函数
+property_$(KEY)_set,  sdk 底层接收到的属性协议处理函数
+action_$(KEY)_set，    sdk 底层接收到的操作协议处理函数 
+event_$(KEY)_up     设备主动上报事件调用此函数
+
+可以通过python 脚本将控制台下载的物模型文件转化为此文件
+*/
+
+#include <stdio.h>
+#include <string.h>
+
+#include "ezlog.h"
+#include "ez_iot_base.h"
+#include "ez_iot_tsl.h"
+
+#include "ez_iot_core_def.h"
+#include "ez_iot_core.h"
+#include "bulb_business.h"
+#include "bulb_protocol_tsl_parse.h"
+
+#include "product_config.h"    //获取设备序列号用

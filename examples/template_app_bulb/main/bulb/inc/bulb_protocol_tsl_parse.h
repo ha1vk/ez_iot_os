@@ -31,7 +31,10 @@
 
 typedef struct
 {
-    char *identify;
+    char *identify;       //功能点
+    char *domain;           //领域标识
+    char *res_type;      //资源标识 resourceCategory                        
+    char *index;        //资源的通道
     int (*func_set)(ez_tsl_value_t *value_out);
     int (*func_up)(ez_tsl_value_t *value_return);
 } property_cmd_t;
@@ -41,6 +44,12 @@ typedef struct
     char *identify;
     int (*func_set)(ez_tsl_value_t *data, ez_tsl_value_t *retrun_value);
 } action_cmd_t;
+
+
+int user_property_report(char *key);
+
+
+ez_int32_t tsl_notice(ez_tsl_event_e event_type, ez_void_t *data, ez_int32_t len);
 
 /**
  * @brief 物模型操作回调函数

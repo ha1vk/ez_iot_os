@@ -1,0 +1,29 @@
+#
+# This is a project Makefile. It is assumed the directory this Makefile resides in is a
+# project subdirectory.
+#
+export IDF_PATH=/opt/esp_sdk/esp-idf
+#export IDF_PATH=/home/liwei/work/IOT-APPsvn/esp-idf_release
+
+PROJECT_NAME := ez_app
+
+ifdef TYPE_SOLO
+	# compile ESP32-SOLO-1
+    # make -j8 TYPE_SOLO=true
+    SDKCONFIG = $(PROJECT_PATH)/sdkconfig.solo
+    $(warning ${SDKCONFIG})
+else
+    SDKCONFIG = $(PROJECT_PATH)/sdkconfig
+    $(warning ${SDKCONFIG})
+endif
+INCLUDE_DIR= $(PWD)/../inc
+include $(IDF_PATH)/make/project.mk
+CFLAGS += -I$(INCLUDE_DIR) -Wno-restrict -Wno-format-overflow -D_FREE_RTOS_32_ -D_FREE_RTOS_32_BLE_
+CFLAGS += -DHAL_ESP -Wno-pointer-sign 
+#CFLAGS += -DSUPPORT_OTA_CHECK_PTID 
+
+#CFLAGS += -DBULB_VERSION 
+
+CFLAGS += -DMCU_VERSION 
+#CFLAGS += -DMCU_UPDATE_DEBUG
+CFLAGS += -DSUPPORT_TASK_MONITOR

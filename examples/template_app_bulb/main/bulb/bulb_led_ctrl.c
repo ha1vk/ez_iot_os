@@ -220,7 +220,6 @@ int32_t led_ctrl_rgb(int dst_lm, int dst_rgb, int sleep_ms, int rgb_loops)
     int tmp_lm = 0;
     int src_lm = g_led_current_param.brightness;
     int src_rgb = g_led_current_param.rgb;
-    ezlog_v(TAG_APP, "the src_rgb is 0x%x ,dst_rgb is 0x%x,rgb_loop=%d,sleep_ms=%d,src_lm=%d,dst_lm=%d\n ", src_rgb, dst_rgb, rgb_loops, sleep_ms, src_lm, dst_lm);
 
     if (dst_lm < 0 || dst_lm > 100)
     {
@@ -245,6 +244,7 @@ int32_t led_ctrl_rgb(int dst_lm, int dst_rgb, int sleep_ms, int rgb_loops)
     }
 
     dst_lm *= 10;
+    ezlog_v(TAG_APP, "the src_rgb is 0x%x ,dst_rgb is 0x%x,rgb_loop=%d,sleep_ms=%d,src_lm=%d,dst_lm=%d\n ", src_rgb, dst_rgb, rgb_loops, sleep_ms, src_lm, dst_lm);
 
     /* 进入彩光调节测试模式。
 	   若颜色开始值和结束值不一致，则进行颜色呼吸调节，亮度采用dst_lm
@@ -691,7 +691,6 @@ void led_ctrl_Task()
     while (1)
     {
         ezos_sem_wait(ctrl_sem, 1000000);
-        printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 
         ledctrl_do(g_stru_led_ctrl);
     }

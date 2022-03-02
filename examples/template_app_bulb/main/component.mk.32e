@@ -1,0 +1,40 @@
+#
+# "main" pseudo-component makefile.
+#
+# (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
+
+LIBS := -lez_iot -lez_linkcore -lmain
+
+# $(warning ${COMPONENT_PATH})
+LIBS_DIR=$(COMPONENT_PATH)/../../lib/esp32
+PROJECT_INC_DIR := ../../inc
+INCLUDE_DIR = ./peripherals/include ./at_cmd_impl ./at ./ymodem
+INCLUDE_DIR += ./bulb/include 
+INCLUDE_DIR += ./kv_ts_db/wrappers/esp32
+
+INCLUDE_DIR += ./kv_ts_db/FlashDB/inc
+INCLUDE_DIR += ./kv_ts_db/FlashDB/port/fal/inc
+
+INCLUDE_DIR += ./logger/inc
+INCLUDE_DIR += ./logger/wrappers/freertos
+
+INCLUDE_DIR += ${PROJECT_INC_DIR}/ez_utils/uuid 
+INCLUDE_DIR += ${PROJECT_INC_DIR}/ez_utils/ezlist  
+INCLUDE_DIR += ${PROJECT_INC_DIR}/ez_utils/http
+INCLUDE_DIR += ${PROJECT_INC_DIR}/ez_utils/http_server
+INCLUDE_DIR += ${PROJECT_INC_DIR}/ez_utils/ezkv
+
+INCLUDE_DIR += ${PROJECT_INC_DIR}/ez_hal
+
+
+
+
+
+src_ut_flashdb := ./kv_ts_db/FlashDB/src ./kv_ts_db/FlashDB/port/fal/src
+COMPONENT_ADD_LDFLAGS =  -Wl,--whole-archive,--start-group -L$(COMPONENT_PATH)/lib -L$(LIBS_DIR) ${LIBS} -mlongcalls -Wl,--end-group,-no-whole-archive
+
+COMPONENT_SRCDIRS += config kv_ts_db/wrappers/esp32 logger/ logger/src logger/wrappers/freertos $(src_ut_flashdb)
+COMPONENT_SRCDIRS += bulb
+COMPONENT_SRCDIRS += peripherals at_cmd_impl at ymodem
+
+COMPONENT_PRIV_INCLUDEDIRS := $(INCLUDE_DIR)
