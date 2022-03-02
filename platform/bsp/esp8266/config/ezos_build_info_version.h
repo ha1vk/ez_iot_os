@@ -4,8 +4,8 @@
 #define BUILD_VERSION_MAJOR   2
 #define BUILD_VERSION_MINOR   0
 #define BUILD_VERSION_MICRO   0
-#define BUILD_VERSION_DEV     2
-#define BUILD_GIT_COMMIT_ID   "g0bbc003"
+#define BUILD_VERSION_DEV     10
+#define BUILD_GIT_COMMIT_ID   "ge3e3b37"
 #define BUILD_GIT_IS_DIRTY    1
 
 //compile append define end
