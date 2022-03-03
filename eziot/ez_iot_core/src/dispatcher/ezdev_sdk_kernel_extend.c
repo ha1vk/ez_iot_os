@@ -34,13 +34,13 @@ EXTERN_QUEUE_BASE_FUN
 static EZDEV_SDK_UINT16 g_kernel_domains_count = 0;                             ///<	扩展数
 static EZDEV_SDK_UINT16 g_kernel_extend_count = 0;                              ///<	扩展数
 static ezdev_sdk_kernel_domain_info g_kernel_domains[CONFIG_EZIOT_CORE_EXTEND_COUNT];   ///<	扩展列表
-static ezdev_sdk_kernel_domain_info_v3 g_kernel_extend[CONFIG_EZIOT_CORE_EXTEND_COUNT]; ///<	扩展列表 V3协议
+static ezdev_sdk_kernel_domain_info_v3 g_kernel_extend[CONFIG_EZIOT_CORE_EXTEND_COUNT_V3]; ///<	扩展列表 V3协议
 static sdk_kernel_event_notice g_kernel_event_notice_cb;                        ///<	SDK回调给上层的通知消息
 
 void extend_init(sdk_kernel_event_notice kernel_event_notice_cb)
 {
     g_kernel_domains_count = CONFIG_EZIOT_CORE_EXTEND_COUNT;
-    g_kernel_extend_count = CONFIG_EZIOT_CORE_EXTEND_COUNT;
+    g_kernel_extend_count = CONFIG_EZIOT_CORE_EXTEND_COUNT_V3;
     ezos_memset(&g_kernel_domains, 0, sizeof(ezdev_sdk_kernel_domain_info) * g_kernel_domains_count);
     ezos_memset(&g_kernel_extend, 0, sizeof(ezdev_sdk_kernel_domain_info_v3) * g_kernel_extend_count);
     g_kernel_event_notice_cb = kernel_event_notice_cb;
@@ -228,79 +228,6 @@ static mkernel_internal_error consume_extend_data(ezdev_sdk_kernel *sdk_kernel)
  *				将该消息分发至所有领域，如果是extend_cb_event类事件，还将分发到上层应用
  *  \return		成功返回0 失败详见错误码
  */
-/*static mkernel_internal_error consume_extend_event_v3()
-{
-    EZDEV_SDK_UINT16 index = 0;
-    mkernel_internal_error kernel_error = mkernel_internal_succ;
-    ezdev_sdk_kernel_inner_cb_notic *ptr_inner_cb_notic = NULL;
-    kernel_error = pop_queue_inner_cb_notic(&ptr_inner_cb_notic);
-    if (kernel_error == mkernel_internal_queue_empty)
-    {
-        return kernel_error;
-    }
-    if (kernel_error != mkernel_internal_succ || NULL == ptr_inner_cb_notic)
-    {
-        ezlog_d(TAG_CORE, "pop_queue_event error");
-        return kernel_error;
-    }
-
-    if (ptr_inner_cb_notic->cb_type == extend_cb_start)
-    {
-        for (index = 0; index < CONFIG_EZIOT_CORE_EXTEND_COUNT; index++)
-        {
-            if (g_kernel_extend[index].kernel_extend.extend_id == 0 || g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_extend_start == NULL)
-                break;
-            g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_extend_start(g_kernel_extend[index].kernel_extend.pUser);
-        }
-    }
-    else if (ptr_inner_cb_notic->cb_type == extend_cb_stop)
-    {
-        for (index = 0; index < CONFIG_EZIOT_CORE_EXTEND_COUNT; index++)
-        {
-            if (g_kernel_extend[index].kernel_extend.extend_id == 0 || g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_extend_stop == NULL)
-                break;
-            g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_extend_stop(g_kernel_extend[index].kernel_extend.pUser);
-        }
-    }
-    else if (ptr_inner_cb_notic->cb_type == extend_cb_event)
-    {
-        sdk_send_msg_ack_context *ptr_ack_ctx = NULL;
-        if (SDK_KERNEL_EVENT_RUNTIME_ERR == ptr_inner_cb_notic->cb_event.event_type)
-        {
-            sdk_runtime_err_context *rt_err_ctx = (sdk_runtime_err_context *)(ptr_inner_cb_notic->cb_event.event_context);
-            if (TAG_MSG_ACK == rt_err_ctx->err_tag)
-                ptr_ack_ctx = (sdk_send_msg_ack_context *)rt_err_ctx->err_ctx;
-        }
-
-        for (index = 0; index < CONFIG_EZIOT_CORE_EXTEND_COUNT; index++)
-        {
-            if (g_kernel_extend[index].kernel_extend.extend_id == 0 || g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_extend_event == NULL)
-                break;
-
-            //消息回执只回调给对应的领域
-            if (ptr_ack_ctx && g_kernel_extend[index].kernel_extend.extend_id != ptr_ack_ctx->msg_extend_id)
-                continue;
-
-            g_kernel_extend[index].kernel_extend.ezdev_sdk_kernel_extend_event(&ptr_inner_cb_notic->cb_event, g_kernel_extend[index].kernel_extend.pUser);
-        }
-
-        //消息回执不需要回调给APP
-        if (NULL == ptr_ack_ctx)
-            g_kernel_event_notice_cb(&ptr_inner_cb_notic->cb_event);
-    }
-
-    destroy_inner_cb_notic(ptr_inner_cb_notic);
-
-    return kernel_error;
-}*/
-
-/** 
- *  \brief		本地消息分发
- *  \method		consume_extend_event
- *	\note		将来自本地各线程的消息队列中按先进先出的原则获取第一个消息，
- *				将该消息分发至所有领域，如果是extend_cb_event类事件，还将分发到上层应用
- *  \return		成功返回0 失败详见错误码
- */
 static mkernel_internal_error consume_extend_event()
 {
     EZDEV_SDK_UINT16 index = 0;
@@ -346,7 +273,7 @@ static mkernel_internal_error consume_extend_event()
             g_kernel_domains[index].kernel_extend.ezdev_sdk_kernel_extend_event(&ptr_inner_cb_notic->cb_event, g_kernel_domains[index].kernel_extend.pUser);
         }
 
-        for (index = 0; index < CONFIG_EZIOT_CORE_EXTEND_COUNT; index++)
+        for (index = 0; index < CONFIG_EZIOT_CORE_EXTEND_COUNT_V3; index++)
         {
             if (ezos_strlen(g_kernel_extend[index].kernel_extend.module) == 0 ||
                 g_kernel_extend[index].kernel_extend.ez_kernel_event_route == NULL)

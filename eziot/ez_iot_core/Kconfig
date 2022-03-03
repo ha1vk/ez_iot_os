@@ -51,6 +51,12 @@ config EZIOT_CORE_EXTEND_COUNT
     default 8
     depends on EZIOT_CORE_ENABLE
 
+config EZIOT_CORE_EXTEND_COUNT_V3
+    int "Maximum number of ezviz protocol v3.0 business modules"
+    range 0 32
+    default 8
+    depends on EZIOT_CORE_ENABLE
+
 config EZIOT_CORE_RISK_CONTROL_CMD_MAX
     int "Maximum number of risk control commands"
     range 0 64
