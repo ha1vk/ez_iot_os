@@ -905,7 +905,7 @@ int disable_light_switch_plan(int index)
             break;
         }
 
-        rv = config_get_value(LIGHTSWITCHPLAN, buf, &buf_len);
+        rv = config_get_value(K_LIGHTSWITCHPLAN, buf, &buf_len);
         if (0 != rv)
         {
             ezlog_e(TAG_APP, "get light switch plan failed.");
@@ -951,7 +951,7 @@ int disable_light_switch_plan(int index)
             break;
         }
 
-        if (0 != config_set_value(LIGHTSWITCHPLAN, (void *)buf_new, strlen(buf_new)))
+        if (0 != config_set_value(K_LIGHTSWITCHPLAN, (void *)buf_new, strlen(buf_new)))
         {
             free(buf_new);
             break;
@@ -1167,11 +1167,11 @@ int disable_light_sleep_plan(int index,ez_bool_t helpsleep)
         }
         if(helpsleep)
         {
-            rv = config_get_value(HELPSLEEP, buf, &buf_len);
+            rv = config_get_value(K_HELPSLEEP, buf, &buf_len);
         }
         else
         {
-            rv = config_get_value(WAKEUP, buf, &buf_len);
+            rv = config_get_value(K_WAKEUP, buf, &buf_len);
         }
 
         if (0 != rv)
@@ -1214,14 +1214,14 @@ int disable_light_sleep_plan(int index,ez_bool_t helpsleep)
 
         if(helpsleep)
         {
-            config_set_value(HELPSLEEP, (void *)buf_new, strlen(buf_new));
+            config_set_value(K_HELPSLEEP, (void *)buf_new, strlen(buf_new));
             g_bulb_param.help_sleep_plan.plan[index].enabled = 0;
             user_property_report("HelpSleep");
 
         }
         else
         {
-            config_set_value(WAKEUP, (void *)buf_new, strlen(buf_new));
+            config_set_value(K_WAKEUP, (void *)buf_new, strlen(buf_new));
             g_bulb_param.wakeup_plan.plan[index].enabled = 0;
             user_property_report("WakeUp");
         }
@@ -1327,7 +1327,7 @@ int disable_countdown()
             break;
         }
 
-        rv = config_get_value(COUNTDOWNCFG, buf, &buf_len);
+        rv = config_get_value(K_COUNTDOWNCFG, buf, &buf_len);
         if (0 != rv)
         {
             ezlog_e(TAG_APP, "get light switch plan failed.");
@@ -1356,7 +1356,7 @@ int disable_countdown()
             break;
         }
 
-        if (0 != config_set_value(LIGHTSWITCHPLAN, (void *)buf_new, strlen(buf_new)))
+        if (0 != config_set_value(K_LIGHTSWITCHPLAN, (void *)buf_new, strlen(buf_new)))
         {
             free(buf_new);
             break;

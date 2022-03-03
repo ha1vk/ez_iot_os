@@ -8,54 +8,54 @@ extern "C"
 
     typedef enum
     {
-        AP_ENABLE,    // ap_enable
-        FIRST_BOOT,   // first_boot
-        AP_TIME_OUT,  // ap_time_out
-        POWER_ON_NUM, // power_on_num
+        K_AP_ENABLE,    // ap_enable
+        K_FIRST_BOOT,   // first_boot
+        K_AP_TIME_OUT,  // ap_time_out
+        K_POWER_ON_NUM, // power_on_num
 
-        WIFI_SSID,
-        WIFI_PASSWORD,
-        WIFI_CC,
-        WIFI_IP,
-        WIFI_MASK,
-        WIFI_GATEWAY,
+        K_WIFI_SSID,
+        K_WIFI_PASSWORD,
+        K_WIFI_CC,
+        K_WIFI_IP,
+        K_WIFI_MASK,
+        K_WIFI_GATEWAY,
 
-        BOOT_LABEL,
-        OTA_CODE,
+        K_BOOT_LABEL,
+        K_OTA_CODE,
 
-        LOG_LEVEL,
-        LOG_REC_START,
+        K_LOG_LEVEL,
+        K_LOG_REC_START,
 
-        PT_PARA1,
-        PT_PARA2,
+        K_PT_PARA1,
+        K_PT_PARA2,
 
-        DAYLIGHT,
-        NTP_SERVER,
-        TIMEZONE,
-        DATLIGHT_STR,
+        K_DAYLIGHT,
+        K_NTP_SERVER,
+        K_TIMEZONE,
+        K_DATLIGHT_STR,
 
-        DOMAIN,
-        DEVICE_ID,
-        USER_ID,
-        MASTERKEY,
+        K_DOMAIN,
+        K_DEVICE_ID,
+        K_USER_ID,
+        K_MASTERKEY,
 
-        DEV_LIST,
+        K_DEV_LIST,
 
-        SWITCH,
-        COLORTEMPERATURE,
-        BRIGHTNESS,
-        COUNTDOWNCFG,
-        LIGHTSWITCHPLAN,
-        WORKMODE,
-        CUSTOMSCENECFG,
-        COUNTDOWN,
-        COLORRGB,
-        MUSICRHYTHM,
-        BIORHYTHM,
-        WAKEUP,
-        HELPSLEEP,
-        TIMEMGR,
-        WIFISTATUS,
+        K_SWITCH,
+        K_COLORTEMPERATURE,
+        K_BRIGHTNESS,
+        K_COUNTDOWNCFG,
+        K_LIGHTSWITCHPLAN,
+        K_WORKMODE,
+        K_CUSTOMSCENECFG,
+        K_COUNTDOWN,
+        K_COLORRGB,
+        K_MUSICRHYTHM,
+        K_BIORHYTHM,
+        K_WAKEUP,
+        K_HELPSLEEP,
+        K_TIMEMGR,
+        K_WIFISTATUS,
     } bulb_key_e;
 
     /**

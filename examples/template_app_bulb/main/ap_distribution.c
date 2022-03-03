@@ -36,14 +36,14 @@ printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__)
     int ret = 0; 
     do
     {
-        ret |= config_set_value(WIFI_SSID, wifi_info.ssid, sizeof(wifi_info.ssid));
-        ret |= config_set_value(WIFI_PASSWORD, wifi_info.password, sizeof(wifi_info.password));
-        ret |= config_set_value(WIFI_CC, wifi_info.cc, sizeof(wifi_info.cc));
+        ret |= config_set_value(K_WIFI_SSID, wifi_info.ssid, sizeof(wifi_info.ssid));
+        ret |= config_set_value(K_WIFI_PASSWORD, wifi_info.password, sizeof(wifi_info.password));
+        ret |= config_set_value(K_WIFI_CC, wifi_info.cc, sizeof(wifi_info.cc));
 
-        ret |= config_set_value(DOMAIN, wifi_info.domain, sizeof(wifi_info.domain));
+        ret |= config_set_value(K_DOMAIN, wifi_info.domain, sizeof(wifi_info.domain));
         if (0 != strlen(wifi_info.device_id))
         {
-            ret |= config_set_value(DEVICE_ID, wifi_info.device_id, sizeof(wifi_info.device_id));
+            ret |= config_set_value(K_DEVICE_ID, wifi_info.device_id, sizeof(wifi_info.device_id));
         }
 
         if (0 != ret)
@@ -144,7 +144,7 @@ void power_on_num_clear_task()
 	vTaskDelay(10000 / portTICK_PERIOD_MS); //10s 后再清空，避免进入配网之后又误操作按了一次，无法进入配网
 
     int power_on_num = 0;
-    int ret = config_set_value(POWER_ON_NUM, &power_on_num, sizeof(power_on_num));
+    int ret = config_set_value(K_POWER_ON_NUM, &power_on_num, sizeof(power_on_num));
     if (0 != ret)
     {
         ezlog_e(TAG_APP, "set value failed. key: POWER_ON_NUM");
@@ -162,7 +162,7 @@ void need_ap_config(void)
     int first_boot = 1;
     int len = sizeof(first_boot);
 
-    int ret = config_get_value(FIRST_BOOT, &first_boot, &len);
+    int ret = config_get_value(K_FIRST_BOOT, &first_boot, &len);
     if (0 != ret)
     {
         ezlog_e(TAG_APP, "get valued failed. key: FIRST_BOOT");
@@ -172,7 +172,7 @@ void need_ap_config(void)
     if (1 == first_boot)
     {
         first_boot = 0;
-        if (0 != config_set_value(FIRST_BOOT, &first_boot, sizeof(first_boot)))
+        if (0 != config_set_value(K_FIRST_BOOT, &first_boot, sizeof(first_boot)))
         {
             ezlog_e(TAG_APP, "need_ap_config 111 config_write error!\n");
         }
@@ -185,7 +185,7 @@ void need_ap_config(void)
     //2、电源开关开关开
     int power_on_num = 0;
     len = sizeof(power_on_num);
-    if (0 != config_get_value(POWER_ON_NUM, &power_on_num, &len))
+    if (0 != config_get_value(K_POWER_ON_NUM, &power_on_num, &len))
     {
         ezlog_e(TAG_APP, "get value failed.");
         return;
@@ -203,7 +203,7 @@ void need_ap_config(void)
     //3、手机APP重置
     int enable = 0;
     len = sizeof(enable);
-    ret = config_get_value(AP_ENABLE, &enable, &len);
+    ret = config_get_value(K_AP_ENABLE, &enable, &len);
     if (0 != ret)
     {
         ezlog_e(TAG_APP, "get valued failed. key: AP_ENABLE");
@@ -216,7 +216,7 @@ void need_ap_config(void)
 
         ezlog_i(TAG_APP, "app reset need ap config!\n");
 
-        if (0 != config_set_value(AP_ENABLE, &enable, sizeof(enable)))
+        if (0 != config_set_value(K_AP_ENABLE, &enable, sizeof(enable)))
         {
             ezlog_e(TAG_APP, "set value failed!");
         }
@@ -236,7 +236,7 @@ int ap_config_checkupdate(void)
     {
         int power_on_num = 0;
         int len = sizeof(power_on_num);
-        if (0 != config_get_value(POWER_ON_NUM, &power_on_num, &len))
+        if (0 != config_get_value(K_POWER_ON_NUM, &power_on_num, &len))
         {
             ezlog_e(TAG_APP, "read ap cfg");
             break;
@@ -245,7 +245,7 @@ int ap_config_checkupdate(void)
         ezlog_i(TAG_APP, "power_on_num[%d]", power_on_num);
         power_on_num++;
 
-        if (0 != config_set_value(POWER_ON_NUM, &power_on_num, sizeof(power_on_num)))
+        if (0 != config_set_value(K_POWER_ON_NUM, &power_on_num, sizeof(power_on_num)))
         {
             ezlog_e(TAG_APP, "set value failed.");
             break;
@@ -288,8 +288,8 @@ ez_bool_t ap_distribution_set(ez_bool_t enable, ez_int_t timeout)
 
         int len = sizeof(int);
 
-        ret = config_set_value(AP_ENABLE, &ap_enable, len);
-        ret |= config_set_value(AP_TIME_OUT, &ap_timeout, len);
+        ret = config_set_value(K_AP_ENABLE, &ap_enable, len);
+        ret |= config_set_value(K_AP_TIME_OUT, &ap_timeout, len);
     } while (false);
     
     if (0 != ret)
@@ -310,7 +310,7 @@ void wifi_connect_do(void)
     char ssid[33] = {0};
     int len = sizeof(ssid);
 
-    if (0 != config_get_value(WIFI_SSID, &ssid, &len))
+    if (0 != config_get_value(K_WIFI_SSID, &ssid, &len))
     {
         return;
     }
@@ -323,7 +323,7 @@ void wifi_connect_do(void)
 
     char password[65] = {0};
     len = sizeof(password);
-    if (0 != config_get_value(WIFI_PASSWORD, &password, &len))
+    if (0 != config_get_value(K_WIFI_PASSWORD, &password, &len))
     {
         return;
     }

@@ -106,7 +106,7 @@ static ez_int32_t property_countdowncfg_up(ez_tsl_value_t *p_stru_key_value)
         }
         p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
     
-        if (0 != config_get_value(COUNTDOWNCFG, p_stru_key_value->value, &len_tmp))
+        if (0 != config_get_value(K_COUNTDOWNCFG, p_stru_key_value->value, &len_tmp))
         {
             break;
         }
@@ -131,7 +131,7 @@ static ez_int32_t property_lightswitchplan_up(ez_tsl_value_t *p_stru_key_value)
 
         p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
 
-        if (0 != config_get_value(LIGHTSWITCHPLAN, p_stru_key_value->value, &len_tmp))
+        if (0 != config_get_value(K_LIGHTSWITCHPLAN, p_stru_key_value->value, &len_tmp))
         {
             break;
         }
@@ -176,7 +176,7 @@ static ez_int32_t property_biorhythm_up(ez_tsl_value_t *p_stru_key_value)
 		{
 			break;
 		}
-		if (0 != config_get_value(BIORHYTHM, p_stru_key_value->value, &len_tmp))
+		if (0 != config_get_value(K_BIORHYTHM, p_stru_key_value->value, &len_tmp))
         {
             break;
         }
@@ -223,7 +223,7 @@ static ez_int32_t property_helpsleep_up(ez_tsl_value_t *p_stru_key_value)
 		{
 			break;
 		}
-		if (0 != config_get_value(HELPSLEEP, p_stru_key_value->value, &len_tmp))
+		if (0 != config_get_value(K_HELPSLEEP, p_stru_key_value->value, &len_tmp))
         {
             break;
         }
@@ -270,7 +270,7 @@ static ez_int32_t property_customscenecfg_up(ez_tsl_value_t *p_stru_key_value)
 		{
 			break;
 		}
-		if (0 != config_get_value(CUSTOMSCENECFG, p_stru_key_value->value, &len_tmp))
+		if (0 != config_get_value(K_CUSTOMSCENECFG, p_stru_key_value->value, &len_tmp))
         {
             break;
         }
@@ -295,7 +295,7 @@ static ez_int32_t property_wakeup_up(ez_tsl_value_t *p_stru_key_value)
 		{
 			break;
 		}
-		if (0 != config_get_value(WAKEUP, p_stru_key_value->value, &len_tmp))
+		if (0 != config_get_value(K_WAKEUP, p_stru_key_value->value, &len_tmp))
         {
             break;
         }
@@ -435,7 +435,7 @@ static ez_int32_t property_countdowncfg_set(ez_tsl_value_t *p_stru_key_value)
 	
 	set_light_countdown(p_stru_key_value->value);
 	
-	config_set_value(COUNTDOWNCFG,(void *)p_stru_key_value->value,p_stru_key_value->size);
+	config_set_value(K_COUNTDOWNCFG,(void *)p_stru_key_value->value,p_stru_key_value->size);
 	return EZ_BASE_ERR_SUCC;
 }
 
@@ -448,7 +448,7 @@ static ez_int32_t property_lightswitchplan_set(ez_tsl_value_t *p_stru_key_value)
 
 	set_light_plan(p_stru_key_value->value);
 	
-	config_set_value(LIGHTSWITCHPLAN,(void *)p_stru_key_value->value,p_stru_key_value->size);
+	config_set_value(K_LIGHTSWITCHPLAN,(void *)p_stru_key_value->value,p_stru_key_value->size);
 
 	return EZ_BASE_ERR_SUCC;
 }
@@ -489,7 +489,7 @@ static ez_int32_t property_biorhythm_set(ez_tsl_value_t *p_stru_key_value)
 
 	set_light_biorhythm(p_stru_key_value->value);
     
-	config_set_value(BIORHYTHM,(void *)p_stru_key_value->value,p_stru_key_value->size);
+	config_set_value(K_BIORHYTHM,(void *)p_stru_key_value->value,p_stru_key_value->size);
 	return EZ_BASE_ERR_SUCC;
 }
 
@@ -519,7 +519,7 @@ static ez_int32_t property_helpsleep_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	
-    config_set_value(HELPSLEEP,(void *)p_stru_key_value->value,p_stru_key_value->size);
+    config_set_value(K_HELPSLEEP,(void *)p_stru_key_value->value,p_stru_key_value->size);
 	
 	set_light_helpsleep(p_stru_key_value->value);
 	return EZ_BASE_ERR_SUCC;
@@ -543,7 +543,7 @@ static ez_int32_t property_customscenecfg_set(ez_tsl_value_t *p_stru_key_value)
 	{
 		return -1;
 	}
-    config_set_value(CUSTOMSCENECFG,(void *)p_stru_key_value->value,p_stru_key_value->size);
+    config_set_value(K_CUSTOMSCENECFG,(void *)p_stru_key_value->value,p_stru_key_value->size);
 
 	set_light_scene(p_stru_key_value->value);
 
@@ -556,7 +556,7 @@ static ez_int32_t property_wakeup_set(ez_tsl_value_t *p_stru_key_value)
 	{
 		return -1;
 	}
-    config_set_value(WAKEUP,(void *)p_stru_key_value->value,p_stru_key_value->size);
+    config_set_value(K_WAKEUP,(void *)p_stru_key_value->value,p_stru_key_value->size);
 
 	set_light_wakeup(p_stru_key_value->value);
 	return EZ_BASE_ERR_SUCC;
