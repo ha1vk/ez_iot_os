@@ -1,5 +1,5 @@
-cd ./platform/bsp/linux
+cd ./platform/bsp/$1
 mkdir build
 cd ./build
 cmake ..
-make
+make V=1
