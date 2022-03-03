@@ -89,34 +89,34 @@ int report_wifi_info(ez_tsl_value_t *value_out)
         char dev_firmwareversion[64] = {0};
         mk_soft_version(dev_firmwareversion);
         
-        if(0 != config_get_value(WIFI_SSID,&wifi_info.ssid,&ssid_len))
+        if(0 != config_get_value(K_WIFI_SSID,&wifi_info.ssid,&ssid_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_SSID error!");
             break;
         }
         ezlog_e(TAG_APP, "config_read WIFI_SSID is:%s",wifi_info.ssid);
-        if(0 != config_get_value(WIFI_PASSWORD,&wifi_info.password,&password_len))
+        if(0 != config_get_value(K_WIFI_PASSWORD,&wifi_info.password,&password_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_PASSWORD error!");
             break;
         }
-        if(0 != config_get_value(WIFI_CC,&wifi_info.cc,&cc_len))
+        if(0 != config_get_value(K_WIFI_CC,&wifi_info.cc,&cc_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_CC error!");
             break;
         }
-        if(0 != config_get_value(WIFI_IP,&wifi_info.ip,&ip_len))
+        if(0 != config_get_value(K_WIFI_IP,&wifi_info.ip,&ip_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_IP error!");
             break;
         }
         ezlog_e(TAG_APP, "config_read WIFI_IP is:%s",wifi_info.ip);
-        if(0 != config_get_value(WIFI_MASK,&wifi_info.mask,&mask_len))
+        if(0 != config_get_value(K_WIFI_MASK,&wifi_info.mask,&mask_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_MASK error!");
             break;
         }
-        if(0 != config_get_value(WIFI_GATEWAY,&wifi_info.gateway,&gateway_len))
+        if(0 != config_get_value(K_WIFI_GATEWAY,&wifi_info.gateway,&gateway_len))
         {
             ezlog_e(TAG_APP, "config_read IFI_GATEWAY error!");
             break;
@@ -456,7 +456,7 @@ void online_access()
         char ssid[33] = {0};
         len = sizeof(ssid);
 
-        ret = config_get_value(WIFI_SSID, ssid, &len);
+        ret = config_get_value(K_WIFI_SSID, ssid, &len);
         if (0 != ret)
         {
             ezlog_e(TAG_APP, "get ssid failed.");
@@ -465,7 +465,7 @@ void online_access()
 
         len = sizeof(domain);
 
-        ret = config_get_value(DOMAIN, domain, &len);
+        ret = config_get_value(K_DOMAIN, domain, &len);
         if (0 != ret)
         {
             ezlog_e(TAG_APP, "get domain failed.");
@@ -484,7 +484,7 @@ void online_access()
 
         len = sizeof(device_id);
 
-        ret = config_get_value(DEVICE_ID, device_id, &len);
+        ret = config_get_value(K_DEVICE_ID, device_id, &len);
         if (0 != ret)
         {
             ezlog_e(TAG_APP, "get device_id failed.");
