@@ -624,11 +624,19 @@ static ez_int32_t property_netstatus_set(ez_tsl_value_t *p_stru_key_value)
 	return EZ_BASE_ERR_SUCC;
 }
 
-static void action_getcountdown(char *data,char *value)
+static int action_getcountdown(const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out)
 {
+    value_out->value = action_get_countdown();
+    if (NULL == value_out->value)
+    {
+        return -1;
+    }
 
+    value_out->type = EZ_TSL_DATA_TYPE_OBJECT;
 
+    value_out->size = strlen(value_out->value);  
 
+    return EZ_BASE_ERR_SUCC;
 }
 
 
@@ -648,15 +656,15 @@ property_cmd_t property_cmd[]=
 	{"WakeUp","RGBLightCtrl","global","0",property_wakeup_set,property_wakeup_up},
 	{"WorkMode","RGBLightCtrl","global","0",property_workmode_set,property_workmode_up},
 	{"TimeZoneCompose","TimeMgr","global","0",property_timezonecompose_set,property_timezonecompose_up},
-	{"NetStatus","WifiStatus","global","0",property_netstatus_set,property_netstatus_up},
+	{"NetStatus","WifiStatus","global","0",property_netstatus_set,property_netstatus_up}, 
 
     {NULL,NULL,NULL,NULL,NULL,NULL}
 };
 
 action_cmd_t action_cmd[]=
 {
-    {"LightCtrl","getcountdown",action_getcountdown},
-    {NULL,NULL,NULL}
+    {"GetCountdown",action_getcountdown},
+    {NULL,NULL}
 };
 
 ez_int32_t tsl_notice(ez_tsl_event_e event_type, ez_void_t *data, ez_int32_t len)

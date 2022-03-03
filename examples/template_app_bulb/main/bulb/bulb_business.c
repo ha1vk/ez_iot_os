@@ -1290,7 +1290,7 @@ int json2param_countdown(char *json_string, switch_countdown_t *p_countdown)
 
     countdown_tmp.enabled = js_enable->valueint;
     countdown_tmp.swit = js_switch->valueint;
-    countdown_tmp.time_remain = js_timeRemaining->valueint;
+    countdown_tmp.time_remain_config = js_timeRemaining->valueint;
 
     cJSON *js_time_stamp = cJSON_GetObjectItem(js_root, "reportTimestamp");
     if(NULL == js_time_stamp)
@@ -1304,7 +1304,7 @@ int json2param_countdown(char *json_string, switch_countdown_t *p_countdown)
     ezlog_i(TAG_APP, "countdown swit=%d,enable=%d,timermain=%d,time_stamp=%ld",
                 countdown_tmp.swit,
                 countdown_tmp.enabled,
-                countdown_tmp.time_remain,
+                countdown_tmp.time_remain_config,
                 countdown_tmp.time_stamp);
 
     memcpy(p_countdown, &countdown_tmp, sizeof(countdown_tmp));
@@ -1378,6 +1378,56 @@ int disable_countdown()
     }
 
     return rv;
+}
+
+void *action_get_countdown()
+{
+
+    cJSON *js_root = NULL;
+    char *buf_json_format = NULL;
+    do
+    { 
+        js_root = cJSON_CreateObject();
+        if (NULL == js_root)
+        {          
+            ezlog_e(TAG_APP, "creat countdown json failed,no memory");
+        }
+
+        if(g_bulb_param.countdown.enabled)
+        {
+            cJSON_AddTrueToObject(js_root, "enable");
+        }
+        else
+        {
+            cJSON_AddFalseToObject(js_root, "enable");
+        }
+
+        if(g_bulb_param.countdown.swit)
+        {
+            cJSON_AddTrueToObject(js_root, "switch");
+        }
+        else
+        {
+            cJSON_AddFalseToObject(js_root, "switch");
+        }
+       
+        cJSON_AddNumberToObject(js_root, "timeRemaining", g_bulb_param.countdown.time_remain_now);
+   
+        ezos_time_t time_now = ezos_time(NULL);
+        cJSON_AddNumberToObject(js_root, "reportTimestamp", time_now);
+ 
+        buf_json_format = cJSON_PrintUnformatted(js_root);
+
+        if (NULL == buf_json_format)
+        {
+            ezlog_e(TAG_APP, "format countdown json failed,no memory");
+            break;
+        }
+    } while (0);
+
+    js_root ? cJSON_Delete(js_root) : 0;
+
+    return buf_json_format;
 }
 
 
@@ -1682,7 +1732,7 @@ static ez_bool_t cycle_plan_do_sleep(light_sleep_metadata_t *pplan,ez_bool_t wee
     
         min_now = ptm_time_now.tm_hour*60 + ptm_time_now.tm_min;
 
-        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): min_start=%d %d,week=%d helpsleep=%d,%d\n ",__LINE__, __func__,min_start,min_now,week,helpsleep,pplan->start_count );
+        //printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): min_start=%d %d,week=%d helpsleep=%d,count =%d\n ",__LINE__, __func__,min_start,min_now,week,helpsleep,pplan->start_count );
         
         
         if (min_now >= min_start
@@ -1786,23 +1836,6 @@ static void switch_plan_timer()
     }
 }
 
-/*
-	考虑到NTP校时,设备时间会比正常时间慢
-*/
-static int8_t is_countdown_up(switch_countdown_t *p_countdown)
-{
-    ezos_time_t time_now = ezos_time(NULL);
-
-    if (time_now > (p_countdown->time_stamp + p_countdown->time_remain))
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 void countdown_timer()
 {
     switch_countdown_t *p_countdown = &g_bulb_param.countdown;
@@ -1811,9 +1844,14 @@ void countdown_timer()
     {
         return;
     }
+    
+    ezos_time_t time_now = ezos_time(NULL);
 
-    if (is_countdown_up(p_countdown))
+    p_countdown->time_remain_now = time_now - p_countdown->time_stamp ;
+     
+    if (p_countdown->time_remain_now <= 0)
     {
+        p_countdown->time_remain_now = 0;
         ezlog_w(TAG_LIGHT, "countdown timeup!!!");
         if (0 == p_countdown->swit)
         {
@@ -1826,8 +1864,6 @@ void countdown_timer()
         
         disable_countdown();
     }
-
-    
 
     return;
 }

@@ -108,7 +108,8 @@ typedef struct
 {
     ez_int8_t enabled;
     ez_int8_t swit;                 //开关
-    ez_int32_t time_remain;
+    ez_int32_t time_remain_config;
+    ez_int32_t time_remain_now;
     ezos_time_t time_stamp;
 } switch_countdown_t;
 
@@ -171,6 +172,8 @@ int set_light_helpsleep(char *json_string);
 int set_light_biorhythm(char *json_string);
 
 int set_light_countdown(char *json_string);
+
+void *action_get_countdown();
 
 
 //ez_int32_t countdown_light_on(ez_int32_t count_down);
