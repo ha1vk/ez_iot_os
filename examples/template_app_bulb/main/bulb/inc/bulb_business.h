@@ -148,6 +148,9 @@ ez_int32_t get_light_brightness();
 ez_int32_t get_light_color_temperature();
 ez_int32_t get_light_color_rgb();
 ez_int32_t get_light_mode();
+
+void* get_light_param();
+
 void set_light_mode();
 
 //ez_int32_t get_light_countdown_on_left_time();
