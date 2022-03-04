@@ -111,7 +111,10 @@ int main(int argc, char **argv)
     signal(SIGPIPE, SIG_IGN);
     #endif
 
-    if (0 != product_config_init())
+    if (0 != product_config_init()
+        || (0 != config_init())
+        
+        )
     {
         ezlog_a(TAG_AP, "global init failed!");
         return 0;

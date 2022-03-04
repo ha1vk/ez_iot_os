@@ -2014,6 +2014,11 @@ void set_light_mode(int mode)
     g_bulb_param.mode = mode;
 }
 
+void* get_light_param()
+{
+    return &g_bulb_param;
+}
+
 void bulb_ctrl_init()
 {
     ez_err_t rv = EZ_CORE_ERR_SUCC;

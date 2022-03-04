@@ -449,7 +449,7 @@ int parse_product_config(cJSON *root)
 		}
 
 
-    print();
+    //print();
 
     return 0;
 }

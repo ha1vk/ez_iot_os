@@ -8,7 +8,9 @@ extern "C"
 
     typedef enum
     {
-        K_AP_ENABLE,    // ap_enable
+
+        K_PARAM_VER,
+		K_AP_ENABLE,    // ap_enable
         K_FIRST_BOOT,   // first_boot
         K_AP_TIME_OUT,  // ap_time_out
         K_POWER_ON_NUM, // power_on_num
@@ -118,6 +120,8 @@ extern "C"
 
 	/* 日志记录到flash ，指定级别类的串口打印记录到设备*/
 	void set_logRec_start(int bLogRecStart);
+
+    int config_init(void);
 	
 #ifdef __cplusplus
 }
