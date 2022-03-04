@@ -9,6 +9,7 @@
 #include "dev_init.h"
 #include "dev_info.h"
 #include "product_config.h"
+#include "bulb_business.h"
 
 static int ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, void *data, int len);
 extern ez_int32_t eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void));
@@ -17,8 +18,7 @@ static void download_result_cb(ez_ota_cb_result_e result, void *user_data);
 static void show_upgrade_info(ez_ota_upgrade_info_t *upgrade_infos);
 char g_PTID[72]={0};
 static int bAppUpgrading = ez_false;
-// char g_mod_name;
-// EZ_INT16 g_progress;
+EZ_INT16 last_progress = -1;
 
 int ez_ota_init()
 {
@@ -87,6 +87,7 @@ static int ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, void *data
     switch (event)
     {
     case START_UPGRADE: {
+		bulb_ctrl_deinit();
         ez_ota_upgrade_info_t *upgrade_infos = (ez_ota_upgrade_info_t *)data;
         if (NULL == upgrade_infos || sizeof(ez_ota_upgrade_info_t) != len)
         {
@@ -149,14 +150,6 @@ static void show_upgrade_info(ez_ota_upgrade_info_t *upgrade_infos)
     }
 }
 
-static void fun1(void)
-{
-    ezlog_e(TAG_OTA, "up g_progress" );
-    //ez_iot_ota_progress_report(NULL, g_mod_name, OTA_STATE_DOWNLOADING, g_progress);
-    return;
-}
-
-
 static int download_data_cb(EZ_UINT32  total_len, EZ_UINT32  offset, void *data, EZ_UINT32  len, void *user_data)
 {
     ez_ota_res_t pres = {0};
@@ -173,6 +166,7 @@ static int download_data_cb(EZ_UINT32  total_len, EZ_UINT32  offset, void *data,
 		if(0 == offset )//
 		{
 			ezlog_i(TAG_OTA, "starting ota to partition ,first erase partition");
+			ez_iot_ota_progress_report(NULL, pStruUserOtaData->mod_name, OTA_STATE_DOWNLOADING, 0);
 			//esp  擦除flash会假死8到10s，这里先slepp 2s ，让系统正常运转将升级response 发出去 
             ezos_delay_ms(2000);
 			rv = esp_ota_begin(pStruUserOtaData->pUpdate_partition, OTA_SIZE_UNKNOWN, &pStruUserOtaData->update_handle);
@@ -235,65 +229,51 @@ static int download_data_cb(EZ_UINT32  total_len, EZ_UINT32  offset, void *data,
         ezlog_e(TAG_OTA, "ota progress= %d",progress);
         //g_progress=progress;
         //g_mod_name=pStruUserOtaData->mod_name;  
-    if(progress==0&&offset==0)
+    if(progress!=last_progress&&(progress%10==0))   
 	{
-        //timer=eztimer_create("timer1",5000,ez_true,fun1);
-		//开启定时器
-        ezlog_e(TAG_OTA, "timer is open");
+       ez_iot_ota_progress_report(NULL, pStruUserOtaData->mod_name, OTA_STATE_DOWNLOADING, progress);
 	}
 	if(progress==100)
 	{
-        //eztimer_delete(timer); //关闭定时器
-         rv = esp_ota_set_boot_partition(esp_ota_get_next_update_partition(NULL));
-		if (ESP_OK !=rv)
-		{
-			ezlog_e(TAG_OTA, "one module update,esp_ota_set_boot_partition failed! err=0x%x", rv);					
-		}
-		else
-		{
-			ezlog_i(TAG_OTA, "one module update,wifidev change partition scucess..");
-		}
-        ez_iot_ota_deinit();
-        ezos_delay_ms(2000);    //待升级状态都上报成功后，在实际重启
-	    esp_restart();
+       rv=0;
 	}
+	last_progress=progress;    //保证不会因为progress值不变重复上报
     return rv ;
 }
 
 static void download_result_cb(ez_ota_cb_result_e result, void *user_data)
 {
-    //底层函数没有执行进来看，待排查
-    // int  rv = -1;
-	// OTA_USER_DATA_T *pStruUserOtaData = (OTA_USER_DATA_T *)user_data;
+ int  rv = -1;
+	 OTA_USER_DATA_T *pStruUserOtaData = (OTA_USER_DATA_T *)user_data;
 	// char mcu_mod_name[32]= {0};
-    // ez_ota_res_t pres = {0};
+      ez_ota_res_t pres = {0};
 	// //ez_ota_t ota_info = {0};
 
 	// bAppUpgrading = ez_false;
 
-	// ezlog_w(TAG_APP, "download_result_cb, result:%d", result);
+	 ezlog_w(TAG_APP, "download_result_cb");
 
-    // if (RESULT_FAILED == result)
-    // {		
-    //     ez_iot_ota_status_fail(&pres, pStruUserOtaData->mod_name, "", OTA_STATE_DOWNLOADING); //上报下载过程中升级错误的 
-    // }
-    // else if (RESULT_SUC== result) //下载都成功，包括esp 写flash全部成功，以及ymodem 发数据到mcu设备都成功
-    // {
-				
-    // }
+    
+    if (RESULT_FAILED == result)
+    {		
+        ez_iot_ota_status_fail(&pres, pStruUserOtaData->mod_name, "", OTA_STATE_DOWNLOADING); //上报下载过程中升级错误的 
+    }
+    else if (RESULT_SUC== result) //下载都成功，包括esp 写flash全部成功，以及ymodem 发数据到mcu设备都成功
+    {
+		rv = esp_ota_set_boot_partition(esp_ota_get_next_update_partition(NULL));		
+    }
     	
-	// if (rv != ESP_OK)
-	// {								
-
-	// }
-	// else
-	// {
-
-	// }
-
-	// ez_iot_ota_progress_report(&pres, pStruUserOtaData->mod_name, OTA_STATE_REBOOTING, 100);//第二次进来，wifi 下载完毕，设备需要重启
-	// ez_iot_ota_progress_report(&pres, pStruUserOtaData->mod_name, OTA_STATE_REBOOTING, 100);//第二次进来，wifi 下载完毕，设备需要重启
-	// ez_iot_ota_deinit();
-    // ezos_delay_ms(2000);  //待升级状态都上报成功后，在实际重启
-	// esp_restart();
+    if (ESP_OK !=rv)
+	{
+		ezlog_e(TAG_OTA, "one module update,esp_ota_set_boot_partition failed! err=0x%x", rv);					
+	}
+	else
+	{
+		ezlog_i(TAG_OTA, "one module update,wifidev change partition scucess..");
+	}
+	ez_iot_ota_progress_report(&pres, pStruUserOtaData->mod_name, OTA_STATE_REBOOTING, 100);//第二次进来，wifi 下载完毕，设备需要重启
+	ez_iot_ota_progress_report(&pres, pStruUserOtaData->mod_name, OTA_STATE_REBOOTING, 100);//第二次进来，wifi 下载完毕，设备需要重启
+	ez_iot_ota_deinit();
+    ezos_delay_ms(2000);  //待升级状态都上报成功后，在实际重启
+	esp_restart();
 }

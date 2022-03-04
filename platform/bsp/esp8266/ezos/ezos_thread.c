@@ -25,6 +25,9 @@
 #include "semphr.h"
 #include <string.h>
 
+#define THREAD_STATE_JOINABLE 0
+#define THREAD_STATE_DETACHED 1
+
 typedef struct
 {
     xSemaphoreHandle lock;
@@ -33,44 +36,52 @@ typedef struct
 typedef struct
 {
     xTaskHandle thread_hd;
-    void *thread_arg;
-    void (*task_do)(void *user_data);
-    char thread_name[16];
-} thread_handle;
+    char name[16];
+    int state;
+    ez_thread_func_t thread_fun;
+    void *user_param;
+} thread_data_t;
 
 static void sdk_thread_fun(void *aArg)
 {
-    thread_handle *hd = (thread_handle *)aArg;
+    thread_data_t *hd = (thread_data_t *)aArg;
     if (hd == NULL)
     {
         return;
     }
 
-    hd->task_do(hd->thread_arg);
+    hd->thread_fun(hd->user_param);
 
-    do
+    if (THREAD_STATE_DETACHED == hd->state)
     {
-        ezos_delay_ms(100);
-    } while (1);
+        vTaskDelete(NULL);
+    }
 }
 
 EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_thread_func_t thread_fun,
                                 const void *param, unsigned int stack_size, unsigned int priority)
 {
     int rc = 0;
-    thread_handle *th_handle = (thread_handle *)malloc(sizeof(thread_handle));
+    thread_data_t *th_handle = (thread_data_t *)malloc(sizeof(thread_data_t));
     if (th_handle == NULL)
     {
         return -1;
     }
 
     memset(th_handle, 0, sizeof(ez_thread_t));
-    th_handle->task_do = thread_fun;
-    th_handle->thread_arg = (void *)param;
-    strncpy(th_handle->thread_name, (const char *)name, sizeof(th_handle->thread_name) - 1);
-
+    th_handle->thread_fun= thread_fun;
+    th_handle->user_param = (void *)param;
+    strncpy(th_handle->name, (const char *)name, sizeof(th_handle->name) - 1);
+    if (NULL != handle)
+    {
+        th_handle->state = THREAD_STATE_JOINABLE;
+    }
+    else
+    {
+        th_handle->state = THREAD_STATE_DETACHED;
+    }
     rc = xTaskCreate(sdk_thread_fun,      /* The function that implements the task. */
-                     th_handle->thread_name, /* Just a text name for the task to aid debugging. */
+                     th_handle->name, /* Just a text name for the task to aid debugging. */
                      stack_size,          /* The stack size is defined in FreeRTOSIPConfig.h. */
                      (void *)th_handle,      /* The task parameter, not used in this case. */
                      priority,            /* The priority assigned to the task is defined in FreeRTOSConfig.h. */
@@ -81,7 +92,10 @@ EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_
         free(th_handle);
         return -1;
     }
-    *handle = (ez_thread_t)th_handle;
+     if (NULL != handle)
+    {
+       *handle = (ez_thread_t)th_handle;
+    }
     return 0;
 }
 
@@ -92,7 +106,7 @@ EZOS_API int ezos_thread_destroy(ez_thread_t handle)
         return -1;
     }
 
-    thread_handle *thandle = (thread_handle *)handle;
+    thread_data_t *thandle = (thread_data_t *)handle;
     xTaskHandle handle_copy = thandle->thread_hd;
     free(thandle);
 

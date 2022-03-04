@@ -243,6 +243,10 @@ static void ota_file_download_thread(void *arg)
         ezlog_e(TAG_OTA,"http_upgrade_download return err,ret:%d, retry_times:%d ", ret, retry_times);
         file_info->notify(RESULT_FAILED, file_info->user_data);
     }
+        else
+	{ 
+		file_info->notify(RESULT_SUC, file_info->user_data);
+	}
     ezos_free(file_info);
     file_info = NULL;
     g_download_status = 0;

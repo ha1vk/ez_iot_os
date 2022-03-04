@@ -40,7 +40,9 @@
 #endif
 
 light_param_t g_bulb_param = {0}; //灯泡所有的参数
-
+ez_thread_t bulb_ctrl_thread;
+ez_thread_t bulb_scene_thread;
+ez_thread_t bulb_plan_thread;
 extern led_current_param_t g_led_current_param; //灯泡实时的亮度
 int g_brightness_upper = 100;                   //灯泡实际最高亮度值,从配置文件读取
 int g_brightness_lower = 0;                     //灯泡实际最低亮度值,从配置文件读取
@@ -2039,7 +2041,7 @@ void bulb_ctrl_init()
     g_led_current_param.cct_value = 3000;
     g_led_current_param.rgb = 0xFF0000;
 
-    ez_thread_t bulb_ctrl_thread;
+    
     const ez_char_t *bulb_ctrl_thread_name = "led_ctrl";
     rv = ezos_thread_create(&bulb_ctrl_thread, bulb_ctrl_thread_name, led_ctrl_Task,
                             (void *)bulb_ctrl_thread_name, 11 * 256, 5);
@@ -2048,12 +2050,11 @@ void bulb_ctrl_init()
         ezlog_e(TAG_APP, "creat bulb_ctrl thread error ,no memory");
     }
 
-    ez_thread_t bulb_scene_thread;
+    
     const ez_char_t *bulb_scene_thread_name = "scene";
     rv = ezos_thread_create(&bulb_scene_thread, bulb_scene_thread_name, light_scene_task,
                             (void *)bulb_ctrl_thread_name, 2 * 1024, 5);
 
-    ez_thread_t bulb_plan_thread;
     const ez_char_t *bulb_plan_thread_name = "plan";
     rv = ezos_thread_create(&bulb_plan_thread, bulb_plan_thread_name, light_plan_task,
                             (void *)bulb_ctrl_thread_name, 4 * 1024, 5);
@@ -2062,4 +2063,29 @@ void bulb_ctrl_init()
     {
         ezlog_e(TAG_APP, "creat bulb_ctrl thread error ,no memory");
     }
+}
+
+void bulb_ctrl_deinit()
+{
+    ezlog_e(TAG_APP, "total heap:%d, dram:%d", heap_caps_get_free_size(2), heap_caps_get_free_size(4));
+    if (NULL != bulb_ctrl_thread)
+	{
+		ezlog_i(TAG_APP, "delete g_PthreadButton.\n");
+		ezos_thread_destroy(bulb_ctrl_thread);
+		bulb_ctrl_thread = NULL;
+	}
+			
+	if (NULL != bulb_scene_thread)
+	{
+		ezlog_i(TAG_APP, "delete g_light_handle.\n");
+		ezos_thread_destroy(bulb_scene_thread);
+		bulb_scene_thread = NULL;
+	}
+    	if (NULL != bulb_plan_thread)
+	{
+		ezlog_i(TAG_APP, "delete g_light_handle.\n");
+		ezos_thread_destroy(bulb_plan_thread);
+		bulb_plan_thread = NULL;
+	}
+    ezlog_e(TAG_APP, "total heap:%d, dram:%d", heap_caps_get_free_size(2), heap_caps_get_free_size(4));
 }
