@@ -148,6 +148,9 @@ ez_int32_t get_light_brightness();
 ez_int32_t get_light_color_temperature();
 ez_int32_t get_light_color_rgb();
 ez_int32_t get_light_mode();
+
+void* get_light_param();
+
 void set_light_mode();
 
 //ez_int32_t get_light_countdown_on_left_time();
@@ -175,7 +178,7 @@ int set_light_countdown(char *json_string);
 
 void *action_get_countdown();
 
-
+void bulb_ctrl_deinit();
 //ez_int32_t countdown_light_on(ez_int32_t count_down);
 //ez_int32_t countdown_light_off(ez_int32_t count_down);
 //ez_int32_t countdown_light_on_cancel();

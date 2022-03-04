@@ -9,6 +9,8 @@
 #include "ezlog.h"
 
 #include "product_config.h"
+#include "bulb_business.h"
+
 
 //#include "fdb_def.h"
 #include "kv_imp.h"
@@ -33,6 +35,7 @@ typedef struct
 
 static const bulb_kv_t g_bulb_kv_tab[] = {
     // ap key
+    {K_PARAM_VER, "param_ver", TYPE_STRING, 0, "V1.0.0 build 200101"},
     {K_AP_ENABLE, "ap_enable", TYPE_NUM, 0, ""},
     {K_FIRST_BOOT, "first_boot", TYPE_NUM, 1, ""},
     {K_AP_TIME_OUT, "ap_time_out", TYPE_NUM, 0, ""},
@@ -70,19 +73,20 @@ static const bulb_kv_t g_bulb_kv_tab[] = {
     {K_SWITCH, "Switch", TYPE_NUM, 1, ""},
     {K_COLORTEMPERATURE, "ColorTemperature", TYPE_NUM, 2700, ""},
     {K_BRIGHTNESS, "Brightness", TYPE_NUM, 100, ""},
-    {K_COUNTDOWNCFG, "CountdownCfg", TYPE_STRING, 0, ""},
-    {K_LIGHTSWITCHPLAN, "LightSwitchPlan", TYPE_STRING, 0, ""},
+    {K_COUNTDOWNCFG, "CountdownCfg", TYPE_STRING, 0, "{}"},
+    {K_LIGHTSWITCHPLAN, "LightSwitchPlan", TYPE_STRING, 0, "{}"},
 
-    {K_WORKMODE, "WrokMode", TYPE_STRING, 0, ""},
-    {K_CUSTOMSCENECFG, "CustomSceneCfg", TYPE_STRING, 0, ""},
-    {K_COUNTDOWN, "Countdown", TYPE_STRING, 0, ""},
-    {K_COLORRGB, "ColorRgb", TYPE_STRING, 0, ""},
-    {K_MUSICRHYTHM, "MusicRhythm", TYPE_STRING, 0, ""},
-    {K_BIORHYTHM, "Biorhythm", TYPE_STRING, 0, ""},
-    {K_WAKEUP, "WakeUp", TYPE_STRING, 0, ""},
-    {K_HELPSLEEP, "HelpSleep", TYPE_STRING, 0, ""},
+    {K_WORKMODE, "WrokMode", TYPE_STRING, 0, "white"},
+    {K_CUSTOMSCENECFG, "CustomSceneCfg", TYPE_STRING, 0, "{}"},
+    {K_COUNTDOWN, "Countdown", TYPE_STRING, 0, "{}"},
+    {K_COLORRGB, "ColorRgb", TYPE_STRING, 0, "#FF0000"},
+    {K_MUSICRHYTHM, "MusicRhythm", TYPE_STRING, 0, "{}"},
+    {K_BIORHYTHM, "Biorhythm", TYPE_STRING, 0, "{}"},
+    {K_WAKEUP, "WakeUp", TYPE_STRING, 0, "{}"},
+    {K_HELPSLEEP, "HelpSleep", TYPE_STRING, 0, "{}"},
     {K_TIMEMGR, "TimeMgr", TYPE_STRING, 0, "{\"timeZone\": \"UTC+08:00\",\"tzCode\": 42,\"daylightSavingTime\": 0}"},
-    {K_WIFISTATUS, "WifiStatus", TYPE_STRING, 0, ""},
+    {K_WIFISTATUS, "WifiStatus", TYPE_STRING, 0, "{}"},
+
 };
 
 int config_set_value(bulb_key_e key_e, void *value, int len)
@@ -257,6 +261,123 @@ int config_print()
 
     return ret;
 }
+
+int bulb_param_init()
+{
+    light_param_t *p_bulb_param = get_light_param();
+    size_t len_tmp= 2048;
+    int value_tmp=0;
+    char *json_string = ezos_malloc(2048);
+
+    if(NULL ==json_string)
+    {
+        ezlog_e(TAG_APP, "bulb_param_init error ,no memory. ");
+    }
+
+    if (0 != config_get_value(K_BRIGHTNESS, &value_tmp, &len_tmp))
+    {
+        ezlog_e(TAG_APP, "brightness is null. ");
+        return -1;
+    }
+    else
+    {
+        p_bulb_param->brightness = value_tmp;
+    }
+    
+    if (0 != config_get_value(K_BRIGHTNESS, &value_tmp, &len_tmp))
+    {
+        ezlog_e(TAG_APP, "brightness is null. ");
+        return -1;
+    }
+    else
+    {
+        p_bulb_param->brightness = value_tmp;
+    }
+
+    if (0 != config_get_value(K_COLORTEMPERATURE, &value_tmp, &len_tmp))
+    {
+        ezlog_e(TAG_APP, "cct is null. ");
+        return -1;
+    }
+    else
+    {
+        p_bulb_param->cct = value_tmp;
+    }
+
+    if (0 != config_get_value(K_COLORRGB, json_string, &len_tmp))
+    {
+        ezlog_e(TAG_APP, "rgb is null. ");
+        return -1;
+    }
+    else
+    {
+        int r, g, b;
+        sscanf(json_string, "#%2x%2x%2x", &r, &g, &b);
+        p_bulb_param->rgb  =r * 256 * 256 + g * 256 + b;;
+    }
+
+    if (0 != config_get_value(K_WORKMODE, json_string, &len_tmp))
+    {
+        ezlog_e(TAG_APP, "workmode is null. ");
+        return -1;
+    }
+    else
+    {
+        if (0 == strcmp(json_string, "white"))
+        {
+            p_bulb_param->mode = LIGHT_WHITE;
+        }
+        else if (0 == strcmp(json_string, "color"))
+        {
+             p_bulb_param->mode = LIGHT_COLOR;
+        }
+        else if (0 == strcmp(json_string, "scene"))
+        {
+            p_bulb_param->mode = LIGHT_SCENE;
+        }
+        else if (0 == strcmp(json_string, "music"))
+        {
+        }
+    }
+
+    if (0 != config_get_value(K_CUSTOMSCENECFG, json_string, &len_tmp))
+    {
+        ezlog_e(TAG_APP, "scence is null. ");
+        return -1;
+    }
+    else
+    {
+        
+    }
+ 
+
+    free(json_string);
+    return 0;
+    
+}
+
+int config_init(void)
+{
+    ezlog_i(TAG_APP, "config_init");
+	char param_ver[24] = {0};
+	char len =0;
+	int ret = config_get_value(K_PARAM_VER, &param_ver, &len);
+
+    if (0 == len)
+    {
+        ezlog_e(TAG_APP, "config param ver is null. set all to factory");
+        config_reset_factory();
+    }
+    else
+    {
+        ezlog_i("param ver is%s\n",param_ver);
+        
+    }
+
+    bulb_param_init();
+	return 0;
+}
+
 
 #ifdef BULB_VERSION
 /**@fn		  

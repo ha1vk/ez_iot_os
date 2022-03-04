@@ -7,8 +7,8 @@ static struct fdb_kvdb ez_kvdb;
 static SemaphoreHandle_t s_lock = NULL;
 #define EZ_KVDB_NAME "data"
 #define EZ_KVDB_PART_NAME "ez_kvdb"
-#define EZ_KVDB_MAX_SIZE 1024 * 36     //kvdb 至少需要2个sec
-#define EZ_KVDB_SEC_SIZE 1024 * 8     //乐鑫底层flash 读写以4k 为块进行擦除，kv 需要是4k 的倍数
+#define EZ_KVDB_MAX_SIZE 1024 * 32     //kvdb 至少需要2个sec
+#define EZ_KVDB_SEC_SIZE 1024 * 16     //乐鑫底层flash 读写以4k 为块进行擦除，kv 需要是4k 的倍数
 
 void kv_lock(fdb_db_t db)
 {
@@ -22,7 +22,7 @@ void kv_unlock(fdb_db_t db)
 
 int32_t kv_init_adv(fdb_kvdb_t db, const char *name, const char *part_name, struct fdb_default_kv *default_kv, int32_t max_size, int32_t sec_size)
 {
-    if (db->parent.init_ok)
+    if (db->parent.init_ok) 
     {
         return 0;
     }

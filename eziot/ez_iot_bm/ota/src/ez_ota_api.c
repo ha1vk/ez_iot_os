@@ -101,7 +101,7 @@ extern "C"
         {
             return EZ_OTA_ERR_NOT_INIT;
         }
-        if (progress <= 0 || progress > 100)
+        if (progress < 0 || progress > 100)
         {
             return EZ_OTA_ERR_PARAM_INVALID;
         }
