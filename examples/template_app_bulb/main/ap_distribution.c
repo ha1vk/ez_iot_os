@@ -127,11 +127,54 @@ static void ez_cloud_access(void)
     first = false;
 }
 
+//判断ip地址是否发生变化，0:未变化；1:变化
+int ip_change(char *new_ip, char *old_ip)
+{
+    if (0 == strncmp(new_ip, old_ip, 16))
+    {
+        ezlog_i(TAG_APP, "ip is same!");
+        return 0;
+    }
+
+    return 1;
+}
+
+static void ip_info_update(tcpip_adapter_ip_info_t *ip_info)
+{
+    wifi_t wifi_info = {0};
+    char *address = NULL;
+    char *mask = NULL;
+    char *gateWay = NULL;
+    int ret=0;
+    address = ip4addr_ntoa(&ip_info->ip);
+    netmgr_ip_update(address);
+    if (0 == ip_change(address, wifi_info.ip))
+    {
+        return;
+    }
+    strncpy(wifi_info.ip, address, sizeof(wifi_info.ip) - 1);
+
+    mask = ip4addr_ntoa(&ip_info->netmask);
+    strncpy(wifi_info.mask, mask, sizeof(wifi_info.mask) - 1);
+
+    gateWay = ip4addr_ntoa(&ip_info->gw);
+    strncpy(wifi_info.gateway, gateWay, sizeof(wifi_info.gateway) - 1);
+    ezlog_e(TAG_APP,"ip is:%s",wifi_info.ip);
+    ret |= config_set_value(K_WIFI_IP,wifi_info.ip,sizeof(wifi_info.ip));
+    ret |= config_set_value(K_WIFI_MASK,wifi_info.mask,sizeof(wifi_info.mask));
+    ret |= config_set_value(K_WIFI_GATEWAY,wifi_info.gateway,sizeof(wifi_info.gateway));
+    ezlog_e(TAG_APP,"ip set value.");
+    if(0 != ret)
+    {
+        ezlog_e(TAG_APP,"set wifi config failed.");
+    }
+}
 
 void wifi_status_cb(void *wifi_status)
 {
     tcpip_adapter_ip_info_t *ip_info = (tcpip_adapter_ip_info_t *)wifi_status;
     /*todo ip地址更新到flash*/
+    ip_info_update(ip_info);
     if (g_ap_exit)
     {
         ez_cloud_access();

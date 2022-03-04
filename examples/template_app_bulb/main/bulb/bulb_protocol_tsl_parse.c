@@ -384,11 +384,12 @@ static ez_int32_t property_netstatus_up(ez_tsl_value_t *p_stru_key_value)
 		}
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
-		char netstatus[128] = "{\"type\":\"\",\"address\":\"\",\"mask\":\"\",\"gateway\":\"\",\"signal\":\"\",\"ssid\":\"\"}";
-		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
-		p_stru_key_value->size = strlen(netstatus);
-        memcpy(p_stru_key_value->value, netstatus, p_stru_key_value->size);
+        report_wifi_info(p_stru_key_value);//todo:获取实际值上传
+		// char netstatus[128] = "{\"type\":\"\",\"address\":\"\",\"mask\":\"\",\"gateway\":\"\",\"signal\":\"\",\"ssid\":\"\"}";
+		// //完善此部分...
+		// printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
+		// p_stru_key_value->size = strlen(netstatus);
+        // memcpy(p_stru_key_value->value, netstatus, p_stru_key_value->size);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -837,11 +838,7 @@ ez_int32_t tsl_things_property2cloud(const ez_int8_t *sn, const ez_tsl_rsc_t *rs
         ezlog_e(TAG_AP, "things property2cloud param error.");
         return -1;
     }
-    if (0 == strcmp((char *)key_info->key, "NetStatus"))
-	{
-		ret=report_wifi_info(value_out);
-        return ret;
-	} 
+    
     for (i = 0; property_cmd[i].identify != NULL; i++)
     {
         if (strncmp(key_info->key, property_cmd[i].identify, IDENTIFIER_LEN_MAX) == 0) /* 匹配功能点 */

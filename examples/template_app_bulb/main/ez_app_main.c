@@ -33,7 +33,7 @@
 #include "bulb_business.h"
 #include "dev_netmgr.h"
 #include "kv_imp.h"
-
+#include "eztimer.h"
 #include "product_config.h"
 #include "config_implement.h"
 #include "dev_init.h"
@@ -47,6 +47,8 @@
 #include "freertos/task.h"
 #endif
 extern int uart_init(void);
+extern void wifi_info_timer_cb();
+ez_int32_t   rssi_timer;
 static ez_kv_default_node_t m_kv_default_table[] = {
     {EZ_KV_DEFALUT_KEY_MASTERKEY, "", 0}, /* basic kv */
     {EZ_KV_DEFALUT_KEY_TSLMAP, "", 0},    /* tslmap profile map */
@@ -153,7 +155,7 @@ int main(int argc, char **argv)
 
     bulb_ctrl_init();   
     kv_print();
-
+    rssi_timer=eztimer_create("rssi_timer", (300 * 1000), ez_true, wifi_info_timer_cb);
     /* 主（父）线程循环,否则进程退出*/
     while (1)
     {

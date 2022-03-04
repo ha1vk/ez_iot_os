@@ -31,7 +31,8 @@ extern char g_time_zone[8];//tsl 需要用
 #endif
 
 #include "net_ctrl_tcp.h"
-
+static int8_t g_rssi = 0;
+static char g_ip[16] = {0};
 static int g_event_id = -1;
 static int g_last_err = 0;
 extern int8_t Ezviz_Wifi_Get_Rssi(int8_t* rssi);
@@ -144,37 +145,8 @@ int report_wifi_info(ez_tsl_value_t *value_out)
             cJSON_Delete(wifi_info_json);
             break;
         }
-        if(NULL!=value_out)
-        {
             value_out->size = strlen(wifi_info_str);
-            value_out->type = EZ_TSL_DATA_TYPE_OBJECT;
             memcpy(value_out->value, wifi_info_str,value_out->size);
-            rv=0;
-        }
-        else
-        {
-            ez_tsl_value_t tsl_value = {0};
-            tsl_value.size = strlen(wifi_info_str);
-            tsl_value.type = EZ_TSL_DATA_TYPE_OBJECT;
-            tsl_value.value = (void *)wifi_info_str;
-
-            ez_tsl_key_t key_info = {0};
-            key_info.domain = (uint8_t *)"WifiStatus";
-            key_info.key = (uint8_t *)"NetStatus";
-
-
-            ez_tsl_rsc_t rsc_info = {.res_type = NULL, .local_index = NULL};
-
-            
-        // rv = ez_iot_tsl_property_report(&key_info, &dev_info, &tsl_value);
-
-            rv = ez_iot_tsl_property_report(dev_serial, &rsc_info, &key_info, &tsl_value);
-        }
-		if (0 != rv)
-        {
-            ezlog_e(TAG_APP, "prop report wifi_info failed.");       
-        }
-
 
     } while (0);
 
@@ -321,6 +293,70 @@ void tsl_access()
         return;
     }
     
+}
+
+void wifi_info_timer_cb()
+{
+    wifi_t wifi_info;
+    int8_t rssi = 0;
+    bool need_report = 0;
+    int ssid_len = sizeof(wifi_info.ssid);
+    int password_len = sizeof(wifi_info.ssid);
+    int cc_len = sizeof(wifi_info.ssid);
+    int ip_len = sizeof(wifi_info.ssid);
+    int mask_len = sizeof(wifi_info.ssid);
+    int gateway_len = sizeof(wifi_info.ssid);
+    ezlog_e(TAG_APP, "timer is run!");
+    if(0 != config_get_value(K_WIFI_SSID,&wifi_info.ssid,&ssid_len))
+    {
+        ezlog_e(TAG_APP, "config_read WIFI_SSID error!");
+        return;
+    }
+    ezlog_e(TAG_APP, "config_read WIFI_SSID is:%s",wifi_info.ssid);
+    if(0 != config_get_value(K_WIFI_PASSWORD,&wifi_info.password,&password_len))
+    {
+        ezlog_e(TAG_APP, "config_read WIFI_PASSWORD error!");
+        return;
+    }
+    if(0 != config_get_value(K_WIFI_CC,&wifi_info.cc,&cc_len))
+    {
+        ezlog_e(TAG_APP, "config_read WIFI_CC error!");
+        return;
+    }
+    if(0 != config_get_value(K_WIFI_IP,&wifi_info.ip,&ip_len))
+    {
+        ezlog_e(TAG_APP, "config_read WIFI_IP error!");
+        return;
+    }
+    ezlog_e(TAG_APP, "config_read WIFI_IP is:%s",wifi_info.ip);
+    if(0 != config_get_value(K_WIFI_MASK,&wifi_info.mask,&mask_len))
+    {
+        ezlog_e(TAG_APP, "config_read WIFI_MASK error!");
+        return;
+    }
+    if(0 != config_get_value(K_WIFI_GATEWAY,&wifi_info.gateway,&gateway_len))
+    {
+        ezlog_e(TAG_APP, "config_read IFI_GATEWAY error!");
+        return;
+    }
+
+    Ezviz_Wifi_Get_Rssi(&rssi);
+    if ((abs(g_rssi - rssi)) > abs((10 * g_rssi / 100)))
+    {
+        g_rssi = rssi;
+        need_report = 1;
+    }
+
+    if (0 != strncmp(g_ip, wifi_info.ip, sizeof(g_ip)))
+    {
+        strncpy(g_ip, wifi_info.ip, sizeof(g_ip));
+        need_report = 1;
+    }
+
+    if (1 == need_report)
+    {
+        user_property_report("NetStatus");   
+    }
 }
 
 static ez_int32_t ez_event_notice_func(ez_event_e event_type, ez_void_t *data, ez_int32_t len)
