@@ -332,7 +332,7 @@ static ez_int32_t process_wifi_config(httpd_req_t *req, ezconn_ctx_t *ctx)
                 ezos_free(rsp_str);
             }
         }
-       
+        ezhal_set_country_code(ctx->wifi_info.cc); 
         ezhal_sta_connect(ctx->wifi_info.ssid, ctx->wifi_info.password);
 
         ctx->wifi_cb(EZCONN_STATE_CONNECTING_ROUTE, NULL);

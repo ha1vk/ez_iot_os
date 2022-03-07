@@ -122,5 +122,5 @@ typedef enum
  * @return ezhal_wifi_state_e 
  */
 ezhal_wifi_state_e ezhal_get_wifi_state();
-
+void ezhal_set_country_code(char *CountryCode);
 #endif

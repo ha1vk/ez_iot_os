@@ -8,7 +8,208 @@
 #include "esp_err.h"
 
 #include "string.h"
+extern bool g_apstamode_flag;
 static const char *TAG_WIFI = "T_WIFI";
+
+
+static const char *TAG_EVENT = "[WIFI EVENT]";
+
+#define COUNTRY_CODE_LEN 3
+#define ARRAY_SIZE_N(a) (sizeof(a) / sizeof((a)[0]))
+/*8*/
+static char us_country_code_table[][COUNTRY_CODE_LEN] = {
+    "US", "CA", "MX", "PE", "TW", "SR", "VI"};
+
+/*29*/
+static char br_country_code_table[][COUNTRY_CODE_LEN] = {
+    "BR", "CO", "BB", "CR", "EC", "UY", "BM", "DM", "DO", "GY", "HT", "TT",
+    "NI", "HN", "PA", "VE", "PY", "BS", "FM", "GD", "GT", "JM", "PW", "SV",
+    "VU", "CL", "AR", "IN", "PK"};
+
+/*30*/
+static char eu_country_code_table[][COUNTRY_CODE_LEN] = {
+    "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GB",
+    "GR", "HR", "HU", "IE", "IT", "LU", "MT", "NL", "PL", "PT", "RO", "SE",
+    "SI", "SK", "TR", "LV", "LT", "EU"};
+
+/*1*/
+static char jp_country_code_table[][COUNTRY_CODE_LEN] = {
+    "JP"};
+
+/*46*/
+static char other_country_code_table[][COUNTRY_CODE_LEN] = {
+    "CN", "AF", "BF", "BH", "BI", "BN", "BO", "BT", "BW", "CD", "CF", "CG",
+    "CI", "CK", "CU", "DJ", "DZ", "ER", "ET", "GH", "GM", "GN", "GQ", "GW",
+    "KM", "KP", "LR", "MG", "MH", "MM", "MU", "NE", "NG", "NR", "NU", "PS",
+    "RW", "SB", "SD", "SL", "SO", "ST", "SY", "TO", "TP", "TV"};
+
+typedef enum
+{
+    eCN = 0,
+    eEU,
+    eUS,
+    eJP,
+    eBR,
+} LIGHT_STATE_E;
+
+extern char *get_product_country_code(void);
+extern void set_product_country_code(char *CountryCode);
+extern int Ezviz_Wifi_Config_Country_CodeMap(char *country_code);
+
+int woal_is_us_country(char *country_code)
+{
+    unsigned char i = 0;
+
+    for (i = 0; i < ARRAY_SIZE_N(us_country_code_table); i++)
+    {
+        if (!memcmp(country_code, us_country_code_table[i],
+                    COUNTRY_CODE_LEN - 1))
+        {
+            ezlog_i(TAG_WIFI, "found region code=%s in US table.\n",
+                     us_country_code_table[i]);
+
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int woal_is_br_country(char *country_code)
+{
+    unsigned char i = 0;
+
+    for (i = 0; i < ARRAY_SIZE_N(br_country_code_table); i++)
+    {
+        if (!memcmp(country_code, br_country_code_table[i], COUNTRY_CODE_LEN - 1))
+        {
+            ezlog_i(TAG_WIFI, "found region code=%s in BR table.\n", br_country_code_table[i]);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int woal_is_eu_country(char *country_code)
+{
+    unsigned char i = 0;
+
+    for (i = 0; i < ARRAY_SIZE_N(eu_country_code_table); i++)
+    {
+        if (!memcmp(country_code, eu_country_code_table[i], COUNTRY_CODE_LEN - 1))
+        {
+            ezlog_i(TAG_WIFI, "found region code=%s in EU table\n", eu_country_code_table[i]);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int woal_is_jp_country(char *country_code)
+{
+    unsigned char i = 0;
+
+    for (i = 0; i < ARRAY_SIZE_N(jp_country_code_table); i++)
+    {
+        if (!memcmp(country_code, jp_country_code_table[i], COUNTRY_CODE_LEN - 1))
+        {
+            printf("found region code=%s in JP table.\n", jp_country_code_table[i]);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int woal_is_other_country(char *country_code)
+{
+    unsigned char i = 0;
+
+    for (i = 0; i < ARRAY_SIZE_N(other_country_code_table); i++)
+    {
+        if (!memcmp(country_code, other_country_code_table[i], COUNTRY_CODE_LEN - 1))
+        {
+            ezlog_i(TAG_WIFI, "found region code=%s in other table.\n", other_country_code_table[i]);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int Ezviz_Wifi_Config_Country_CodeMap(char *country_code)
+{
+    int8_t wifi_country_code = eCN;
+
+    if (country_code == NULL)
+    {
+        printf("%s country_code is NULL !!! \n", __FUNCTION__);
+        return -1;
+    }
+
+    if (woal_is_eu_country(country_code))
+    {
+        wifi_country_code = eEU;
+    }
+    else if (woal_is_us_country(country_code))
+    {
+        wifi_country_code = eUS;
+    }
+    else if (woal_is_jp_country(country_code))
+    {
+        wifi_country_code = eJP;
+    }
+    else if (woal_is_br_country(country_code))
+    {
+        wifi_country_code = eBR;
+    }
+    else
+    {
+        wifi_country_code = eCN;
+    }
+    return wifi_country_code;
+    ezlog_i(TAG_WIFI, "config country code(%d)success.\n", wifi_country_code);
+}
+
+void Ezviz_Wifi_set_country_code(void)
+{
+    if (g_apstamode_flag)
+    {
+        ezlog_i(TAG_WIFI, "apsta mode,no need set country_code.\n");
+        return;
+    }
+    wifi_country_t country = {"US", 1, 13, 20, WIFI_COUNTRY_POLICY_MANUAL};
+    int iWifiCountryCodeMap = 0;
+    iWifiCountryCodeMap = Ezviz_Wifi_Config_Country_CodeMap(get_product_country_code());
+    switch (iWifiCountryCodeMap)
+    {
+    case eCN:
+        country.nchan = 13;
+        country.max_tx_power = 20;
+        break;
+    case eEU:
+        country.nchan = 13;
+        country.max_tx_power = 17;
+        break;
+    case eUS:
+        country.nchan = 11;
+        country.max_tx_power = 20;
+        break;
+    case eJP:
+        country.nchan = 14;
+        country.max_tx_power = 20;
+        break;
+    case eBR:
+        country.nchan = 13;
+        country.max_tx_power = 20;
+        break;
+    default:
+        break;
+    }
+
+    ezlog_i(TAG_WIFI, "set countrycode(%s) end,wifi actual start %d and end %d !", get_product_country_code(), country.schan, country.nchan);
+    //¡ä?o¡¥¨ºy?¨¢o???country.max_tx_power2?¨ºy
+    esp_wifi_set_country(&country);
+    // esp_wifi_set_max_tx_power(country.max_tx_power);
+}
+
 
 static EventGroupHandle_t g_wifi_event_group = NULL;
 static ezhal_wifi_state_e g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
@@ -198,6 +399,7 @@ int ezhal_sta_connect(char *ssid, char *password)
 
     wifi_config.sta.listen_interval = 10;
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
+    Ezviz_Wifi_set_country_code();
     ESP_ERROR_CHECK(esp_wifi_start());
     esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
 
@@ -416,4 +618,9 @@ int ezhal_get_rssi(char *rssi)
 ezhal_wifi_state_e ezhal_get_wifi_state()
 {
     return g_wifi_connect_state;
+}
+
+void ezhal_set_country_code(char *CountryCode)
+{
+    set_product_country_code(CountryCode);
 }

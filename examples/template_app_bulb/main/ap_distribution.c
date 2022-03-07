@@ -24,6 +24,7 @@ extern char bind_token[64];
 bool g_need_ap = false;
 bool g_ap_exit = true;   //配网模式下，内部会有两次获取到ip，需要在第二次获取到ip时进行联网
 bool g_if_need_ap = false; //检测是否需要进入ap 模式
+bool g_apstamode_flag = false;
 
 static void wd_sucess_proc(void *param)
 {
@@ -90,7 +91,7 @@ static void wifi_ap_distribution_cb(ezconn_state_e err_code, ezconn_wifi_info_t 
         ezlog_i(TAG_AP, "domain: %s", wifi_info->domain);
 
         ez_thread_t wd_sucess_handle;
-       
+        g_apstamode_flag = false;
         ezos_thread_create(&wd_sucess_handle, "wd_sucess_proc",wd_sucess_proc, (void *)wifi_info, 3*1024,3);
         //xTaskCreate(wd_sucess_proc, "wd_sucess_proc", 4096, (void *)wifi_info, 3, NULL);
         break;
@@ -101,6 +102,7 @@ static void wifi_ap_distribution_cb(ezconn_state_e err_code, ezconn_wifi_info_t 
         ezlog_w(TAG_AP, "connect failed.");
         break;
     case EZCONN_STATE_WIFI_CONFIG_TIMEOUT:
+        g_apstamode_flag = false;
         ezlog_w(TAG_AP, "wifi config timeout.");
         ezconn_ap_stop();
         break; 
@@ -382,7 +384,7 @@ void ap_distribution_do()
     ezconn_dev_info_t dev_info = {0};
     ezconn_ap_info_t ap_info = {0};
     char ssid[33] = {0};
-
+    g_apstamode_flag = true;
     #if 1 //暂且写死ap模式的ssid名称，后续用从flash读取相关信息
     device_t *device_info = get_product_device_config();
     if (NULL == device_info)
