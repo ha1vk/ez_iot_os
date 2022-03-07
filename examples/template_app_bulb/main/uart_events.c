@@ -16,6 +16,9 @@
 #include "driver/gpio.h"
 #include "ezlog.h"
 #include "ezos_time.h" //延迟需要
+
+#include "bulb_led_ctrl.h"
+
 //#include "esp_system.h"
 // #include "lwip/arch.h"
 // #include "lwip/opt.h"
@@ -178,23 +181,24 @@ static int g_reply_length = 0;
 //     return true;
 // }
 
-// int hextoi(char *s)
-// {
-// 	int i=0;
-// 	int t=0;             //tčŽ°ĺ˝ä¸´ćśĺ çć° 
-// 	long sum =0;	
-// 	for(i=0;s[i] !=' ';i++)
-// 	{
-// 		if(s[i]>='0'&&s[i]<='9')
-// 		t=s[i]-'0';       //ĺ˝ĺ­çŹŚćŻ0~9ćśäżćĺć°ä¸ĺ
-// 		if(s[i]>='a'&&s[i]<='z')
-// 		t=s[i]-'a'+10;
-// 		if(s[i]>='A'&&s[i]<='Z')
-// 		t=s[i]-'A'+10;
-// 		sum=sum*16+t;
-// 	}
-// 	return sum;
-//  } 
+int hextoi(char *s)
+{
+	int i=0;
+	int t=0;             //t记录临时加的数 
+	long sum =0;	
+	for(i=0;s[i] !=' ';i++)
+	{
+		if(s[i]>='0'&&s[i]<='9')
+		t=s[i]-'0';       //当字符是0~9时保持原数不变
+		if(s[i]>='a'&&s[i]<='z')
+		t=s[i]-'a'+10;
+		if(s[i]>='A'&&s[i]<='Z')
+		t=s[i]-'A'+10;
+		sum=sum*16+t;
+	}
+	return sum;
+ } 
+
 
 //  unsigned short RTU_CRC( unsigned char * puchMsg,unsigned short usDataLen,unsigned short nAccum )
 // {
@@ -321,27 +325,28 @@ static void pasreATCMD(unsigned char *data, int len)
 
     char *p = NULL;
 
-    // char *p1srcLm = NULL;
-    // char *p2dstLm = NULL;
-    // char *p3srcRgb = NULL;
-    // char *p4dstRgb= NULL;
-	// char *p5mSleep = NULL;
-	// char *p6chgLoops = NULL;
-	// char *pMacStr =NULL;
-	// char *pSceneDurationStr = NULL;
-	// char *pSpeedtimeStr = NULL;
-	// char *psceneName= NULL;
+    char *p1srcLm = NULL;
+    char *p2dstLm = NULL;
+    char *p3srcRgb = NULL;
+    char *p4dstRgb= NULL;
+    char *p5mSleep = NULL;
+    char *p6chgLoops = NULL;
+    char *pMacStr =NULL;
+    char *pSceneDurationStr = NULL;
+    char *pSpeedtimeStr = NULL;
+    char *psceneName= NULL;
 
-	
-	// int srcLm=0;
-	// int dstLm=0;
-	// int srcRgb=0;
-	// int dstRgb=0;
-	// int mSleep =0;
-	// int chgLoops = 0;
-	// int iSceneDuration = 0;
-	// int iSpeedtime = 0;
-	// int index = 0;
+    
+    int srcLm=0;
+    int dstLm=0;
+    int srcRgb=0;
+    int dstRgb=0;
+    int mSleep =0;
+    int chgLoops = 0;
+    int iSceneDuration = 0;
+    int iSpeedtime = 0;
+    int index = 0;
+	led_ctrl_t led_ctrl_cmd = {0};
 	
     ezlog_w(TAG_APP, "get at cmd:%s", data);
     ezlog_w(TAG_APP, "len:%d", len);
@@ -370,7 +375,6 @@ static void pasreATCMD(unsigned char *data, int len)
 		{
             ezlog_w(TAG_APP, "the level is:%d", loglvl);
             ezlog_filter_lvl(loglvl);
-        	//set_log_lvl(loglvl);
 		}
 // 		else if(loglvl == 6)
 // 		{
@@ -421,76 +425,80 @@ static void pasreATCMD(unsigned char *data, int len)
 // 			g_light_scene_cfg.speed = iSpeedtime;
 
 // 		}
-// 		else
-// 		{
-// 			if (NULL == (p1srcLm = strstr((const char *)p + 1, " ")))
-// 			{
-// 			   return;
-// 			}
+        else
+        {
+            if (NULL == (p1srcLm = strstr((const char *)p + 1, " ")))
+            {
+            return;
+            }
 
-// 			if (NULL == (p2dstLm= strstr((const char *)p1srcLm + 1, " ")))
-// 			{
-// 			   return;
-// 			}
+            if (NULL == (p2dstLm= strstr((const char *)p1srcLm + 1, " ")))
+            {
+            return;
+            }
 
-// 			if (NULL == (p3srcRgb = strstr((const char *)p2dstLm + 1, " ")))
-// 			{
-// 			   return;
-// 			}
+            if (NULL == (p3srcRgb = strstr((const char *)p2dstLm + 1, " ")))
+            {
+            return;
+            }
 
-// 			if (NULL == (p4dstRgb = strstr((const char *)p3srcRgb + 1, " ")))
-// 			{
-// 			   return;
-// 			}
+            if (NULL == (p4dstRgb = strstr((const char *)p3srcRgb + 1, " ")))
+            {
+            return;
+            }
 
-// 			if (NULL == (p5mSleep = strstr((const char *)p4dstRgb + 1, " ")))
-// 			{
-// 			   return;
-// 			}
+            if (NULL == (p5mSleep = strstr((const char *)p4dstRgb + 1, " ")))
+            {
+            return;
+            }
 
-// 			if (NULL == (p6chgLoops = strstr((const char *)p5mSleep + 1, " ")))
-// 			{
-// 			   return;
-// 			}
-			
-// 			p1srcLm++;
-//         	p2dstLm++;
-//         	p3srcRgb++;
-//         	p4dstRgb++;
-//         	p5mSleep++;
-//         	p6chgLoops++;
+            if (NULL == (p6chgLoops = strstr((const char *)p5mSleep + 1, " ")))
+            {
+            return;
+            }
+            
+            p1srcLm++;
+            p2dstLm++;
+            p3srcRgb++;
+            p4dstRgb++;
+            p5mSleep++;
+            p6chgLoops++;
 
-// //AT+CMD=setloglvl 2700 1 20 100 100 20 50
+//AT+CMD=setloglvl 2700 1 20 100 100 20 50
 
-// 			srcLm = atoi(p1srcLm);
-// 			dstLm= atoi(p2dstLm);
+            srcLm = atoi(p1srcLm);
+            dstLm= atoi(p2dstLm);
 
-// 			srcRgb = hextoi(p3srcRgb);
-// 			dstRgb = hextoi(p4dstRgb);
-//  			mSleep =  atoi(p5mSleep);
-//  			chgLoops = atoi(p6chgLoops);
+            srcRgb = hextoi(p3srcRgb);
+            dstRgb = hextoi(p4dstRgb);
+            mSleep =  atoi(p5mSleep);
+            chgLoops = atoi(p6chgLoops);
 
-//  			ezlog_i(TAG_APP,"line (%d) and function (%s)): cct=%d,srclm=%d,destlm=%d,srcrgb=0x%x,destrgb=0x%x,msleep=%d,loops=%d\n "
-//  				,__LINE__, __func__,loglvl,srcLm,dstLm,srcRgb,dstRgb,mSleep,chgLoops);
-// 			if(loglvl > 6500)
-// 			{			
-// 				//g_b_RgbChanged = true;
-// 				led_ctrl_rgb(srcLm,dstLm,srcRgb,dstRgb,mSleep,chgLoops);
-// 			}
-// 			else
-// 			{
-// 				for(index=0;index <2;index++)
-// 				{
-// 					/*ć­Łĺĺĺ*/
-// 					led_ctrl_cct(loglvl,loglvl,srcLm,dstLm,mSleep,chgLoops);
-// 					/*éĺĺĺ*/
-// 					led_ctrl_cct(loglvl,loglvl,dstLm,srcLm,mSleep,chgLoops);
-// 				}
-// 			}
-			
-			
-// 		}
-				
+            ezlog_i(TAG_APP,"line (%d) and function (%s)): cct=%d,srclm=%d,destlm=%d,srcrgb=0x%x,destrgb=0x%x,msleep=%d,loops=%d\n "
+                ,__LINE__, __func__,loglvl,srcLm,dstLm,srcRgb,dstRgb,mSleep,chgLoops);
+            if(loglvl > 6500)
+            {			
+             
+                led_ctrl_cmd.iRgbValue = dstRgb;
+                led_ctrl_cmd.nbrightness = dstLm;
+                led_ctrl_cmd.nUpDuration = mSleep * chgLoops;
+                led_ctrl_do_async(&led_ctrl_cmd);
+            }
+            else
+            {
+                for(index=0;index <2;index++)
+                {
+                    led_ctrl_cmd.iRgbValue = 0;
+                    led_ctrl_cmd.nCctValue = loglvl;
+                    led_ctrl_cmd.nbrightness = dstLm;
+                    led_ctrl_cmd.nUpDuration = mSleep * chgLoops;
+                    led_ctrl_do_async(&led_ctrl_cmd);
+
+                }
+            }
+
+		}
+
      }
 }
 
@@ -582,6 +590,6 @@ int uart_init(void)
         ezlog_e(TAG_APP, "uart_init uart_driver_install error!");
         return ret;
     }
-    xTaskCreate(uart_event_task, "uart_event_task", 1792, NULL, 5, NULL);
+    xTaskCreate(uart_event_task, "uart_event_task", 2048, NULL, 5, NULL);
     return ret;
 }

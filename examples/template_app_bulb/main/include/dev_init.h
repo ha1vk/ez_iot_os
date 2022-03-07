@@ -16,6 +16,20 @@ typedef enum {
     MCU = 1,
 }product_type_t;
 
+typedef enum
+{
+    LAMP_W = 0,         // 单色灯
+    LAMP_WC,            // 双色CW灯
+    LAMP_RGB,           // 三色RGB灯
+    LAMP_RGBW,          // 四色RGBW灯
+    LAMP_RGBWC,         // 五色RGBWC灯
+
+    LAMP_CCT,           // 双色CCT灯
+    LAMP_RGBCCT,        // 五色RGBCCT灯
+
+    LAMP_C,
+} product_subtpye_t;
+
 int set_gpio_config(void);
 int mk_soft_version(char *pversion_buf);
 int light_start(void);

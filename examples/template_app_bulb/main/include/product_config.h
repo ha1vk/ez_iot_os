@@ -25,8 +25,9 @@ typedef struct{
 	char enable;				// 0:低电平 ；1:高电平
 	char mode;					// 1: 输入 ；2：输出
 	char drive_mode;			// IO驱动方式 0:PWM驱动 1：I2C 2:i/o 3:spi	
-	char light;      // 0：冷光 ；1：暖光；2：红 ；3：绿；4：蓝；5：CCT；6：亮度
-	char holder[3];
+	char light;      // 0：冷光 ；1：暖光；2：红 ；3：绿；4：蓝；5：CCT；6：亮度,(5,6须同时存在）
+    char i2c;        //LED_I2C_SDA=0;LED_I2C_CLK=1;
+	char holder[2];
 	drive_mode_param_t param;	// 驱动方式需要的一些特殊参数
 }IO_config_t;
 

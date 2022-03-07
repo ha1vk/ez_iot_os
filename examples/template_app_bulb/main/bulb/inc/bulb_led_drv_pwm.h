@@ -30,6 +30,13 @@ extern "C"
         LED_CCT_LIGHT,
     } led_color_name_e;
 
+    /*灯控逻辑口*/
+    typedef enum
+    {
+        LED_I2C_SDA,
+        LED_I2C_CLK,
+    } led_i2c_name_e;
+
     typedef enum
     {
         LED_GPIO_UNKNOW = 0,
@@ -56,9 +63,9 @@ extern "C"
 
     typedef enum
     {
-        LED_GPIO_DRIVER_MODE_IO = 0,
-        LED_GPIO_DRIVER_MODE_PWM = 1,
-        LED_GPIO_DRIVER_MODE_I2C = 2,
+        LED_GPIO_DRIVER_MODE_PWM = 0,
+        LED_GPIO_DRIVER_MODE_I2C = 1,
+        LED_GPIO_DRIVER_MODE_IO = 2,
         LED_GPIO_DRIVER_MODE_SPI = 3,
     } led_gpio_driver_mode_e;
 
@@ -86,6 +93,7 @@ extern "C"
     {
         config_led_color_name_e led_color_name; //0：冷光 ；1：暖光；2：红 ；3：绿；4：蓝；5：CCT；6：亮度
         led_gpio_name_e led_gpio_name;          //led maps to the real hardware pin,
+        led_i2c_name_e led_i2c_name;          //0 为数据线，1位时钟线
         led_gpio_level_e led_gpio_level;        //1：高电平驱动有效，0低电平驱动有效
         led_gpio_mode_e led_gpio_mode;          //input:0 ,output:1
         intr_type_e intr_type;                  //I/O为输入方式时使用的中断方式,I/O为输出时无效
@@ -94,7 +102,6 @@ extern "C"
     typedef struct
     {
         led_gpio_config_t led_gpio_config[5];
-        led_gpio_driver_mode_e led_gpio_driver_mode;
         ez_uint8_t white_control_mode;    //cct or cw 驱动
         union
         {
@@ -113,12 +120,13 @@ extern "C"
 #define LM_CV_STEP_MAX_SMART 1000 //亮度调节支持千分之一变化
 #define LM_CV_STEP_MAX 100        //亮度调节支持百分之一变化
 
-#define LEDC_CHANNEL_MAX 5 //最多支持5路灯，5路pwm 控制不同颜色led
+#define LEDC_CHANNEL_MAX 5 //最多5个引脚，支持5路灯，5路pwm 控制不同颜色led 。i2c 只用两路
 
     typedef enum
     {
         WHITE_CONTROL_CW = 0,  //冷暖灯珠驱动按时
         WHITE_CONTROL_CCT = 1, //CCT+ 亮度驱动方式
+        LED_CONTROL_I2C = 2,    //I2C 驱动,支持冷暖和rgb 同时设置
     } led_white_control_method_e;
 
     typedef struct
@@ -158,13 +166,23 @@ extern "C"
     /**
  * @brief    This function initializes the soft PWM channel and pin.
  * @param[in] led_gpio_config: PWM channel config info.
+ * @return    
+ * @note     针对球泡灯（1路，2路冷暖可调，3路rgb彩灯可调，5路rgb彩+冷暖灯可调）的gpio通用配置方法
+ * @waring
+ */
+    ez_int8_t bulb_leds_pwm_init(led_gpio_init_t * led_gpio_init);
+
+
+    /**
+ * @brief    This function initializes the soft I2C channel and pin.
+ * @param[in] led_gpio_config: I2c channel config info.
  * @param[in] frequency:PWM frequency.
  * @param[in] led_white_control_mode:bulb white led driver method
  * @return    
  * @note     针对球泡灯（1路，2路冷暖可调，3路rgb彩灯可调，5路rgb彩+冷暖灯可调）的gpio通用配置方法
  * @waring
  */
-    ez_int8_t bulb_leds_gpio_config(led_gpio_init_t * led_gpio_init);
+    ez_int8_t bulb_leds_i2c_bp5758_config(led_gpio_init_t * led_gpio_init);
 
     /**@fn		  
  * @brief		  点亮cct灯
@@ -182,11 +200,42 @@ extern "C"
  */
     ez_int8_t bulb_leds_RGB_config(ez_int32_t color_value, ez_int16_t led_lm_percentage);
 
-    void Ezviz_Led_stop();
-
-    void Ezviz_Led_start();
-
-    void Ezviz_Led_restart();
+    
+    /*写入 byte8�?byte7 �?byte8 共同设置 OUT1 灰度 2/1024,
+        Byte8 �?B[4:0]�?Byte7 �?B[4:0]共同决定 OUT1 的输出灰�?    B8[4:0] B7[4:0] �?OUT1灰度设置
+        00000 00000 �?0/1024灰度设置
+        00000 00001 �?1/1024灰度设置
+        00000 00010 �?2/1024灰度设置
+        00000 00011 �?3/1024灰度设置
+        00000 00100 �?4/1024灰度设置
+        �?�?    10000 00000 �?512/1024灰度设置
+        �?�?    11111 11110 �?1022/1024灰度设置
+        11111 11111 �?1023/1024灰度设置
+        默认�?�?0/1024灰度设置 
+        */
+    
+    typedef struct tag_I2c_pwm_duty
+    {
+        char duty_l;
+        char duty_h;
+    }BP5758_I2C_PWM_DUTY_T;
+    
+    typedef struct tag_I2c_ctrl_init
+    {
+        char    bp5758_address;
+        char    enable;
+        char    electric_out1;
+        char    electric_out2;
+        char    electric_out3;
+        char    electric_out4;
+        char    electric_out5;
+    }BP5758_I2C_INIT_T;
+    
+    typedef struct tag_I2c_ctrl_duties
+    {
+        char    bp5758_address;
+        BP5758_I2C_PWM_DUTY_T   duty[5]; //一路pwm 需要两个字节来表示    
+    }BP5758_I2C_CTRL_T;
 
 #ifdef __cplusplus
 }

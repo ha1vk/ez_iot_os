@@ -318,7 +318,7 @@ static ez_int32_t property_workmode_up(ez_tsl_value_t *p_stru_key_value)
         strcpy(mode, "white");
         break;
     case LIGHT_COLOR:
-        strcpy(mode, "color");
+        strcpy(mode, "colour");
         break;
     case LIGHT_SCENE:
         strcpy(mode, "scene");
@@ -580,7 +580,7 @@ static ez_int32_t property_workmode_set(ez_tsl_value_t *p_stru_key_value)
             return -1;
         }
     }
-    else if (0 == strcmp(p_stru_key_value->value, "color"))
+    else if (0 == strcmp(p_stru_key_value->value, "colour"))
     {
         int rgb = get_light_color_rgb();
 
@@ -796,10 +796,30 @@ ez_int32_t tsl_things_property2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_
         }
     }
     #ifdef HAL_ESP
-    ezlog_e(TAG_APP, "total heap:%d, dram:%d", heap_caps_get_free_size(2), heap_caps_get_free_size(4));
+    ezlog_v(TAG_APP, "total heap:%d, dram:%d", heap_caps_get_free_size(2), heap_caps_get_free_size(4));
     #endif
     if (NULL != property_cmd[i].identify)
     {
+         if((EZ_TSL_DATA_TYPE_INT == value_out->type)||
+            (EZ_TSL_DATA_TYPE_BOOL == value_out->type)
+            )
+
+        {
+            ezlog_v(TAG_APP,"receive identify:%s,  value=%d:\n ",property_cmd[i].identify,value_out->value_int);
+        }
+        else if((EZ_TSL_DATA_TYPE_STRING == value_out->type)
+                ||(EZ_TSL_DATA_TYPE_ARRAY== value_out->type)
+                ||(EZ_TSL_DATA_TYPE_OBJECT== value_out->type)
+                )
+        {
+            ezlog_v(TAG_APP, "receive identify: %s,  value=%s:\n ",property_cmd[i].identify,(char *)value_out->value);
+        }
+        else
+        {
+            ezlog_v(TAG_APP, "receive identify:%s,:\n ",property_cmd[i].identify);
+        }
+
+        
         ret = property_cmd[i].func_set(value_out);
 
         /* @brief 云端下发属性，且设备的属性已变化，应该执行主动上报。
@@ -857,5 +877,23 @@ ez_int32_t tsl_things_property2cloud(const ez_int8_t *sn, const ez_tsl_rsc_t *rs
     {
         ezlog_w(TAG_AP, "property[%s] do not realize up to cloude!!\n", key_info->key);
     }
+    if((EZ_TSL_DATA_TYPE_INT == value_out->type)||
+               (EZ_TSL_DATA_TYPE_BOOL == value_out->type)
+               )
+
+        {
+            ezlog_v(TAG_APP,"report identify:%s,  value=%d:\n ",property_cmd[i].identify, value_out->value_int);
+        }
+                else if((EZ_TSL_DATA_TYPE_STRING == value_out->type)
+                ||(EZ_TSL_DATA_TYPE_ARRAY== value_out->type)
+                ||(EZ_TSL_DATA_TYPE_OBJECT== value_out->type)
+                )
+        {
+            ezlog_v(TAG_APP,"report identify: %s,  value=%s:\n ",property_cmd[i].identify,(char *)value_out->value);
+        }
+        else
+        {
+            ezlog_v(TAG_APP, "report identify:%s,:\n ",property_cmd[i].identify);
+        }
     return ret;
 }

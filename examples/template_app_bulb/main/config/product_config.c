@@ -208,10 +208,14 @@ int parse_product_config(cJSON *root)
     cJSON *ap_timval = cJSON_GetObjectItem(root, "ap_timval");
     if (NULL == ap_timval)
     {
-        ezlog_e(TAG_APP, "parse_product_config cJSON_GetObjectItem ap_timval error!");
-        return -1;
+        ezlog_e(TAG_APP, "parse_product_config cJSON_GetObjectItem ap_timval error,set it to default");
+        g_product_config.ap_timval = 12;
     }
-    g_product_config.ap_timval = ap_timval->valuedouble;
+    else
+    {
+        g_product_config.ap_timval = ap_timval->valuedouble;
+    }
+    
 
     cJSON *country_code = cJSON_GetObjectItem(root, "country_code");
     if (NULL == country_code)
@@ -256,16 +260,20 @@ int parse_product_config(cJSON *root)
     int i = 0;
     cJSON *signal_IO_config = NULL;
     g_product_config.param.io_config_num = IO_config_Num;
+    memset(g_product_config.param.io_config,0xff,sizeof(g_product_config.param.io_config));
+    ezlog_v(TAG_APP, "init ioconfig ,length=%d",sizeof(g_product_config.param.io_config));
     for (i = 0; i < IO_config_Num; i++)
     {
         if (i >= IO_NUMS)
         {
             break;
         }
+       
+        
         signal_IO_config = cJSON_GetArrayItem(IO_config, i);
         if ((found = cJSON_GetObjectItem(signal_IO_config, "name")))
         {
-            g_product_config.param.io_config[i].name = found->valuedouble;
+            g_product_config.param.io_config[i].name = found->valuedouble;       
         }
 
         if ((found = cJSON_GetObjectItem(signal_IO_config, "enable")))
@@ -276,6 +284,11 @@ int parse_product_config(cJSON *root)
         if ((found = cJSON_GetObjectItem(signal_IO_config, "light")))
         {
             g_product_config.param.io_config[i].light = found->valuedouble;
+        }
+
+        if ((found = cJSON_GetObjectItem(signal_IO_config, "i2c")))
+        {
+            g_product_config.param.io_config[i].i2c = found->valuedouble;
         }
 
 		
@@ -414,6 +427,11 @@ int parse_product_config(cJSON *root)
 		if ((found = cJSON_GetObjectItem(function, "memory_timval")))
 		{
 			g_product_config.param.function.memory_timval = found->valuedouble;
+		}
+
+        if ((found = cJSON_GetObjectItem(function, "ap_timval")))
+		{
+			g_product_config.ap_timval = found->valuedouble;
 		}
 	
 		if ((found = cJSON_GetObjectItem(function, "reset_time_lower")))

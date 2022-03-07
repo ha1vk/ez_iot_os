@@ -328,7 +328,7 @@ int bulb_param_init()
         {
             p_bulb_param->mode = LIGHT_WHITE;
         }
-        else if (0 == strcmp(json_string, "color"))
+        else if (0 == strcmp(json_string, "colour"))
         {
              p_bulb_param->mode = LIGHT_COLOR;
         }

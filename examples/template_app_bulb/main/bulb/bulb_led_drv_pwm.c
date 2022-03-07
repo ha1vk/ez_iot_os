@@ -24,12 +24,16 @@
 #include "ezlog.h"
 #ifdef HAL_ESP
 #include "driver/pwm.h"
+#include "driver/i2c.h"
+
 #endif
 static const char *TAG_LED = "[LED]";
 
 static ez_uint32_t g_led_pwm_cycle_time = 1000;  //us
 
-static ez_uint8_t g_led_white_control_mode = WHITE_CONTROL_CW; //球泡灯的白光控制方式
+static ez_uint8_t g_led_control_mode = WHITE_CONTROL_CW; //球泡灯的白光控制方式
+
+#define I2C_EXAMPLE_MASTER_NUM              I2C_NUM_0        /*!< I2C port number for master dev */
 
 /* 由于渐变引入的实时变化中的灯泡状态*/
 led_current_param_t g_led_current_param =
@@ -148,7 +152,7 @@ static const char *TAG_GPIO = "[GPIO]";
  * @note     针对球泡灯（1路，2路冷暖可调，3路rgb彩灯可调，5路rgb彩+冷暖灯可调）的gpio通用配置方法
  * @waring
  */
-ez_int8_t bulb_leds_gpio_config(led_gpio_init_t * led_gpio_init)
+ez_int8_t bulb_leds_pwm_init(led_gpio_init_t * led_gpio_init)
 {
     int i = 0;
     ez_uint32_t pwm_led_duties[5] = {100, 100, 100, 100, 100}; //初始的占空比（亮度），频率为1000的情况下，占空比10%
@@ -216,7 +220,7 @@ ez_int8_t bulb_leds_gpio_config(led_gpio_init_t * led_gpio_init)
 
     g_led_pwm_cycle_time = 1000 * 1000 / led_gpio_init->driver_config.pwm_frequency;
 
-    g_led_white_control_mode = led_gpio_init->white_control_mode;
+    g_led_control_mode = led_gpio_init->white_control_mode;
 
     #ifdef HAL_ESP
     pwm_init(g_led_pwm_cycle_time, pwm_led_duties, 5, pwm_led_pin);
@@ -231,6 +235,120 @@ ez_int8_t bulb_leds_gpio_config(led_gpio_init_t * led_gpio_init)
     #endif
     return 0;
 }
+
+#if 1
+#define ESP_SLAVE_ADDR 0x28
+#define ACK_CHECK_DIS                       0x0              /*!< I2C master will not check ack from slave */
+
+static int i2c_master_write_slave(i2c_port_t i2c_num, uint8_t *data_wr, size_t size)
+{
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    //i2c_master_write_byte(cmd, (ESP_SLAVE_ADDR << 1) | WRITE_BIT, ACK_CHECK_EN);
+    i2c_master_write(cmd, data_wr, size, ACK_CHECK_DIS);
+    i2c_master_stop(cmd);
+    esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+    return ret;
+}
+
+//duties[5]分别为r,g,b,w,c,转化到意博灯Bp5758的out1  b ,out2g,out3r, out4w,out5 c
+esp_err_t pwm_to_i2c_BP5758(i2c_port_t i2c_num, uint32_t duties[5])
+{
+    int ret=0;
+    BP5758_I2C_CTRL_T led_i2c_ctrl ={0};
+
+    led_i2c_ctrl.bp5758_address = 0xb6;   //Start1： 10110000（写入 byte0， 正常模式，选择 byte1）
+
+    led_i2c_ctrl.duty[2].duty_l = duties[0] & 0x1F;
+    led_i2c_ctrl.duty[2].duty_h = (duties[0] & 0x3E0)>>5;
+
+    led_i2c_ctrl.duty[1].duty_l = duties[1] & 0x1F;
+    led_i2c_ctrl.duty[1].duty_h = (duties[1] & 0x3E0)>>5;
+
+    led_i2c_ctrl.duty[0].duty_l = duties[2] & 0x1F;
+    led_i2c_ctrl.duty[0].duty_h = (duties[2] & 0x3E0)>>5;
+
+    led_i2c_ctrl.duty[3].duty_l = duties[3] & 0x1F;
+    led_i2c_ctrl.duty[3].duty_h = (duties[3] & 0x3E0)>>5;
+
+    led_i2c_ctrl.duty[4].duty_l = duties[4] & 0x1F;
+    led_i2c_ctrl.duty[4].duty_h = (duties[4] & 0x3E0)>>5;
+
+    ret = i2c_master_write_slave(I2C_EXAMPLE_MASTER_NUM, (uint8_t *)&led_i2c_ctrl, sizeof(led_i2c_ctrl));
+    //disp_buf((uint8_t *)&led_i2c_ctrl, sizeof(led_i2c_ctrl));
+
+    return ret;
+}
+
+/**
+ * @brief    This function initializes the soft PWM channel and pin.
+ * @param[in] led_gpio_config: PWM channel config info.
+ * @param[in] frequency:PWM frequency.
+ * @param[in] led_white_control_mode:bulb white led driver method
+ * @return    
+ * @note     针对球泡灯（1路，2路冷暖可调，3路rgb彩灯可调，5路rgb彩+冷暖灯可调）的gpio通用配置方法
+ * @waring
+ */
+ez_int8_t bulb_leds_i2c_bp5758_config(led_gpio_init_t * led_gpio_init)
+{
+    //start i2c task
+    int ret=0;
+    int i=0;
+    //i2c_bp5758_master_init();
+    g_led_control_mode = led_gpio_init->white_control_mode;
+
+    int i2c_master_port = I2C_EXAMPLE_MASTER_NUM;
+    i2c_config_t conf;
+    conf.mode = I2C_MODE_MASTER;
+
+    for (i = 0; i < LEDC_CHANNEL_MAX; i++)
+    {
+        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): %d,%d\n ",__LINE__, __func__
+            ,led_gpio_init->led_gpio_config[i].led_gpio_name,
+             led_gpio_init->led_gpio_config[i].led_i2c_name);
+        
+
+        switch (led_gpio_init->led_gpio_config[i].led_i2c_name)
+        {
+            case LED_I2C_SDA:    
+                conf.sda_io_num = led_gpio_init->led_gpio_config[i].led_gpio_name; 
+                conf.sda_pullup_en = 0;
+                break;
+            case LED_I2C_CLK:      
+                conf.scl_io_num = led_gpio_init->led_gpio_config[i].led_gpio_name;
+                conf.scl_pullup_en = 0;
+                break;
+            
+            default:
+                ezlog_e(TAG_GPIO, "unknow i2c config!");
+                break;
+        }
+    }
+
+    ESP_ERROR_CHECK(i2c_driver_install(i2c_master_port, conf.mode));
+    ESP_ERROR_CHECK(i2c_param_config(i2c_master_port, &conf));
+    
+    BP5758_I2C_INIT_T led_i2c_init ={0};
+    led_i2c_init.bp5758_address = 0xb0;   //Start1： 10110000（写入 byte0， 正常模式，选择 byte1）
+    led_i2c_init.enable = 0x1f;             //写入 byte1，设置 OUT1~5 输出使能有效
+
+    /*意博灯Bp5758的out1  b,out2g,out3r,out4w,out5 c,
+     灯板冷暖灯珠总电压270v ，设置电流量程为30ma，功率为9w， 
+     rgb 灯珠为162V,设置电流为10ma ，三路总功率控制在3~5w    意博需求
+    */
+    led_i2c_init.electric_out1 = 0xe;     //写入 byte2，设置 OUT1 量程电流 40mA
+    led_i2c_init.electric_out2 = 0xe;
+    led_i2c_init.electric_out3 = 0xe;
+    led_i2c_init.electric_out4 = 0x1b;
+    led_i2c_init.electric_out5 = 0x1b;
+
+    /* 设置pwm 调制最大电流（最大功率)*/
+    ret = i2c_master_write_slave(I2C_EXAMPLE_MASTER_NUM, (uint8_t *)&led_i2c_init, sizeof(led_i2c_init));
+    ezos_delay_ms(10 / portTICK_RATE_MS);
+    return ret;
+}
+#endif
 
 /**@fn  
  * @brief  交互正常使用的是色温加亮度进行调节，对于cw 驱动的灯板，需要先转换在设置。
@@ -291,7 +409,7 @@ ez_int8_t bulb_leds_cct_config(ez_int16_t cct_value, ez_int16_t led_lm_percentag
 
     g_led_current_param.cct_value = cct_value;
 
-    if (g_led_white_control_mode == 1) // cct  驱动方式
+    if (g_led_control_mode == WHITE_CONTROL_CCT) // cct  驱动方式
     {
         if (cct_value < 2700)
         {
@@ -348,14 +466,27 @@ ez_int8_t bulb_leds_cct_config(ez_int16_t cct_value, ez_int16_t led_lm_percentag
         }
     }
 
-    ezlog_e(TAG_LED, "mduties[3] %d duties[4] = %d  duties[5]= %d", pwm_led_duties[3], pwm_led_duties[4],pwm_led_duties[5]);
-
-    for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
+    ezlog_v(TAG_LED, "duties[0]=%d,duties[1]=%d,duties[2]=%d,duties[3] %d duties[4] = %d,mode=%d"
+        , pwm_led_duties[0], pwm_led_duties[1],pwm_led_duties[2], 
+        pwm_led_duties[3], pwm_led_duties[4],g_led_control_mode);
+    if((WHITE_CONTROL_CCT == g_led_control_mode)||(WHITE_CONTROL_CW == g_led_control_mode))
     {
-        ezhal_pwm_set_duty(i, pwm_led_duties[i]);
+        for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
+        {
+            ezhal_pwm_set_duty(i, pwm_led_duties[i]);
+        }
+        ezhal_pwm_start();
     }
-
-    ezhal_pwm_start();
+    else if(LED_CONTROL_I2C == g_led_control_mode)
+    {
+        pwm_to_i2c_BP5758(0,pwm_led_duties);
+    }
+    else
+    {
+        ezlog_e(TAG_LED, "drv config error\n");
+    }
+    
+    
 
     return 0;
 }
@@ -401,15 +532,28 @@ ez_int8_t bulb_leds_RGB_config(ez_int32_t color_value, ez_int16_t led_lm_percent
         pwm_led_duties[LED_COLOR_BLUE] = g_led_pwm_cycle_time - pwm_led_duties[LED_COLOR_BLUE];
     }
 
-    ezlog_v(TAG_LED, " red=%d  green=%d  blue=%d!!!",  
-        pwm_led_duties[0], pwm_led_duties[1], pwm_led_duties[2]);
+    ezlog_v(TAG_LED, "duties[0]=%d,duties[1]=%d,duties[2]=%d,duties[3] %d duties[4] = %d,mode=%d"
+        , pwm_led_duties[0], pwm_led_duties[1],pwm_led_duties[2], 
+        pwm_led_duties[3], pwm_led_duties[4],g_led_control_mode);
 
-    for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
+
+    if((WHITE_CONTROL_CCT == g_led_control_mode)||(WHITE_CONTROL_CW == g_led_control_mode))
     {
-        ezhal_pwm_set_duty(i, pwm_led_duties[i]);
+        for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
+        {
+            ezhal_pwm_set_duty(i, pwm_led_duties[i]);
+        }
+        ezhal_pwm_start();
     }
-    ezhal_pwm_start();
-
+    else if(LED_CONTROL_I2C == g_led_control_mode)
+    {
+        pwm_to_i2c_BP5758(0,pwm_led_duties);
+    }
+    else
+    {
+        ezlog_e(TAG_LED, "drv config error\n");
+    }
+    
     return 0;
 }
 

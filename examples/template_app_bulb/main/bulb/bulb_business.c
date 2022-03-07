@@ -304,11 +304,6 @@ int adjust_light_cct(int light_cct)
     int iChangeRange = 10;
     ezlog_v(TAG_LIGHT, "function %s in.", __func__);
 
-    if (g_bulb_param.cct == light_cct)
-    {
-        ezlog_d(TAG_LIGHT, "light cct is not changed.");
-        return 0;
-    }
 
     if (2700 > light_cct || 6500 < light_cct)
     {
@@ -357,11 +352,7 @@ int adjust_light_rgb(int light_rgb)
     led_ctrl_t led_ctrl_cmd = {0};
     ezlog_v(TAG_LIGHT, "function %s in.", __func__);
 
-    if (g_bulb_param.rgb == light_rgb)
-    {
-        ezlog_d(TAG_LIGHT, "light rgb is not changed.");
-        return 0;
-    }
+
 
     if (light_rgb > 0xffffff || light_rgb < 0)
     {
@@ -597,12 +588,13 @@ void light_scene_task(void *param)
 
     do
     {
-        if (g_bulb_param.mode != LIGHT_SCENE)
+        if ((g_bulb_param.mode != LIGHT_SCENE)
+            ||(0 == scene.cb_count)
+            )
         {
-            ezos_delay_ms(2000);
+            ezos_delay_ms(1000);
             continue;
         }
-
         g_b_SceneChanged = false; //新的场景执行时，退出标志位清空
 
         memcpy(&scene, &g_bulb_param.scene, sizeof(light_scene_t));
@@ -2031,15 +2023,10 @@ void bulb_ctrl_init()
     */
     printf("\n to_do DEBUG in line (%d) and function (%s)): %d\n ", __LINE__, __func__, sizeof(g_bulb_param));
 
-    g_bulb_param.swit = 1;
-    g_bulb_param.brightness = 100;
-    g_bulb_param.mode = LIGHT_WHITE;
-    g_bulb_param.cct = 3000;
-    g_bulb_param.rgb = 0xFF0000;
 
-    g_led_current_param.brightness = 100;
-    g_led_current_param.cct_value = 3000;
-    g_led_current_param.rgb = 0xFF0000;
+    g_led_current_param.brightness = g_bulb_param.brightness;
+    g_led_current_param.cct_value = g_bulb_param.cct;
+    g_led_current_param.rgb = g_bulb_param.rgb;
 
     
     const ez_char_t *bulb_ctrl_thread_name = "led_ctrl";

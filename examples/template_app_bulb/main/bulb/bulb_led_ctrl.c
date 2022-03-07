@@ -442,6 +442,7 @@ int32_t led_ctrl_cct(int dst_cct, int dst_lm, int sleep_ms, int chg_loops)
 	*/
     //src_lm *= 10;
     dst_lm *= 10;
+    ezlog_v(TAG_APP, "the src_cct is %d ,dst_cct is %d,chg_loop=%d,sleep_ms=%d,src_lm=%d,dst_lm=%d\n ", src_cct, dst_cct, chg_loops, sleep_ms, src_lm, dst_lm);
 
     if (src_lm != dst_lm) //亮度主变，色温辅助变化
     {
