@@ -56,6 +56,7 @@ static const bulb_kv_t g_bulb_kv_tab[] = {
 
     {K_PT_PARA1, "para1", TYPE_NUM, 0, ""},
     {K_PT_PARA2, "para2", TYPE_NUM, 0, ""},
+    {K_PT_AGE_TIME, "age_time", TYPE_NUM, 0, ""},
 
     {K_DAYLIGHT, "daylight", TYPE_NUM, 0, ""},
     {K_NTP_SERVER, "ntp_server", TYPE_STRING, 0, "time.ys7.com"},
@@ -107,7 +108,7 @@ int config_get_value(bulb_key_e key_e, void *value, ez_size_t *len)
     int ret = 0;
 
     ret = kv_raw_get(g_bulb_kv_tab[key_e].key_v, NULL, len);
-    if (0 != ret || 0 > *len)
+    if (0 != ret)
     {
         ezlog_e(TAG_CONFIG, "get length failed: %s, len: %d", g_bulb_kv_tab[key_e].key_v, *len);
         return -1;

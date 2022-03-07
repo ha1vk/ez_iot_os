@@ -33,9 +33,9 @@ static int parse_sap_config(char *buf, int buf_size)
 {
     BOOT_PARAMS boot_param = {0};
     memcpy(&boot_param, buf, sizeof(BOOT_PARAMS));
-    if (boot_param.magicNumber != MAGIC_NUMBER)
+    if (boot_param.magicNumber != MAGIC_NUMBER && boot_param.magicNumber != MAGIC_NUMBER_INVERT)
     {
-        ezlog_e(TAG, "not a sap config.");
+        ezlog_e(TAG, "not a sap config. magic number: %x", boot_param.magicNumber);
         return -1;
     }
 
