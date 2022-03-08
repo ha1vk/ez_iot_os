@@ -29,7 +29,7 @@
 #include "lwip/apps/sntp.h"
 extern char g_time_zone[8];//tsl 需要用
 #endif
-
+#define TAG_TIMEZONE                         "TIME_ZONE" 
 #include "net_ctrl_tcp.h"
 static int8_t g_rssi = 0;
 static char g_ip[16] = {0};
@@ -90,34 +90,34 @@ int report_wifi_info(ez_tsl_value_t *value_out)
         char dev_firmwareversion[64] = {0};
         mk_soft_version(dev_firmwareversion);
         
-        if(0 != config_get_value(K_WIFI_SSID,&wifi_info.ssid,&ssid_len))
+        if(0 != config_get_value(K_WIFI_SSID,wifi_info.ssid,&ssid_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_SSID error!");
             break;
         }
         ezlog_e(TAG_APP, "config_read WIFI_SSID is:%s",wifi_info.ssid);
-        if(0 != config_get_value(K_WIFI_PASSWORD,&wifi_info.password,&password_len))
+        if(0 != config_get_value(K_WIFI_PASSWORD,wifi_info.password,&password_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_PASSWORD error!");
             break;
         }
-        if(0 != config_get_value(K_WIFI_CC,&wifi_info.cc,&cc_len))
+        if(0 != config_get_value(K_WIFI_CC,wifi_info.cc,&cc_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_CC error!");
             break;
         }
-        if(0 != config_get_value(K_WIFI_IP,&wifi_info.ip,&ip_len))
+        if(0 != config_get_value(K_WIFI_IP,wifi_info.ip,&ip_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_IP error!");
             break;
         }
         ezlog_e(TAG_APP, "config_read WIFI_IP is:%s",wifi_info.ip);
-        if(0 != config_get_value(K_WIFI_MASK,&wifi_info.mask,&mask_len))
+        if(0 != config_get_value(K_WIFI_MASK,wifi_info.mask,&mask_len))
         {
             ezlog_e(TAG_APP, "config_read WIFI_MASK error!");
             break;
         }
-        if(0 != config_get_value(K_WIFI_GATEWAY,&wifi_info.gateway,&gateway_len))
+        if(0 != config_get_value(K_WIFI_GATEWAY,wifi_info.gateway,&gateway_len))
         {
             ezlog_e(TAG_APP, "config_read IFI_GATEWAY error!");
             break;
@@ -307,34 +307,34 @@ void wifi_info_timer_cb()
     int mask_len = sizeof(wifi_info.ssid);
     int gateway_len = sizeof(wifi_info.ssid);
     ezlog_e(TAG_APP, "timer is run!");
-    if(0 != config_get_value(K_WIFI_SSID,&wifi_info.ssid,&ssid_len))
+    if(0 != config_get_value(K_WIFI_SSID,wifi_info.ssid,&ssid_len))
     {
         ezlog_e(TAG_APP, "config_read WIFI_SSID error!");
         return;
     }
     ezlog_e(TAG_APP, "config_read WIFI_SSID is:%s",wifi_info.ssid);
-    if(0 != config_get_value(K_WIFI_PASSWORD,&wifi_info.password,&password_len))
+    if(0 != config_get_value(K_WIFI_PASSWORD,wifi_info.password,&password_len))
     {
         ezlog_e(TAG_APP, "config_read WIFI_PASSWORD error!");
         return;
     }
-    if(0 != config_get_value(K_WIFI_CC,&wifi_info.cc,&cc_len))
+    if(0 != config_get_value(K_WIFI_CC,wifi_info.cc,&cc_len))
     {
         ezlog_e(TAG_APP, "config_read WIFI_CC error!");
         return;
     }
-    if(0 != config_get_value(K_WIFI_IP,&wifi_info.ip,&ip_len))
+    if(0 != config_get_value(K_WIFI_IP,wifi_info.ip,&ip_len))
     {
         ezlog_e(TAG_APP, "config_read WIFI_IP error!");
         return;
     }
     ezlog_e(TAG_APP, "config_read WIFI_IP is:%s",wifi_info.ip);
-    if(0 != config_get_value(K_WIFI_MASK,&wifi_info.mask,&mask_len))
+    if(0 != config_get_value(K_WIFI_MASK,wifi_info.mask,&mask_len))
     {
         ezlog_e(TAG_APP, "config_read WIFI_MASK error!");
         return;
     }
-    if(0 != config_get_value(K_WIFI_GATEWAY,&wifi_info.gateway,&gateway_len))
+    if(0 != config_get_value(K_WIFI_GATEWAY,wifi_info.gateway,&gateway_len))
     {
         ezlog_e(TAG_APP, "config_read IFI_GATEWAY error!");
         return;
@@ -597,3 +597,267 @@ int register_server(void)
     return 0;
 }
 
+int correct_time_zone(char *time_zone_string)
+{
+    time_zone_t time_zone_cfg = {0};
+    if (NULL == time_zone_string)
+    {
+        ezlog_e(TAG_APP, "read time zone error.");
+        return -1;
+    }
+    printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the timezone_string is:%s \n ",__LINE__, __func__,time_zone_string);
+
+    int host_len=sizeof(time_zone_cfg.host);           
+    int daylightstring_len=sizeof(time_zone_cfg.daylightstring); 
+    int timezone_len=sizeof(time_zone_cfg.timezone);       
+    int daylight_len=sizeof(time_zone_cfg.daylight); 
+    if(0 != config_get_value(K_NTP_SERVER,time_zone_cfg.host,&host_len))
+    {
+        ezlog_e(TAG_APP, "config_read HOST error!");
+        return -1;
+    }
+        if(0 != config_get_value(K_DAYLIGHT_STR,time_zone_cfg.daylightstring,&daylightstring_len))
+    {
+        ezlog_e(TAG_APP, "config_read DAYLIGHTSTRING error!");
+        return -1;
+    }
+        if(0 != config_get_value(K_TIMEZONE,time_zone_cfg.timezone,&timezone_len))
+    {
+        ezlog_e(TAG_APP, "config_read TIMEZONE error!");
+        return -1;
+    }
+        if(0 != config_get_value(K_DAYLIGHT,&time_zone_cfg.daylight,&daylight_len))
+    {
+        ezlog_e(TAG_APP, "config_read DAYLIGHT, error!");
+        return -1;
+    }
+     printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
+    char daylight_string[64] = {0};
+    cJSON *js_root = NULL;
+    cJSON *js_time_zone = NULL;
+    cJSON *js_daylight = NULL;
+     do
+    {
+        js_root = cJSON_Parse(time_zone_string);
+        if (NULL == js_root)
+        {
+            ezlog_e(TAG_TIMEZONE , "time zone info parse error.");
+            break;
+        }
+
+        js_daylight = cJSON_GetObjectItem(js_root, "daylightSavingTime");
+        if (NULL == js_daylight)
+        {
+            ezlog_e(TAG_TIMEZONE, "day light absent.");
+            break;
+        }
+        time_zone_cfg.daylight = js_daylight->valueint;
+
+        js_time_zone = cJSON_GetObjectItem(js_root, "timeZone");
+        if (NULL == js_time_zone)
+        {
+            ezlog_e(TAG_TIMEZONE , "time zone absent.");
+            break;
+        }
+        strcpy(time_zone_cfg.timezone, js_time_zone->valuestring);
+        int hour = 0;
+        int minute = 0;
+        char offset_time[16] = {0};
+
+        int i = 0;
+        for (i = 0; i < strlen(time_zone_cfg.timezone); i++)
+        {
+            if ('+' == time_zone_cfg.timezone[i])
+            {
+                strcpy(offset_time, &time_zone_cfg.timezone[i + 1]);
+                sscanf(offset_time, "%2d:%2d", &hour, &minute);
+
+                break;
+            }
+            if ('-' == time_zone_cfg.timezone[i])
+            {
+                strcpy(offset_time, &time_zone_cfg.timezone[i + 1]);
+                sscanf(offset_time, "%2d:%2d", &hour, &minute);
+                hour = -hour;
+                minute = -minute;
+                break;
+            }
+        }
+
+        int offsetminute = 60 * hour + minute;
+
+        if (0 != js_daylight->valueint)
+        {
+            cJSON *js_offset_time = cJSON_GetObjectItem(js_root, "offsetTime");
+            if (NULL == js_offset_time)
+            {
+                ezlog_e(TAG_TIMEZONE, "offset time absent.");
+                break;
+            }
+            offsetminute += js_offset_time->valueint;
+            hour = offsetminute / 60;
+            minute = offsetminute % 60;
+
+            cJSON *js_start_time = cJSON_GetObjectItem(js_root, "startTime");
+            if (NULL == js_start_time)
+            {
+                ezlog_e(TAG_TIMEZONE, "start time absent.");
+                break;
+            }
+            cJSON *js_end_time = cJSON_GetObjectItem(js_root, "endTime");
+            if (NULL == js_end_time)
+            {
+                ezlog_e(TAG_TIMEZONE, "end time absent.");
+                break;
+            }
+
+            cJSON *js_start_week_day = cJSON_GetObjectItem(js_root, "startWeekDay");
+            if (NULL == js_start_week_day)
+            {
+                ezlog_e(TAG_TIMEZONE, "start week day absent.");
+                break;
+            }
+            int start_week_day = atoi(js_start_week_day->valuestring);
+            if (start_week_day == 7)
+            {
+                start_week_day = 0; //星期1-7对应0-6
+            }
+
+            cJSON *js_start_month = cJSON_GetObjectItem(js_root, "startMonth");
+            if (NULL == js_start_month)
+            {
+                ezlog_e(TAG_TIMEZONE, "start month absent.");
+                break;
+            }
+            cJSON *js_start_week_index = cJSON_GetObjectItem(js_root, "startWeekIndex");
+            if (NULL == js_start_week_index)
+            {
+                ezlog_e(TAG_TIMEZONE, "start week index absent.");
+                break;
+            }
+
+            int start_week_index = 0;
+            if (0 == strcmp(js_start_week_index->valuestring, "99"))
+            {
+                start_week_index = 5;
+            }
+            else
+            {
+                start_week_index = atoi(js_start_week_index->valuestring);
+            }
+
+            cJSON *js_end_month = cJSON_GetObjectItem(js_root, "endMonth");
+            if (NULL == js_end_month)
+            {
+                ezlog_e(TAG_TIMEZONE, "end month absent.");
+                break;
+            }
+
+            cJSON *js_end_week_index = cJSON_GetObjectItem(js_root, "endWeekIndex");
+            if (NULL == js_end_week_index)
+            {
+                ezlog_e(TAG_TIMEZONE, "end week index absent.");
+                break;
+            }
+            int end_week_index = 0;
+            if (0 == strcmp(js_end_week_index->valuestring, "99"))
+            {
+                end_week_index = 5;
+            }
+            else
+            {
+                end_week_index = atoi(js_end_week_index->valuestring);
+            }
+
+            cJSON *js_end_week_day = cJSON_GetObjectItem(js_root, "endWeekDay");
+            if (NULL == js_end_week_day)
+            {
+                ezlog_e(TAG_TIMEZONE, "end week day absent.");
+                break;
+            }
+            int end_week_day = atoi(js_end_week_day->valuestring);
+            if (end_week_day == 7)
+            {
+                end_week_day = 0; //星期1-7对应0-6
+            }
+
+            if (offsetminute < 0)
+            {
+                sprintf(daylight_string, "DST+%02d:%02d,M%02d.%1d.%1d",
+                        -hour, -minute,
+                        js_start_month->valueint, start_week_index, start_week_day);
+
+                if (0 == strcmp(js_start_time->valuestring, ""))
+                {
+                    sprintf(daylight_string, "%s,M%02d.%1d.%1d", daylight_string,
+                            js_end_month->valueint, end_week_index, end_week_day);
+                }
+                else
+                {
+                    sprintf(daylight_string, "%s/%s,M%02d.%1d.%1d", daylight_string,
+                            js_start_time->valuestring, js_end_month->valueint, end_week_index, end_week_day);
+                }
+
+                if (0 != strcmp(js_end_time->valuestring, ""))
+                {
+                    sprintf(daylight_string, "%s/%s", daylight_string, js_end_time->valuestring);
+                }
+            }
+            else
+            {
+                sprintf(daylight_string, "DST-%02d:%02d,M%02d.%1d.%1d",
+                        hour, minute,
+                        js_start_month->valueint, start_week_index, start_week_day);
+
+                if (0 == strcmp(js_start_time->valuestring, ""))
+                {
+                    sprintf(daylight_string, "%s,M%02d.%1d.%1d", daylight_string,
+                            js_end_month->valueint, end_week_index, end_week_day);
+                }
+                else
+                {
+                    sprintf(daylight_string, "%s/%s,M%02d.%1d.%1d", daylight_string,
+                            js_start_time->valuestring, js_end_month->valueint, end_week_index, end_week_day);
+                }
+
+                if (0 != strcmp(js_end_time->valuestring, ""))
+                {
+                    sprintf(daylight_string, "%s/%s", daylight_string, js_end_time->valuestring);
+                }
+            }
+        }
+        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the daylight_string is:%s \n ",__LINE__, __func__,(char *)daylight_string);
+        strcpy(time_zone_cfg.daylightstring, daylight_string);
+        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the daylightstring is:%s \n ",__LINE__, __func__,(char *)time_zone_cfg.daylightstring);
+        ez_iot_correct_time(time_zone_cfg.host, time_zone_cfg.timezone, time_zone_cfg.daylight, time_zone_cfg.daylightstring);
+        
+    } while (false);
+
+    if (NULL != js_root)
+    {
+        cJSON_Delete(js_root);
+    }
+
+    if(0 != config_set_value(K_NTP_SERVER,time_zone_cfg.host,sizeof(time_zone_cfg.host)))
+    {
+        ezlog_e(TAG_APP, "config_write HOST error!");
+        return -1;
+    }
+    if(0 != config_set_value(K_DAYLIGHT_STR,time_zone_cfg.daylightstring,sizeof(time_zone_cfg.daylightstring)))
+    {
+        ezlog_e(TAG_APP, "config_write DAYLIGHTSTRING error!");
+        return -1;
+    }
+    if(0 != config_set_value(K_TIMEZONE,time_zone_cfg.timezone,sizeof(time_zone_cfg.timezone)))
+    {
+        ezlog_e(TAG_APP, "config_write TIMEZONE error!");
+        return -1;
+    }
+    if(0 != config_set_value(K_DAYLIGHT,&time_zone_cfg.daylight,sizeof(time_zone_cfg.daylight)))
+    {
+        ezlog_e(TAG_APP, "config_write DAYLIGHT error!");
+        return -1;
+    }
+     printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
+     return 0;
+}

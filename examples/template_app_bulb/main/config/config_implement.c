@@ -62,7 +62,7 @@ static const bulb_kv_t g_bulb_kv_tab[] = {
     {K_DAYLIGHT, "daylight", TYPE_NUM, 0, ""},
     {K_NTP_SERVER, "ntp_server", TYPE_STRING, 0, "time.ys7.com"},
     {K_TIMEZONE, "time_zone", TYPE_STRING, 0, "UTC+08:00"},
-    {K_DATLIGHT_STR, "daylight_string", TYPE_STRING, 0, ""},
+    {K_DAYLIGHT_STR, "daylight_string", TYPE_STRING, 0, ""},
 
     {K_DOMAIN, "domain", TYPE_STRING, 0, ""},
     {K_DEVICE_ID, "device_id", TYPE_STRING, 0, ""},
@@ -86,7 +86,7 @@ static const bulb_kv_t g_bulb_kv_tab[] = {
     {K_BIORHYTHM, "Biorhythm", TYPE_STRING, 0, "{}"},
     {K_WAKEUP, "WakeUp", TYPE_STRING, 0, "{}"},
     {K_HELPSLEEP, "HelpSleep", TYPE_STRING, 0, "{}"},
-    {K_TIMEMGR, "TimeMgr", TYPE_STRING, 0, "{\"timeZone\": \"UTC+08:00\",\"tzCode\": 42,\"daylightSavingTime\": 0}"},
+    {K_TIMEZONECOMPOSE, "TimeZoneCompose", TYPE_STRING, 0, "{\"timeFormat\":\"0\",\"timeZone\": \"UTC+08:00\",\"tzCode\": 42,\"daylightSavingTime\": 1,\"offsetTime\": 0,\"startMonth\": 0,\"startWeekIndex\": \"\",\"startWeekDay\": \"\",\"startTime\": \"08:00:00\",\"endMonth\": 0,\"endWeekIndex\": \"\",\"endWeekDay\": \"\",\"endTime\": \"08:00:00\"}"},
     {K_WIFISTATUS, "WifiStatus", TYPE_STRING, 0, "{}"},
 
 };
@@ -196,7 +196,7 @@ int config_reset_wifi()
 int config_reset_time_zone(void)
 {
     int ret = 0;
-    for (size_t i = K_DAYLIGHT; i <= K_DATLIGHT_STR; i++)
+    for (size_t i = K_DAYLIGHT; i <= K_DAYLIGHT_STR; i++)
     {
         if (TYPE_NUM == g_bulb_kv_tab[i].value_type)
         {
@@ -220,10 +220,10 @@ int config_reset_time_zone_str(void)
 {
     int ret = 0;
 
-    ret = kv_raw_set(g_bulb_kv_tab[K_TIMEMGR].key_v, g_bulb_kv_tab[K_TIMEMGR].bulb_default_value_str, strlen(g_bulb_kv_tab[K_TIMEMGR].bulb_default_value_str));
+    ret = kv_raw_set(g_bulb_kv_tab[K_TIMEZONECOMPOSE].key_v, g_bulb_kv_tab[K_TIMEZONECOMPOSE].bulb_default_value_str, strlen(g_bulb_kv_tab[K_TIMEZONECOMPOSE].bulb_default_value_str));
     if (0 != ret)
     {
-        ezlog_e(TAG_CONFIG, "reset time_zone string failed. key: %s", g_bulb_kv_tab[K_TIMEMGR].key_v);
+        ezlog_e(TAG_CONFIG, "reset time_zone string failed. key: %s", g_bulb_kv_tab[K_TIMEZONECOMPOSE].key_v);
     }
 
     return ret;

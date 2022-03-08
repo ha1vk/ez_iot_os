@@ -35,7 +35,7 @@ extern "C"
         K_DAYLIGHT,
         K_NTP_SERVER,
         K_TIMEZONE,
-        K_DATLIGHT_STR,
+        K_DAYLIGHT_STR,
 
         K_DOMAIN,
         K_DEVICE_ID,
@@ -57,7 +57,7 @@ extern "C"
         K_BIORHYTHM,
         K_WAKEUP,
         K_HELPSLEEP,
-        K_TIMEMGR,
+        K_TIMEZONECOMPOSE,
         K_WIFISTATUS,
     } bulb_key_e;
 

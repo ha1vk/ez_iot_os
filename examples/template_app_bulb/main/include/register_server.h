@@ -5,7 +5,7 @@ extern "C" {
 #define _EZVIZ_REGISTER_SERVER_H_
 
 int register_server(void);
-
+int correct_time_zone(char *time_zone_string);
 #ifdef __cplusplus
 }
 #endif

@@ -50,7 +50,7 @@ event_$(KEY)_up     设备主动上报事件调用此函数
 #endif
 
 //debug 数据，上报的复杂属性值，比较复杂，内存中不保存，直接从flash中读取省内存
-
+#include "register_server.h"
 #include "config_implement.h"
 extern int report_wifi_info(ez_tsl_value_t *value_out);
 
@@ -351,7 +351,7 @@ static ez_int32_t property_workmode_up(ez_tsl_value_t *p_stru_key_value)
 static ez_int32_t property_timezonecompose_up(ez_tsl_value_t *p_stru_key_value)
 {
 	ez_int32_t rv = -1;
-
+    size_t len_tmp= 2048;
 	do
 	{
 		if (NULL == p_stru_key_value || NULL == p_stru_key_value->value)
@@ -359,14 +359,20 @@ static ez_int32_t property_timezonecompose_up(ez_tsl_value_t *p_stru_key_value)
 			break;
 		}
 		//todo:获取实际值上传
+        if (0 != config_get_value(K_TIMEZONECOMPOSE, p_stru_key_value->value, &len_tmp))
+        {
+            break;
+        }
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
-		char netstatus[128] = "{\"type\":\"\",\"address\":\"\",\"mask\":\"\",\"gateway\":\"\",\"signal\":\"\",\"ssid\":\"\"}";
-		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
-		p_stru_key_value->size = strlen(netstatus);
-        memcpy(p_stru_key_value->value, netstatus, p_stru_key_value->size);
+        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the uptimezone is:%s \n ",__LINE__, __func__,(char *)p_stru_key_value->value);
+		// printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
+		// char netstatus[128] = "{\"type\":\"\",\"address\":\"\",\"mask\":\"\",\"gateway\":\"\",\"signal\":\"\",\"ssid\":\"\"}";
+		// //完善此部分...
+		// printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
+		// p_stru_key_value->size = strlen(netstatus);
+        //memcpy(p_stru_key_value->value, netstatus, p_stru_key_value->size);
+        p_stru_key_value->size = len_tmp;
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -619,6 +625,8 @@ static ez_int32_t property_timezonecompose_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
+    printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the timezone value is:%s \n ",__LINE__, __func__,(char *)p_stru_key_value->value);
+    correct_time_zone(p_stru_key_value->value);//todo:应用层业务处理
 	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
