@@ -141,7 +141,7 @@ typedef enum
 ez_int32_t turn_on_lamp();
 ez_int32_t turn_off_lamp();
 
-
+int regular_power_up(void);
 
 bool get_light_switch();
 ez_int32_t get_light_brightness();

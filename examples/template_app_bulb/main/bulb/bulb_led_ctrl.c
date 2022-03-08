@@ -229,7 +229,7 @@ int32_t led_ctrl_rgb(int dst_lm, int dst_rgb, int sleep_ms, int rgb_loops)
 
     if (src_rgb < 0 || src_rgb > 0xffffff || dst_rgb < 0 || dst_rgb > 0xffffff)
     {
-        ezlog_e(TAG_APP, "led_ctrl_rgb color Rgb param is error src_lm=%d,dst_lm=%d ", src_lm, dst_lm);
+        ezlog_e(TAG_APP, "led_ctrl_rgb color Rgb param is error src_lm=%d,dst_lm=%d ", src_rgb, dst_rgb);
         return -1;
     }
 

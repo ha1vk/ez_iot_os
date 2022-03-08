@@ -25,6 +25,10 @@ extern "C"
         short nDownDuration;  //颜色变化时间  20ms-10000ms,依赖nLowBrightness
     } led_ctrl_t;
 
+    int32_t led_ctrl_rgb(int dst_lm, int dst_rgb, int sleep_ms, int rgb_loops);
+
+    int32_t led_ctrl_cct(int dst_cct, int dst_lm, int sleep_ms, int chg_loops);
+
     int led_ctrl_do_async(led_ctrl_t *struLedCtrl);
 
     int led_ctrl_do_sync(led_ctrl_t *struLedCtrl);

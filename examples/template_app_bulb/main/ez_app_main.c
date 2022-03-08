@@ -121,10 +121,13 @@ int main(int argc, char **argv)
         ezlog_a(TAG_AP, "global init failed!");
         return 0;
     }
-    config_print();
-
+    //config_print();
     set_gpio_config();
- 
+  
+    bulb_ctrl_init();  
+
+    regular_power_up();
+	
     #ifdef HAL_ESP
     ap_config_checkupdate();
 
@@ -153,7 +156,7 @@ int main(int argc, char **argv)
     }
     #endif
 
-    bulb_ctrl_init();   
+  
     kv_print();
     rssi_timer=eztimer_create("rssi_timer", (300 * 1000), ez_true, wifi_info_timer_cb);
     /* 主（父）线程循环,否则进程退出*/

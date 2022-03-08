@@ -44,7 +44,7 @@ extern "C"
 
         K_DEV_LIST,
 
-        K_SWITCH,
+        K_POWERSWITCH,
         K_COLORTEMPERATURE,
         K_BRIGHTNESS,
         K_COUNTDOWNCFG,

@@ -16,6 +16,7 @@
 #include "kv_imp.h"
 
 #define TAG_CONFIG "T_CONF"
+#define KV_LENGTH_MAX 2048
 
 typedef enum
 {
@@ -71,7 +72,7 @@ static const bulb_kv_t g_bulb_kv_tab[] = {
     {K_DEV_LIST, "dev_list", TYPE_STRING, 0, ""},
 
     // light things key
-    {K_SWITCH, "Switch", TYPE_NUM, 1, ""},
+    {K_POWERSWITCH, "PowerSwitch", TYPE_NUM, 1, ""},
     {K_COLORTEMPERATURE, "ColorTemperature", TYPE_NUM, 2700, ""},
     {K_BRIGHTNESS, "Brightness", TYPE_NUM, 100, ""},
     {K_COUNTDOWNCFG, "CountdownCfg", TYPE_STRING, 0, "{}"},
@@ -266,9 +267,9 @@ int config_print()
 int bulb_param_init()
 {
     light_param_t *p_bulb_param = get_light_param();
-    size_t len_tmp= 2048;
+    size_t len_tmp= KV_LENGTH_MAX;
     int value_tmp=0;
-    char *json_string = ezos_malloc(2048);
+    char *json_string = ezos_malloc(KV_LENGTH_MAX);
 
     if(NULL ==json_string)
     {
@@ -284,7 +285,8 @@ int bulb_param_init()
     {
         p_bulb_param->brightness = value_tmp;
     }
-    
+
+    len_tmp = KV_LENGTH_MAX;
     if (0 != config_get_value(K_BRIGHTNESS, &value_tmp, &len_tmp))
     {
         ezlog_e(TAG_APP, "brightness is null. ");
@@ -295,6 +297,7 @@ int bulb_param_init()
         p_bulb_param->brightness = value_tmp;
     }
 
+    len_tmp = KV_LENGTH_MAX;
     if (0 != config_get_value(K_COLORTEMPERATURE, &value_tmp, &len_tmp))
     {
         ezlog_e(TAG_APP, "cct is null. ");
@@ -305,6 +308,7 @@ int bulb_param_init()
         p_bulb_param->cct = value_tmp;
     }
 
+    len_tmp = KV_LENGTH_MAX;
     if (0 != config_get_value(K_COLORRGB, json_string, &len_tmp))
     {
         ezlog_e(TAG_APP, "rgb is null. ");
@@ -315,8 +319,11 @@ int bulb_param_init()
         int r, g, b;
         sscanf(json_string, "#%2x%2x%2x", &r, &g, &b);
         p_bulb_param->rgb  =r * 256 * 256 + g * 256 + b;;
+        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): 0x%x\n ",__LINE__, __func__,p_bulb_param->rgb);
+        
     }
 
+    len_tmp = KV_LENGTH_MAX;
     if (0 != config_get_value(K_WORKMODE, json_string, &len_tmp))
     {
         ezlog_e(TAG_APP, "workmode is null. ");
@@ -340,7 +347,8 @@ int bulb_param_init()
         {
         }
     }
-
+    
+    len_tmp = KV_LENGTH_MAX;
     if (0 != config_get_value(K_CUSTOMSCENECFG, json_string, &len_tmp))
     {
         ezlog_e(TAG_APP, "scence is null. ");
@@ -361,7 +369,7 @@ int config_init(void)
 {
     ezlog_i(TAG_APP, "config_init");
 	char param_ver[24] = {0};
-	char len =0;
+	char len =24;
 	int ret = config_get_value(K_PARAM_VER, &param_ver, &len);
 
     if (0 == len)
@@ -371,7 +379,7 @@ int config_init(void)
     }
     else
     {
-        ezlog_i("param ver is%s\n",param_ver);
+        ezlog_i("param ver is %s\n",param_ver);
         
     }
 

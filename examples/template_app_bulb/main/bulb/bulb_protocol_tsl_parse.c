@@ -408,6 +408,9 @@ static ez_int32_t property_brightness_set(ez_tsl_value_t *p_stru_key_value)
         ezlog_e(TAG_LIGHT, "adjust light brightness failed.");
         return -1;
     }
+
+    config_set_value(K_BRIGHTNESS,(void *)&p_stru_key_value->value_int,p_stru_key_value->size);
+    
 	return EZ_BASE_ERR_SUCC;
 }
 
@@ -423,7 +426,8 @@ static ez_int32_t property_colortemperature_set(ez_tsl_value_t *p_stru_key_value
         ezlog_e(TAG_LIGHT, "adjust light cct failed.");
         return -1;
     }
-    
+
+    config_set_value(K_COLORTEMPERATURE,(void *)&p_stru_key_value->value_int,p_stru_key_value->size);
 	return EZ_BASE_ERR_SUCC;
 }
 
@@ -477,7 +481,9 @@ static ez_int32_t property_powerswitch_set(ez_tsl_value_t *p_stru_key_value)
             return -1;
         }
     }
-    
+  
+    config_set_value(K_POWERSWITCH,(void *)&p_stru_key_value->value_bool,p_stru_key_value->size);
+
 	return EZ_BASE_ERR_SUCC;
 }
 
@@ -510,7 +516,10 @@ static ez_int32_t property_colorrgb_set(ez_tsl_value_t *p_stru_key_value)
         ezlog_e(TAG_LIGHT, "adjust light rgb error.");
         return -1;
     }
-	return EZ_BASE_ERR_SUCC;
+
+    config_set_value(K_COLORRGB,(void *)p_stru_key_value->value,p_stru_key_value->size);
+
+    return EZ_BASE_ERR_SUCC;
 }
 
 static ez_int32_t property_helpsleep_set(ez_tsl_value_t *p_stru_key_value)
@@ -597,6 +606,8 @@ static ez_int32_t property_workmode_set(ez_tsl_value_t *p_stru_key_value)
     else if (0 == strcmp(p_stru_key_value->value, "music"))
     {
     }
+
+    config_set_value(K_WORKMODE,(void *)p_stru_key_value->value,p_stru_key_value->size);
 	return EZ_BASE_ERR_SUCC;
 }
 
