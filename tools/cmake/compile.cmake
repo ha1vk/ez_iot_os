@@ -10,8 +10,11 @@ get_filename_component(parent_dir ${CMAKE_PARENT_LIST_FILE} DIRECTORY)
 get_filename_component(current_dir ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 get_filename_component(parent_dir_name ${parent_dir} NAME)
 
-#  global variables
+# global variables
 set(g_dynamic_libs "" CACHE INTERNAL "g_dynamic_libs")
+set(g_ezos_inc_dirs "" CACHE INTERNAL "g_ezos_inc_dirs")
+set(g_ezos_lib_dirs "" CACHE INTERNAL "g_ezos_lib_dirs")
+set(g_ezos_lib_depens "" CACHE INTERNAL "g_ezos_lib_depens")
 
 # Set project dir, so just projec can include this cmake file!!!
 set(PROJECT_SOURCE_DIR ${parent_dir})
@@ -24,25 +27,9 @@ message(STATUS "PROJECT_PATH:${PROJECT_SOURCE_DIR}")
 
 include(${EZOS_PATH}/tools/cmake/tools.cmake)
 
-if(${parent_dir_name} STREQUAL "linux")
-    set(g_depens "-lpthread;-lrt;-lm" CACHE INTERNAL "g_depens")
-else()
-    set(g_depens "" CACHE INTERNAL "g_depens")
-endif()
-
-set(g_inc_dirs "" CACHE INTERNAL "g_inc_dirs")
-set(g_depens_dirs "" CACHE INTERNAL "g_depens_dirs")
-set(g_depens_com "" CACHE INTERNAL "g_depens_com")
-
 function(register_component)
     get_filename_component(component_dir ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
-
-    if(ADD_COMPONENT_ALIAS)
-        set(component_name ${ADD_COMPONENT_ALIAS})
-    else()
-        get_filename_component(component_name ${component_dir} NAME)
-    endif()
-
+    get_filename_component(component_name ${component_dir} NAME)
     message(STATUS "[register component: ${component_name} ], path:${component_dir}")
 
     # Get params: DYNAMIC/SHARED
@@ -52,6 +39,7 @@ function(register_component)
             set(to_dynamic_lib true)
         endif()
     endforeach()
+
     if(to_dynamic_lib)
         message("-- component ${component_name} will compiled to dynamic lib")
         # Add dynamic file path to g_dynamic_libs variable
@@ -59,24 +47,11 @@ function(register_component)
         list(APPEND dynamic_libs "${PROJECT_BINARY_DIR}/${component_name}/lib${component_name}${DL_EXT}")
         set(g_dynamic_libs ${dynamic_libs}  CACHE INTERNAL "g_dynamic_libs")
     else()
-        # message("-- component ${component_name} will compiled to static lib")
-        # get_property(tmp GLOBAL PROPERTY UT_DEPENS)
-        # # message("################## ${tmp}")
-        # set(tmp "${tmp}-l${component_name};")
-        # set_property(GLOBAL PROPERTY UT_DEPENS "${tmp}")
-        set(ut_depens ${g_depens})
-        list(APPEND ut_depens "-l${component_name}")
-        set(g_depens ${ut_depens}  CACHE INTERNAL "g_depens")
-        # message("################## ${g_depens}")
-
-        set(depens_com ${g_depens_com})
-        list(APPEND depens_com "${component_name}")
-        set(g_depens_com ${depens_com}  CACHE INTERNAL "g_depens_com")
-
-        set(depens_dirs ${g_depens_dirs})
-        list(APPEND depens_dirs "${PROJECT_PATH}/build/${component_name}")
-        set(g_depens_dirs ${depens_dirs}  CACHE INTERNAL "g_depens_dirs")
-        # message("################## ${g_depens_dirs}")
+        message("-- component ${component_name} will compiled to static lib")
+        # Add static file path to g_ezos_lib_dirs variable
+        set(lib_dirs ${g_ezos_lib_dirs})
+        list(APPEND lib_dirs "-L${PROJECT_BINARY_DIR}/${component_name}")
+        set(g_ezos_lib_dirs ${lib_dirs}  CACHE INTERNAL "g_ezos_lib_dirs")
     endif()
 
     message("-- component ${component_name} dependencies:${ADD_REQUIREMENTS}")
@@ -106,10 +81,9 @@ function(register_component)
             message(FATAL_ERROR "${CMAKE_CURRENT_LIST_FILE}: ${include_dir} not found!")
         endif()
 
-        set(inc_dirs ${g_inc_dirs})
+        set(inc_dirs ${g_ezos_inc_dirs})
         list(APPEND inc_dirs "${abs_dir}")
-        set(g_inc_dirs ${inc_dirs} CACHE INTERNAL "g_inc_dirs")
-        # message("################## ${g_inc_dirs}")
+        set(g_ezos_inc_dirs ${inc_dirs} CACHE INTERNAL "g_ezos_inc_dirs")
 
         target_include_directories(${component_name} ${include_type} ${abs_dir})
     endforeach()
@@ -124,14 +98,10 @@ function(register_component)
             message(FATAL_ERROR "${CMAKE_CURRENT_LIST_FILE}: ${include_dir} not found!")
         endif()
 
-        set(inc_dirs ${g_inc_dirs})
-        list(APPEND inc_dirs "${abs_dir}")
-        set(g_inc_dirs ${inc_dirs} CACHE INTERNAL "g_inc_dirs")
-
         target_include_directories(${component_name} PRIVATE ${abs_dir})
     endforeach()
 
-    # Add blobal config include
+    # Add global config include
     if(${include_type} STREQUAL INTERFACE)
         target_include_directories(${component_name} INTERFACE ${ezos_gconfig_dir})
     else()
@@ -223,6 +193,9 @@ function(get_python python version info_str)
     endif()
 endfunction(get_python python)
 
+# 1.Compile the ezos component without linking
+# 2.Generate global build configuration by menuconfig
+# 3.Generate link dependencies info
 macro(do_lib_building name)
     get_filename_component(current_dir ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
     set(PROJECT_SOURCE_DIR ${current_dir})
@@ -267,7 +240,7 @@ macro(do_lib_building name)
     endforeach()
 
     # Find components in bsp folder
-    file(GLOB project_component_dirs ${EZOS_PATH}/platform/bsp/${name}/ezos)
+    file(GLOB project_component_dirs ${EZOS_PATH}/platform/bsp/${PROJECT_NAME}/ezos)
     foreach(component_dir ${project_component_dirs})
         is_path_component(is_component ${component_dir})
         if(is_component)
@@ -309,19 +282,22 @@ macro(do_lib_building name)
                         --menuconfig False
                         --env "EZOS_PATH=${EZOS_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
-                        --env "PROJECT_NAME=${name}"
+                        --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
+                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
                         --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
                         --output header ${PROJECT_PATH}/config/ezos_gconfig.h
                         )
-    set(generate_config_cmd2 ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
+
+    set(generate_config_cmd_gui ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
                         --kconfig "${EZOS_PATH}/Kconfig"
                         ${kconfig_defaults_files_args}
                         --menuconfig True
                         --env "EZOS_PATH=${EZOS_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
-                        --env "PROJECT_NAME=${name}"
+                        --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
+                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
                         --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
                         --output header ${PROJECT_PATH}/config/ezos_gconfig.h
                         )
@@ -384,6 +360,7 @@ macro(do_lib_building name)
     set(sort_components ${python}  ${EZOS_PATH}/tools/cmake/sort_components.py
                                    ${component_priority_conf_file} ${components_dirs}
                         )
+
     execute_process(COMMAND ${sort_components} OUTPUT_VARIABLE component_dirs_sorted RESULT_VARIABLE cmd_res)
     if(cmd_res EQUAL 2)
         message(STATUS "No components priority config file")
@@ -398,12 +375,21 @@ macro(do_lib_building name)
     foreach(component_dir ${component_dirs_sorted})
         get_filename_component(base_dir ${component_dir} NAME)
         add_subdirectory(${component_dir} ${base_dir})
+
         if(TARGET ${base_dir})
             add_dependencies(${base_dir} update_build_info) # add build info dependence
+
+            set(lib_depens ${g_ezos_lib_depens})
+            list(APPEND lib_depens "-l${base_dir}")
+            set(g_ezos_lib_depens ${lib_depens}  CACHE INTERNAL "g_ezos_lib_depens")
         else()
             message(STATUS "component ${base_dir} not enabled")
         endif()
     endforeach()
+
+    string(REPLACE ";" " " g_ezos_inc_dirs "${g_ezos_inc_dirs}")
+    string(REPLACE ";" " " g_ezos_lib_dirs "${g_ezos_lib_dirs}")
+    string(REPLACE ";" " " g_ezos_lib_depens "${g_ezos_lib_depens}")
 
     # Remove duplicate dynamic libs from var g_dynamic_libs
     set(dynamic_libs_abs "")
@@ -414,15 +400,38 @@ macro(do_lib_building name)
     set(g_dynamic_libs ${dynamic_libs_abs})
     list(REMOVE_DUPLICATES g_dynamic_libs)
 
+    set(update_config_cmd ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
+                        --kconfig "${EZOS_PATH}/Kconfig"
+                        ${kconfig_defaults_files_args}
+                        --menuconfig False
+                        --env "EZOS_PATH=${EZOS_PATH}"
+                        --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
+                        --env "PROJECT_NAME=${PROJECT_NAME}"
+                        --output config ${PROJECT_PATH}/config/.config
+                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
+                        --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
+                        --output header ${PROJECT_PATH}/config/ezos_gconfig.h
+                        --addkv "ADD_EZOS_INC_DIRS" ${g_ezos_inc_dirs}
+                        --addkv "ADD_EZOS_LIB_DIRS" ${g_ezos_lib_dirs}
+                        --addkv "ADD_EZOS_LIB_DEPENS" ${g_ezos_lib_depens}
+                        )
+
+    execute_process(COMMAND ${update_config_cmd} RESULT_VARIABLE cmd_res)
+    if(NOT cmd_res EQUAL 0)
+        message(FATAL_ERROR "Update Kconfig content")
+    endif()
+
     # Add menuconfig target for makefile
-    add_custom_target(menuconfig COMMAND ${generate_config_cmd2})
+    add_custom_target(menuconfig COMMAND ${generate_config_cmd_gui})
 
 endmacro()
 
+# Compile the ezos component and linking
 macro(do_project_building name)
     get_filename_component(current_dir ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
     set(PROJECT_SOURCE_DIR ${current_dir})
     set(PROJECT_BINARY_DIR "${current_dir}/build")
+
     # Find components in SDK's components folder, register components
     file(GLOB component_dirs ${EZOS_PATH}/components/*)
     foreach(component_dir ${component_dirs})
@@ -442,10 +451,29 @@ macro(do_project_building name)
         endif()
     endforeach()
 
-    # Find components in project folder
-    file(GLOB project_component_dirs ${EZOS_PATH}/eziot/*)
+    # Find components in eziot folder, register components
+    file(GLOB component_dirs ${EZOS_PATH}/eziot/*)
+    foreach(component_dir ${component_dirs})
+        is_path_component(is_component ${component_dir})
+        if(is_component)
+            message(STATUS "Find component: ${component_dir}")
+            get_filename_component(base_dir ${component_dir} NAME)
+            list(APPEND components_dirs ${component_dir})
+            if(EXISTS ${component_dir}/Kconfig)
+                message(STATUS "Find component Kconfig of ${base_dir}")
+                list(APPEND components_kconfig_files ${component_dir}/Kconfig)
+            endif()
+            if(EXISTS ${component_dir}/.config_defaults)
+                message(STATUS "Find component defaults config of ${base_dir}")
+                list(APPEND kconfig_defaults_files_args --defaults "${component_dir}/.config_defaults")
+            endif()
+        endif()
+    endforeach()
+
+    file(GLOB project_component_dirs ${PROJECT_SOURCE_DIR}/*)
     foreach(component_dir ${project_component_dirs})
         is_path_component(is_component ${component_dir})
+
         if(is_component)
             message(STATUS "find component: ${component_dir}")
             get_filename_component(base_dir ${component_dir} NAME)
@@ -457,15 +485,16 @@ macro(do_project_building name)
                 message(STATUS "Find component Kconfig of ${base_dir}")
                 list(APPEND components_kconfig_files ${component_dir}/Kconfig)
             endif()
-            if(EXISTS ${component_dir}/.config_defaults)
+            if(EXISTS ${component_dir}/config_defaults.mk)
                 message(STATUS "Find component defaults config of ${base_dir}")
-                list(APPEND kconfig_defaults_files_args --defaults "${component_dir}/.config_defaults")
+                list(APPEND kconfig_defaults_files_args --defaults "${component_dir}/config_defaults.mk")
             endif()
         endif()
     endforeach()
-#    if(NOT main_component)
-#        message(FATAL_ERROR "=================\nCan not find main component(folder) in project folder!!\n=================")
-#    endif()
+
+   if(NOT main_component)
+       message(FATAL_ERROR "=================\nCan not find main component(folder) in project folder!!\n=================")
+   endif()
 
     file(GLOB project_component_dirs ${EZOS_PATH}/examples/*)
     foreach(component_dir ${project_component_dirs})
@@ -483,7 +512,7 @@ macro(do_project_building name)
     endforeach()
 
     # Find components in bsp folder
-    file(GLOB project_component_dirs ${EZOS_PATH}/platform/bsp/${name}/ezos)
+    file(GLOB project_component_dirs ${EZOS_PATH}/platform/bsp/${PROJECT_NAME}/ezos)
     foreach(component_dir ${project_component_dirs})
         is_path_component(is_component ${component_dir})
         if(is_component)
@@ -524,19 +553,22 @@ macro(do_project_building name)
                         --menuconfig False
                         --env "EZOS_PATH=${EZOS_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
-                        --env "PROJECT_NAME=${name}"
+                        --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
+                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
                         --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
                         --output header ${PROJECT_PATH}/config/ezos_gconfig.h
                         )
-    set(generate_config_cmd2 ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
+
+    set(generate_config_cmd_gui ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
                         --kconfig "${EZOS_PATH}/Kconfig"
                         ${kconfig_defaults_files_args}
                         --menuconfig True
                         --env "EZOS_PATH=${EZOS_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
-                        --env "PROJECT_NAME=${name}"
+                        --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
+                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
                         --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
                         --output header ${PROJECT_PATH}/config/ezos_gconfig.h
                         )
@@ -580,10 +612,14 @@ macro(do_project_building name)
 
     set(CMAKE_C_COMPILER_WORKS 1)
     set(CMAKE_CXX_COMPILER_WORKS 1)
-    
-    # set(CMAKE_SYSTEM_NAME Generic) # set this flag may leads to dymamic(/shared) lib compile fail
 
     include(${EZOS_PATH}/tools/cmake/compile_flags.cmake)
+
+    message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+    message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+    message(STATUS "CMAKE_C_LINK_FLAGS: ${CMAKE_C_LINK_FLAGS}")
+    message(STATUS "CMAKE_CXX_LINK_FLAGS: ${CMAKE_CXX_LINK_FLAGS}")
+
     # Add dependence: update configfile, append time and git info for global config header file
     # we didn't generate build info for cmake and makefile for if we do, it will always rebuild cmake
     # everytime we execute make
@@ -613,39 +649,33 @@ macro(do_project_building name)
         add_subdirectory(${component_dir} ${base_dir})
         if(TARGET ${base_dir})
             add_dependencies(${base_dir} update_build_info) # add build info dependence
+            message(STATUS "component ${base_dir}, ${update_build_info}")
+
         else()
             message(STATUS "component ${base_dir} not enabled")
         endif()
     endforeach()
-    
+
     # Remove duplicate dynamic libs from var g_dynamic_libs
     set(dynamic_libs_abs "")
     foreach(item ${g_dynamic_libs})
-    get_filename_component(item ${item} ABSOLUTE)
-    list(APPEND dynamic_libs_abs ${item})
+        get_filename_component(item ${item} ABSOLUTE)
+        list(APPEND dynamic_libs_abs ${item})
     endforeach()
     set(g_dynamic_libs ${dynamic_libs_abs})
     list(REMOVE_DUPLICATES g_dynamic_libs)
 
-    # # Add menuconfig target for makefile
-    add_custom_target(menuconfig COMMAND ${generate_config_cmd2})
+    # Add menuconfig target for makefile
+    add_custom_target(menuconfig COMMAND ${generate_config_cmd_gui})
 
-    aux_source_directory(. exe_src)
-    message(STATUS "exe_src: ${exe_src}")
-
-    set(inc_dirs ${g_inc_dirs})
-    list(APPEND inc_dirs "${ezos_gconfig_dir}")
-    set(g_inc_dirs ${inc_dirs} CACHE INTERNAL "g_inc_dirs")
-
-    message(STATUS "inc_dirs: ${g_inc_dirs}")
-    INCLUDE_DIRECTORIES(${g_inc_dirs})
-
-    message(STATUS "depen_dirs: ${g_depens_dirs}")
-    LINK_DIRECTORIES(${g_depens_dirs})
-
-    message(STATUS "depens: ${g_depens}")
-
+    # Create dummy source file exe_src.c to satisfy cmake's `add_executable` interface!
+    set(exe_src ${CMAKE_BINARY_DIR}/exe_src.c)
     add_executable(${name} "${exe_src}")
-    add_dependencies(${name} ${g_depens_com})
-    target_link_libraries(${name} PUBLIC "-Wl,--whole-archive,--start-group ${g_depens} -Wl,--no-whole-archive,--end-group")
+    add_custom_command(OUTPUT ${exe_src} COMMAND ${CMAKE_COMMAND} -E touch ${exe_src} VERBATIM)
+    add_custom_target(gen_exe_src DEPENDS "${exe_src}")
+    add_dependencies(${name} gen_exe_src)
+
+    # Add main component(lib)
+    target_link_libraries(${name} main)
+
 endmacro()
