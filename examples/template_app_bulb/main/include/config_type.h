@@ -43,12 +43,6 @@ extern "C"
         char res[3];
     } time_zone_t;
 
-    typedef struct
-    {
-        int8_t ota_label[8];
-        int8_t ota_code;
-    } ota_t;
-
 #ifdef __cplusplus
 }
 #endif

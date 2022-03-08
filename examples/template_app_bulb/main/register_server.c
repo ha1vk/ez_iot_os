@@ -374,7 +374,7 @@ static ez_int32_t ez_event_notice_func(ez_event_e event_type, ez_void_t *data, e
         {
             ezlog_w(TAG_APP, "bind request send error");
         }
-        
+        ez_ota_reboot_report_reuslt();
         music_server_start();
         
         break;

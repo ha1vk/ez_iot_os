@@ -10,6 +10,7 @@
 #include "dev_info.h"
 #include "product_config.h"
 #include "bulb_business.h"
+#include "config_implement.h"
 
 static int ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, void *data, int len);
 extern ez_int32_t eztimer_create(ez_char_t *name, ez_int32_t time_out, ez_bool_t reload, void (*fun)(void));
@@ -40,7 +41,47 @@ void ez_ota_start()
 	szModules[0].fw_ver = dev_firmwareversion;
 
     ez_iot_ota_modules_report(&ota_res, &modules, 5000);                      //上报升级模块的PID和版本信息
-    ez_iot_ota_status_ready(&ota_res, get_dev_productKey());            //上报状态0，清除服务器状态
+}
+
+int ez_ota_reboot_report_reuslt()
+{
+	int rv  = -1;
+	ez_ota_res_t pres = {0};
+	
+	ez_ota_t ota_info = {0};
+	int ota_code_len=sizeof(ota_info.ota_code);
+	if(0 != config_get_value(K_OTA_CODE,&ota_info.ota_code,&ota_code_len))
+	{
+		ezlog_e(TAG_APP, "config_read WIFI_CC error!");
+		return -1;
+	}
+	if(REBOOT_NORMAL == ota_info.ota_code)
+	{
+ 		ezlog_i(TAG_OTA, "not uppdate reboot,start report ready status ",rv);
+		ez_iot_ota_status_ready(&pres, get_dev_productKey());            //上报状态0，清除服务器状态
+	}
+	else
+	{
+
+		/* 报升级成功与否*/    	
+		if (REBOOT_OTA_SUCCEED == ota_info.ota_code)
+		{
+ 			ezlog_i(TAG_OTA, "uppdate reboot,start report success status ");
+			ez_iot_ota_status_succ(&pres, get_dev_productKey());
+		}
+		else
+		{		
+ 			ezlog_i(TAG_OTA, "uppdate reboot,start report failed status ");
+			ez_iot_ota_status_fail(&pres, get_dev_productKey(), "", OTA_CODE_BURN); //烧录过程中升级错误
+		}
+
+		ota_info.ota_code = REBOOT_NORMAL;
+        config_set_value(K_OTA_CODE,&ota_info.ota_code,sizeof(ota_info.ota_code));
+        ezos_delay_ms(10000); 
+		ez_iot_ota_status_ready(&pres, get_dev_productKey());            //上报状态0，清除服务器状态
+	}
+    
+    return 0;
 }
 
 static int ota_download_fun(ota_upgrade_info_t *upgrade_infos,int file_index)
@@ -84,6 +125,7 @@ static int ota_download_fun(ota_upgrade_info_t *upgrade_infos,int file_index)
 static int ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, void *data, int len)
 {
     int rv = -1;
+	ez_ota_t ota_info = {0};
     switch (event)
     {
     case START_UPGRADE: {
@@ -124,7 +166,9 @@ static int ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, void *data
     default:
         break;
     }
-     return rv;
+	ota_info.ota_code = REBOOT_OTA_FAILED;  //初始状态先写成失败
+    config_set_value(K_OTA_CODE,&ota_info.ota_code,sizeof(ota_info.ota_code));
+    return rv;
 }
 
 static void show_upgrade_info(ez_ota_upgrade_info_t *upgrade_infos)
@@ -247,7 +291,7 @@ static void download_result_cb(ez_ota_cb_result_e result, void *user_data)
 	 OTA_USER_DATA_T *pStruUserOtaData = (OTA_USER_DATA_T *)user_data;
 	// char mcu_mod_name[32]= {0};
       ez_ota_res_t pres = {0};
-	// //ez_ota_t ota_info = {0};
+	  ez_ota_t ota_info = {0};
 
 	// bAppUpgrading = ez_false;
 
@@ -265,12 +309,15 @@ static void download_result_cb(ez_ota_cb_result_e result, void *user_data)
     	
     if (ESP_OK !=rv)
 	{
+		ota_info.ota_code = REBOOT_OTA_FAILED; 
 		ezlog_e(TAG_OTA, "one module update,esp_ota_set_boot_partition failed! err=0x%x", rv);					
 	}
 	else
 	{
+		ota_info.ota_code = REBOOT_OTA_SUCCEED;
 		ezlog_i(TAG_OTA, "one module update,wifidev change partition scucess..");
 	}
+	config_set_value(K_OTA_CODE,&ota_info.ota_code,sizeof(ota_info.ota_code));
 	ez_iot_ota_progress_report(&pres, pStruUserOtaData->mod_name, OTA_STATE_REBOOTING, 100);//第二次进来，wifi 下载完毕，设备需要重启
 	ez_iot_ota_progress_report(&pres, pStruUserOtaData->mod_name, OTA_STATE_REBOOTING, 100);//第二次进来，wifi 下载完毕，设备需要重启
 	ez_iot_ota_deinit();

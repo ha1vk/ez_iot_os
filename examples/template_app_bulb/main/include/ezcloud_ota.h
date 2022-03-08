@@ -77,21 +77,28 @@ extern "C"
 
 
 	typedef struct
-		{
-			int interval;                ///< 上报升级进度间隔
-			int file_num;				 //V3升级协议中升级文件个数，
-			char mod_name[32];            //ptid
-			int bSubdevUpgrade;			 //至少包含有一个mcu 升级包程序
-            #ifdef HAL_ESP
-			esp_partition_t *pUpdate_partition;  //乐鑫备份升级中的分区
-			esp_ota_handle_t update_handle; 		//乐鑫的升级写flash句柄
-            #endif
-        } OTA_USER_DATA_T;
+    {
+        int interval;                ///< 上报升级进度间隔
+        int file_num;				 //V3升级协议中升级文件个数，
+        char mod_name[32];            //ptid
+        int bSubdevUpgrade;			 //至少包含有一个mcu 升级包程序
+        #ifdef HAL_ESP
+        esp_partition_t *pUpdate_partition;  //乐鑫备份升级中的分区
+        esp_ota_handle_t update_handle; 		//乐鑫的升级写flash句柄
+        #endif
+    } OTA_USER_DATA_T;
+
+    typedef struct
+    {
+        int8_t ota_label[8];
+        int8_t ota_code;
+    } ez_ota_t;
 
     int ez_ota_init();
 
     void ez_ota_start();
-
+   
+    int ez_ota_reboot_report_reuslt();
 #ifdef __cplusplus
 }
 #endif
