@@ -61,7 +61,6 @@ typedef enum
 {
     sdk_entrance_normal,     ///<	SDK正常入口
     sdk_entrance_switchover, ///<	SDK入口切换
-    sdk_entrance_authcode_invalid
 } sdk_entrance_state;
 
 /**
@@ -171,9 +170,6 @@ typedef struct
 {
     EZDEV_SDK_UINT8 lbs_redirect_times;  ///<	记录lbs连续重定向的次数
     EZDEV_SDK_UINT8 das_retry_times;     ///<	记录das连续重连的次数
-    EZDEV_SDK_BOOL secretkey_applied;    ///<	是否已经申请过secretkey
-    EZDEV_SDK_UINT16 secretkey_interval; ///<	申请secretkey出错后重试间隔(s)
-    EZDEV_SDK_UINT32 secretkey_duration; ///<	申请secretkey出错后重试总时间(s)
     sdk_v3_reg_status v3_reg_status;     ///<	V3协议是否使用
 
     sdk_entrance_state entr_state;   ///<	sdk入口状态

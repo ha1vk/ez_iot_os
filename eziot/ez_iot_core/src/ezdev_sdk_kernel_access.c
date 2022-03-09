@@ -109,20 +109,10 @@ static mkernel_internal_error cnt_lbs_redirect_do(ezdev_sdk_kernel *sdk_kernel)
 {
     mkernel_internal_error sdk_error = mkernel_internal_succ;
 
-    if (sdk_entrance_authcode_invalid == sdk_kernel->entr_state)
+    if (sdk_kernel->lbs_redirect_times &&
+        !ezcore_time_isexpired_bydiff(&sdk_kernel->cnt_state_timer, sdk_kernel->lbs_redirect_times * 2000))
     {
-        if (!ezcore_time_isexpired_bydiff(&sdk_kernel->cnt_state_timer, sdk_kernel->secretkey_interval * 1000) ||
-            sdk_kernel->lbs_redirect_times > sdk_kernel->secretkey_duration)
-        {
-            return sdk_error;
-        }
-    }
-    else
-    {
-        if (sdk_kernel->lbs_redirect_times && !ezcore_time_isexpired_bydiff(&sdk_kernel->cnt_state_timer, sdk_kernel->lbs_redirect_times * 2000))
-        {
-            return sdk_error;
-        }
+        return sdk_error;
     }
 
     ezcore_time_countdown(&sdk_kernel->cnt_state_timer, 0);
@@ -290,30 +280,30 @@ mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel)
 
     switch (sdk_kernel->cnt_state)
     {
-        case sdk_cnt_unredirect:
-        {
-            sdk_error = cnt_lbs_redirect_do(sdk_kernel);
-            break;
-        }
-        case sdk_cnt_redirected:
-        {
-            sdk_error = cnt_das_reg_do(sdk_kernel);
-            break;
-        }
-        case sdk_cnt_das_reged:
-        {
-            sdk_error = cnt_das_work_do(sdk_kernel);
-            break;
-        }
-        case sdk_cnt_das_break:
-        {
-            sdk_error = cnt_das_retry_do(sdk_kernel);
-            break;
-        }
-        default:
-        {
-            sdk_error = mkernel_internal_internal_err;
-        }
+    case sdk_cnt_unredirect:
+    {
+        sdk_error = cnt_lbs_redirect_do(sdk_kernel);
+        break;
+    }
+    case sdk_cnt_redirected:
+    {
+        sdk_error = cnt_das_reg_do(sdk_kernel);
+        break;
+    }
+    case sdk_cnt_das_reged:
+    {
+        sdk_error = cnt_das_work_do(sdk_kernel);
+        break;
+    }
+    case sdk_cnt_das_break:
+    {
+        sdk_error = cnt_das_retry_do(sdk_kernel);
+        break;
+    }
+    default:
+    {
+        sdk_error = mkernel_internal_internal_err;
+    }
     }
 
     if (mkernel_internal_mqtt_blacklist == sdk_error)
