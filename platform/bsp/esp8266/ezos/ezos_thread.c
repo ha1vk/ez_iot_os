@@ -52,10 +52,8 @@ static void sdk_thread_fun(void *aArg)
 
     hd->thread_fun(hd->user_param);
 
-    // if (THREAD_STATE_DETACHED == hd->state)
-    {
-        vTaskDelete(NULL);
-    }
+    hd->state = THREAD_STATE_DETACHED;
+    vTaskDelete(NULL);
 }
 
 EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_thread_func_t thread_fun,
@@ -69,7 +67,7 @@ EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_
     }
 
     memset(th_handle, 0, sizeof(ez_thread_t));
-    th_handle->thread_fun= thread_fun;
+    th_handle->thread_fun = thread_fun;
     th_handle->user_param = (void *)param;
     strncpy(th_handle->name, (const char *)name, sizeof(th_handle->name) - 1);
     if (NULL != handle)
@@ -80,11 +78,11 @@ EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_
     {
         th_handle->state = THREAD_STATE_DETACHED;
     }
-    rc = xTaskCreate(sdk_thread_fun,      /* The function that implements the task. */
-                     th_handle->name, /* Just a text name for the task to aid debugging. */
-                     stack_size,          /* The stack size is defined in FreeRTOSIPConfig.h. */
+    rc = xTaskCreate(sdk_thread_fun,         /* The function that implements the task. */
+                     th_handle->name,        /* Just a text name for the task to aid debugging. */
+                     stack_size,             /* The stack size is defined in FreeRTOSIPConfig.h. */
                      (void *)th_handle,      /* The task parameter, not used in this case. */
-                     priority,            /* The priority assigned to the task is defined in FreeRTOSConfig.h. */
+                     priority,               /* The priority assigned to the task is defined in FreeRTOSConfig.h. */
                      &th_handle->thread_hd); /* The task handle is not used. */
 
     if (rc != pdPASS)
@@ -92,9 +90,9 @@ EZOS_API int ezos_thread_create(ez_thread_t *const handle, const char *name, ez_
         free(th_handle);
         return -1;
     }
-     if (NULL != handle)
+    if (NULL != handle)
     {
-       *handle = (ez_thread_t)th_handle;
+        *handle = (ez_thread_t)th_handle;
     }
     return 0;
 }
@@ -107,13 +105,14 @@ EZOS_API int ezos_thread_destroy(ez_thread_t handle)
     }
 
     thread_data_t *thandle = (thread_data_t *)handle;
-    xTaskHandle handle_copy = thandle->thread_hd;
-    free(thandle);
 
-    if (handle_copy != 0)
+    // wait for the task exit(pthread_join)
+    while (THREAD_STATE_DETACHED != thandle->state)
     {
-        vTaskDelete(handle_copy);
+        ezos_delay_ms(1000);
     }
+
+    free(thandle);
 
     return 0;
 }
