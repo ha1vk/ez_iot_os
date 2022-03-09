@@ -29,8 +29,11 @@
 #include "lwip/apps/sntp.h"
 extern char g_time_zone[8];//tsl 需要用
 #endif
-#define TAG_TIMEZONE                         "TIME_ZONE" 
+
 #include "net_ctrl_tcp.h"
+
+#define TAG_TIMEZONE                         "TIME_ZONE" 
+
 static int8_t g_rssi = 0;
 static char g_ip[16] = {0};
 static int g_event_id = -1;
@@ -440,6 +443,7 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
     case EZ_EVENT_UNBINDING:
     {
         ezlog_w(TAG_APP, "dev unbound");
+        config_reset_factory();
     }
     break;
     case EZ_EVENT_BINDING_CHALLENGE:
@@ -564,8 +568,14 @@ void online_access()
 #else
     dev_info.auth_mode = get_dev_auth_mode();
     ezos_strncpy((char*)dev_info.dev_type, get_dev_productKey(), sizeof(dev_info.dev_type) - 1);
-    ezos_snprintf((char*)dev_info.dev_subserial, sizeof(dev_info.dev_subserial),"%s:%s", get_dev_productKey(), get_dev_deviceName());
-
+    if(AUTH_MODE_LIC == dev_info.auth_mode)
+    {
+        ezos_snprintf((char*)dev_info.dev_subserial, sizeof(dev_info.dev_subserial),"%s:%s", get_dev_productKey(), get_dev_deviceName());
+    }
+    else
+    {
+        ezos_strncpy((char*)dev_info.dev_subserial, get_dev_deviceName(),sizeof(dev_info.dev_subserial));
+    }
     ezos_strncpy((char*)dev_info.dev_verification_code, get_dev_License(), sizeof(dev_info.dev_verification_code) - 1);
 #endif
     /*you can get the lbs addres from the ap distribution or from the flash storage*/

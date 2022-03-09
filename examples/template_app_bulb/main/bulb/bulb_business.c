@@ -669,7 +669,7 @@ int disable_light_sleep_plan(int index,ez_bool_t helpsleep)
     ez_int32_t buf_len = 1024 * 2;
     ez_int8_t *buf = (ez_int8_t *)malloc(buf_len);
     cJSON *js_root = NULL;
-    ezlog_w(TAG_LIGHT, "disable_switch_plan, index = %d", index);
+    ezlog_w(TAG_LIGHT, "disable_sleep_plan, index = %d", index);
 
     do
     {
@@ -688,7 +688,7 @@ int disable_light_sleep_plan(int index,ez_bool_t helpsleep)
 
         if (0 != rv)
         {
-            ezlog_e(TAG_APP, "get light switch plan failed.");
+            ezlog_e(TAG_APP, "get sleep plan failed.");
             break;
         }
 
@@ -1263,7 +1263,7 @@ void sleep_plan_timer()
             continue;
         }
 
-        ezlog_v(TAG_LIGHT, "helpsleep plan[%d], %d %d %d %d %d %d %d", i,
+        ezlog_v(TAG_LIGHT, "wakeup plan[%d], %d %d %d %d %d %d %d", i,
                 p_plan->plan[i].week_days[0], p_plan->plan[i].week_days[1],
                 p_plan->plan[i].week_days[2], p_plan->plan[i].week_days[3],
                 p_plan->plan[i].week_days[4], p_plan->plan[i].week_days[5],

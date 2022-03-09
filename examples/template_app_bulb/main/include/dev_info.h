@@ -9,6 +9,8 @@
 #define PRODDATELEN 8
 #define PRODNUMLEN 9
 #define MODEL_LEN 64
+#define AUTH_MODE_SAP 0
+#define AUTH_MODE_LIC 1
 
 typedef struct
 {

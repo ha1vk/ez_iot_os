@@ -43,7 +43,7 @@ static int parse_sap_config(char *buf, int buf_size)
     memcpy(g_product_dev_info.dev_productKey, get_product_PTID(), sizeof(g_product_dev_info.dev_productKey));
     memcpy(g_product_dev_info.dev_deviceName, boot_param.prodNo, sizeof(boot_param.prodNo));
     memcpy(g_product_dev_info.dev_deviceLicense, boot_param.rand_code, sizeof(boot_param.rand_code));
-    g_product_dev_info.dev_auth_mode = 0;
+    g_product_dev_info.dev_auth_mode = AUTH_MODE_SAP;
     return 0;
 }
 
@@ -90,7 +90,7 @@ int parse_lic_config(char *buf, int buf_size)
         }
 
         strncpy(g_product_dev_info.dev_deviceLicense, found->valuestring, sizeof(g_product_dev_info.dev_deviceLicense) - 1);
-        g_product_dev_info.dev_auth_mode = 1;
+        g_product_dev_info.dev_auth_mode = AUTH_MODE_LIC;
 
         rv = 0;
     } while (0);

@@ -117,8 +117,14 @@ extern "C"
      */
     int config_print();
 
+    /**
+     * @brief       set the log print level 
+     * 
+     * @return      
+     */
     void set_log_lvl(int loglvl);
 
+    int config_reset_factory();
 	/* 日志记录到flash ，指定级别类的串口打印记录到设备*/
 	void set_logRec_start(int bLogRecStart);
 

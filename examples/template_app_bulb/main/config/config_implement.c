@@ -265,100 +265,104 @@ int config_print()
 }
 
 int bulb_param_init()
-{
+{    
+    int ret = 0;
     light_param_t *p_bulb_param = get_light_param();
     size_t len_tmp= KV_LENGTH_MAX;
     int value_tmp=0;
-    char *json_string = ezos_malloc(KV_LENGTH_MAX);
-
-    if(NULL ==json_string)
+    int i=0;
+    int r, g, b;
+    
+    char *json_string = ezos_malloc(KV_LENGTH_MAX); 
+    if(NULL == json_string)
     {
         ezlog_e(TAG_APP, "bulb_param_init error ,no memory. ");
-    }
-
-    if (0 != config_get_value(K_BRIGHTNESS, &value_tmp, &len_tmp))
-    {
-        ezlog_e(TAG_APP, "brightness is null. ");
         return -1;
-    }
-    else
-    {
-        p_bulb_param->brightness = value_tmp;
-    }
-
-    len_tmp = KV_LENGTH_MAX;
-    if (0 != config_get_value(K_BRIGHTNESS, &value_tmp, &len_tmp))
-    {
-        ezlog_e(TAG_APP, "brightness is null. ");
-        return -1;
-    }
-    else
-    {
-        p_bulb_param->brightness = value_tmp;
-    }
-
-    len_tmp = KV_LENGTH_MAX;
-    if (0 != config_get_value(K_COLORTEMPERATURE, &value_tmp, &len_tmp))
-    {
-        ezlog_e(TAG_APP, "cct is null. ");
-        return -1;
-    }
-    else
-    {
-        p_bulb_param->cct = value_tmp;
-    }
-
-    len_tmp = KV_LENGTH_MAX;
-    if (0 != config_get_value(K_COLORRGB, json_string, &len_tmp))
-    {
-        ezlog_e(TAG_APP, "rgb is null. ");
-        return -1;
-    }
-    else
-    {
-        int r, g, b;
-        sscanf(json_string, "#%2x%2x%2x", &r, &g, &b);
-        p_bulb_param->rgb  =r * 256 * 256 + g * 256 + b;;
-        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): 0x%x\n ",__LINE__, __func__,p_bulb_param->rgb);
-        
-    }
-
-    len_tmp = KV_LENGTH_MAX;
-    if (0 != config_get_value(K_WORKMODE, json_string, &len_tmp))
-    {
-        ezlog_e(TAG_APP, "workmode is null. ");
-        return -1;
-    }
-    else
-    {
-        if (0 == strcmp(json_string, "white"))
-        {
-            p_bulb_param->mode = LIGHT_WHITE;
-        }
-        else if (0 == strcmp(json_string, "colour"))
-        {
-             p_bulb_param->mode = LIGHT_COLOR;
-        }
-        else if (0 == strcmp(json_string, "scene"))
-        {
-            p_bulb_param->mode = LIGHT_SCENE;
-        }
-        else if (0 == strcmp(json_string, "music"))
-        {
-        }
     }
     
-    len_tmp = KV_LENGTH_MAX;
-    if (0 != config_get_value(K_CUSTOMSCENECFG, json_string, &len_tmp))
+    for(i=K_POWERSWITCH;i<K_HELPSLEEP;i++)
     {
-        ezlog_e(TAG_APP, "scence is null. ");
-        return -1;
+        if (TYPE_NUM == g_bulb_kv_tab[i].value_type)
+        {
+            len_tmp = sizeof(value_tmp);
+            ret = kv_raw_get(g_bulb_kv_tab[i].key_v, &value_tmp, &len_tmp);
+        }
+        else if (TYPE_STRING == g_bulb_kv_tab[i].value_type)
+        {
+            len_tmp = KV_LENGTH_MAX;
+            memset(json_string,0,KV_LENGTH_MAX);
+            kv_raw_get(g_bulb_kv_tab[i].key_v, json_string, &len_tmp);
+        }
+
+        switch(i)
+        {
+            case K_POWERSWITCH:                
+                p_bulb_param->swit = value_tmp;
+                break;
+                
+            case K_COLORTEMPERATURE:
+                p_bulb_param->cct = value_tmp;
+                break;
+                
+            case K_BRIGHTNESS:
+                p_bulb_param->brightness = value_tmp;               
+                break;   
+                
+            case K_COUNTDOWNCFG:
+                set_light_countdown(json_string);
+                break;
+                
+            case K_LIGHTSWITCHPLAN:
+                set_light_plan(json_string);
+                break;
+
+            case K_WORKMODE:
+                if (0 == strcmp(json_string, "white"))
+                {
+                    set_light_mode(LIGHT_WHITE);
+                }
+                else if (0 == strcmp(json_string, "colour"))
+                {
+                    set_light_mode(LIGHT_COLOR);
+                }
+                else if (0 == strcmp(json_string, "scene"))
+                {
+                    set_light_mode(LIGHT_SCENE);
+                }
+                else 
+                {
+                    ezlog_e(TAG_APP, "unknow workmode ");
+                }
+
+            case K_CUSTOMSCENECFG:
+                set_light_scene(json_string);
+                break;
+
+            case K_COUNTDOWN:
+                set_light_countdown(json_string);
+                break;
+                
+            case K_COLORRGB:                
+                sscanf(json_string, "#%2x%2x%2x", &r, &g, &b);
+                p_bulb_param->rgb  =r * 256 * 256 + g * 256 + b;;
+                break;
+
+            case K_MUSICRHYTHM:
+                printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
+                break;
+                
+            case K_BIORHYTHM:
+                set_light_biorhythm(json_string);
+                break;
+                
+            case K_WAKEUP:
+                set_light_wakeup(json_string);
+                break;
+            case K_HELPSLEEP: 
+                set_light_helpsleep(json_string);
+                break;
+        }
     }
-    else
-    {
-        
-    }
- 
 
     free(json_string);
     return 0;

@@ -279,9 +279,9 @@ void json2param_plan_conf(char *json_string,switch_plan_t *p_swit_plan)
         ezlog_e(TAG_APP, "parse json failed.");
         goto exit;
     }
-
+    
     cJSON *plan_array = cJSON_GetObjectItem(js_root, "plan");
-    if (NULL == js_root || cJSON_Array != plan_array->type)
+    if (NULL == plan_array || cJSON_Array != plan_array->type)
     {
         ezlog_e(TAG_APP, "parse json failed.");
         goto exit;
@@ -330,11 +330,11 @@ void json2param_plan_conf(char *json_string,switch_plan_t *p_swit_plan)
             break;
         }
 
-        if (0 == strcmp(js_action->valuestring, "true"))
+        if (0 == strcmp(js_action->valuestring, "on"))
         {
             swit_plan_tmp.plan[k].action = 1;
         }
-        else if (0 == strcmp(js_action->valuestring, "false"))
+        else if (0 == strcmp(js_action->valuestring, "off"))
         {
             swit_plan_tmp.plan[k].action = 0;
         }
