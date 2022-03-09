@@ -201,14 +201,16 @@ char ezcore_time_isexpired_bydiff(ezos_timespec_t *assign_timer, unsigned int ti
 void ezcore_time_countdown(ezos_timespec_t *assign_timer, unsigned int time_count)
 {
     ezos_timespec_t now;
+    ezos_timespec_t interval = {time_count / TIMESPEC_THOUSAND, (time_count % TIMESPEC_THOUSAND) * TIMESPEC_MILLION};
+
     if (NULL == assign_timer)
     {
         return;
     }
 
     ezos_get_clock(&now);
-    assign_timer->tv_sec = assign_timer->tv_sec + now.tv_sec;
-    assign_timer->tv_nsec = assign_timer->tv_sec + now.tv_nsec;
+    assign_timer->tv_sec = interval.tv_sec + now.tv_sec;
+    assign_timer->tv_nsec = interval.tv_nsec + now.tv_nsec;
 
     if (assign_timer->tv_nsec >= TIMESPEC_BILLION)
     {
