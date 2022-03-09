@@ -48,7 +48,10 @@ static int sendPacket(MQTTClient *c, int length, Timer *timer)
         rc = SUCCESS;
     }
     else
+    {
         rc = FAILURE;
+    }
+
     return rc;
 }
 
@@ -212,19 +215,16 @@ int deliverMessage(MQTTClient *c, MQTTString *topicName, MQTTMessage *message)
 
 int keepalive(MQTTClient *c)
 {
-    int rc = FAILURE;
+    int rc = SUCCESS;
     int len = 0;
     Timer timer;
     if (c->keepAliveInterval == 0)
     {
-        rc = SUCCESS;
         goto exit;
     }
 
     if (TimerIsExpired(&c->ping_timer))
     {
-        //         if (!c->ping_outstanding)
-        //         {
         TimerInit(&timer);
         TimerCountdownMS(&timer, 1000);
         len = MQTTSerialize_pingreq(c->buf, c->buf_size);
@@ -313,7 +313,11 @@ int cycle(MQTTClient *c, Timer *timer)
         break;
     }
 
-    keepalive(c);
+    if (keepalive(c) != SUCCESS)
+    {
+        //check only keepalive FAILURE status so that previous FAILURE status can be considered as FAULT
+        rc = FAILURE;
+    }
 exit:
     if (rc == SUCCESS)
         rc = packet_type;
@@ -410,7 +414,6 @@ int MQTTConnect(MQTTClient *c, MQTTPacket_connectData *options)
         goto exit;
     if ((rc = sendPacket(c, len, &connect_timer)) != SUCCESS) // send the connect packet
         goto exit;                                            // there was a problem
-
     // this will be a blocking call, wait for the connack
     if (waitfor(c, CONNACK, &connect_timer) == CONNACK)
     {
@@ -422,7 +425,9 @@ int MQTTConnect(MQTTClient *c, MQTTPacket_connectData *options)
             rc = FAILURE;
     }
     else
+    {
         rc = FAILURE;
+    }
 
 exit:
     if (rc == SUCCESS)
@@ -568,7 +573,6 @@ int MQTTPublish(MQTTClient *c, const char *topicName, MQTTMessage *message)
         unsigned short packetIdRsp;
         unsigned char dup, type;
 
-        //??????id??ack??????????
         while (packetTypeWait4 == (rc = waitfor(c, packetTypeWait4, &timer)))
         {
             if (MQTTDeserialize_ack(&type, &dup, &packetIdRsp, c->readbuf, c->readbuf_size) != 1)
