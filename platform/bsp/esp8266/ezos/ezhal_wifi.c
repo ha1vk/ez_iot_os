@@ -11,6 +11,7 @@
 extern bool g_apstamode_flag;
 static const char *TAG_WIFI = "T_WIFI";
 
+static int g_wifi_start_flag = 0;
 
 static const char *TAG_EVENT = "[WIFI EVENT]";
 
@@ -402,6 +403,7 @@ int ezhal_sta_connect(char *ssid, char *password)
     Ezviz_Wifi_set_country_code();
     ESP_ERROR_CHECK(esp_wifi_start());
     esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
+    g_wifi_start_flag = 1;
 
     ret = esp_wifi_connect();
     if (ESP_OK != ret)
@@ -493,6 +495,7 @@ int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned
     ezlog_i(TAG_WIFI, "wifi_init_softap finished.SSID:%s password:%s", wifi_config.sta.ssid, wifi_config.sta.password);
 
     ESP_ERROR_CHECK(esp_wifi_start());
+    g_wifi_start_flag = 1;
 
     return 0;
 }
@@ -562,6 +565,12 @@ unsigned char ezhal_sta_get_scan_list(unsigned char max_ap_num, ezhal_wifi_list_
         g_wifi_scan_start = false;
         return 0;
     }
+
+    if (g_wifi_start_flag != 1)
+    {
+        ESP_ERROR_CHECK(esp_wifi_start());
+    }
+
     wifi_ap_record_t *tmp_list = (wifi_ap_record_t *)malloc(max_ap_num * sizeof(wifi_ap_record_t));
     if (NULL == tmp_list)
     {

@@ -79,7 +79,7 @@ typedef enum
 typedef struct
 {
     ezhal_wifi_auth_mode_e authmode;
-    char rssi;
+    signed char rssi;
     unsigned char channel;
     char bssid[6];
     char ssid[33];

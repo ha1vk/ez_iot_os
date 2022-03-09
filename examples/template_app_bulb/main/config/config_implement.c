@@ -33,7 +33,6 @@ typedef struct
     char *bulb_default_value_str;
 } bulb_kv_t;
 
-
 static const bulb_kv_t g_bulb_kv_tab[] = {
     // ap key
     {K_PARAM_VER, "param_ver", TYPE_STRING, 0, "V1.0.0 build 200101"},
@@ -58,6 +57,7 @@ static const bulb_kv_t g_bulb_kv_tab[] = {
     {K_PT_PARA1, "para1", TYPE_NUM, 0, ""},
     {K_PT_PARA2, "para2", TYPE_NUM, 0, ""},
     {K_PT_AGE_TIME, "age_time", TYPE_NUM, 0, ""},
+    {K_PT_STAGE3_COUNT, "stage3_count", TYPE_NUM, 0, ""},
 
     {K_DAYLIGHT, "daylight", TYPE_NUM, 0, ""},
     {K_NTP_SERVER, "ntp_server", TYPE_STRING, 0, "time.ys7.com"},

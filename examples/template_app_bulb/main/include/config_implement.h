@@ -31,6 +31,7 @@ extern "C"
         K_PT_PARA1,
         K_PT_PARA2,
         K_PT_AGE_TIME,
+        K_PT_STAGE3_COUNT,
 
         K_DAYLIGHT,
         K_NTP_SERVER,

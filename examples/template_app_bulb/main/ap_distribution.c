@@ -373,7 +373,6 @@ void wifi_connect_do(void)
         return;
     }
     #endif
-    ezconn_wifi_init();
     ezconn_wifi_config(EZCONN_WIFI_MODE_STA);
     ezconn_sta_start(ssid, password);
 }
@@ -428,7 +427,6 @@ void ap_distribution_do()
     
     #endif
     
-    ezconn_wifi_init();
     ezconn_wifi_config(EZCONN_WIFI_MODE_APSTA);
     ezconn_ap_start(&ap_info, &dev_info, wifi_ap_distribution_cb);
     g_ap_exit = false;

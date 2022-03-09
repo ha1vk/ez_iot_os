@@ -34,9 +34,11 @@
 #include "dev_netmgr.h"
 #include "kv_imp.h"
 #include "eztimer.h"
+#include "ezconn.h"
 #include "product_config.h"
 #include "config_implement.h"
 #include "dev_init.h"
+#include "product_test.h"
 
 #ifdef HAL_ESP
 
@@ -113,6 +115,8 @@ int main(int argc, char **argv)
     signal(SIGPIPE, SIG_IGN);
     #endif
 
+    ezconn_wifi_init();
+
     if (0 != product_config_init()
         || (0 != config_init())
         
@@ -127,9 +131,11 @@ int main(int argc, char **argv)
     bulb_ctrl_init();  
 
     regular_power_up();
-	
-    #ifdef HAL_ESP
+
+#ifdef HAL_ESP
     ap_config_checkupdate();
+
+    ez_product_test(get_product_subtype());
 
     if (ap_distribution_check())
     {
@@ -146,15 +152,15 @@ int main(int argc, char **argv)
     {
        netmgr_sta_update(net_sta_dile, 0);
     }
-    #else
-    
+#else
+
     if (0 != register_server())
     {
         printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 
         return;
     }
-    #endif
+#endif
 
   
     kv_print();

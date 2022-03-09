@@ -52,7 +52,7 @@ static void sdk_thread_fun(void *aArg)
 
     hd->thread_fun(hd->user_param);
 
-    if (THREAD_STATE_DETACHED == hd->state)
+    // if (THREAD_STATE_DETACHED == hd->state)
     {
         vTaskDelete(NULL);
     }
