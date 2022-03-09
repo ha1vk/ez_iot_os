@@ -196,30 +196,21 @@ static int light_mode_pt2_normal()
     {
     case 0x00010:
     {
-        if (g_stage_2_age_time_count < g_stage_2_time)
-        {
-            ctrl_param.nbrightness = 100;
-            ctrl_param.nCctValue = 2700;
-        }
+        ctrl_param.nbrightness = 100;
+        ctrl_param.nCctValue = 2700;
     }
     break;
     case 0x00001:
     {
-        if (g_stage_2_age_time_count < g_stage_2_time)
-        {
-            ctrl_param.nbrightness = 100;
-            ctrl_param.nCctValue = 6500;
-        }
+        ctrl_param.nbrightness = 100;
+        ctrl_param.nCctValue = 6500;
     }
     break;
     
     case 0x11100:
     {
-        if (g_stage_2_age_time_count < g_stage_2_time)
-        {
-            ctrl_param.nbrightness = 100;
-            ctrl_param.iRgbValue = 0xffffff;
-        }
+        ctrl_param.nbrightness = 100;
+        ctrl_param.iRgbValue = 0xffffff;
     }
     break;
     case 0x00011:
@@ -229,7 +220,7 @@ static int light_mode_pt2_normal()
             ctrl_param.nbrightness = 100;
             ctrl_param.nCctValue = 2700;
         }
-        else if (g_stage_2_age_time_count < g_stage_2_time)
+        else
         {
             ctrl_param.nbrightness = 100;
             ctrl_param.nCctValue = 6500;
@@ -243,7 +234,7 @@ static int light_mode_pt2_normal()
             ctrl_param.nbrightness = 100;
             ctrl_param.nCctValue = 2700;
         }
-        else if (g_stage_2_age_time_count < g_stage_2_time)
+        else
         {
             ctrl_param.nbrightness = 100;
             ctrl_param.iRgbValue = 0xffffff;
@@ -262,7 +253,7 @@ static int light_mode_pt2_normal()
             ctrl_param.nbrightness = 100;
             ctrl_param.nCctValue = 6500;
         }
-        else if (g_stage_2_age_time_count < g_stage_2_time)
+        else
         {
             ctrl_param.nbrightness = 100;
             ctrl_param.iRgbValue = 0xffffff;
