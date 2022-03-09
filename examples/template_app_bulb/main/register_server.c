@@ -456,18 +456,34 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
         
         ez_base_ntp_info_t *p_ntp_info = (ez_base_ntp_info_t *)data;
 
-        
         time_zone_t time_zone_cfg = {0};
-        #if 0 //需要保存到flash 中
-        if (0 == config_read(CONFIG_TIME_ZONE, &time_zone_cfg) &&
-            0 != strncmp(time_zone_cfg.host, ntp_info_t->host, sizeof(time_zone_cfg.host)))
+        int daylightstring_len=sizeof(time_zone_cfg.daylightstring); 
+        int timezone_len=sizeof(time_zone_cfg.timezone);       
+        int daylight_len=sizeof(time_zone_cfg.daylight); 
+        int time_zone_cfg_len=sizeof(time_zone_cfg.host);
+        if (0 == config_get_value(K_NTP_SERVER, time_zone_cfg.host,&time_zone_cfg_len) &&
+            0 != strncmp(time_zone_cfg.host, p_ntp_info->host, sizeof(time_zone_cfg.host)))
         {
-            ez_log_w(TAG_APP, "ntp server update");
-            strcpy(time_zone_cfg.host, ntp_info_t->host);
-            config_write(CONFIG_TIME_ZONE, &time_zone_cfg);
+            ezlog_w(TAG_APP, "ntp server update");
+            strcpy(time_zone_cfg.host, p_ntp_info->host);
+            config_set_value(K_NTP_SERVER,time_zone_cfg.host,sizeof(time_zone_cfg.host));
         }
-        #endif
-        
+        if(0 != config_get_value(K_DAYLIGHT_STR,time_zone_cfg.daylightstring,&daylightstring_len))
+        {
+            ezlog_e(TAG_APP, "config_read DAYLIGHTSTRING error!");
+            return -1;
+        }
+        if(0 != config_get_value(K_TIMEZONE,time_zone_cfg.timezone,&timezone_len))
+        {
+            ezlog_e(TAG_APP, "config_read TIMEZONE error!");
+            return -1;
+        }
+        if(0 != config_get_value(K_DAYLIGHT,&time_zone_cfg.daylight,&daylight_len))
+        {
+            ezlog_e(TAG_APP, "config_read DAYLIGHT, error!");
+            return -1;
+        }   
+
 		#ifdef SUPPORT_ESP_LWIP_NTP
         ez_iot_correct_time(p_ntp_info->host, time_zone_cfg.timezone, time_zone_cfg.daylight, time_zone_cfg.daylightstring);
 		#endif
@@ -615,33 +631,13 @@ int correct_time_zone(char *time_zone_string)
         ezlog_e(TAG_APP, "read time zone error.");
         return -1;
     }
-    printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the timezone_string is:%s \n ",__LINE__, __func__,time_zone_string);
 
     int host_len=sizeof(time_zone_cfg.host);           
-    int daylightstring_len=sizeof(time_zone_cfg.daylightstring); 
-    int timezone_len=sizeof(time_zone_cfg.timezone);       
-    int daylight_len=sizeof(time_zone_cfg.daylight); 
     if(0 != config_get_value(K_NTP_SERVER,time_zone_cfg.host,&host_len))
     {
         ezlog_e(TAG_APP, "config_read HOST error!");
         return -1;
     }
-        if(0 != config_get_value(K_DAYLIGHT_STR,time_zone_cfg.daylightstring,&daylightstring_len))
-    {
-        ezlog_e(TAG_APP, "config_read DAYLIGHTSTRING error!");
-        return -1;
-    }
-        if(0 != config_get_value(K_TIMEZONE,time_zone_cfg.timezone,&timezone_len))
-    {
-        ezlog_e(TAG_APP, "config_read TIMEZONE error!");
-        return -1;
-    }
-        if(0 != config_get_value(K_DAYLIGHT,&time_zone_cfg.daylight,&daylight_len))
-    {
-        ezlog_e(TAG_APP, "config_read DAYLIGHT, error!");
-        return -1;
-    }
-     printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
     char daylight_string[64] = {0};
     cJSON *js_root = NULL;
     cJSON *js_time_zone = NULL;
@@ -868,6 +864,5 @@ int correct_time_zone(char *time_zone_string)
         ezlog_e(TAG_APP, "config_write DAYLIGHT error!");
         return -1;
     }
-     printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
-     return 0;
+    return 0;
 }

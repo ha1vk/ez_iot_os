@@ -363,15 +363,8 @@ static ez_int32_t property_timezonecompose_up(ez_tsl_value_t *p_stru_key_value)
         {
             break;
         }
-		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
-		//完善此部分...
         printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the uptimezone is:%s \n ",__LINE__, __func__,(char *)p_stru_key_value->value);
-		// printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
-		// char netstatus[128] = "{\"type\":\"\",\"address\":\"\",\"mask\":\"\",\"gateway\":\"\",\"signal\":\"\",\"ssid\":\"\"}";
-		// //完善此部分...
-		// printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
-		// p_stru_key_value->size = strlen(netstatus);
-        //memcpy(p_stru_key_value->value, netstatus, p_stru_key_value->size);
+		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
         p_stru_key_value->size = len_tmp;
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
@@ -625,9 +618,10 @@ static ez_int32_t property_timezonecompose_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-    printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the timezone value is:%s \n ",__LINE__, __func__,(char *)p_stru_key_value->value);
+    //printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the timezone value is:%s \n ",__LINE__, __func__,(char *)p_stru_key_value->value);
+    config_set_value(K_TIMEZONECOMPOSE,(void *)p_stru_key_value->value,p_stru_key_value->size);
     correct_time_zone(p_stru_key_value->value);//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
+	//printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
