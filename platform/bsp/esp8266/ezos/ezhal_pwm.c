@@ -40,7 +40,6 @@
  */
 int ezhal_pwm_init(int pwm_channal,int pwm_led_pin,int pwm_period, int pwm_duty_period)
 {
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 
 	return 0;
 	
@@ -55,7 +54,6 @@ int ezhal_pwm_init(int pwm_channal,int pwm_led_pin,int pwm_period, int pwm_duty_
  */
 int ezhal_pwm_deinit(int pwm_channal)
 {
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 	return 0;
 }
 
@@ -84,7 +82,6 @@ int ezhal_pwm_set_duty(int pwm_channal, int pwm_duty_cycle)
  */
 int ezhal_pwm_start()
 {
-	//printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
     pwm_start();
 
     return 0;
@@ -98,7 +95,6 @@ int ezhal_pwm_start()
  */
 int ezhal_pwm_stop()
 {
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 	return 0;
 }
 

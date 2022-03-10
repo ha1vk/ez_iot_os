@@ -504,10 +504,8 @@ int ezhal_ap_stop()
 {
     wifi_mode_t wifi_mode = WIFI_MODE_NULL;
     esp_err_t ret = ESP_OK;
-    printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 
     esp_wifi_get_mode(&wifi_mode);
-    printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 
     switch (wifi_mode)
     {
@@ -524,7 +522,6 @@ int ezhal_ap_stop()
         ezlog_w(TAG_WIFI, "not ap or apsta mode, nothing to do");
         break;
     }
-    printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 
     return ret;
 }

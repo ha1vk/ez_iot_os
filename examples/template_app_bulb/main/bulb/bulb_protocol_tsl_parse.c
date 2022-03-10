@@ -252,7 +252,6 @@ static ez_int32_t property_musicrhythm_up(ez_tsl_value_t *p_stru_key_value)
 		//完善此部分...
 		p_stru_key_value->size = strlen(light_musicrhythm);
         memcpy(p_stru_key_value->value, light_musicrhythm, p_stru_key_value->size);
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -363,7 +362,7 @@ static ez_int32_t property_timezonecompose_up(ez_tsl_value_t *p_stru_key_value)
         {
             break;
         }
-        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the uptimezone is:%s \n ",__LINE__, __func__,(char *)p_stru_key_value->value);
+
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
         p_stru_key_value->size = len_tmp;
 		rv = EZ_BASE_ERR_SUCC;
@@ -541,7 +540,6 @@ static ez_int32_t property_musicrhythm_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -617,8 +615,6 @@ static ez_int32_t property_timezonecompose_set(ez_tsl_value_t *p_stru_key_value)
 	{
 		return -1;
 	}
-	//todo:应用层业务处理
-    //printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the timezone value is:%s \n ",__LINE__, __func__,(char *)p_stru_key_value->value);
     config_set_value(K_TIMEZONECOMPOSE,(void *)p_stru_key_value->value,p_stru_key_value->size);
     correct_time_zone(p_stru_key_value->value);//todo:应用层业务处理
 	//printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
@@ -633,7 +629,6 @@ static ez_int32_t property_netstatus_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -718,7 +713,6 @@ int user_property_report(char *key)
 		* 
 		*/
  
-        printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
         rsc_info.res_type = property_cmd[i].res_type;
         rsc_info.local_index = property_cmd[i].index;
 

@@ -348,7 +348,6 @@ int bulb_param_init()
                 break;
 
             case K_MUSICRHYTHM:
-                printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
                 break;
                 
             case K_BIORHYTHM:
@@ -383,8 +382,7 @@ int config_init(void)
     }
     else
     {
-        ezlog_i("param ver is %s\n",param_ver);
-        
+        ezlog_i("param ver is:%s",param_ver);
     }
 
     bulb_param_init();

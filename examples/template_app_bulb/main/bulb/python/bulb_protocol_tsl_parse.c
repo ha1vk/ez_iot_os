@@ -56,7 +56,6 @@ static ez_int32_t property_brightness_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_INT;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -75,7 +74,6 @@ static ez_int32_t property_colortemperature_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_INT;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -94,7 +92,6 @@ static ez_int32_t property_countdowncfg_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -113,7 +110,6 @@ static ez_int32_t property_lightswitchplan_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -132,7 +128,6 @@ static ez_int32_t property_powerswitch_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_BOOL;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -151,7 +146,6 @@ static ez_int32_t property_biorhythm_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -170,7 +164,6 @@ static ez_int32_t property_colorrgb_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_STRING;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -189,7 +182,6 @@ static ez_int32_t property_helpsleep_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_ARRAY;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -208,7 +200,6 @@ static ez_int32_t property_musicrhythm_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_STRING;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -227,7 +218,6 @@ static ez_int32_t property_scene_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_ARRAY;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -246,7 +236,6 @@ static ez_int32_t property_wakeup_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_ARRAY;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -265,7 +254,6 @@ static ez_int32_t property_workmode_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_STRING;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -284,7 +272,6 @@ static ez_int32_t property_timezonecompose_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -303,7 +290,6 @@ static ez_int32_t property_netstatus_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_OBJECT;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -322,7 +308,6 @@ static ez_int32_t property_scene1_up(ez_tsl_value_t *p_stru_key_value)
 		//todo:获取实际值上传
 		p_stru_key_value->type = EZ_TSL_DATA_TYPE_ARRAY;
 		//完善此部分...
-		printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 		rv = EZ_BASE_ERR_SUCC;
 	}while(0);
 	return rv;
@@ -338,7 +323,6 @@ static ez_int32_t property_brightness_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -350,7 +334,6 @@ static ez_int32_t property_colortemperature_set(ez_tsl_value_t *p_stru_key_value
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -362,7 +345,6 @@ static ez_int32_t property_countdowncfg_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -374,7 +356,6 @@ static ez_int32_t property_lightswitchplan_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -386,7 +367,6 @@ static ez_int32_t property_powerswitch_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -398,7 +378,6 @@ static ez_int32_t property_biorhythm_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -410,7 +389,6 @@ static ez_int32_t property_colorrgb_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -422,7 +400,6 @@ static ez_int32_t property_helpsleep_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -434,7 +411,6 @@ static ez_int32_t property_musicrhythm_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -446,7 +422,6 @@ static ez_int32_t property_scene_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -458,7 +433,6 @@ static ez_int32_t property_wakeup_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -470,7 +444,6 @@ static ez_int32_t property_workmode_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -482,7 +455,6 @@ static ez_int32_t property_timezonecompose_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -494,7 +466,6 @@ static ez_int32_t property_netstatus_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -506,7 +477,6 @@ static ez_int32_t property_scene1_set(ez_tsl_value_t *p_stru_key_value)
 		return -1;
 	}
 	//todo:应用层业务处理
-	printf("\n to_do DEBUG in line (%d) and function (%s)): \n ", __LINE__, __func__);
 	//完善此部分...
 	return EZ_BASE_ERR_SUCC;
 }
@@ -584,7 +554,6 @@ int user_property_report(char *key)
 		* 
 		*/
  
-        printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
         rsc_info.res_type = property_cmd[i].res_type;
         rsc_info.local_index = property_cmd[i].index;
 

@@ -49,8 +49,6 @@ void netmgr_sta_update(netmgr_sta_flag_t sta, int reset)
 bool netmgr_is_wd_done(void)
 {
     bool ret = true;
-    printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
-    
 
     return ret;
 }

@@ -168,10 +168,6 @@ ez_int8_t bulb_leds_pwm_init(led_gpio_init_t * led_gpio_init)
 
     for (i = 0; i < LEDC_CHANNEL_MAX; i++)
     {
-        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): %d,%d\n ",__LINE__, __func__
-            ,led_gpio_init->led_gpio_config[i].led_gpio_name,
-             led_gpio_init->led_gpio_config[i].led_color_name);
-        
 
         switch (led_gpio_init->led_gpio_config[i].led_color_name)
         {
@@ -304,11 +300,6 @@ ez_int8_t bulb_leds_i2c_bp5758_config(led_gpio_init_t * led_gpio_init)
 
     for (i = 0; i < LEDC_CHANNEL_MAX; i++)
     {
-        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): %d,%d\n ",__LINE__, __func__
-            ,led_gpio_init->led_gpio_config[i].led_gpio_name,
-             led_gpio_init->led_gpio_config[i].led_i2c_name);
-        
-
         switch (led_gpio_init->led_gpio_config[i].led_i2c_name)
         {
             case LED_I2C_SDA:    

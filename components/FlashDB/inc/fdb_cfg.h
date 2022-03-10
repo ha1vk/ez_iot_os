@@ -68,7 +68,7 @@
 
 
 /* log print macro. default EF_PRINT macro is printf() */
-/* #define FDB_PRINT(...)              my_printf(__VA_ARGS__) */
+#define FDB_PRINT(...)              ezos_printf(__VA_ARGS__)
 
 #ifdef CONFIG_EZIOT_COMPONENT_FLASHDB_DEBUG_ENABLE
 /* print debug information */

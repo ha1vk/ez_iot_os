@@ -162,35 +162,6 @@ int report_wifi_info(ez_tsl_value_t *value_out)
     return rv;
 }
 
-#ifdef HEAP_DEBUG
-ez_int32_t tsl_notice(ez_tsl_event_e event_type, ez_void_t *data, ez_int32_t len)
-{
-    return  0;
-}
-
-ez_int32_t tsl_things_action2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info,
-
-                                 const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out)
-{
-printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
-
-    return  0;
-}
-
-ez_int32_t tsl_things_property2cloud(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out)
-{
-printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
-
-    return  0;
-}
-
-ez_int32_t tsl_things_property2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out)
-{
-    printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
-    return  0;
-}
-#endif
-
 #define BULB_EZIOT_TEST_DEV_TYPE "G1FC47D8"
 //线上序列号
 #define BULB_EZIOT_TEST_DEV_SERIAL_NUMBER "P20151771"
@@ -576,12 +547,6 @@ void online_access()
     ezos_strncpy((char*)dev_info.dev_firmwareversion, dev_firmwareversion, sizeof(dev_info.dev_firmwareversion) - 1);
     ezos_strncpy((char*)lbs_addr.host, domain, sizeof(lbs_addr.host) - 1);
 
-#if 0
-    dev_info.auth_mode = get_dev_auth_mode();
-    ezos_strncpy(dev_info.dev_type, BULB_EZIOT_TEST_DEV_TYPE, sizeof(dev_info.dev_type) - 1);
-    ezos_strncpy(dev_info.dev_subserial, BULB_EZIOT_TEST_DEV_SERIAL_NUMBER, sizeof(dev_info.dev_subserial) - 1);
-    ezos_strncpy(dev_info.dev_verification_code, BULB_EZIOT_TEST_DEV_VERIFICATION_CODE, sizeof(dev_info.dev_verification_code) - 1);
-#else
     dev_info.auth_mode = get_dev_auth_mode();
     ezos_strncpy((char*)dev_info.dev_type, get_dev_productKey(), sizeof(dev_info.dev_type) - 1);
     if(AUTH_MODE_LIC == dev_info.auth_mode)
@@ -593,7 +558,7 @@ void online_access()
         ezos_strncpy((char*)dev_info.dev_subserial, get_dev_deviceName(),sizeof(dev_info.dev_subserial));
     }
     ezos_strncpy((char*)dev_info.dev_verification_code, get_dev_License(), sizeof(dev_info.dev_verification_code) - 1);
-#endif
+
     /*you can get the lbs addres from the ap distribution or from the flash storage*/
     if (EZ_CORE_ERR_SUCC != ez_iot_core_init(&lbs_addr, &dev_info, ez_event_notice_func))
     {
@@ -832,9 +797,7 @@ int correct_time_zone(char *time_zone_string)
                 }
             }
         }
-        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the daylight_string is:%s \n ",__LINE__, __func__,(char *)daylight_string);
         strcpy(time_zone_cfg.daylightstring, daylight_string);
-        printf("\n LW_PRINT DEBUG in line (%d) and function (%s)):the daylightstring is:%s \n ",__LINE__, __func__,(char *)time_zone_cfg.daylightstring);
         ez_iot_correct_time(time_zone_cfg.host, time_zone_cfg.timezone, time_zone_cfg.daylight, time_zone_cfg.daylightstring);
         
     } while (false);

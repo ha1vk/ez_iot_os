@@ -32,7 +32,6 @@ static void wd_sucess_proc(void *param)
     memcpy(&wifi_info, param, sizeof(ezconn_wifi_info_t));
 
     strncpy(bind_token, wifi_info.token, sizeof(bind_token) - 1);
-printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 
     int ret = 0; 
     do
@@ -53,7 +52,6 @@ printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__)
             break;
         }
     } while (false);
-printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
 
     if (0 != ret)
     {
@@ -67,7 +65,6 @@ printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__)
     /*此时需要将配网信息写入到flash中*/
 
     /*ap模式关闭后，底层连接也断开，此处时重新连接*/
-    // printf("\n to_do DEBUG in line (%d) and function (%s)): countrycode \n ", __LINE__, __func__);
     // ezconn_wifi_init();
     ezconn_wifi_config(EZCONN_WIFI_MODE_STA);
     ezconn_sta_start(wifi_info.ssid, wifi_info.password);
@@ -346,11 +343,6 @@ ez_bool_t ap_distribution_set(ez_bool_t enable, ez_int_t timeout)
 
 void wifi_connect_do(void)
 {
-    #if 0
-    printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
-    strncpy((char *)wifi_info.ssid, "Lee", sizeof(wifi_info.ssid) - 1);
-    strncpy((char *)wifi_info.password, "12345678", sizeof(wifi_info.password) - 1);
-    #else
     /* 从设备flash 获取ssid 以及密码信息*/
     char ssid[33] = {0};
     int len = sizeof(ssid);
@@ -372,7 +364,7 @@ void wifi_connect_do(void)
     {
         return;
     }
-    #endif
+
     ezconn_wifi_config(EZCONN_WIFI_MODE_STA);
     ezconn_sta_start(ssid, password);
 }
@@ -384,7 +376,7 @@ void ap_distribution_do()
     ezconn_ap_info_t ap_info = {0};
     char ssid[33] = {0};
     g_apstamode_flag = true;
-    #if 1 //暂且写死ap模式的ssid名称，后续用从flash读取相关信息
+
     device_t *device_info = get_product_device_config();
     if (NULL == device_info)
     {
@@ -420,13 +412,6 @@ void ap_distribution_do()
     mk_soft_version(dev_version);
     memcpy(dev_info.dev_version, dev_version, sizeof(dev_info.dev_version));
 
-    
-    #else
-    /* 从配置文件中拿取*/
-    printf("\n to_do DEBUG in line (%d) and function (%s)): \n ",__LINE__, __func__);
-    
-    #endif
-    
     ezconn_wifi_config(EZCONN_WIFI_MODE_APSTA);
     ezconn_ap_start(&ap_info, &dev_info, wifi_ap_distribution_cb);
     g_ap_exit = false;
