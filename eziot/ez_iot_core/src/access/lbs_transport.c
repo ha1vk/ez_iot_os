@@ -50,6 +50,9 @@ AES_SUPPORT_INTERFACE
 #define LBS_AUTH_SHA256_LEN 32
 #define LBS_AUTH_SHA256_OFFSET 10
 
+extern unsigned char g_sendbuf[CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX];
+extern unsigned char g_readbuf[CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX];
+
 typedef struct
 {
     unsigned char *head_buf;
@@ -183,6 +186,7 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
         ezlog_e(TAG_CORE, "malloc out_packet head_buf err");
         return mkernel_internal_mem_lack;
     }
+
     ezos_memset(redirect_affair->global_out_packet.head_buf, 0, 16);
     redirect_affair->global_out_packet.head_buf_off = 0;
     redirect_affair->global_out_packet.head_buf_Len = 16;
@@ -196,39 +200,35 @@ static mkernel_internal_error init_lbs_affair(ezdev_sdk_kernel *sdk_kernel, lbs_
     ezos_memset(redirect_affair->global_out_packet.var_head_buf, 0, LBS_AUTH_TAG_LEN);
     redirect_affair->global_out_packet.var_head_buf_off = 0;
     redirect_affair->global_out_packet.var_head_buf_Len = LBS_AUTH_TAG_LEN;
-    redirect_affair->global_out_packet.payload_buf = ezos_malloc(CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
-    if (NULL == redirect_affair->global_out_packet.payload_buf)
-    {
-        ezlog_e(TAG_CORE, "malloc out_packet payload_buf err");
-        return mkernel_internal_mem_lack;
-    }
+
+    redirect_affair->global_out_packet.payload_buf = g_sendbuf;
     ezos_memset(redirect_affair->global_out_packet.payload_buf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     redirect_affair->global_out_packet.payload_buf_off = 0;
     redirect_affair->global_out_packet.payload_buf_Len = CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX;
+
     redirect_affair->global_in_packet.head_buf = ezos_malloc(16);
     if (NULL == redirect_affair->global_in_packet.head_buf)
     {
         ezlog_e(TAG_CORE, "malloc in_packet head_buf err ");
         return mkernel_internal_mem_lack;
     }
+
     ezos_memset(redirect_affair->global_in_packet.head_buf, 0, 16);
     redirect_affair->global_in_packet.head_buf_off = 0;
     redirect_affair->global_in_packet.head_buf_Len = 16;
+
     redirect_affair->global_in_packet.var_head_buf = ezos_malloc(LBS_AUTH_TAG_LEN);
     if (NULL == redirect_affair->global_in_packet.var_head_buf)
     {
         ezlog_e(TAG_CORE, "malloc out_packet head_buf err");
         return mkernel_internal_mem_lack;
     }
+
     ezos_memset(redirect_affair->global_in_packet.var_head_buf, 0, LBS_AUTH_TAG_LEN);
     redirect_affair->global_in_packet.var_head_buf_off = 0;
     redirect_affair->global_in_packet.var_head_buf_Len = LBS_AUTH_TAG_LEN;
-    redirect_affair->global_in_packet.payload_buf = ezos_malloc(CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
-    if (NULL == redirect_affair->global_in_packet.payload_buf)
-    {
-        ezlog_e(TAG_CORE, "malloc in_packet payload_buf err ");
-        return mkernel_internal_mem_lack;
-    }
+
+    redirect_affair->global_in_packet.payload_buf = g_readbuf;
     ezos_memset(redirect_affair->global_in_packet.payload_buf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     redirect_affair->global_in_packet.payload_buf_off = 0;
     redirect_affair->global_in_packet.payload_buf_Len = CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX;
@@ -265,8 +265,7 @@ static void fini_lbs_affair(lbs_affair *redirect_affair)
     }
     if (redirect_affair->global_out_packet.payload_buf != NULL)
     {
-        ezos_free(redirect_affair->global_out_packet.payload_buf);
-        redirect_affair->global_out_packet.payload_buf = NULL;
+        ezos_memset(redirect_affair->global_out_packet.payload_buf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     }
     if (redirect_affair->global_in_packet.head_buf != NULL)
     {
@@ -280,8 +279,7 @@ static void fini_lbs_affair(lbs_affair *redirect_affair)
     }
     if (redirect_affair->global_in_packet.payload_buf != NULL)
     {
-        ezos_free(redirect_affair->global_in_packet.payload_buf);
-        redirect_affair->global_in_packet.payload_buf = NULL;
+        ezos_memset(redirect_affair->global_in_packet.payload_buf, 0, CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX);
     }
     ezos_memset(redirect_affair, 0, sizeof(lbs_affair));
 }
