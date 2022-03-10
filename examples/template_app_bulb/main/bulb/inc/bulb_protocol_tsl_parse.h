@@ -61,7 +61,7 @@ ez_int32_t tsl_notice(ez_tsl_event_e event_type, ez_void_t *data, ez_int32_t len
  * @return :成功SUCCESS/失败返回:ERROR
  * @note: 
  */
-ez_int32_t tsl_things_action2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info,
+ez_int32_t tsl_things_action2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info,
 
                                  const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out);
 /**
@@ -74,7 +74,7 @@ ez_int32_t tsl_things_action2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_in
  * @return :成功SUCCESS/失败返回:ERROR
  * @note: SDK 24小时会强制执行同步设备的属性给平台，会遍历所有功能点回调此函数
  */
-ez_int32_t tsl_things_property2cloud(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out);
+ez_int32_t tsl_things_property2cloud(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out);
 
 /**
  * @brief 物模型属性同步回调函数
@@ -85,4 +85,4 @@ ez_int32_t tsl_things_property2cloud(const ez_int8_t *sn, const ez_tsl_rsc_t *rs
  * @return :成功SUCCESS/失败返回:ERROR
  * @note: SDK 24小时会强制执行同步设备的属性给平台，会遍历所有功能点回调此函数
  */
-ez_int32_t tsl_things_property2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out);
+ez_int32_t tsl_things_property2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value);

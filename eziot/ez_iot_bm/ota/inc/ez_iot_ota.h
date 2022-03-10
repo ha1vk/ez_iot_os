@@ -191,7 +191,7 @@ extern "C"
      * @param user_data :user input data
      * @return ez_int32_t 
      */
-    typedef ez_int32_t (*get_file_cb)(ez_int32_t total_len, ez_int32_t offset, ez_void_t *data, ez_int32_t len, ez_void_t *user_data);
+    typedef ez_int32_t (*get_file_cb)(ez_uint32_t total_len, ez_uint32_t offset, ez_void_t *data, ez_uint32_t len, ez_void_t *user_data);
 
     /**
      * @brief 升级包下载过程通知回调

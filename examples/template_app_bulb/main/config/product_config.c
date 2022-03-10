@@ -79,7 +79,6 @@ void parse_product_config_baud(cJSON *baud)
     if (NULL == baud)
     {
         ezlog_e(TAG_APP, "parse_product_config cJSON_GetObjectItem baud error!");
-        return -1;
     }
 
     if ((found = cJSON_GetObjectItem(baud, "baud_rate")))
@@ -135,7 +134,6 @@ void parse_product_config_device(cJSON *device)
     if (NULL == device)
     {
         ezlog_e(TAG_APP, "parse_product_config cJSON_GetObjectItem device error!");
-        return -1;
     }
 
     device_t *device_cfg = &g_product_config.device;
@@ -171,7 +169,6 @@ void parse_product_config_device(cJSON *device)
 int parse_product_config(cJSON *root)
 {
     cJSON *device = NULL;
-    cJSON *baud = NULL;
     cJSON *found = NULL;
 #ifdef MCU_VERSION
     baud = cJSON_GetObjectItem(root, "baud_config");

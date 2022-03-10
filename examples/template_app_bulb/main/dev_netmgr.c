@@ -19,8 +19,6 @@ static char g_net_ssid[33] = {0};
 
 void netmgr_sta_update(netmgr_sta_flag_t sta, int reset)
 {
-    int cache = g_net_sta;
-
     if (net_sta_dile == sta)
     {
         g_net_sta = sta;

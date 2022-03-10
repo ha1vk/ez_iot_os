@@ -96,7 +96,7 @@ static int ota_download_fun(ota_upgrade_info_t *upgrade_infos,int file_index)
 		return ota_code_mem;
 	}
 	memset(pstruUserOtaData, 0, sizeof(OTA_USER_DATA_T));
-	ota_download_info_t download_info = {0};
+	ez_ota_download_info_t download_info = {0};
     snprintf(download_info.url, sizeof(download_info.url) - 1, "http://%s", upgrade_infos->pota_files[file_index].url);
     strncpy(download_info.degist, upgrade_infos->pota_files[file_index].degist, sizeof(download_info.degist) - 1);
     download_info.block_size = 1024;    //这个大小可以改成512字节的倍数
@@ -149,7 +149,7 @@ static int ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, void *data
         }
         bAppUpgrading = ez_true;
         show_upgrade_info(upgrade_infos);
-        rv = ota_download_fun(upgrade_infos,0);
+        rv = ota_download_fun((ota_upgrade_info_t *)upgrade_infos, 0);
         if (0 != rv)
 		{
 			bAppUpgrading = ez_false;
@@ -196,7 +196,6 @@ static void show_upgrade_info(ez_ota_upgrade_info_t *upgrade_infos)
 
 static int download_data_cb(EZ_UINT32  total_len, EZ_UINT32  offset, void *data, EZ_UINT32  len, void *user_data)
 {
-    ez_ota_res_t pres = {0};
     int  rv = 0;
     EZ_INT16 progress = 0;
    

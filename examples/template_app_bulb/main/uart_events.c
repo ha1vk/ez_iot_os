@@ -331,11 +331,6 @@ static void pasreATCMD(unsigned char *data, int len)
     char *p4dstRgb= NULL;
     char *p5mSleep = NULL;
     char *p6chgLoops = NULL;
-    char *pMacStr =NULL;
-    char *pSceneDurationStr = NULL;
-    char *pSpeedtimeStr = NULL;
-    char *psceneName= NULL;
-
     
     int srcLm=0;
     int dstLm=0;
@@ -343,8 +338,6 @@ static void pasreATCMD(unsigned char *data, int len)
     int dstRgb=0;
     int mSleep =0;
     int chgLoops = 0;
-    int iSceneDuration = 0;
-    int iSpeedtime = 0;
     int index = 0;
 	led_ctrl_t led_ctrl_cmd = {0};
 	

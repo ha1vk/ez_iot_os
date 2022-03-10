@@ -36,9 +36,6 @@ extern char g_time_zone[8];//tsl 需要用
 
 static int8_t g_rssi = 0;
 static char g_ip[16] = {0};
-static int g_event_id = -1;
-static int g_last_err = 0;
-extern int8_t Ezviz_Wifi_Get_Rssi(int8_t* rssi);
 char bind_token[64] = {0};
 
 int8_t Ezviz_Wifi_Get_Rssi(int8_t *rssi)
@@ -56,9 +53,7 @@ int8_t Ezviz_Wifi_Get_Rssi(int8_t *rssi)
         esp_wifi_sta_get_ap_info(&wifi_param);
         *rssi = wifi_param.rssi;
 #endif
-
         //ezlog_i(TAG_WIFI, "Get Rssi success! rssi = %d", *rssi);
-
         ret = 0;
     }
     else
@@ -201,7 +196,7 @@ int8_t ez_iot_correct_time(const char *ntp_server, const char *time_zone_info, i
 
 		if (0 != strlen(ntp_server))
 		{       
-            sntp_setservername(0, ntp_server);
+            sntp_setservername(0, (char *)ntp_server);
             sntp_init();
         }
 
@@ -391,7 +386,6 @@ static ez_int32_t ez_event_notice_func(ez_event_e event_type, ez_void_t *data, e
 static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *data, ez_int32_t len)
 {
     ez_bind_info_t *bind_info;
-    ez_bind_challenge_t *bind_chanllenge;
     ezlog_d(TAG_APP, "receive notice message from sdk: event_type[%d]", event_type);
 
     switch (event_type)

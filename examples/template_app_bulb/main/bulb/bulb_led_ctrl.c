@@ -686,7 +686,6 @@ void led_ctrl_Task()
 {
 
     ezlog_i(TAG_APP, "enter %s", __func__);
-    led_ctrl_t struMusicCtrlCmd;
     ctrl_sem = ezos_sem_create(0, 1);
 
     while (1)

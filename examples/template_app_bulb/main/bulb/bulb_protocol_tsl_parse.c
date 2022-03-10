@@ -633,7 +633,7 @@ static ez_int32_t property_netstatus_set(ez_tsl_value_t *p_stru_key_value)
 	return EZ_BASE_ERR_SUCC;
 }
 
-static int action_getcountdown(const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out)
+static int action_getcountdown(ez_tsl_value_t *value_in, ez_tsl_value_t *value_out)
 {
     value_out->value = action_get_countdown();
     if (NULL == value_out->value)
@@ -745,7 +745,7 @@ int user_property_report(char *key)
  * @return :成功SUCCESS/失败返回:ERROR
  * @note: 
  */
-ez_int32_t tsl_things_action2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info,
+ez_int32_t tsl_things_action2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info,
 
                                  const ez_tsl_value_t *value_in, ez_tsl_value_t *value_out)
 {
@@ -766,7 +766,7 @@ ez_int32_t tsl_things_action2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_in
     }
     if (NULL != action_cmd[i].identify)
     {
-        ret = action_cmd[i].func_set(value_in, value_out);
+        ret = action_cmd[i].func_set((ez_tsl_value_t *)value_in, value_out);
     }
     else
     {
@@ -784,12 +784,12 @@ ez_int32_t tsl_things_action2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_in
  * @return :成功SUCCESS/失败返回:ERROR
  * @note: 此函数执行不应该阻塞，相关业务处理若有时间较长应开启另一个线程任务处理
  */
-ez_int32_t tsl_things_property2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out)
+ez_int32_t tsl_things_property2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, const ez_tsl_value_t *value)
 {
     int ret = 0;
     int i = 0;
 
-    if (NULL == key_info || NULL == value_out)
+    if (NULL == key_info || NULL == value)
     {
         ezlog_e(TAG_AP, "things report2dev param error.");
         return -1;
@@ -807,19 +807,19 @@ ez_int32_t tsl_things_property2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_
     #endif
     if (NULL != property_cmd[i].identify)
     {
-         if((EZ_TSL_DATA_TYPE_INT == value_out->type)||
-            (EZ_TSL_DATA_TYPE_BOOL == value_out->type)
+         if((EZ_TSL_DATA_TYPE_INT == value->type)||
+            (EZ_TSL_DATA_TYPE_BOOL == value->type)
             )
 
         {
-            ezlog_v(TAG_APP,"receive identify:%s,  value=%d:\n ",property_cmd[i].identify,value_out->value_int);
+            ezlog_v(TAG_APP,"receive identify:%s,  value=%d:\n ",property_cmd[i].identify,value->value_int);
         }
-        else if((EZ_TSL_DATA_TYPE_STRING == value_out->type)
-                ||(EZ_TSL_DATA_TYPE_ARRAY== value_out->type)
-                ||(EZ_TSL_DATA_TYPE_OBJECT== value_out->type)
+        else if((EZ_TSL_DATA_TYPE_STRING == value->type)
+                ||(EZ_TSL_DATA_TYPE_ARRAY== value->type)
+                ||(EZ_TSL_DATA_TYPE_OBJECT== value->type)
                 )
         {
-            ezlog_v(TAG_APP, "receive identify: %s,  value=%s:\n ",property_cmd[i].identify,(char *)value_out->value);
+            ezlog_v(TAG_APP, "receive identify: %s,  value=%s:\n ",property_cmd[i].identify,(char *)value->value);
         }
         else
         {
@@ -827,7 +827,7 @@ ez_int32_t tsl_things_property2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_
         }
 
         
-        ret = property_cmd[i].func_set(value_out);
+        ret = property_cmd[i].func_set((ez_tsl_value_t *)value);
 
         /* @brief 云端下发属性，且设备的属性已变化，应该执行主动上报。
         ez_iot_tsl_property_report()接口传NULL 值，sdk会调用tsl_things_property2cloud上报属性值，
@@ -856,7 +856,7 @@ ez_int32_t tsl_things_property2dev(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_
  * @return :成功SUCCESS/失败返回:ERROR
  * @note: SDK 24小时会强制执行同步设备的属性给平台，会遍历所有功能点回调此函数
  */
-ez_int32_t tsl_things_property2cloud(const ez_int8_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out)
+ez_int32_t tsl_things_property2cloud(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out)
 {
     int ret = 0;
     int i;

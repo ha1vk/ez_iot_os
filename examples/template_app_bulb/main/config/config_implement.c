@@ -292,7 +292,6 @@ int check_ota_reboot()
 
 int bulb_param_init()
 {    
-    int ret = 0;
     light_param_t *p_bulb_param = get_light_param();
     size_t len_tmp= KV_LENGTH_MAX;
     int value_tmp=0;
@@ -311,7 +310,7 @@ int bulb_param_init()
         if (TYPE_NUM == g_bulb_kv_tab[i].value_type)
         {
             len_tmp = sizeof(value_tmp);
-            ret = kv_raw_get(g_bulb_kv_tab[i].key_v, &value_tmp, &len_tmp);
+            kv_raw_get(g_bulb_kv_tab[i].key_v, &value_tmp, &len_tmp);
         }
         else if (TYPE_STRING == g_bulb_kv_tab[i].value_type)
         {
@@ -399,8 +398,8 @@ int config_init(void)
 {
     ezlog_i(TAG_APP, "config_init");
 	char param_ver[24] = {0};
-	char len =24;
-	int ret = config_get_value(K_PARAM_VER, &param_ver, &len);
+	size_t len =24;
+	config_get_value(K_PARAM_VER, &param_ver, &len);
 
     if (0 == len)
     {
