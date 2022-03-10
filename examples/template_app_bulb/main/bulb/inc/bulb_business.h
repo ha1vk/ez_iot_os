@@ -178,6 +178,9 @@ int set_light_countdown(char *json_string);
 
 void *action_get_countdown();
 
+int disable_countdown();
+
+
 void bulb_ctrl_deinit();
 //ez_int32_t countdown_light_on(ez_int32_t count_down);
 //ez_int32_t countdown_light_off(ez_int32_t count_down);

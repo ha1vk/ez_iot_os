@@ -426,7 +426,7 @@ void json2param_action_conf(cJSON *js_array, light_action_t *action)
         {
             if (cJSON_String == js_action->type)
             {
-                sscanf((char *)js_action->valuestring, "%2x%2x%2x", &r, &g, &b);
+                sscanf((char *)js_action->valuestring, "#%2x%2x%2x", &r, &g, &b);
                 action->color_rgb = r * 256 * 256 + g * 256 + b;
             }
             else

@@ -130,7 +130,10 @@ extern "C"
 	void set_logRec_start(int bLogRecStart);
 
     int config_init(void);
-	
+
+    int check_ota_reboot();
+
+    
 #ifdef __cplusplus
 }
 #endif

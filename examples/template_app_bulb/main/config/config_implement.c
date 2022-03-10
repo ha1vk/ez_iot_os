@@ -1,4 +1,4 @@
-#include "config_implement.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/unistd.h>
@@ -10,7 +10,7 @@
 
 #include "product_config.h"
 #include "bulb_business.h"
-
+#include "config_implement.h"
 
 //#include "fdb_def.h"
 #include "kv_imp.h"
@@ -264,6 +264,32 @@ int config_print()
     return ret;
 }
 
+int check_ota_reboot()
+{
+	int ota_reboot_code = REBOOT_NORMAL;
+	
+    int len = sizeof(ota_reboot_code);
+
+    int ret = config_get_value(K_OTA_CODE, &ota_reboot_code, &len);
+    if (0 != ret)
+    {
+        ezlog_e(TAG_APP, "get ota reboot code error. ");
+        return -1;
+    }
+
+    if(REBOOT_OTA_FAILED == ota_reboot_code || REBOOT_OTA_SUCCEED == ota_reboot_code)
+    {
+        ezlog_i(TAG_APP, "ota reboot");
+        return true;
+    }
+    else
+    {
+        ezlog_i(TAG_APP, "normal reboot");
+        return false;
+    }
+	
+}
+
 int bulb_param_init()
 {    
     int ret = 0;
@@ -309,7 +335,8 @@ int bulb_param_init()
                 break;   
                 
             case K_COUNTDOWNCFG:
-                set_light_countdown(json_string);
+                //set_light_countdown(json_string);
+                disable_countdown();    //重新上电，灯泡将倒计时初始化为关闭
                 break;
                 
             case K_LIGHTSWITCHPLAN:

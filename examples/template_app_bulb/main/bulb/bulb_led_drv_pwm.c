@@ -457,9 +457,9 @@ ez_int8_t bulb_leds_cct_config(ez_int16_t cct_value, ez_int16_t led_lm_percentag
         }
     }
 
-    ezlog_v(TAG_LED, "duties[0]=%d,duties[1]=%d,duties[2]=%d,duties[3] %d duties[4] = %d,mode=%d"
-        , pwm_led_duties[0], pwm_led_duties[1],pwm_led_duties[2], 
-        pwm_led_duties[3], pwm_led_duties[4],g_led_control_mode);
+    //ezlog_v(TAG_LED, "duties[0]=%d,duties[1]=%d,duties[2]=%d,duties[3] %d duties[4] = %d,mode=%d"
+    //    , pwm_led_duties[0], pwm_led_duties[1],pwm_led_duties[2], 
+    //    pwm_led_duties[3], pwm_led_duties[4],g_led_control_mode);
     if((WHITE_CONTROL_CCT == g_led_control_mode)||(WHITE_CONTROL_CW == g_led_control_mode))
     {
         for (int i = 0; i < LEDC_CHANNEL_MAX; i++)
@@ -523,9 +523,9 @@ ez_int8_t bulb_leds_RGB_config(ez_int32_t color_value, ez_int16_t led_lm_percent
         pwm_led_duties[LED_COLOR_BLUE] = g_led_pwm_cycle_time - pwm_led_duties[LED_COLOR_BLUE];
     }
 
-    ezlog_v(TAG_LED, "duties[0]=%d,duties[1]=%d,duties[2]=%d,duties[3] %d duties[4] = %d,mode=%d"
-        , pwm_led_duties[0], pwm_led_duties[1],pwm_led_duties[2], 
-        pwm_led_duties[3], pwm_led_duties[4],g_led_control_mode);
+    //ezlog_v(TAG_LED, "duties[0]=%d,duties[1]=%d,duties[2]=%d,duties[3] %d duties[4] = %d,mode=%d"
+    //    , pwm_led_duties[0], pwm_led_duties[1],pwm_led_duties[2], 
+    //    pwm_led_duties[3], pwm_led_duties[4],g_led_control_mode);
 
 
     if((WHITE_CONTROL_CCT == g_led_control_mode)||(WHITE_CONTROL_CW == g_led_control_mode))

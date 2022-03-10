@@ -85,13 +85,13 @@ int light_brigtness_to_limit(int light_brightness)
 int regular_power_up(void)
 {
     int dstBrigtness = 0;
-#if 0
+
     if (true == check_ota_reboot() && false == g_bulb_param.swit)    //ota 升级且原来是关灯状态，其他物理断电都需要开灯，后面有上报状态同步平台
     {
         ezlog_w(TAG_APP, "ota reboot, no need light up!");
         return -1;
     }
-#endif
+
     dstBrigtness = light_brigtness_to_limit(g_bulb_param.brightness);
     
     switch (g_bulb_param.mode)
@@ -115,6 +115,9 @@ int regular_power_up(void)
     default:
         break;
     }
+
+    g_bulb_param.swit = true;  //物理断电重启，直接开灯
+    config_set_value(K_POWERSWITCH,(void *)&g_bulb_param.swit,sizeof(int));
     return 0;
 }
 
@@ -182,6 +185,10 @@ int turn_on_lamp()
     default:
         break;
     }
+
+    config_set_value(K_POWERSWITCH,(void *)&g_bulb_param.swit,sizeof(int));
+    
+    user_property_report("PowerSwitch");
 
     g_b_manual_change = true;
 
@@ -268,6 +275,10 @@ int turn_off_lamp()
     default:
         break;
     }
+
+    config_set_value(K_POWERSWITCH,(void *)&g_bulb_param.swit,sizeof(int));
+    
+    user_property_report("PowerSwitch");
 
     g_b_manual_change = true;
     
@@ -621,6 +632,7 @@ int disable_light_switch_plan(int index)
             break;
         }
 
+        pJsonEnable->type = cJSON_False; 
         pJsonEnable->valueint = 0;
         pJsonEnable->valuedouble = 0;
 
@@ -715,9 +727,8 @@ int disable_light_sleep_plan(int index,ez_bool_t helpsleep)
             break;
         }
 
-        pJsonEnable->valueint = 0;
-        pJsonEnable->valuedouble = 0;
-
+      	pJsonEnable->type = cJSON_False;
+		pJsonEnable->valueint = 0;       
         char *buf_new = cJSON_PrintUnformatted(js_root);
         if (NULL == buf_new)
         {
@@ -806,8 +817,9 @@ int disable_countdown()
             break;
         }
 
+        pJsonEnable->type = cJSON_False;
         pJsonEnable->valueint = 0;
-        pJsonEnable->valuedouble = 0;
+        
 
         char *buf_new = cJSON_PrintUnformatted(js_root);
         if (NULL == buf_new)
@@ -815,7 +827,7 @@ int disable_countdown()
             break;
         }
 
-        if (0 != config_set_value(K_LIGHTSWITCHPLAN, (void *)buf_new, strlen(buf_new)))
+        if (0 != config_set_value(K_COUNTDOWNCFG, (void *)buf_new, strlen(buf_new)))
         {
             free(buf_new);
             break;
@@ -1049,7 +1061,9 @@ static ez_bool_t cycle_plan_do_sleep(light_sleep_metadata_t *pplan,ez_bool_t wee
     ez_bool_t is_done = 0;
     led_ctrl_t led_ctrl_cmd = {0};
     ez_int32_t min_start;
+    
     ez_int32_t min_now;
+    ez_int32_t secend_now;
     ezos_time_t time_now = ezos_time(NULL);
     int brightness_change =0;
     int interval = 0;
@@ -1079,6 +1093,7 @@ static ez_bool_t cycle_plan_do_sleep(light_sleep_metadata_t *pplan,ez_bool_t wee
         }
     
         min_now = ptm_time_now.tm_hour*60 + ptm_time_now.tm_min;
+        secend_now = min_now * 60 + ptm_time_now.tm_sec;
 
         //printf("\n LW_PRINT DEBUG in line (%d) and function (%s)): min_start=%d %d,week=%d helpsleep=%d,count =%d\n ",__LINE__, __func__,min_start,min_now,week,helpsleep,pplan->start_count );
         
@@ -1087,11 +1102,7 @@ static ez_bool_t cycle_plan_do_sleep(light_sleep_metadata_t *pplan,ez_bool_t wee
             && min_now < (min_start + pplan->fade_time +1) //有一定的误差，能够多次进入进行亮度调节 ，直到亮度调节完毕
             && 0xffffffff != pplan->start_count 
             )
-        {
-
-            ezlog_v(TAG_LIGHT, "sleep process!!!,pplan->count=%d,start_time=%d:%d,fadetime=%d,week=%d"
-                , pplan->start_count,pplan->begin.tm_hour,pplan->begin.tm_min,pplan->fade_time,week);
-            
+        {          
             /* 每1s钟 的亮度，间隔一定时间，变化%1，总秒 数分布到 需要变化的亮度范围上 
             e.g 5分钟 从20%亮度 熄灭，则每隔15s 变化1%，0到14s为0%，15到29s 为%1，....275-299s为19,300s 熄灭
             */
@@ -1107,6 +1118,7 @@ static ez_bool_t cycle_plan_do_sleep(light_sleep_metadata_t *pplan,ez_bool_t wee
                 pplan->start_count = 0xffffffff;
                 g_b_manual_change = false;
                 is_done = 1;
+                ezlog_v(TAG_LIGHT, "sleep time is up,but not need process !!!.");
                 break;
             }
 
@@ -1115,10 +1127,10 @@ static ez_bool_t cycle_plan_do_sleep(light_sleep_metadata_t *pplan,ez_bool_t wee
                 g_b_manual_change = false;
             }
       
-            /*按照起始时刻计算 调整的亮度，通过start_count计数调整。*/                
+            /*按照起始时刻计算 调整的亮度，按照时间调整。*/                
             led_ctrl_cmd.iRgbValue = pplan->action.color_rgb;
             
-            brightness_change  = pplan->start_count / interval;
+            brightness_change  = (secend_now - min_start * 60) / interval;
             if(helpsleep)
             {
                 led_ctrl_cmd.nbrightness = pplan->action.brightness - brightness_change;
@@ -1127,15 +1139,24 @@ static ez_bool_t cycle_plan_do_sleep(light_sleep_metadata_t *pplan,ez_bool_t wee
             {
                 led_ctrl_cmd.nbrightness = brightness_change + 1 ;
             }
+            ezlog_v(TAG_LIGHT, "sleep process!!!.week=%d,fadetime=%d,secend_start=%d,secend_time_now=%d,target lm is %d"
+                ,week,pplan->fade_time,min_start*60,secend_now,led_ctrl_cmd.nbrightness);
+
             led_ctrl_cmd.nCctValue = pplan->action.color_temperature;
             led_ctrl_cmd.nUpDuration = 2000; //2s渐变%1 的亮度
 
             led_ctrl_do_async(&led_ctrl_cmd);
+
+            g_bulb_param.brightness = led_ctrl_cmd.nbrightness;
+            user_property_report("Brightness");
             pplan->start_count ++;
             if(0 == led_ctrl_cmd.nbrightness)
             {
                 pplan->start_count = 0xffffffff;
                 is_done = 1;
+                g_bulb_param.swit = false;
+                ezlog_v(TAG_LIGHT, "sleep time is end.");
+                user_property_report("PowerSwitch");
                 break;
             }
             if(pplan->start_count > 2 * 60 * 60)  //2小时后，count 清零，用于周重复计划的下一次能够进入
@@ -1163,12 +1184,6 @@ static void switch_plan_timer()
             continue;
         }
 
-        ezlog_v(TAG_LIGHT, "plan[%d], %d %d %d %d %d %d %d", i,
-                p_plan->plan[i].week_days[0], p_plan->plan[i].week_days[1],
-                p_plan->plan[i].week_days[2], p_plan->plan[i].week_days[3],
-                p_plan->plan[i].week_days[4], p_plan->plan[i].week_days[5],
-                p_plan->plan[i].week_days[6]);
-
         if (0 == memcmp(week_days_zero, p_plan->plan[i].week_days, sizeof(week_days_zero)))
         {
             if(true == cycle_plan_do_swit(&p_plan->plan[i], false))
@@ -1195,7 +1210,7 @@ void countdown_timer()
     
     ezos_time_t time_now = ezos_time(NULL);
 
-    p_countdown->time_remain_now = time_now - p_countdown->time_stamp ;
+    p_countdown->time_remain_now = p_countdown->time_remain_config - (time_now - p_countdown->time_stamp);
      
     if (p_countdown->time_remain_now <= 0)
     {
@@ -1234,12 +1249,6 @@ void sleep_plan_timer()
             continue;
         }
 
-        ezlog_v(TAG_LIGHT, "sleep plan[%d], %d %d %d %d %d %d %d", i,
-                p_plan->plan[i].week_days[0], p_plan->plan[i].week_days[1],
-                p_plan->plan[i].week_days[2], p_plan->plan[i].week_days[3],
-                p_plan->plan[i].week_days[4], p_plan->plan[i].week_days[5],
-                p_plan->plan[i].week_days[6]);
-
         if (0 == memcmp(week_days_zero, p_plan->plan[i].week_days, sizeof(week_days_zero)))
         {
             if(cycle_plan_do_sleep(&p_plan->plan[i], false,true))
@@ -1261,13 +1270,7 @@ void sleep_plan_timer()
         if (0 == p_plan->plan[i].enabled)
         {
             continue;
-        }
-
-        ezlog_v(TAG_LIGHT, "wakeup plan[%d], %d %d %d %d %d %d %d", i,
-                p_plan->plan[i].week_days[0], p_plan->plan[i].week_days[1],
-                p_plan->plan[i].week_days[2], p_plan->plan[i].week_days[3],
-                p_plan->plan[i].week_days[4], p_plan->plan[i].week_days[5],
-                p_plan->plan[i].week_days[6]);
+        }        
 
         if (0 == memcmp(week_days_zero, p_plan->plan[i].week_days, sizeof(week_days_zero)))
         {
@@ -1398,7 +1401,7 @@ void bulb_ctrl_init()
 
     const ez_char_t *bulb_plan_thread_name = "plan";
     rv = ezos_thread_create(&bulb_plan_thread, bulb_plan_thread_name, light_plan_task,
-                            (void *)bulb_plan_thread_name, 4 * 1024, 5);
+                            (void *)bulb_plan_thread_name, 3 * 1024, 5);
 
     if (EZ_CORE_ERR_SUCC != rv)
     {
