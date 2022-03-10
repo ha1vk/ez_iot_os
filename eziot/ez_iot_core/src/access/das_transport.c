@@ -553,7 +553,7 @@ static void das_message_receive_v3(MessageData *msg_data)
         ptr_submsg = (ezdev_sdk_kernel_submsg_v3 *)ezos_malloc(sizeof(ezdev_sdk_kernel_submsg_v3));
         if (ptr_submsg == NULL)
         {
-            ezlog_d(TAG_CORE, "das_message_receive_v3 mallc submsg error ");
+            ezlog_e(TAG_CORE, "das_message_receive_v3 mallc submsg error ");
             sdk_error = mkernel_internal_malloc_error;
             break;
         }
@@ -567,8 +567,6 @@ static void das_message_receive_v3(MessageData *msg_data)
         }
         ezos_strncpy(msg_topic, msg_data->topicName->lenstring.data, msg_data->topicName->lenstring.len);
 
-        ezlog_d(TAG_CORE, "das_message_receive_v3 msg_topic: %s", msg_topic);
-
         division_num = sscanf(msg_topic, "/iot/%72[^/]/%72[^/]/%64[^-]-%64[^/]/%16[^/]/", dev_serial, (char *)&ptr_submsg->sub_serial, (char *)&ptr_submsg->resource_id, (char *)&ptr_submsg->resource_type,
                               (char *)&ptr_submsg->module);
         if (division_num != 5)
@@ -577,6 +575,7 @@ static void das_message_receive_v3(MessageData *msg_data)
             sdk_error = mkernel_internal_platform_appoint_error;
             break;
         }
+
         snprintf(find_str, 32, "%s/", ptr_submsg->module);
         if (0 == ezos_strcmp(ptr_submsg->module, "model"))
         {
@@ -655,7 +654,9 @@ static void das_message_receive_v3(MessageData *msg_data)
             ezos_free(output_buf);
             output_buf = NULL;
         }
-        ezlog_d(TAG_CORE, "das_message_receive_v3 payloadlen:%lu, seq:%d", msg_data->message->payloadlen, ptr_submsg->msg_seq);
+
+        ezlog_d(TAG_CORE, "receive topic:%s, seq:%d", msg_topic, ptr_submsg->msg_seq);
+        ezlog_v(TAG_CORE, "receive payload:%s", ptr_submsg->buf);
     } while (0);
 
     /**
@@ -962,7 +963,10 @@ static mkernel_internal_error das_send_pubmsg_v3(ezdev_sdk_kernel *sdk_kernel, e
             snprintf(publish_topic, 512, "/iot/%s/%s/%s-%s/%s/%s/%s", dev_serial, dev_subserial, pubmsg->resource_id,
                      pubmsg->resource_type, pubmsg->module, pubmsg->method, pubmsg->msg_type);
         }
-        ezlog_d(TAG_CORE, "publish topic:%s", publish_topic);
+
+        ezlog_d(TAG_CORE, "publish topic:%s, seq:%d", publish_topic, pubmsg->msg_seq);
+        ezlog_v(TAG_CORE, "payload:%s", pubmsg->msg_body);
+
         ezos_memset(&mqtt_msg, 0, sizeof(mqtt_msg));
         mqtt_msg.qos = pubmsg->msg_qos;
         mqtt_msg.retained = 1; //平台不关心
@@ -1148,11 +1152,6 @@ static mkernel_internal_error send_message_to_das_v3(ezdev_sdk_kernel *sdk_kerne
         }
 
         sdk_error = das_send_pubmsg_v3(sdk_kernel, &ptr_pubmsg_exchange->msg_conntext_v3);
-
-        ezlog_i(TAG_CORE, "pub msg v3 result, module:%s, resource_id:%s, resource_type:%s, msg_type:%s,ext_msg:%s seq:%d",
-                ptr_pubmsg_exchange->msg_conntext_v3.module, ptr_pubmsg_exchange->msg_conntext_v3.resource_id,
-                ptr_pubmsg_exchange->msg_conntext_v3.resource_type, ptr_pubmsg_exchange->msg_conntext_v3.msg_type,
-                ptr_pubmsg_exchange->msg_conntext_v3.ext_msg, ptr_pubmsg_exchange->msg_conntext_v3.msg_seq);
 
         if (mkernel_internal_call_mqtt_pub_error == sdk_error)
         {

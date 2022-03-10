@@ -19,19 +19,10 @@
  *******************************************************************************/
 
 #include <stdio.h>
-
 #include "ezlog.h"
-
 #include "ezos_time.h" //延迟需要
-
-#ifdef __linux
-#include "signal.h"
-#endif
-
 #include "ap_distribution.h"
-
 #include "bulb_business.h"
-#include "dev_netmgr.h"
 #include "kv_imp.h"
 #include "eztimer.h"
 #include "ezconn.h"
@@ -48,7 +39,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #endif
-extern int uart_init(void);
+
 extern void wifi_info_timer_cb();
 ez_int32_t rssi_timer;
 static ez_kv_default_node_t m_kv_default_table[] = {
@@ -93,7 +84,6 @@ int app_main(int argc, char **argv)
     ezlog_filter_lvl(4);
 
     kv_init(&m_default_kv);
-    uart_init();
 
     ezconn_wifi_init();
 
@@ -118,14 +108,9 @@ int app_main(int argc, char **argv)
         /* 设备通过重启进入配网，检查是否需要配网 */
         ap_distribution_do();
     }
-    else if (netmgr_is_wd_done()) //flash 已存有ssid信息
-    {
-        /* 已配过网，直接上线 */
-        wifi_connect_do();
-    }
     else
     {
-        netmgr_sta_update(net_sta_dile, 0);
+        wifi_connect_do();
     }
 
     eztimer_create("rssi_timer", (300 * 1000), ez_true, wifi_info_timer_cb);

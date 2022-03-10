@@ -14,7 +14,7 @@
 #endif
 #define SOFT_MAJOR_VERSION	2
 #define SOFT_MINOR_VERSION 	0
-#define SOFT_REVISION		0
+#define SOFT_REVISION		1
 
 
 int set_light_gpio_config(void)

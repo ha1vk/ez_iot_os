@@ -436,7 +436,7 @@ ez_int8_t bulb_leds_cct_config(ez_int16_t cct_value, ez_int16_t led_lm_percentag
         config_duty = bulb_leds_ctrl_cct2Duty(cct_value);
         if (config_duty == -1)
         {
-            ezlog_e(TAG_LED, "get config duty fail, cct_valu %d!\n", cct_value);
+            ezlog_e(TAG_LED, "get config duty fail, cct_valu %d!", cct_value);
             return -1;
         }
 
@@ -474,7 +474,7 @@ ez_int8_t bulb_leds_cct_config(ez_int16_t cct_value, ez_int16_t led_lm_percentag
     }
     else
     {
-        ezlog_e(TAG_LED, "drv config error\n");
+        ezlog_e(TAG_LED, "drv config error");
     }
     
     
@@ -542,7 +542,7 @@ ez_int8_t bulb_leds_RGB_config(ez_int32_t color_value, ez_int16_t led_lm_percent
     }
     else
     {
-        ezlog_e(TAG_LED, "drv config error\n");
+        ezlog_e(TAG_LED, "drv config error");
     }
     
     return 0;

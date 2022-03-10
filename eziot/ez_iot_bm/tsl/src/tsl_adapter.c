@@ -173,7 +173,6 @@ static ez_err_t business2cloud_imp(ez_shadow_value_t *pvalue, ez_shadow_business
     ez_tsl_rsc_t rsc_info = {.res_type = ppram->pres.res_type, .local_index = local_index};
     ez_tsl_key_t key_info = {.domain = (ez_char_t *)ppram->pdomain, .key = (ez_char_t *)ppram->pkey};
 
-    ezlog_d(TAG_TSL, "busi to cloud. dev_sn: %s", ppram->pres.dev_serial);
     rv = g_tsl_things_cbs.property2cloud(ppram->pres.dev_serial, &rsc_info, &key_info, tsl_value);
 
     return rv;

@@ -171,6 +171,7 @@ int parse_product_config(cJSON *root)
     cJSON *device = NULL;
     cJSON *found = NULL;
 #ifdef MCU_VERSION
+    cJSON *baud = NULL;
     baud = cJSON_GetObjectItem(root, "baud_config");
     parse_product_config_baud(baud)
 #endif
@@ -475,12 +476,8 @@ int product_config_init(void)
     int rv = -1;
     char *buf = NULL;
     cJSON *cjson_product = NULL;
-#ifdef HAL_ESP
     const esp_partition_t *partition = NULL;
-#else
-	FILE * fp1;
-	FILE * fp2;
-#endif
+
     do
     {
         if (NULL == (buf = (char *)malloc(PRODUCT_CONFIG_MAX_SIZE)))
@@ -489,7 +486,6 @@ int product_config_init(void)
         }
         memset(buf, 0, PRODUCT_CONFIG_MAX_SIZE);
 
-#ifdef HAL_ESP
         partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, "factory_data");
 
         if (NULL == partition)
@@ -503,16 +499,8 @@ int product_config_init(void)
             ezlog_e(TAG_APP, "esp_partition_read error!");
             break;
         }
-#else
-        fp2 = fopen("product.bin", "r");
-        if (NULL == fp2)
-        {
-            ezlog_e(TAG_APP, "open error.");
-            break;
-        }
-        fread(buf, PRODUCT_CONFIG_MAX_SIZE, 1, fp2);
-#endif
-        ezlog_d(TAG_APP, "get_product_config read : [%s] len[%d]\n", buf, strlen(buf));
+
+        ezlog_v(TAG_APP, "%s", buf);
 
         if (NULL == (cjson_product = cJSON_Parse(buf)))
         {
@@ -527,24 +515,14 @@ int product_config_init(void)
         }
 
 		memset(buf, 0, PRODUCT_CONFIG_MAX_SIZE);
-	    #ifdef HAL_ESP
         
         if (ESP_OK != esp_partition_read(partition, 0, buf, PRODUCT_CONFIG_MAX_SIZE))
         {
             ezlog_e(TAG_APP, "read fdata part 1");
             break;
         }
-		#else
-        fp1 = fopen ("lic.bin", "r");
-		if(NULL == fp1)
-		{
-			ezlog_e(TAG_APP, "open error.");
-            break;
-		}
-		fread(buf, PRODUCT_CONFIG_MAX_SIZE, 1, fp1);
-        #endif
-        
-		ezlog_d(TAG_APP, "get_product_lic read : [%s] len[%d]\n", buf, strlen(buf));
+
+        ezlog_v(TAG_APP, "%s", buf);
         if (0 != parse_dev_config(buf, PRODUCT_CONFIG_MAX_SIZE))
         {
             ezlog_e(TAG_APP, "parse_lic_config!");

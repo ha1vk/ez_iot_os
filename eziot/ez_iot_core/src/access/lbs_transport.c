@@ -758,7 +758,7 @@ static mkernel_internal_error send_authentication_i(ezdev_sdk_kernel *sdk_kernel
 
     } while (0);
 
-    ezlog_d(TAG_CORE, "send_authentication_i complete, code:%d", sdk_error);
+    ezlog_d(TAG_CORE, "auth i complete, code:%d", sdk_error);
     return sdk_error;
 }
 
@@ -973,7 +973,7 @@ static mkernel_internal_error send_update_sessionkey_req(ezdev_sdk_kernel *sdk_k
     }
 
     sdk_error = send_lbs_msg(sdk_kernel, authi_affair);
-    ezlog_d(TAG_CORE, "send_authentication_iii complete, code:%d", sdk_error);
+    ezlog_d(TAG_CORE, "auth iii complete, code:%d", sdk_error);
     return mkernel_internal_succ;
 }
 
@@ -1019,7 +1019,7 @@ static mkernel_internal_error send_authentication_creat_dev_id(ezdev_sdk_kernel 
     }
 
     sdk_error = send_lbs_msg(sdk_kernel, authi_affair);
-    ezlog_d(TAG_CORE, "send_authentication_iii complete, code:%d", sdk_error);
+    ezlog_d(TAG_CORE, "auth iii complete, code:%d", sdk_error);
     return mkernel_internal_succ;
 }
 

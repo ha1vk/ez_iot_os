@@ -137,7 +137,7 @@ static mkernel_internal_error consume_extend_data_v3(ezdev_sdk_kernel *sdk_kerne
             }
             else if (kernel_extend->kernel_extend.ez_kernel_data_route)
             {
-                ezlog_d(TAG_CORE, "sdk_data_route v3, module:%s,msg_type:%s ,seq:%d", ptr_submsg->module, ptr_submsg->msg_type, ptr_submsg->msg_seq);
+                ezlog_v(TAG_CORE, "data_route v3, module:%s, msg_type:%s, seq:%d", ptr_submsg->module, ptr_submsg->msg_type, ptr_submsg->msg_seq);
                 kernel_extend->kernel_extend.ez_kernel_data_route(ptr_submsg);
             }
         }

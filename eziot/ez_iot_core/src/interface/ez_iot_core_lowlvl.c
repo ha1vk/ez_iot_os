@@ -328,8 +328,8 @@ EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
     CHECK_COND_DONE(!pubmsg->msg_body, EZ_CORE_ERR_PARAM_INVALID);
     CHECK_COND_DONE(!pubmsg->msg_body_len, EZ_CORE_ERR_PARAM_INVALID);
 
-    ezlog_i(TAG_CORE, "module:%s, resource_type:%s,msg_type:%s, method:%s, ext_msg:%s, seq:%d, len:%d, string:%s", pubmsg->module,
-            pubmsg->resource_type, pubmsg->msg_type, pubmsg->method, pubmsg->ext_msg, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
+    ezlog_d(TAG_CORE, "module:%s, resource_type:%s, msg_type:%s, method:%s, seq:%d, len:%d",
+            pubmsg->resource_type, pubmsg->msg_type, pubmsg->method, pubmsg->ext_msg, pubmsg->msg_body_len, pubmsg->msg_seq);
 
     CHECK_COND_DONE(pubmsg->msg_body_len > CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX, EZ_CORE_ERR_OUT_RANGE);
 

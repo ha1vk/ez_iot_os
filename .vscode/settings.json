@@ -69,7 +69,8 @@
         "ez_iot_base.h": "c",
         "ez_iot_base_def.h": "c",
         "ez_iot_base_protocol.h": "c",
-        "utest.h": "c"
+        "utest.h": "c",
+        "config_implement.h": "c"
     },
     "files.autoGuessEncoding": true
 }

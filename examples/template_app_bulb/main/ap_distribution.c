@@ -4,7 +4,6 @@
 #include "ezconn.h"
 #include "ap_distribution.h"
 
-#include "dev_netmgr.h"
 #include "config_type.h"
 #include "register_server.h"
 
@@ -146,7 +145,6 @@ static void ip_info_update(tcpip_adapter_ip_info_t *ip_info)
     char *gateWay = NULL;
     int ret=0;
     address = ip4addr_ntoa(&ip_info->ip);
-    netmgr_ip_update(address);
     if (0 == ip_change(address, wifi_info.ip))
     {
         return;
@@ -237,7 +235,7 @@ void need_ap_config(void)
     int reset_time_upper = get_reset_time_upper();
     if (power_on_num >= reset_switch_times && power_on_num <= reset_time_upper)
     {
-        ezlog_i(TAG_APP, "on-off need ap config!\n");
+        ezlog_i(TAG_APP, "on-off need ap config!");
         g_if_need_ap = true;
         return;
     }
@@ -256,7 +254,7 @@ void need_ap_config(void)
     {
         enable = 0;
 
-        ezlog_i(TAG_APP, "app reset need ap config!\n");
+        ezlog_i(TAG_APP, "app reset need ap config!");
 
         if (0 != config_set_value(K_AP_ENABLE, &enable, sizeof(enable)))
         {
@@ -398,7 +396,6 @@ void ap_distribution_do()
         ssid[32] = '\0';
     }
 
-
     strncpy((char *)ap_info.ap_ssid, ssid , sizeof(ap_info.ap_ssid) - 1);
     ap_info.auth_mode = 0;
     ap_info.channel = 1;
@@ -416,7 +413,6 @@ void ap_distribution_do()
     ezconn_ap_start(&ap_info, &dev_info, wifi_ap_distribution_cb);
     g_ap_exit = false;
 
-    netmgr_sta_update(net_sta_distribution, 0);
     return;
 }
 

@@ -325,7 +325,7 @@ static ez_int32_t shadow_proc_do()
 
 ez_void_t shadow_core_event_occured(shadow_event_type_e event_type)
 {
-    ezlog_w(TAG_SHD, "set semaphore, t:%d", event_type);
+    ezlog_v(TAG_SHD, "set semaphore, t:%d", event_type);
 
     switch (event_type)
     {
@@ -979,7 +979,7 @@ ez_int32_t shadow_core_cloud_data_in(ez_void_t *shadow_res, ez_uint32_t seq, ez_
     ez_int32_t rv = -1;
     ez_shadow_res_t *pshadow_res = (ez_shadow_res_t *)shadow_res;
 
-    ezlog_d(TAG_SHD, "data in:%s, seq:%d", business_type, seq);
+    ezlog_v(TAG_SHD, "data in:%s, seq:%d", business_type, seq);
 
     do
     {
@@ -1423,7 +1423,7 @@ static ez_void_t shadow_reply2report(ez_uint32_t seq, ez_int32_t code)
                         ezlog_v(TAG_SHD, "local seq:%d, ack seq:%d, code:%d", pnode_key->msg_seq, seq, code);
                         if (pnode_key->msg_seq == seq)
                         {
-                            ezlog_d(TAG_SHD, "seq match, code:%d", code);
+                            ezlog_d(TAG_SHD, "seq match, prop publish succ");
                             if (0 == code)
                             {
                                 pnode_key->need_report = 0;
