@@ -12,6 +12,7 @@ extern bool g_apstamode_flag;
 static const char *TAG_WIFI = "T_WIFI";
 
 static int g_wifi_start_flag = 0;
+static int g_wifi_disconnect_flag = 0;
 
 static const char *TAG_EVENT = "[WIFI EVENT]";
 
@@ -302,6 +303,12 @@ static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
     case SYSTEM_EVENT_STA_DISCONNECTED:
         ezlog_w(TAG_WIFI, "SYSTEM_EVENT_STA_DISCONNECTED");
         wifi_disconnect_reason(info->disconnected.reason);
+
+        if (0 == g_wifi_disconnect_flag)
+        {
+            ezlog_i(TAG_EVENT, "Device DISCONNECTED,start a new connect!");
+            esp_wifi_connect();
+        }
         break;
 
     default:
@@ -354,7 +361,7 @@ int ezhal_sta_connect(char *ssid, char *password)
     esp_err_t ret = ESP_OK;
 
     ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
-
+    g_wifi_disconnect_flag = 0;
     wifi_mode_t wifi_mode = WIFI_MODE_NULL;
     esp_wifi_get_mode(&wifi_mode);
     if (WIFI_MODE_STA != wifi_mode && WIFI_MODE_APSTA != wifi_mode)
@@ -432,6 +439,7 @@ int ezhal_sta_stop()
 {
     ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
     g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
+    g_wifi_disconnect_flag = 1;
     esp_wifi_disconnect();
     return 0;
 }
@@ -504,7 +512,8 @@ int ezhal_ap_stop()
 {
     wifi_mode_t wifi_mode = WIFI_MODE_NULL;
     esp_err_t ret = ESP_OK;
-
+    
+    g_wifi_disconnect_flag = 1;
     esp_wifi_get_mode(&wifi_mode);
 
     switch (wifi_mode)

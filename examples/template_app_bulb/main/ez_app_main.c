@@ -111,7 +111,7 @@ int app_main(int argc, char **argv)
 
     ap_config_checkupdate();
 
-    // ez_product_test(get_product_subtype());
+    ez_product_test(get_product_subtype());
 
     if (ap_distribution_check())
     {

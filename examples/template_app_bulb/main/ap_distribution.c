@@ -36,14 +36,14 @@ static void wd_sucess_proc(void *param)
     int ret = 0; 
     do
     {
-        ret |= config_set_value(K_WIFI_SSID, wifi_info.ssid, sizeof(wifi_info.ssid));
-        ret |= config_set_value(K_WIFI_PASSWORD, wifi_info.password, sizeof(wifi_info.password));
-        ret |= config_set_value(K_WIFI_CC, wifi_info.cc, sizeof(wifi_info.cc));
+        ret |= config_set_value(K_WIFI_SSID, wifi_info.ssid, strlen(wifi_info.ssid));
+        ret |= config_set_value(K_WIFI_PASSWORD, wifi_info.password, strlen(wifi_info.password));
+        ret |= config_set_value(K_WIFI_CC, wifi_info.cc, strlen(wifi_info.cc));
 
-        ret |= config_set_value(K_DOMAIN, wifi_info.domain, sizeof(wifi_info.domain));
+        ret |= config_set_value(K_DOMAIN, wifi_info.domain, strlen(wifi_info.domain));
         if (0 != strlen(wifi_info.device_id))
         {
-            ret |= config_set_value(K_DEVICE_ID, wifi_info.device_id, sizeof(wifi_info.device_id));
+            ret |= config_set_value(K_DEVICE_ID, wifi_info.device_id, strlen(wifi_info.device_id));
         }
 
         if (0 != ret)
@@ -89,8 +89,10 @@ static void wifi_ap_distribution_cb(ezconn_state_e err_code, ezconn_wifi_info_t 
 
         ez_thread_t wd_sucess_handle;
         g_apstamode_flag = false;
-        ezos_thread_create(&wd_sucess_handle, "wd_sucess_proc",wd_sucess_proc, (void *)wifi_info, 3*1024,3);
-        //xTaskCreate(wd_sucess_proc, "wd_sucess_proc", 4096, (void *)wifi_info, 3, NULL);
+        if (0 != ezos_thread_create(&wd_sucess_handle, "wd_sucess_proc",wd_sucess_proc, (void *)wifi_info, 3*1024,3))
+        {
+            ezlog_e(TAG_AP, "create wd_success thread failed.");
+        }
         break;
     case EZCONN_STATE_CONNECTING_ROUTE:
         ezlog_w(TAG_AP, "connecting route.");
@@ -101,13 +103,11 @@ static void wifi_ap_distribution_cb(ezconn_state_e err_code, ezconn_wifi_info_t 
     case EZCONN_STATE_WIFI_CONFIG_TIMEOUT:
         g_apstamode_flag = false;
         ezlog_w(TAG_AP, "wifi config timeout.");
-        ezconn_ap_stop();
         break; 
     default:
         break;
     }
 }
-
 
 static void ez_cloud_access(void)
 {
