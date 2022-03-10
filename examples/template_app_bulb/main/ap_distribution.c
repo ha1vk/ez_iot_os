@@ -10,6 +10,7 @@
 
 #include "config_implement.h"
 #include "product_config.h"
+#include "pt_light_mode.h"
 
 
 #include "freertos/FreeRTOS.h"
@@ -78,14 +79,18 @@ static void wifi_ap_distribution_cb(ezconn_state_e err_code, ezconn_wifi_info_t 
     {
     case EZCONN_STATE_APP_CONNECTED:
         ezlog_w(TAG_AP, "app connected.");  
+        pt_light_set_mode(MODE_AP_CLIENT_CONN);
         break;
     case EZCONN_STATE_SUCC:
         ezlog_w(TAG_AP, "wifi config success.");
+        pt_light_set_mode(MODE_AP_CONN_SUCC);
         ezlog_i(TAG_AP, "ssid: %s", wifi_info->ssid);
         ezlog_i(TAG_AP, "password: %s", wifi_info->password);
         ezlog_i(TAG_AP, "token: %s", wifi_info->token);
         ezlog_i(TAG_AP, "domain: %s", wifi_info->domain);
 
+        ezos_delay_ms(1000);
+        pt_light_deinit();
         ez_thread_t wd_sucess_handle;
         g_apstamode_flag = false;
         if (0 != ezos_thread_create(&wd_sucess_handle, "wd_sucess_proc",wd_sucess_proc, (void *)wifi_info, 3*1024,3))
@@ -95,13 +100,19 @@ static void wifi_ap_distribution_cb(ezconn_state_e err_code, ezconn_wifi_info_t 
         break;
     case EZCONN_STATE_CONNECTING_ROUTE:
         ezlog_w(TAG_AP, "connecting route.");
+        pt_light_set_mode(MODE_AP_CONN_ROUTE);
         break;
     case EZCONN_STATE_CONNECT_FAILED:
         ezlog_w(TAG_AP, "connect failed.");
+        ezos_delay_ms(1000);
+        pt_light_deinit();
         break;
     case EZCONN_STATE_WIFI_CONFIG_TIMEOUT:
         g_apstamode_flag = false;
         ezlog_w(TAG_AP, "wifi config timeout.");
+        pt_light_set_mode(MODE_AP_TIMEOUT);
+        ezos_delay_ms(1000);
+        pt_light_deinit();
         break; 
     default:
         break;
@@ -411,6 +422,7 @@ void ap_distribution_do()
 
     ezconn_wifi_config(EZCONN_WIFI_MODE_APSTA);
     ezconn_ap_start(&ap_info, &dev_info, wifi_ap_distribution_cb);
+    pt_light_set_mode(MODE_AP_START);
     g_ap_exit = false;
 
     return;
