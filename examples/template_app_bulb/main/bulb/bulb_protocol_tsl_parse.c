@@ -695,7 +695,7 @@ int user_property_report(char *key)
         return -1;
     }
 
-    sprintf(dev_serial, "%s:%s", get_dev_productKey(), get_dev_deviceName());
+    ezos_strncpy(dev_serial, get_dev_subserial(), sizeof(dev_serial) - 1);
 
     for (i = 0; property_cmd[i].identify != NULL; i++)
     {

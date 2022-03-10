@@ -7,7 +7,21 @@
 
 #define TAG "T_DEVINFO"
 
+typedef struct
+{
+    char dev_subserial[48];     //设备序列号
+    char dev_productKey[33];    //产品PID
+    char dev_deviceName[13];    //产品序列号
+    char dev_deviceLicense[48]; //产品验证码
+    char dev_auth_mode;         // 1 for license, 0 for sap
+} product_dev_info_t;
+
 static product_dev_info_t g_product_dev_info = {0};
+
+const char *get_dev_subserial()
+{
+    return g_product_dev_info.dev_subserial;
+}
 
 char *get_dev_productKey()
 {
@@ -43,6 +57,8 @@ static int parse_sap_config(char *buf, int buf_size)
     memcpy(g_product_dev_info.dev_productKey, get_product_PTID(), sizeof(g_product_dev_info.dev_productKey));
     memcpy(g_product_dev_info.dev_deviceName, boot_param.prodNo, sizeof(boot_param.prodNo));
     memcpy(g_product_dev_info.dev_deviceLicense, boot_param.rand_code, sizeof(boot_param.rand_code));
+    memcpy(g_product_dev_info.dev_subserial, boot_param.prodNo, sizeof(boot_param.prodNo));
+
     g_product_dev_info.dev_auth_mode = AUTH_MODE_SAP;
     return 0;
 }
@@ -83,6 +99,7 @@ int parse_lic_config(char *buf, int buf_size)
         }
 
         strncpy(g_product_dev_info.dev_deviceName, found->valuestring, sizeof(g_product_dev_info.dev_deviceName) - 1);
+        snprintf(g_product_dev_info.dev_subserial, sizeof(g_product_dev_info.dev_subserial),"%s:%s", g_product_dev_info.dev_productKey, g_product_dev_info.dev_deviceName);
 
         if (NULL == (found = cJSON_GetObjectItem(cjson_lic, "dev_deviceLicense")) || cJSON_String != found->type)
         {

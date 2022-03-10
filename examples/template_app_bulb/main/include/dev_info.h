@@ -87,14 +87,7 @@ typedef struct
     unsigned int irewrite;    // 0 --- 不重写，  1 --- 重写
 } PRODUCT_INFO, *PPRODUCT_INFO;
 
-typedef struct
-{
-    char dev_productKey[33];    //产品PID
-    char dev_deviceName[13];    //产品序列号
-    char dev_deviceLicense[48]; //产品验证码
-    char dev_auth_mode;             // 1 for license, 0 for sap
-} product_dev_info_t;
-
+const char *get_dev_subserial();
 char *get_dev_productKey();
 char *get_dev_deviceName();
 char *get_dev_License();

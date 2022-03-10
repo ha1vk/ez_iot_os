@@ -32,7 +32,6 @@ typedef enum {
 
 int set_gpio_config(void);
 int mk_soft_version(char *pversion_buf);
-int light_start(void);
 
 #ifdef __cplusplus
 }

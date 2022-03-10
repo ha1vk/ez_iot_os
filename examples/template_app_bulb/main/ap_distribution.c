@@ -382,13 +382,13 @@ void ap_distribution_do()
         return false;
     }
 
-    if (strlen(get_dev_deviceName()) <= 9)
+    if (0 == get_dev_auth_mode())
     {
         sprintf(ssid, "%s_%s", device_info->ap_prefix, get_dev_deviceName());
     }
     else
     {
-        sprintf(ssid, "%s_%s", device_info->ap_prefix, get_dev_deviceName() + strlen(get_dev_deviceName()) - 9);
+        sprintf(ssid, "%s_%s", device_info->ap_prefix, get_dev_subserial() + strlen(get_dev_subserial()) - 9);
     }
 
     if (ssid[32] != '\0')
@@ -402,7 +402,7 @@ void ap_distribution_do()
     ap_info.ap_timeout = 5;
     ap_info.apsta_coexist = ez_true;
 
-    sprintf(dev_info.dev_serial, "%s:%s", get_dev_productKey(), get_dev_deviceName());
+    strncpy((char *)dev_info.dev_serial, get_dev_subserial(), sizeof(dev_info.dev_type)); 
     strncpy((char *)dev_info.dev_type, get_dev_productKey(), sizeof(dev_info.dev_type)); 
 
     char dev_version[64];

@@ -82,8 +82,8 @@ int report_wifi_info(ez_tsl_value_t *value_out)
     int gateway_len = sizeof(wifi_info.ssid);
     do
     {
-		char dev_serial[72] = {0};
-        sprintf(dev_serial, "%s:%s", get_dev_productKey(), get_dev_deviceName());
+        char dev_serial[72] = {0};
+        strncpy(dev_serial, get_dev_subserial(), sizeof(dev_serial)); 
 
         char dev_firmwareversion[64] = {0};
         mk_soft_version(dev_firmwareversion);
@@ -543,14 +543,7 @@ void online_access()
 
     dev_info.auth_mode = get_dev_auth_mode();
     ezos_strncpy((char*)dev_info.dev_type, get_dev_productKey(), sizeof(dev_info.dev_type) - 1);
-    if(AUTH_MODE_LIC == dev_info.auth_mode)
-    {
-        ezos_snprintf((char*)dev_info.dev_subserial, sizeof(dev_info.dev_subserial),"%s:%s", get_dev_productKey(), get_dev_deviceName());
-    }
-    else
-    {
-        ezos_strncpy((char*)dev_info.dev_subserial, get_dev_deviceName(),sizeof(dev_info.dev_subserial));
-    }
+    ezos_strncpy((char*)dev_info.dev_subserial, get_dev_subserial(), sizeof(dev_info.dev_subserial) - 1);
     ezos_strncpy((char*)dev_info.dev_verification_code, get_dev_License(), sizeof(dev_info.dev_verification_code) - 1);
 
     /*you can get the lbs addres from the ap distribution or from the flash storage*/
