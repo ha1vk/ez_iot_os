@@ -17,6 +17,13 @@ typedef enum
     MODE_PT3_NORMAL,
 
     MODE_RESET_FACTORY,
+
+    MODE_AP_START,
+    MODE_AP_CLIENT_CONN,
+    MODE_AP_CONN_ROUTE,
+    MODE_AP_CONN_SUCC,
+    MODE_AP_CONN_FAIL,
+    MODE_AP_TIMEOUT,
 } pt_light_mode_e;
 
 int pt_light_init(int type);

@@ -15,6 +15,7 @@
 static int g_stage_2_time = 50;          // 根据wifi信息获取
 static int g_stage_2_age_time_count = 0; // 已经老化的时间
 static char g_light_order[8] = {0};
+static int g_default_cct = 0;
 
 #define PT_COND_RETURN(cond, rv) \
     do                        \
@@ -375,6 +376,50 @@ static int light_mode_reset_factory()
     return light_mode_no_route();
 }
 
+static int light_mode_ap_start()
+{
+    led_ctrl_t ctrl_param = {0};
+    ctrl_param.nbrightness = 5;
+    ctrl_param.nCctValue = g_default_cct;
+    ctrl_param.nUpDuration = 1500;
+    led_ctrl_do_async(&ctrl_param);
+    ezos_delay_ms(1500);
+    ctrl_param.nbrightness = 75;
+    led_ctrl_do_async(&ctrl_param);
+    ezos_delay_ms(1500);
+    return 0;    
+}
+
+static int light_app_client_conn()
+{
+    led_ctrl_t ctrl_param = {0};
+    ctrl_param.nbrightness = 100;
+    ctrl_param.nCctValue = g_default_cct;
+    led_ctrl_do_async(&ctrl_param);
+    ezos_delay_ms(1000);
+    return 0;
+}
+
+static int light_ap_conn_route()
+{
+    return light_mode_ap_start();
+}
+
+static int light_ap_conn_succ()
+{
+    return light_app_client_conn();
+}
+
+static int light_ap_conn_fail()
+{
+    return light_app_client_conn();
+}
+
+static int light_ap_timeout()
+{
+    return light_app_client_conn();
+}
+
 static int lighting_with_mode()
 {
     switch (g_pt_light_mode)
@@ -410,7 +455,29 @@ static int lighting_with_mode()
     case MODE_RESET_FACTORY:
         light_mode_reset_factory();
         break;
-    
+
+    case MODE_AP_START:
+        light_mode_ap_start();
+        break;
+
+    case MODE_AP_CLIENT_CONN:
+        light_app_client_conn();
+        break;
+
+    case MODE_AP_CONN_ROUTE:
+        light_ap_conn_route();
+        break;
+    case MODE_AP_CONN_FAIL:
+        light_ap_conn_fail();
+        break;
+
+    case MODE_AP_CONN_SUCC:
+        light_ap_conn_succ();
+        break;
+
+    case MODE_AP_TIMEOUT:
+        light_ap_timeout();
+        break;
     default:
         break;
     }
@@ -461,6 +528,9 @@ int pt_light_init(int type)
         strcpy(g_light_order, "RGBWC");
     }
     ezlog_i(TAG, "light order: %s .", g_light_order);
+
+    BULB_FUNCTION_T *bulb_fun = get_product_function();
+    g_default_cct = bulb_fun->default_cct;
 
     ret = ezos_thread_create(&g_pt_light_thread, "pt_light", pt_light_fun, NULL, 1024 * 2, 5);
     if (0 != ret)

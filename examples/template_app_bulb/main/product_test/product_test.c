@@ -270,7 +270,7 @@ int ez_product_test(int type)
         }
         else
         {
-            ret = pt_light_deinit();
+            ret = 0;
         }
         break;
     case STATE_WEAK_SIGNAL:
