@@ -30,7 +30,7 @@
 
 //#define FAL_DEBUG 1
 #define FAL_PART_HAS_TABLE_CFG
-#define NOR_FLASH_DEV_NAME             "norflash0"
+#define NOR_FLASH_DEV_NAME "norflash0"
 
 //#define FAL_PART_TABLE_FLASH_DEV_NAME NOR_FLASH_DEV_NAME
 //#define FAL_PART_TABLE_END_OFFSET      65536
@@ -39,21 +39,21 @@
 extern const struct fal_flash_dev nor_flash0;
 
 /* flash device table */
-#define FAL_FLASH_DEV_TABLE                                          \
-{                                                                    \
-    &nor_flash0,                                                     \
-}
+#define FAL_FLASH_DEV_TABLE \
+    {                       \
+        &nor_flash0,        \
+    }
 /* ====================== Partition Configuration ========================== */
 #ifdef FAL_PART_HAS_TABLE_CFG
 /* partition table 
     采用8266 的日志分区作为存储kv区，大小0x14000
 */
-#define FAL_PART_TABLE                                                                \
-{                                                                                     \
-    {FAL_PART_MAGIC_WORD, "ez_kvdb",  NOR_FLASH_DEV_NAME,       0x100000, 32*1024, 0},    \
-    {FAL_PART_MAGIC_WORD, "ez_tsdb",  NOR_FLASH_DEV_NAME,       0x104000, 48*1024, 0},    \
-}
+#define FAL_PART_TABLE                                                                    \
+    {                                                                                     \
+        {FAL_PART_MAGIC_WORD, "app_kvdb", NOR_FLASH_DEV_NAME, 0x100000, 32 * 1024, 0},    \
+        {FAL_PART_MAGIC_WORD, "sdk_kvdb", NOR_FLASH_DEV_NAME, 0x104000, 8 * 1024, 0},     \
+        {FAL_PART_MAGIC_WORD, "app_tsdb", NOR_FLASH_DEV_NAME, 0x106000, 40 * 1024, 0},    \
+    }
 #endif /* FAL_PART_HAS_TABLE_CFG */
-
 
 #endif /* _FAL_CFG_H_ */

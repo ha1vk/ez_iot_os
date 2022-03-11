@@ -41,6 +41,9 @@ if(CONFIG_EZIOT_COMPONENT_FLASHDB_ENABLE)
     ###### Add required/dependent components ######
     # list(APPEND ADD_REQUIREMENTS component1)
     list(APPEND ADD_REQUIREMENTS ezos)
+    if(CONFIG_EZIOT_COMPONENT_FLASHDB_USING_FAL_MODE)
+    list(APPEND ADD_REQUIREMENTS main)  # fal mode needs to include fal_cfg.h files when compiling, main is defalut application component
+    endif()
     ###############################################
 
     ############ Add static libs ##################
