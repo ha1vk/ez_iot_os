@@ -18,10 +18,12 @@
 |       +-- bulb_storage.c
 |   +-- product                                       // 产测相关
 |       +-- product_test.c
-|       +-- product_info.c
+|       +-- product_config.c
+|       +-- device_info.c
 |   +-- port                                          // 编译时&运行时适配
 |       +-- inc
-|           +-- hal_storage.h
+|           +-- hal_config.h
+|           +-- hal_flash.h
 |           +-- hal_ota.h
 |       +-- linux
 |       +-- esp8266
@@ -31,3 +33,4 @@
 |       +-- dev_log.c
 |
 ```
+

@@ -40,10 +40,6 @@ menu "components configuration"
     osource "${EZOS_PATH}/components/*/Kconfig"
 endmenu
 
-menu "unit-test configuration"
-    osource "${EZOS_PATH}/unit_test/Kconfig"
-endmenu
-
-menu "examples configuration"
-    source "${EZOS_PATH}/examples/Kconfig"
+menu "project configuration"
+    osource "${PROJECT_KCONFIG_PATH}/Kconfig"
 endmenu

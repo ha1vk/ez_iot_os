@@ -17,6 +17,9 @@
 PWD := $(shell pwd)
 include ${PWD}/../../config/ezos_gconfig.mk
 
+# 包含hal头文件目录
+COMPONENT_INCLUDES += ${PWD}/../../..
+
 # 添加EZOS头文件目录
 COMPONENT_INCLUDES += ${PWD}/../../config
 COMPONENT_INCLUDES += $(CONFIG_ADD_EZOS_INC_DIRS)

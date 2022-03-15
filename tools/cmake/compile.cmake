@@ -303,6 +303,7 @@ macro(do_lib_building name)
                         ${kconfig_defaults_files_args}
                         --menuconfig False
                         --env "EZOS_PATH=${EZOS_PATH}"
+                        --env "PROJECT_KCONFIG_PATH=${PROJECT_KCONFIG_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
@@ -316,6 +317,7 @@ macro(do_lib_building name)
                         ${kconfig_defaults_files_args}
                         --menuconfig True
                         --env "EZOS_PATH=${EZOS_PATH}"
+                        --env "PROJECT_KCONFIG_PATH=${PROJECT_KCONFIG_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
