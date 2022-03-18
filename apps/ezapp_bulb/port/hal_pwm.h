@@ -21,65 +21,47 @@
 #ifndef _EZHAL_PWM_H_
 #define _EZHAL_PWM_H_
 
+#include "ezos.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#include "stdio.h"
-#include "ezos_def.h"
-
-    /**
-     * @brief    This function initializes the PWM hardware channel
-     * @param[in] pwm_channal:PWM channel logical
-     * @param[in] pwm_led_pin:Gpio used by PWM channel.
-     * @param[in] period: PWM period, unit: us.
-                        e.g. For 1KHz PWM, period is 1000 us.
-    * @param[in] pwm_led_duty.:original duty cycle of pwm channel
-    * @return    
-    *     - OK :Success
-    *     - FAIL: Init error
-    * @note
-    * @waring
-    */
-    int ezhal_pwm_init(int pwm_channal, int pwm_led_pin, int pwm_period, int pwm_duty_period);
+    typedef struct pin_list_s
+    {
+      ez_uint32_t pin_num;
+      ez_uint32_t dutie;
+    } pin_list_t;
 
     /**
       * @brief  init all channels,PWM function initialization, including GPIO, frequency and duty cycle,
       *
       * @param  channel_num PWM channel number, maximum is 8
-      * @param  pin_num GPIO number of PWM channels
-      * @param  period PWM period, unit: us.
+      * @param  pin_list pin list
+      * @param  pwm_period PWM period, unit: us.
       *         e.g. For 1KHz PWM, period is 1000 us. Do not set the period below 20us.
-      * @param  duties duty cycle of each channels.
       * 
       * @return
       *     - ESP_OK Success
       *     - ESP_ERR_INVALID_ARG Parameter error
       *     - ESP_FAIL Init error
       */
-    int ezhal_mult_pwms_init(ez_uint8_t channel_num, const ez_uint32_t *pin_num, ez_uint32_t pwm_period, ez_uint32_t *duties);
+    ez_int32_t hal_pwm_init(ez_uint8_t channel_num, const pin_list_t *pin_list, ez_uint32_t pwm_period);
+
 
     /**
-     * @brief    This function uninitialize the PWM hardware channel.
-     * @param[in] pwm_channal:PWM channel logical .
-     * @return   
-     * @note
-     * @waring
-     */
-    int ezhal_pwm_deinit(int pwm_channal);
-
-    /**
-     * @brief Set the duty cycle of a PWM channel.
-     *        Set the time that high level or low(if you invert the output of this channel)
-     *        signal will last, the duty cycle cannot exceed the period.
-     * @param[in] pwm_channal is PWM channel number.
-     * @param[in] pwm_duty_cycle is PWM real period time, unit: us.
-     * @return   
-     * @note   
-     * @waring
-     */
-    int ezhal_pwm_set_duty(int pwm_channal, int pwm_duty_period);
+      * @brief  Set the duty cycle of all channels.
+      *
+      * @note   After set configuration, pwm_start needs to be called to take effect.
+      *
+      * @param  duties An array that store the duty cycle of each channel,
+      *         the array elements number needs to be the same as the number of channels.
+      * @return
+      *     
+      *     
+      */
+    ez_int32_t hal_pwm_set_duties(int *pwm_duty_period);
 
     /**
      * @brief This function is  used to start the PWM execution.
@@ -88,7 +70,7 @@ extern "C"
      * @note
      * @waring
      */
-    int ezhal_pwm_start();
+    ez_int32_t hal_pwm_start();
 
     /**
      * @brief  This function is mainly used to stop the PWM execution.
@@ -96,7 +78,16 @@ extern "C"
      * @return   
      * @waring
      */
-    int ezhal_pwm_stop();
+    ez_int32_t hal_pwm_stop();
+
+    /**
+     * @brief    This function uninitialize the PWM hardware channel.
+     * @param[in] pwm_channal:PWM channel logical .
+     * @return   
+     * @note
+     * @waring
+     */
+    ez_int32_t hal_pwm_deinit(ez_int32_t pwm_channal);
 
 #ifdef __cplusplus
 }

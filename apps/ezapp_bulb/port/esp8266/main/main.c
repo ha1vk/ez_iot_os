@@ -21,72 +21,103 @@
 #include "ezos.h"
 #include "ezlog.h"
 #include "hal_config.h"
+#include "device_info.h"
+#include "product_config.h"
+#include "network.h"
 
 static void boot_info_show(void)
 {
-    ezos_printf("ezapp, easy your life!\r\n");
+    //TODO 输出固件关键信息
 
+    ezos_printf("ezapp, easy your life!\r\n");
+    ezos_printf("fwver:%s\r\n", dev_info_get_fwver());
+
+    // 初始化日志模块，默认日志等级为WARN
     ezlog_init();
     ezlog_start();
-    ezlog_filter_lvl(EZ_ELOG_LVL_DEBUG);
+    ezlog_filter_lvl(EZ_ELOG_LVL_WARN);
 }
 
-static void system_init(void)
+static void board_init(void)
 {
+    //TODO 初始化芯片关键驱动、中断
 }
 
 static void factory_data_load(void)
 {
-    static unsigned char buf[4096];
+    //TODO 初始化存储模块, 加载设备出厂配置
+
+    const ez_int32_t max_len = 2048;
+    ez_int32_t read_len = 0;
+    ez_char_t *buf = ezos_malloc(max_len);
     hal_config_init();
 
-    // 加载产品配置文件
-    ezos_bzero(buf, sizeof(buf));
-    hal_config_product_load((ez_char_t *)buf, sizeof(buf));
-    ezlog_hexdump(TAG_APP, 32, buf, sizeof(buf));
+    ezos_bzero(buf, max_len);
+    read_len = hal_config_product_load(buf, max_len);
+    if (!product_config_init(buf, read_len))
+    {
+        ezlog_a(TAG_APP, "Invalid product profile!");
+    }
 
-    // 加载设备license
-    ezos_bzero(buf, sizeof(buf));
-    hal_config_lic_load((ez_char_t *)buf, sizeof(buf));
-    ezlog_hexdump(TAG_APP, 32, buf, sizeof(buf));
-}
+    ezos_bzero(buf, max_len);
+    read_len = hal_config_lic_load((ez_char_t *)buf, sizeof(buf));
+    if (!dev_info_init(buf, read_len))
+    {
+        ezlog_a(TAG_APP, "Invalid lic!");
+    }
 
-static void app_global_init(void)
-{
-    // TODO1 业务模块初始化
-    // TODO1
+    ezos_free(buf);
 }
 
 static int integrity_check()
 {
-    // 出厂数据校验
+    // TODO 出厂数据校验/签名校验
+    // 暂时不校验
 
-    // 是否完成产测
+    // TODO 是否完成产测
 
     return 0;
 }
 
+static void app_global_init(void)
+{
+    // TODO 初始化各业务模块以及组件
+
+    network_init();
+    network_wifi_prov_update();
+    if (network_wifi_prov_need())
+    {
+        network_wifi_prov_do();
+        network_wifi_prov_waitfor();
+    }
+
+    network_connect_start();
+    ezcloud_iot_link();
+
+    // 2.定时计划启动
+
+    // 3.场景启动等等
+}
+
 static void app_entry_done()
 {
+    //TODO 回收资源或开启监控
 }
 
 int app_main(void)
 {
     boot_info_show();
 
-    system_init();
+    board_init();
 
     factory_data_load();
 
-    app_global_init();
-
     if (0 != integrity_check())
     {
-        ezlog_a(TAG_APP, "Integrity check failed!");
         goto done;
     }
 
-    // ezcloud_iot_link();
+    app_global_init();
 done:
     app_entry_done();
 

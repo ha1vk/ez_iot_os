@@ -11,7 +11,7 @@
  *   http://www.eclipse.org/org/documents/edl-v10.php.
  * 
  * Contributors:
- * XuRongjun (xurongjun@ezvizlife.com) - Device configuration interface declaration
+ * XuRongjun (xurongjun@ezvizlife.com) - Device configuration abstract interface declaration
  *
  * Change Logs:
  * Date           Author       Notes
@@ -40,18 +40,18 @@ extern "C"
      * 
      * @param[out] val data read buffer
      * @param[in] len the maximum length of val buffer
-     * @return true for success, false for failed
+     * @return read data length
      */
-    ez_bool_t hal_config_product_load(ez_char_t *val, ez_int32_t len);
+    ez_int32_t hal_config_product_load(ez_char_t *val, ez_int32_t len);
 
     /**
      * @brief Get device license
      * 
      * @param[out] val data read buffer
      * @param[in] len the maximum length of val buffer
-     * @return true for success, false for failed 
+     * @return read data length
      */
-    ez_bool_t hal_config_lic_load(ez_char_t *val, ez_int32_t len);
+    ez_int32_t hal_config_lic_load(ez_char_t *val, ez_int32_t len);
 
     /**
      * @brief Read kv (type int)

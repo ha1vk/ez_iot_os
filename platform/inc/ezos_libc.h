@@ -57,7 +57,7 @@ extern "C"
     EZOS_API char *ezos_strdup(const char *s);
     EZOS_API long int ezos_strtol(const char *nptr, char **endptr, int base);
 
-    EZOS_API int ezos_cli_getchar(void);
+    EZOS_API int ezos_getchar(void);
     EZOS_API int ezos_putchar(int c);
 
 #ifdef __cplusplus

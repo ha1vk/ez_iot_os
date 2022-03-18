@@ -98,36 +98,45 @@ ez_bool_t hal_config_init(ez_void_t)
     return ez_true;
 }
 
-ez_bool_t hal_config_product_load(ez_char_t *val, ez_int32_t len)
+ez_int32_t hal_config_product_load(ez_char_t *val, ez_int32_t len)
 {
-    CHECK_INIT_OK(ez_false);
-    CHECK_NULL(val, ez_false);
+    CHECK_INIT_OK(0);
+    CHECK_NULL(val, 0);
 
     // 读取设备产品配置文件
     extern int hal_flash_read(long offset, uint8_t *buf, size_t size);
     const ez_long_t offset = 0x11000;
     if (0 != hal_flash_read(offset, (ez_void_t *)val, (size_t)len))
     {
-        return ez_false;
+        return 0;
     }
 
-    return ez_true;
+    for (ez_int32_t i = 0; i < len; i++)
+    {
+        if (val[i] == 0xff)
+        {
+            val[i] = 0x0;
+            return i;
+        }
+    }
+
+    return len;
 }
 
-ez_bool_t hal_config_lic_load(ez_char_t *val, ez_int32_t len)
+ez_int32_t hal_config_lic_load(ez_char_t *val, ez_int32_t len)
 {
-    CHECK_INIT_OK(ez_false);
-    CHECK_NULL(val, ez_false);
+    CHECK_INIT_OK(0);
+    CHECK_NULL(val, 0);
 
     // 读取设备license
     extern int hal_flash_read(long offset, uint8_t *buf, size_t size);
     const ez_int32_t offset = 0x10000;
     if (0 != hal_flash_read(offset, (ez_void_t *)val, (size_t)len))
     {
-        return ez_false;
+        return 0;
     }
 
-    return ez_true;
+    return len;
 }
 
 ez_bool_t hal_config_get_int(const ez_char_t *key, ez_int32_t *val, ez_int32_t _defval)

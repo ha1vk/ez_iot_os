@@ -101,6 +101,14 @@ extern "C"
      */
     EZOS_API void ezos_delay_ms(ez_ulong_t msecs);
 
+    /**
+     * @brief set time zone
+     * 
+     * @param timezone 
+     * @return void 
+     */
+    EZOS_API void ezos_tzset(const ez_char_t *timezone);
+
 #ifdef __cplusplus
 }
 #endif
