@@ -80,7 +80,7 @@ extern "C"
      * @param upper reboot times =< upper
      * @return 
      */
-    ez_void_t product_config_get_wd_condition(ez_int8_t *lower, ez_int8_t *upper);
+    ez_void_t product_config_get_wd_condition(ez_int32_t *lower, ez_int32_t *upper);
 
     /**
      * @brief Get the default color temperature value

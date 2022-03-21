@@ -42,28 +42,28 @@ extern "C"
      * 
      * @return const char* 
      */
-    const char *dev_info_get_type();
+    const ez_char_t *dev_info_get_type();
 
     /**
      * @brief 
      * 
      * @return const char* 
      */
-    const char *dev_info_get_fwver();
+    const ez_char_t *dev_info_get_fwver();
 
     /**
      * @brief 
      * 
      * @return const char* 
      */
-    const char *dev_info_get_sn();
+    const ez_char_t *dev_info_get_sn();
 
     /**
      * @brief 
      * 
      * @return const char* 
      */
-    const char *dev_info_get_vcode();
+    const ez_char_t *dev_info_get_vcode();
 
     /**
      * @brief 

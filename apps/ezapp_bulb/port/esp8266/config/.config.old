@@ -109,3 +109,10 @@ CONFIG_EZIOT_COMPONENT_WEBCLIENT_ENABLE=y
 #
 # project configuration
 #
+
+#
+# Component1 configuration
+#
+# CONFIG_COMPONENT1_INCLUDE_STATIC_LIB is not set
+# end of Component1 configuration
+# end of project configuration

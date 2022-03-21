@@ -75,6 +75,7 @@ static int integrity_check()
     // 暂时不校验
 
     // TODO 是否完成产测
+    
 
     return 0;
 }
@@ -92,7 +93,7 @@ static void app_global_init(void)
     }
 
     network_connect_start();
-    ezcloud_iot_link();
+    ezcloud_link_start();
 
     // 2.定时计划启动
 

@@ -2,11 +2,11 @@
 list(APPEND ADD_INCLUDE "../inc")
 
 set(PRIVATE_SRC_ROOT "../../..")
-list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/bussiness")
-list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/debug")
-list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/distribution")
-list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/port")
-list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/product")
+list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/bussiness/inc")
+list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/debug/inc")
+list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/network/inc")
+list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/port/inc")
+list(APPEND ADD_PRIVATE_INCLUDE "${PRIVATE_SRC_ROOT}/product/inc")
 ###############################################
 
 ############## Add source files ###############
