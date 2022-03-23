@@ -1,0 +1,7 @@
+config EZIOT_COMPONENT_APP_NAME
+    string "ezapp custom module name"
+    default "ezapp"
+
+config EZIOT_COMPONENT_APP_PRODUCTKEY
+    string "ezapp custom module name"
+    default "11111111111111111111111111"
