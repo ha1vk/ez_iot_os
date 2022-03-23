@@ -24,6 +24,7 @@
 #include "device_info.h"
 #include "product_config.h"
 #include "network.h"
+#include "ezcloud_link.h"
 
 static void boot_info_show(void)
 {

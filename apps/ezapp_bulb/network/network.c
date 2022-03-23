@@ -38,6 +38,8 @@ ez_bool_t network_init(ez_void_t)
     {
         g_sem_prov = ezos_sem_create(0, 1);
     }
+
+    return ez_true;
 }
 
 ez_bool_t network_connect_start(ez_void_t)
@@ -59,6 +61,8 @@ ez_bool_t network_connect_start(ez_void_t)
 
     ezhal_wifi_config(EZOS_WIFI_MODE_STA);
     ezhal_sta_connect(wifi_ssid, wifi_pwd);
+
+    return ez_true;
 }
 
 ez_void_t network_wifi_prov_update(ez_void_t)
@@ -95,8 +99,8 @@ ez_bool_t network_wifi_prov_do(ez_void_t)
     ezconn_dev_info_t dev_info = {0};
     ezconn_ap_info_t ap_info = {0};
     ez_char_t ap_ssid[33] = {0};
-    ez_char_t *ap_prefix = product_config_get_wd_prefix();
-    ez_char_t *ap_suffix = dev_info_get_sn() + ezos_strlen(dev_info_get_sn()) - 9;
+    const ez_char_t *ap_prefix = product_config_get_wd_prefix();
+    const ez_char_t *ap_suffix = dev_info_get_sn() + ezos_strlen(dev_info_get_sn()) - 9;
 
     snprintf(ap_ssid, sizeof(ap_ssid - 1), "%1.23s_%s", ap_prefix, ap_suffix);
 
@@ -166,6 +170,7 @@ static ez_void_t wifi_provisioning_result(ezconn_state_e err_code, ezconn_wifi_i
         hal_config_set_string("wifi_pwd", wifi_info->password);
         hal_config_set_string("wifi_cc", wifi_info->cc);
         hal_config_set_string("domain", wifi_info->domain);
+        hal_config_set_string("token", wifi_info->token);
         if (0 != ezos_strlen(wifi_info->device_id))
         {
             hal_config_set_string("device_id", wifi_info->device_id);

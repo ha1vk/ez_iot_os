@@ -72,13 +72,6 @@ extern "C"
      */
     ez_void_t network_wifi_prov_waitfor(ez_void_t);
 
-    /**
-     * @brief Obtain binding token through near field communication (ap/ble)
-     * 
-     * @return !NULL; binding token
-     */
-    const ez_char_t* network_wifi_prov_token(ez_void_t);
-
 #ifdef __cplusplus
 }
 #endif

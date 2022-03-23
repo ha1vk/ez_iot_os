@@ -26,5 +26,5 @@ get_filename_component(project_dir_name ${parent_dir} NAME)
 set(PROJECT_NAME ${project_dir_name})
 set(PROJECT_KCONFIG_PATH "${parent_dir}/../..")
 
-do_lib_building("ezapp_bulb")
+do_lib_building("ezapp")
 ###############################################

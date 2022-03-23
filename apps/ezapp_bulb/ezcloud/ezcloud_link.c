@@ -24,6 +24,7 @@
 #include "device_info.h"
 #include "product_config.h"
 #include "hal_config.h"
+#include "ezlog.h"
 
 #define EZCLOUD_DEFAULT_DOMAIN "devcn.eziot.com"
 #define EZCLOUD_DEFAULT_PORT 8666
@@ -68,8 +69,6 @@ ez_void_t ezcloud_core_init(ez_void_t)
 
     ez_iot_core_init(&m_lbs_addr, &m_dev_info, ez_event_notice_func);
     ez_iot_core_start();
-
-    return 0;
 }
 
 ez_void_t ezcloud_link_start(ez_void_t)
@@ -88,12 +87,12 @@ ez_void_t ezcloud_link_start(ez_void_t)
 
 #ifdef CONFIG_EZIOT_OTA_ENABLE
     extern ez_void_t ezcloud_ota_init(ez_void_t);
-    ezcloud_base_init();
+    ezcloud_ota_init();
 #endif
 
 #ifdef CONFIG_EZIOT_TSL_ENABLE
-    extern ez_void_t ezcloud_base_init(ez_void_t);
-    ezcloud_base_init();
+    extern ez_void_t ezcloud_tsl_init(ez_void_t);
+    ezcloud_tsl_init();
 #endif
 
     g_is_inited = ez_true;

@@ -109,6 +109,14 @@ extern "C"
     ez_bool_t hal_config_set_string(const ez_char_t *key, const ez_char_t *val);
 
     /**
+     * @brief Del kv
+     * 
+     * @param key 
+     * @return 
+     */
+    ez_void_t hal_config_del(const ez_char_t *key);
+
+    /**
      * @brief Restore to factory state
      * 
      * @return true for success, false for failed 

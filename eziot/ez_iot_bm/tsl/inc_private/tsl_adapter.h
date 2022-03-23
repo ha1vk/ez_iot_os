@@ -21,7 +21,7 @@ extern "C"
      * @param dev_info 设备信息
      * @return ez_int32_t 0表示成功、-1表示失败
      */
-    ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile);
+    ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info);
 
     /**
      * @brief 检测profile是否正在下载

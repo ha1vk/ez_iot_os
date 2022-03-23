@@ -193,7 +193,7 @@ done:
     return rv;
 }
 
-EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pevinfo, ez_char_t *profile)
+EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pevinfo)
 {
     FUNC_IN();
 
@@ -216,7 +216,7 @@ EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pevinfo, ez_char_t *profile)
         CHECK_COND_DONE(NULL == pevinfo->dev_firmwareversion, EZ_TSL_ERR_PARAM_INVALID);
     }
 
-    tsl_adapter_add(pevinfo, profile);
+    tsl_adapter_add(pevinfo);
 
 done:
     FUNC_OUT();

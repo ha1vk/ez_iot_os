@@ -21,6 +21,7 @@
 #include "device_info.h"
 #include "product_config.h"
 #include "ezlog.h"
+#include "cJSON.h"
 
 #define SOFT_MAJOR_VERSION 2
 #define SOFT_MINOR_VERSION 0
@@ -146,7 +147,7 @@ const ez_char_t *dev_info_get_fwver()
 
     for (month = 0; month < 12; month++)
     {
-        if (strcmp(month_name, all_mon_names[month]) == 0)
+        if (ezos_strcmp(month_name, all_mon_names[month]) == 0)
         {
             break;
         }

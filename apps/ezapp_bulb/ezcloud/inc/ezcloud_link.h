@@ -35,6 +35,20 @@ extern "C"
      */
     ez_void_t ezcloud_link_start(ez_void_t);
 
+    /**
+     * @brief 上报属性
+     * 
+     * @return ez_void_t 
+     */
+    ez_void_t ezcloud_tsl_prop_report(ez_char_t *identify);
+
+    /**
+     * @brief 重置所有属性
+     * 
+     * @return ez_void_t 
+     */
+    ez_void_t ezcloud_tsl_prop_reset(ez_void_t);
+
 #ifdef __cplusplus
 }
 #endif

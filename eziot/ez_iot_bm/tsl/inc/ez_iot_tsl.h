@@ -162,7 +162,7 @@ extern "C"
      * @param profile 物模型描述文件; NULL默认从网络自动下载
      * @return ez_tsl_err_e 
      */
-    EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pdevinfo, ez_char_t *profile);
+    EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pdevinfo);
 
     /**
     * @brief 向平台上报一条属性

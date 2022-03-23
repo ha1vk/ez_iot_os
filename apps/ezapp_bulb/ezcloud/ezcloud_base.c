@@ -21,11 +21,12 @@
 #include "ezos.h"
 #include "ezlog.h"
 #include "ez_iot_base.h"
+#include "network.h"
+#include "ezcloud_link.h"
+#include "hal_config.h"
 
 static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *data, ez_int32_t len)
 {
-    ez_bind_challenge_t *bind_chanllenge;
-
     switch (event_type)
     {
     case EZ_EVENT_BINDING:
@@ -37,9 +38,9 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
     break;
     case EZ_EVENT_UNBINDING:
     {
-        /* 设备未绑定 */
+        /* 设备未绑定, 清空所有用户数据 */
         ezlog_d(TAG_APP, "The device is not bound");
-        //TODO 清空所有用户数据
+        ezcloud_tsl_prop_reset();
     }
     break;
     default:
@@ -51,5 +52,17 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
 
 ez_void_t ezcloud_base_init(ez_void_t)
 {
+    ez_char_t bind_token[64] = {0};
+    ez_char_t length = sizeof(bind_token);
+
     ez_iot_base_init(ez_base_notice_func);
+
+    // The binding token can only be used once
+    hal_config_get_string("token", bind_token, &length, "");
+    hal_config_del("token");
+
+    if (0 != ezos_strlen(bind_token))
+    {
+        ez_iot_base_bind_near(bind_token);
+    }
 }

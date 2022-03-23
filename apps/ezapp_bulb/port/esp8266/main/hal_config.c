@@ -234,6 +234,11 @@ ez_bool_t hal_config_set_string(const ez_char_t *key, const ez_char_t *val)
     return ez_true;
 }
 
+ez_void_t hal_config_del(const ez_char_t *key)
+{
+    kv_del_ex(&app_kvdb, key);
+}
+
 ez_bool_t hal_config_reset_factory(ez_void_t)
 {
     CHECK_INIT_OK(ez_false);

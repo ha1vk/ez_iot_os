@@ -1,16 +1,35 @@
-#include <string.h>
-
-#include "pt_light_mode.h"
-#include "bulb_led_ctrl.h"
-#include "product_test.h"
-#include "config_implement.h"
-#include "product_config.h"
+/*******************************************************************************
+ * Copyright © 2017-2022 Ezviz Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v1.0 which accompany this distribution.
+ *
+ * The Eclipse Public License is available at
+ *    http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ *   http://www.eclipse.org/org/documents/edl-v10.php.
+ * 
+ * Contributors:
+ * ChenTengfei (chentengfei5@ezvizlife.com) - Smart bulb application Production test light status
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2022-03-15     ChenTengfei  first version 
+ *******************************************************************************/
 
 #include "ezlog.h"
-#include "ezos_thread.h"
-#include "ezos_time.h"
+#include "product_test_light.h"
+#include "bulb_led_ctrl.h"
+#include "product_test.h"
+#include "product_config.h"
+#include "hal_config.h"
 
 #define TAG "T_PT"
+
+#define KV_DEFVAL(key) key##_DEFVAL       // Key映射默认值
+#define KV_PT_AGE_TIME "age_time"         // 已经老化的时间
+#define KV_PT_AGE_TIME_DEFVAL 0           // 默认值
 
 static int g_stage_2_time = 50;          // 根据wifi信息获取
 static int g_stage_2_age_time_count = 0; // 已经老化的时间
@@ -104,7 +123,7 @@ static int light_mode_week_singal()
 static int light_mode_pt1_normal(int dur_time)
 {
     static int i = 0;
-    int len = strlen(g_light_order);
+    int len = ezos_strlen(g_light_order);
     len = len ? len : 1;
 
     led_ctrl_t ctrl_param = {0};
@@ -190,7 +209,7 @@ static int light_mode_pt2_normal()
     {
         g_stage_2_age_time_count++;
         ezlog_d(TAG, "stage 2 age time count: %d", g_stage_2_age_time_count);
-        config_set_value(K_PT_AGE_TIME, &g_stage_2_age_time_count, sizeof(g_stage_2_age_time_count));
+        hal_config_set_int(KV_PT_AGE_TIME, g_stage_2_age_time_count);
     }
 
     switch (g_product_type)
@@ -311,7 +330,7 @@ static int light_mode_pt2_end()
 static int light_mode_pt3_normal()
 {
     static int i = 0;
-    int len = strlen(g_light_order);
+    int len = ezos_strlen(g_light_order);
     len = len ? len : 1;
 
     led_ctrl_t ctrl_param = {0};
@@ -507,30 +526,21 @@ int pt_light_init(int type)
 {
     int ret = 0;
     PT_COND_RETURN(0 != g_pt_light_inited, -1);
+    const bulb_test_param_t *bulb_test = get_product_test_param();
 
     set_product_type(type);
 
-    int size = sizeof(g_stage_2_age_time_count);
-    ret |= config_get_value(K_PT_AGE_TIME, &g_stage_2_age_time_count, &size);
-    if (0 != ret)
-    {
-        ezlog_e(TAG, "get pt param failed.");
-        return -1;
-    }
+    hal_config_get_int(KV_PT_AGE_TIME, &g_stage_2_age_time_count, KV_DEFVAL(KV_PT_AGE_TIME));
+    ezos_strncpy(g_light_order, bulb_test->order, sizeof(g_light_order) - 1);
 
-    BULB_TEST_T *bulb_test = get_product_test_param();
-
-    strncpy(g_light_order, bulb_test->order, sizeof(g_light_order) - 1);
-
-    if (0 == strlen(g_light_order))
+    if (0 == ezos_strlen(g_light_order))
     {
         ezlog_e(TAG, "get light order failed.");
-        strcpy(g_light_order, "RGBWC");
+        ezos_strcpy(g_light_order, "RGBWC");
     }
-    ezlog_i(TAG, "light order: %s .", g_light_order);
 
-    BULB_FUNCTION_T *bulb_fun = get_product_function();
-    g_default_cct = bulb_fun->default_cct;
+    ezlog_i(TAG, "light order: %s .", g_light_order);
+    g_default_cct = product_config_default_cct();
 
     ret = ezos_thread_create(&g_pt_light_thread, "pt_light", pt_light_fun, NULL, 1024 * 2, 5);
     if (0 != ret)
@@ -538,6 +548,7 @@ int pt_light_init(int type)
         ezlog_e(TAG, "create pt thread failed.");
         return ret;
     }
+
     g_pt_light_exit = 0;
     g_pt_light_inited = 1;
     return ret;

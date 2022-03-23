@@ -29,7 +29,6 @@ EXTERN_QUEUE_BASE_FUN
 static mkernel_internal_error push_event_to_queue(ezdev_sdk_kernel_inner_cb_notic *prt_inner_cb_notic)
 {
     mkernel_internal_error kernel_error = mkernel_internal_succ;
-    ez_int32_t i;
     if (NULL == prt_inner_cb_notic)
     {
         return mkernel_internal_input_param_invalid;
@@ -42,7 +41,7 @@ static mkernel_internal_error push_event_to_queue(ezdev_sdk_kernel_inner_cb_noti
 #if CONFIG_EZIOT_CORE_MULTI_TASK
         ezlog_e(TAG_CORE, "queue no memory, try again.");
 
-        for (i = 0; i < 50; i++)
+        for (ez_int32_t i = 0; i < 50; i++)
         {
             kernel_error = push_queue_inner_cb_notic(prt_inner_cb_notic);
             if (mkernel_internal_succ == kernel_error)

@@ -472,7 +472,7 @@ done:
     return rv;
 }
 
-ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
+ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info)
 {
     ez_err_t rv = EZ_TSL_ERR_SUCC;
     ez_char_t *buf = NULL;
@@ -492,38 +492,25 @@ ez_err_t tsl_adapter_add(ez_tsl_devinfo_t *dev_info, ez_char_t *profile)
         goto done;
     }
 
-    if (profile)
+    /* 使用已经下载的profile */
+    ezlog_d(TAG_TSL, "try flash");
+    rv = tsl_storage_load(dev_info->dev_subserial, &buf, &len);
+    if (EZ_KV_ERR_SUCC == rv)
     {
-        /* 从参数传入 profile */
-        ezlog_d(TAG_TSL, "try param");
         rv = tsl_profile_reg(dev_info->dev_subserial, dev_info->dev_type,
-                             dev_info->dev_firmwareversion, profile);
+                             dev_info->dev_firmwareversion, buf);
 
-        CHECK_COND_DONE(rv, EZ_TSL_ERR_PROFILE_LOADING);
+        CHECK_COND_DONE(rv, EZ_TSL_ERR_MEMORY);
         tsl_adapter_shadow_inst(dev_info->dev_subserial);
+    }
+    else if (EZ_KV_ERR_NAME == rv)
+    {
+        ezlog_w(TAG_TSL, "try download");
+        CHECK_COND_DONE(!tsl_adapter_profile_download(dev_info), EZ_TSL_ERR_MEMORY);
     }
     else
     {
-        /* 使用已经下载的profile */
-        ezlog_d(TAG_TSL, "try flash");
-        rv = tsl_storage_load(dev_info->dev_subserial, &buf, &len);
-        if (EZ_KV_ERR_SUCC == rv)
-        {
-            rv = tsl_profile_reg(dev_info->dev_subserial, dev_info->dev_type,
-                                 dev_info->dev_firmwareversion, buf);
-
-            CHECK_COND_DONE(rv, EZ_TSL_ERR_MEMORY);
-            tsl_adapter_shadow_inst(dev_info->dev_subserial);
-        }
-        else if (EZ_KV_ERR_NAME == rv)
-        {
-            ezlog_w(TAG_TSL, "try download");
-            CHECK_COND_DONE(!tsl_adapter_profile_download(dev_info), EZ_TSL_ERR_MEMORY);
-        }
-        else
-        {
-            rv = EZ_TSL_ERR_MEMORY;
-        }
+        rv = EZ_TSL_ERR_MEMORY;
     }
 
 done:
