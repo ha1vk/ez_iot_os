@@ -34,9 +34,11 @@ function(register_component)
 
     # Get params: DYNAMIC/SHARED
     foreach(name ${ARGN})
-        string(TOUPPER ${name} name)
-        if(${name} STREQUAL "DYNAMIC" OR ${name} STREQUAL "SHARED")
+        string(TOUPPER ${name} name_upper)
+        if(${name_upper} STREQUAL "DYNAMIC" OR ${name_upper} STREQUAL "SHARED")
             set(to_dynamic_lib true)
+        else()
+            set(component_name ${name})
         endif()
     endforeach()
 
@@ -263,9 +265,7 @@ macro(do_lib_building name)
             message(STATUS "find component: ${component_dir}")
             get_filename_component(base_dir ${component_dir} NAME)
             list(APPEND components_dirs ${component_dir})
-            if(${base_dir} STREQUAL "main")
-                set(main_component 1)
-            endif()
+
             if(EXISTS ${component_dir}/Kconfig)
                 message(STATUS "Find component Kconfig of ${base_dir}")
                 list(APPEND components_kconfig_files ${component_dir}/Kconfig)
@@ -398,6 +398,9 @@ macro(do_lib_building name)
     # Call CMakeLists.txt
     foreach(component_dir ${component_dirs_sorted})
         get_filename_component(base_dir ${component_dir} NAME)
+        if(${base_dir} STREQUAL "main")
+            set(base_dir ${name}) #rename
+        endif()
         add_subdirectory(${component_dir} ${base_dir})
 
         if(TARGET ${base_dir})
