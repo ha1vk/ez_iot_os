@@ -4,4 +4,19 @@ config EZIOT_COMPONENT_APP_NAME
 
 config EZIOT_COMPONENT_APP_PRODUCTKEY
     string "ezapp custom module name"
-    default "11111111111111111111111111"
+    default ""
+
+config EZIOT_COMPONENT_APP_FWV_MAJOR
+    int "The major version of firmware"
+    range 0 9
+    default 1
+
+config EZIOT_COMPONENT_APP_FWV_MINOR
+    int "The minor version of firmware"
+    range 0 9
+    default 0
+
+config EZIOT_COMPONENT_APP_FWV_MICRO
+    int "The micro version of firmware"
+    range 0 9
+    default 0

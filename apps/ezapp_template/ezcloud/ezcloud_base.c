@@ -25,6 +25,41 @@
 #include "ezcloud_link.h"
 #include "hal_config.h"
 
+#define KV_USER_ID "user_id"
+
+static ez_bool_t is_user_switched(ez_void_t *data)
+{
+    ez_bool_t rv = ez_false;
+    ez_char_t user_id[32] = {0};
+    ez_int32_t length = sizeof(user_id);
+    ez_bind_info_t *bind_info = (ez_bind_info_t *)data;
+
+    if (NULL == bind_info || 0 == ezos_strlen(bind_info->user_id))
+    {
+        return rv;
+    }
+
+    hal_config_get_string(KV_USER_ID, user_id, &length, "");
+
+    if (0 == length)
+    {
+        ezlog_d(TAG_APP, "user_id null");
+        hal_config_set_string(KV_USER_ID, bind_info->user_id);
+    }
+    else if (0 == ezos_strcmp(user_id, bind_info->user_id))
+    {
+        ezlog_d(TAG_APP, "user_id match");
+    }
+    else
+    {
+        ezlog_w(TAG_APP, "user_id mismatch, local:%s, new:%s", user_id, bind_info->user_id);
+        hal_config_set_string(KV_USER_ID, bind_info->user_id);
+        rv = ez_true;
+    }
+
+    return rv;
+}
+
 static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *data, ez_int32_t len)
 {
     switch (event_type)
@@ -33,13 +68,20 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
     {
         /* 设备已绑定 */
         ezlog_d(TAG_APP, "Device is bound");
-        //TODO 处理抢占式
+
+        /* 设备换用户, 清空原用户数据 */
+        if (is_user_switched(data))
+        {
+            ezcloud_tsl_prop_reset();
+        }
     }
     break;
     case EZ_EVENT_UNBINDING:
     {
-        /* 设备未绑定, 清空所有用户数据 */
+        /* 设备未绑定/解绑, 清空网络配置及用户数据 */
         ezlog_d(TAG_APP, "The device is not bound");
+        network_connect_stop();
+        network_reset();
         ezcloud_tsl_prop_reset();
     }
     break;
@@ -64,5 +106,9 @@ ez_void_t ezcloud_base_init(ez_void_t)
     if (0 != ezos_strlen(bind_token))
     {
         ez_iot_base_bind_near(bind_token);
+    }
+    else
+    {
+        ez_iot_base_bind_query();
     }
 }

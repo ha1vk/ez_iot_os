@@ -152,6 +152,7 @@ ez_bool_t hal_config_get_int(const ez_char_t *key, ez_int32_t *val, ez_int32_t _
         *val = _defval;
     }
 
+    ezlog_i(TAG_APP, "load succ. %s:%d", key, *val);
     return ez_true;
 }
 
@@ -165,6 +166,7 @@ ez_bool_t hal_config_set_int(const ez_char_t *key, ez_int32_t val)
         return ez_false;
     }
 
+    ezlog_i(TAG_APP, "save succ. %s:%d", key, val);
     return ez_true;
 }
 
@@ -181,6 +183,7 @@ ez_bool_t hal_config_get_double(const ez_char_t *key, ez_double_t *val, ez_doubl
         *val = _defval;
     }
 
+    ezlog_i(TAG_APP, "load succ. %s:%f", key, *val);
     return ez_true;
 }
 
@@ -194,6 +197,7 @@ ez_bool_t hal_config_set_double(const ez_char_t *key, ez_double_t val)
         return ez_false;
     }
 
+    ezlog_i(TAG_APP, "save succ. %s:%f", key, val);
     return ez_true;
 }
 
@@ -211,12 +215,13 @@ ez_bool_t hal_config_get_string(const ez_char_t *key, ez_char_t *val, ez_int32_t
         *len = (ez_int32_t)length;
     }
 
-    if (0 == len && NULL != val)
+    if (0 == length && NULL != val)
     {
         ezos_strncpy(val, _defval, *len);
         *len = ezos_strlen(_defval);
     }
 
+    ezlog_i(TAG_APP, "load succ. %s:%s", key, val);
     return ez_true;
 }
 
@@ -226,10 +231,12 @@ ez_bool_t hal_config_set_string(const ez_char_t *key, const ez_char_t *val)
     CHECK_NULL(key, ez_false);
     CHECK_NULL(val, ez_false);
 
-    if (FDB_NO_ERR != kv_raw_set_ex(&app_kvdb, key, (const void *)&val, ezos_strlen(val)))
+    if (FDB_NO_ERR != kv_raw_set_ex(&app_kvdb, key, (const void *)val, ezos_strlen(val)))
     {
         return ez_false;
     }
+
+    ezlog_i(TAG_APP, "save succ. %s:%s", key, val);
 
     return ez_true;
 }

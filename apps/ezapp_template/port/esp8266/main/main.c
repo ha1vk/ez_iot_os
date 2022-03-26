@@ -35,7 +35,7 @@ static void boot_info_show(void)
     // 初始化日志模块，默认日志等级为WARN
     ezlog_init();
     ezlog_start();
-    ezlog_filter_lvl(EZ_ELOG_LVL_WARN);
+    ezlog_filter_lvl(EZ_ELOG_LVL_DEBUG);
 }
 
 static void board_init(void)
@@ -53,7 +53,7 @@ static void factory_data_load(void)
     hal_config_init();
 
     ezos_bzero(buf, max_len);
-    read_len = hal_config_lic_load((ez_char_t *)buf, sizeof(buf));
+    read_len = hal_config_lic_load((ez_char_t *)buf, max_len);
     if (!dev_info_init(buf, read_len))
     {
         ezlog_a(TAG_APP, "Invalid lic!");
@@ -68,7 +68,6 @@ static int integrity_check()
     // 暂时不校验
 
     // TODO 是否完成产测
-    
 
     return 0;
 }

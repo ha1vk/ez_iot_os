@@ -26,6 +26,13 @@
 #include "eztimer.h"
 #include "ezconn.h"
 
+#define KV_WIFI_SSID "wifi_ssid"
+#define KV_WIFI_PWD "wifi_pwd"
+#define KV_WIFI_CC "wifi_cc"
+#define KV_PN_NUM "power_on_num"
+#define KV_EZLOUCD_DOMIAN "domain"
+#define KV_EZLOUCD_TOKEN "token"
+
 static ez_void_t power_on_num_clear();
 static ez_void_t wifi_provisioning_result(ezconn_state_e err_code, ezconn_wifi_info_t *wifi_info);
 static ez_sem_t g_sem_prov = NULL;
@@ -37,6 +44,7 @@ ez_bool_t network_init(ez_void_t)
         g_sem_prov = ezos_sem_create(0, 1);
     }
 
+    ezconn_wifi_init();
     return ez_true;
 }
 
@@ -46,7 +54,7 @@ ez_bool_t network_connect_start(ez_void_t)
     ez_char_t wifi_pwd[65] = {0};
 
     ez_int32_t length = sizeof(wifi_ssid) - 1;
-    hal_config_get_string("wifi_ssid", wifi_ssid, &length, "");
+    hal_config_get_string(KV_WIFI_SSID, wifi_ssid, &length, "");
 
     if (0 == length)
     {
@@ -55,7 +63,7 @@ ez_bool_t network_connect_start(ez_void_t)
     }
 
     length = sizeof(wifi_pwd) - 1;
-    hal_config_get_string("wifi_pwd", wifi_pwd, &length, "");
+    hal_config_get_string(KV_WIFI_PWD, wifi_pwd, &length, "");
 
     ezhal_wifi_config(EZOS_WIFI_MODE_STA);
     ezhal_sta_connect(wifi_ssid, wifi_pwd);
@@ -63,15 +71,20 @@ ez_bool_t network_connect_start(ez_void_t)
     return ez_true;
 }
 
+ez_void_t network_connect_stop(ez_void_t)
+{
+    ezhal_sta_stop();
+}
+
 ez_void_t network_wifi_prov_update(ez_void_t)
 {
     ez_int32_t power_on_num;
 
-    hal_config_get_int("power_on_num", &power_on_num, 0);
+    hal_config_get_int(KV_PN_NUM, &power_on_num, 0);
     ezlog_i(TAG_APP, "power on num[%d]", power_on_num);
 
     power_on_num++;
-    hal_config_set_int("power_on_num", power_on_num);
+    hal_config_set_int(KV_PN_NUM, power_on_num);
     eztimer_create("power_on_num_clear", (10 * 1000), ez_false, power_on_num_clear);
 }
 
@@ -81,7 +94,7 @@ ez_bool_t network_wifi_prov_need(ez_void_t)
     ez_int32_t cond_lower = 3;
     ez_int32_t power_on_num;
 
-    hal_config_get_int("power_on_num", &power_on_num, 0);
+    hal_config_get_int(KV_PN_NUM, &power_on_num, 0);
 
     if (power_on_num >= cond_lower && power_on_num <= cond_upper)
     {
@@ -95,13 +108,10 @@ ez_bool_t network_wifi_prov_do(ez_void_t)
 {
     ezconn_dev_info_t dev_info = {0};
     ezconn_ap_info_t ap_info = {0};
-    ez_char_t ap_ssid[33] = {0};
     const ez_char_t *ap_prefix = "EZVIZ";
     const ez_char_t *ap_suffix = dev_info_get_sn() + ezos_strlen(dev_info_get_sn()) - 9;
 
-    snprintf(ap_ssid, sizeof(ap_ssid - 1), "%1.23s_%s", ap_prefix, ap_suffix);
-
-    ezos_strncpy(ap_info.ap_ssid, ap_ssid, sizeof(ap_info.ap_ssid) - 1);
+    snprintf(ap_info.ap_ssid, sizeof(ap_info.ap_ssid) - 1, "%1.23s_%s", ap_prefix, ap_suffix);
     ap_info.auth_mode = 0;
     ap_info.channel = 1;
     ap_info.ap_timeout = 15;
@@ -125,19 +135,25 @@ ez_void_t network_wifi_prov_waitfor(ez_void_t)
     }
 
     ezlog_w(TAG_AP, "prov waitfor begin");
-    ezos_sem_wait(g_sem_prov, 15 * 1000);
+    ezos_sem_wait(g_sem_prov, 15 * 1000 * 60);
     ezlog_w(TAG_AP, "prov waitfor end");
 
     ezconn_ap_stop();
 }
 
+ez_void_t network_reset(ez_void_t)
+{
+    hal_config_del(KV_WIFI_SSID);
+    hal_config_del(KV_WIFI_PWD);
+    hal_config_del(KV_WIFI_CC);
+    hal_config_del(KV_EZLOUCD_DOMIAN);
+    hal_config_del(KV_EZLOUCD_TOKEN);
+}
+
 static ez_void_t power_on_num_clear()
 {
-    ez_int_t power_on_num = 0;
-    if (0 != hal_config_set_int("power_on_num", power_on_num))
-    {
-        ezlog_e(TAG_APP, "set value failed. key: power_on_num");
-    }
+    hal_config_set_int(KV_PN_NUM, 0);
+    ezlog_d(TAG_APP, "power_on_num clean");
 }
 
 static ez_void_t wifi_provisioning_result(ezconn_state_e err_code, ezconn_wifi_info_t *wifi_info)
@@ -152,22 +168,12 @@ static ez_void_t wifi_provisioning_result(ezconn_state_e err_code, ezconn_wifi_i
     case EZCONN_STATE_SUCC:
     {
         ezlog_w(TAG_AP, "wifi config success.");
-        ezlog_i(TAG_AP, "ssid: %s", wifi_info->ssid);
-        ezlog_i(TAG_AP, "password: %s", wifi_info->password);
-        ezlog_i(TAG_AP, "token: %s", wifi_info->token);
-        ezlog_i(TAG_AP, "domain: %s", wifi_info->domain);
 
-        ezos_delay_ms(1000);
-
-        hal_config_set_string("wifi_ssid", wifi_info->ssid);
-        hal_config_set_string("wifi_pwd", wifi_info->password);
-        hal_config_set_string("wifi_cc", wifi_info->cc);
-        hal_config_set_string("domain", wifi_info->domain);
-        hal_config_set_string("token", wifi_info->token);
-        if (0 != ezos_strlen(wifi_info->device_id))
-        {
-            hal_config_set_string("device_id", wifi_info->device_id);
-        }
+        hal_config_set_string(KV_WIFI_SSID, wifi_info->ssid);
+        hal_config_set_string(KV_WIFI_PWD, wifi_info->password);
+        hal_config_set_string(KV_WIFI_CC, wifi_info->cc);
+        hal_config_set_string(KV_EZLOUCD_DOMIAN, wifi_info->domain);
+        hal_config_set_string(KV_EZLOUCD_TOKEN, wifi_info->token);
 
         ezos_sem_post(g_sem_prov);
         break;
@@ -186,7 +192,7 @@ static ez_void_t wifi_provisioning_result(ezconn_state_e err_code, ezconn_wifi_i
     case EZCONN_STATE_WIFI_CONFIG_TIMEOUT:
     {
         ezlog_w(TAG_AP, "wifi config timeout.");
-        ezos_delay_ms(1000);
+        ezos_sem_post(g_sem_prov);
         break;
     }
     default:

@@ -25,11 +25,12 @@
 #define MAKE_DEFVAL(type, _defval) \
     .value_##type = _defval
 
-#define CHECK_VALUE_INVAILD(value_type)                                     \
-    if (NULL == tsl_value || value_type != tsl_value->type)                 \
-    {                                                                       \
-        ezlog_e(TAG_APP, "tsl value invaild, identify:%s", thiz->identify); \
-        goto done;                                                          \
+#define CHECK_VALUE_INVAILD(value_type)                                                  \
+    if (NULL == tsl_value || value_type != tsl_value->type)                              \
+    {                                                                                    \
+        ezlog_w(TAG_APP, "value_type1:%d, value_type2:%d", value_type, tsl_value->type); \
+        ezlog_e(TAG_APP, "tsl value invaild, identify:%s", thiz->identify);              \
+        goto done;                                                                       \
     }
 
 static ez_bool_t property_set_wrapper(tsl_prop_impl_t *thiz, const ez_tsl_value_t *tsl_value)
@@ -117,11 +118,8 @@ static ez_int32_t property_brightness_get(tsl_prop_impl_t *thiz, ez_tsl_value_t 
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_INT);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_INT);
     rv = EZ_TSL_ERR_SUCC;
-done:
     return rv;
 }
 
@@ -143,13 +141,8 @@ static ez_int32_t property_colortemperature_get(tsl_prop_impl_t *thiz, ez_tsl_va
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_INT);
-
-    // TODO 执行业务
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_INT);
     rv = EZ_TSL_ERR_SUCC;
-done:
     return rv;
 }
 
@@ -170,12 +163,9 @@ done:
 static ez_int32_t property_countdowncfg_get(tsl_prop_impl_t *thiz, ez_tsl_value_t *tsl_value)
 {
     ez_int32_t rv = -1;
-
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_OBJECT);
-
+ 
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_OBJECT);
     rv = EZ_TSL_ERR_SUCC;
-done:
     return rv;
 }
 
@@ -197,11 +187,9 @@ static ez_int32_t property_lightswitchplan_get(tsl_prop_impl_t *thiz, ez_tsl_val
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_OBJECT);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_OBJECT);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -223,11 +211,9 @@ static ez_int32_t property_powerswitch_get(tsl_prop_impl_t *thiz, ez_tsl_value_t
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_BOOL);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_BOOL);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -249,11 +235,9 @@ static ez_int32_t property_biorhythm_get(tsl_prop_impl_t *thiz, ez_tsl_value_t *
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_OBJECT);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_OBJECT);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -275,11 +259,9 @@ static ez_int32_t property_colorrgb_get(tsl_prop_impl_t *thiz, ez_tsl_value_t *t
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_STRING);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_STRING);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -301,11 +283,9 @@ static ez_int32_t property_helpsleep_get(tsl_prop_impl_t *thiz, ez_tsl_value_t *
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_ARRAY);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_ARRAY);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -313,7 +293,7 @@ static ez_int32_t property_musicrhythm_set(tsl_prop_impl_t *thiz, const ez_tsl_v
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_ARRAY);
+    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_STRING);
 
     // TODO 执行业务
     // do nothing
@@ -328,11 +308,9 @@ static ez_int32_t property_musicrhythm_get(tsl_prop_impl_t *thiz, ez_tsl_value_t
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_ARRAY);
-
-    property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_ARRAY);
+    property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_STRING);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -354,11 +332,9 @@ static ez_int32_t property_customscenecfg_get(tsl_prop_impl_t *thiz, ez_tsl_valu
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_OBJECT);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_OBJECT);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -380,11 +356,9 @@ static ez_int32_t property_wakeup_get(tsl_prop_impl_t *thiz, ez_tsl_value_t *tsl
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_ARRAY);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_ARRAY);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -406,11 +380,9 @@ static ez_int32_t property_workmode_get(tsl_prop_impl_t *thiz, ez_tsl_value_t *t
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_STRING);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_STRING);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -432,11 +404,9 @@ static ez_int32_t property_timezonecompose_get(tsl_prop_impl_t *thiz, ez_tsl_val
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_OBJECT);
-
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_OBJECT);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -444,10 +414,9 @@ static ez_int32_t property_netstatus_get(tsl_prop_impl_t *thiz, ez_tsl_value_t *
 {
     ez_int32_t rv = -1;
 
-    CHECK_VALUE_INVAILD(EZ_TSL_DATA_TYPE_OBJECT);
-
+    property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_OBJECT);
     rv = EZ_TSL_ERR_SUCC;
-done:
+
     return rv;
 }
 
@@ -480,6 +449,6 @@ tsl_prop_impl_t g_tsl_prop_lst[] = {
 };
 
 tsl_action_impl_t g_tsl_action_lst[] = {
-    {"LightCtrl", "getcountdown", "global", "0", action_getcountdown_down},
+    {"GetCountdown", "LightCtrl", "global", "0", action_getcountdown_down},
     {NULL, NULL, NULL, NULL, NULL},
 };

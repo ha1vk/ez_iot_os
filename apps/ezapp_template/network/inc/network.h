@@ -43,6 +43,12 @@ extern "C"
     ez_bool_t network_connect_start(ez_void_t);
 
     /**
+     * @brief Stop network connection
+     * 
+     */
+    ez_void_t network_connect_stop(ez_void_t);
+
+    /**
      * @brief Update the judgment condition of the wifi provisioning
      * 
      * @brief Switch on and off multiple times means that the wifi network needs to be configured 
@@ -72,6 +78,11 @@ extern "C"
      */
     ez_void_t network_wifi_prov_waitfor(ez_void_t);
 
+    /**
+     * @brief Rest network config
+     * 
+     */
+    ez_void_t network_reset(ez_void_t);
 #ifdef __cplusplus
 }
 #endif

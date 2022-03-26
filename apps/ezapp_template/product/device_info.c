@@ -49,7 +49,7 @@ static ez_int32_t parse_sap_config(ez_char_t *buf, ez_int32_t buf_size)
         return -1;
     }
 
-    ezos_memcmp((void *)&magicNumber, (void *)buf, sizeof(magicNumber));
+    ezos_memcpy((void *)&magicNumber, (void *)buf, sizeof(magicNumber));
     if (magicNumber != SAP_MAGIC_NUMBER && magicNumber != SAP_MAGIC_NUMBER_INVERT)
     {
         ezlog_e(TAG_APP, "not a sap data 2");
@@ -57,7 +57,7 @@ static ez_int32_t parse_sap_config(ez_char_t *buf, ez_int32_t buf_size)
     }
 
     ezos_memset(&g_dev_info, 0, sizeof(dev_info_t));
-    ezos_strncpy(g_dev_info.dev_productKey, "1111111111111111111111", sizeof(g_dev_info.dev_productKey) - 1);
+    ezos_strncpy(g_dev_info.dev_productKey, CONFIG_EZIOT_COMPONENT_APP_PRODUCTKEY, sizeof(g_dev_info.dev_productKey) - 1);
     ezos_memcpy(g_dev_info.dev_subserial, buf + 73, 9);
     ezos_memcpy(g_dev_info.dev_deviceLicense, buf + 30, 6);
     g_dev_info.dev_auth_mode = 0;
@@ -154,7 +154,7 @@ const ez_char_t *dev_info_get_fwver()
 
     month++;
     year -= 2000;
-    ezos_sprintf(dev_fwver, "V%d.%d.%d build %02d%02d%02d", SOFT_MAJOR_VERSION, SOFT_MINOR_VERSION, SOFT_REVISION, year, month, day);
+    ezos_sprintf(dev_fwver, "V%d.%d.%d build %02d%02d%02d", CONFIG_EZIOT_COMPONENT_APP_FWV_MAJOR, CONFIG_EZIOT_COMPONENT_APP_FWV_MINOR, CONFIG_EZIOT_COMPONENT_APP_FWV_MICRO, year, month, day);
 
     return dev_fwver;
 }
