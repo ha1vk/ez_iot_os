@@ -21,9 +21,9 @@
 export IDF_PATH=/opt/esp_sdk/ESP8266_RTOS_SDK
 
 # build ez_iot_os
-MKDIR:=$(shell mkdir build)
-DOCMAKE:=$(shell cmake -S ./ -B build)
-DOMAKE:=$(shell make -C build)
+MKDIR:=$(shell mkdir libs)
+DOCMAKE:=$(shell cmake -S ./ -B libs)
+DOMAKE:=$(shell make -C libs)
 
 # build esp idf
 PROJECT_NAME := ezapp_bulb

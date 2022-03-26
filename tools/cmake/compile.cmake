@@ -201,7 +201,7 @@ endfunction(get_python python)
 macro(do_lib_building name)
     get_filename_component(current_dir ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
     set(PROJECT_SOURCE_DIR ${current_dir})
-    set(PROJECT_BINARY_DIR "${current_dir}/build")
+    set(PROJECT_BINARY_DIR "${current_dir}/libs")
 
     # Find components in ezos's components folder, register components
     file(GLOB component_dirs ${EZOS_PATH}/components/*)
@@ -432,6 +432,7 @@ macro(do_lib_building name)
                         ${kconfig_defaults_files_args}
                         --menuconfig False
                         --env "EZOS_PATH=${EZOS_PATH}"
+                        --env "PROJECT_KCONFIG_PATH=${PROJECT_KCONFIG_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
