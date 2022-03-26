@@ -922,33 +922,35 @@ ez_err_t shadow_core_propertie_changed(ez_char_t *sn, ez_char_t *res_type, ez_in
         pnode_dev = shadow_module_find_dev(&g_shaodw_modules, dev_sn);
         if (NULL == pnode_dev)
         {
-            ezlog_e(TAG_SHD, "dev not found!, sn:%s", dev_sn);
+            rv = EZ_SHD_ERR_DEV_NOT_FOUND;
             break;
         }
 
         pnode_indexs = shadow_module_find_indexs(&pnode_dev->type_lst, res_type);
         if (NULL == pnode_indexs)
         {
-            ezlog_e(TAG_SHD, "indexs not found!, t:%s", res_type);
+            rv = EZ_SHD_ERR_RSCTYPE_NOT_FOUND;
             break;
         }
 
         pnode_index = shadow_module_find_index(&pnode_indexs->index_lst, index);
         if (NULL == pnode_index)
         {
-            ezlog_e(TAG_SHD, "index not found!, i:%d", index);
+            rv = EZ_SHD_ERR_INDEX_NOT_FOUND;
             break;
         }
+
         pnode_domain = shadow_module_find_domain(&pnode_index->domain_lst, domain_id);
         if (NULL == pnode_domain)
         {
-            ezlog_e(TAG_SHD, "domain not found!, t:%s", domain_id);
+            rv = EZ_SHD_ERR_DOMAIN_NOT_FOUND;
             break;
         }
+
         pnode_key = shadow_module_find_key(&pnode_domain->key_lst, pkey);
         if (NULL == pnode_key)
         {
-            ezlog_e(TAG_SHD, "pkey not found!, t:%s", pkey);
+            rv = EZ_SHD_ERR_KEY_NOT_FOUND;
             break;
         }
 
@@ -966,8 +968,6 @@ ez_err_t shadow_core_propertie_changed(ez_char_t *sn, ez_char_t *res_type, ez_in
         {
             pnode_key->json_value = tlv2json((ez_shadow_value_t *)value);
         }
-
-        rv = 0;
     } while (0);
     shadow_module_unlock();
 
@@ -1420,10 +1420,10 @@ static ez_void_t shadow_reply2report(ez_uint32_t seq, ez_int32_t code)
                     {
                         pnode_key = (node_key_t *)node_key;
 
-                        ezlog_v(TAG_SHD, "local seq:%d, ack seq:%d, code:%d", pnode_key->msg_seq, seq, code);
+                        ezlog_v(TAG_SHD, "report seq:%d, ack seq:%d, code:%d", pnode_key->msg_seq, seq, code);
                         if (pnode_key->msg_seq == seq)
                         {
-                            ezlog_d(TAG_SHD, "seq match, prop publish succ");
+                            ezlog_d(TAG_SHD, "report succ, %s", pnode_key->key);
                             if (0 == code)
                             {
                                 pnode_key->need_report = 0;
@@ -1432,7 +1432,7 @@ static ez_void_t shadow_reply2report(ez_uint32_t seq, ez_int32_t code)
                             }
 
                             pnode_key->msg_seq = 0;
-                            ezos_bzero(&pnode_index->sync_timer, sizeof(pnode_index->sync_timer));
+                            ezos_bzero(&pnode_key->report_timer, sizeof(pnode_key->report_timer));
 
                             goto done;
                         }
