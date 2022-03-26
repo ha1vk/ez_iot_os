@@ -23,6 +23,7 @@
 #include <stddef.h>
 #include <ezos_def.h>
 
+#define EZ_KV_DEFALUT_KEY_DEVID "devid"
 #define EZ_KV_DEFALUT_KEY_MASTERKEY "masterkey"
 #define EZ_KV_DEFALUT_KEY_TSLMAP "tslmap"
 #define EZ_KV_DEFALUT_KEY_HUBLIST "hublist"

@@ -45,6 +45,13 @@ extern "C"
      */
     int ezos_get_uuid(char *uuid, short len);
 
+    /**
+     * @brief  Reboot system
+     *
+     * This function does not return.
+     */
+    void ezos_reboot(void);
+
 #ifdef __cplusplus
 }
 #endif

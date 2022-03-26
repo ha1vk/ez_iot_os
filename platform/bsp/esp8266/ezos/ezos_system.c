@@ -15,12 +15,13 @@
  * 
  * Change Logs:
  * Date           Author       Notes
- * 2021-11-25     zoujinwei    first version
+ * 2021-11-25     xurongjun    first version
 *******************************************************************************/
 
 #include <stdlib.h>
 #include <unistd.h>
 #include "ezos_system.h"
+#include "esp_system.h"
 
 long int ezos_rand(void)
 {
@@ -29,7 +30,10 @@ long int ezos_rand(void)
 
 int ezos_get_uuid(char *uuid, short len)
 {
-    //gethostname(uuid, len);
+    return esp_base_mac_addr_get((ez_uint8_t *)uuid);
+}
 
-    return 0;
+void ezos_reboot(void)
+{
+    esp_restart();
 }

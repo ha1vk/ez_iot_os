@@ -21,8 +21,6 @@ static ez_bool_t g_wifi_init = false;
 static ez_bool_t g_wifi_scan_start = false;
 const int g_WIFI_SCAN_DONE_BIT = BIT0;
 
-extern void wifi_status_cb(void *wifi_status);
-
 static void wifi_disconnect_reason(uint8_t reason)
 {
     switch (reason)
@@ -81,8 +79,6 @@ static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
     case SYSTEM_EVENT_STA_GOT_IP:
         ezlog_i(TAG_WIFI, "got ip:%s",
                 ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
-
-        wifi_status_cb(&event->event_info.got_ip.ip_info);
         break;
     case SYSTEM_EVENT_AP_STACONNECTED: /**< a station connected to ESP8266 soft-AP */
         ezlog_w(TAG_WIFI, "AP_STA_CONNECTED");
