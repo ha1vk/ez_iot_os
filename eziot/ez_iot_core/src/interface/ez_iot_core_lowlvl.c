@@ -75,10 +75,13 @@ EZOS_API ez_err_t ez_kernel_init(const ez_server_info_t *psrv_info, const ez_dev
     ezlog_i(TAG_CORE, "vcode:%s", g_ezdev_sdk_kernel.dev_info.dev_verification_code);
     ezlog_i(TAG_CORE, "fw:%s", g_ezdev_sdk_kernel.dev_info.dev_firmwareversion);
     ezlog_i(TAG_CORE, "display:%s", g_ezdev_sdk_kernel.dev_info.dev_typedisplay);
+    ezlog_i(TAG_CORE, "devid:");
 
     ezos_strncpy((char *)g_ezdev_sdk_kernel.dev_id, devid, sizeof(g_ezdev_sdk_kernel.dev_id));
     size_t key_len = sizeof(g_ezdev_sdk_kernel.master_key);
     CHECK_COND_DONE(ezos_kv_raw_get(EZ_KV_DEFALUT_KEY_MASTERKEY, g_ezdev_sdk_kernel.master_key, &key_len), EZ_CORE_ERR_STORAGE);
+
+    ezlog_hexdump(TAG_CORE, 16, (ez_uint8_t*)g_ezdev_sdk_kernel.dev_id, sizeof(g_ezdev_sdk_kernel.dev_id));
 
     /* 初始化链接状态 */
     g_ezdev_sdk_kernel.lbs_redirect_times = 0;
