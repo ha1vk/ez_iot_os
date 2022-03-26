@@ -34,12 +34,11 @@ extern "C"
                                              const char *name, uint16_t stacksize, int prio,
                                              void (*thread_routine)(void *arg), void *arg)
     {
-
-        ezos_thread_create(thread, name, thread_routine, arg, stacksize, prio);
-        if (NULL != *thread)
+        if (0 == ezos_thread_create(NULL, name, thread_routine, arg, stacksize, prio))
         {
-	    	return OS_SUCCESS;
-        }       
+            return OS_SUCCESS;
+        }
+
         return OS_FAIL;
     }
 

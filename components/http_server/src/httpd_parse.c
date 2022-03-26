@@ -544,7 +544,7 @@ static ez_err_t httpd_parse_req(struct httpd_data *hd)
 {
     httpd_req_t *r = &hd->hd_req;
     int blk_len, offset;
-    http_parser parser;
+    http_parser parser = {0};
     parser_data_t parser_data;
 
     /* Initialize parser */
@@ -572,7 +572,7 @@ static ez_err_t httpd_parse_req(struct httpd_data *hd)
             return httpd_resp_send_err(r, parser_data.error);
         }
     } while (parser_data.status != PARSING_COMPLETE);
-
+    hd->hd_req.method = parser.method;
     ezlog_v(TAG, LOG_FMT("parsing complete"));
     return httpd_uri(hd);
 }

@@ -193,22 +193,34 @@ int ezos_inet_aton(const char *cp, ez_in_addr_t *inp)
 
 int ezos_bind(int socket_fd, const ez_sockaddr_t *addr, ez_socklen_t addrlen)
 {
-    return lwip_bind(socket_fd, (struct sockaddr *)addr, (socklen_t)addrlen);
+    struct sockaddr tmp_addr = {0};
+    transfer_sockaddr(&tmp_addr, addr);
+
+    return lwip_bind(socket_fd, (struct sockaddr *)&tmp_addr, (socklen_t)addrlen);
 }
 
 ez_ssize_t ezos_sendto(int socket_fd, const void *buf, ez_size_t len, int flags, const ez_sockaddr_t *dst_addr, ez_socklen_t addrlen)
 {
-    return lwip_sendto(socket_fd, buf, len, flags, (struct sockaddr *)dst_addr, (socklen_t)addrlen);
+    struct sockaddr tmp_addr = {0};
+    transfer_sockaddr(&tmp_addr, dst_addr);
+
+    return lwip_sendto(socket_fd, buf, len, flags, (struct sockaddr *)&tmp_addr, (socklen_t)addrlen);
 }
 
 ez_ssize_t ezos_recvfrom(int socket_fd, void *buf, ez_size_t len, int flags, ez_sockaddr_t *src_addr, ez_socklen_t *addrlen)
 {
-    return lwip_recvfrom(socket_fd, buf, len, flags, (struct sockaddr *)src_addr, (socklen_t *)addrlen);
+    struct sockaddr tmp_addr = {0};
+    transfer_sockaddr(&tmp_addr, src_addr);
+
+    return lwip_recvfrom(socket_fd, buf, len, flags, (struct sockaddr *)&tmp_addr, (socklen_t *)addrlen);
 }
 
 int ezos_accept(int socket_fd, struct ez_sockaddr *addr, ez_socklen_t *addrlen)
 {
-    return lwip_accept(socket_fd, (struct sockaddr *)addr, (socklen_t *)addrlen);
+    struct sockaddr tmp_addr = {0};
+    transfer_sockaddr(&tmp_addr, addr);
+
+    return lwip_accept(socket_fd, (struct sockaddr *)&tmp_addr, (socklen_t *)addrlen);
 }
 
 int ezos_listen(int socket_fd, int back_log)
