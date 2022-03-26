@@ -68,7 +68,6 @@ mkernel_internal_error net_connect(int socket_fd, const char *server_ip, int ser
     host = ezos_gethostbyname(server_ip);
     if (host == NULL)
     {
-        ezlog_e(TAG_CORE, "gethost error");
         return mkernel_internal_net_gethostbyname_error;
     }
 

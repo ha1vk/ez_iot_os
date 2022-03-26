@@ -322,7 +322,7 @@ mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel)
         sdk_kernel->cnt_state = sdk_cnt_unredirect;
         sdk_kernel->lbs_redirect_times = 0;
         sdk_kernel->das_retry_times = 0;
-        ezlog_d(TAG_CORE, "redirect, code:%d", sdk_error);
+        ezlog_w(TAG_CORE, "das need redirect, code:%d", sdk_error);
     }
 
     return sdk_error;

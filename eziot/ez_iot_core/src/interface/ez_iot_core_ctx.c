@@ -50,7 +50,6 @@ ez_int32_t ez_iot_value_save(sdk_keyvalue_type valuetype, ez_uchar_t *keyvalue, 
     if (valuetype == sdk_keyvalue_devid)
     {
         rv = ezos_kv_raw_set(EZ_KV_DEFALUT_KEY_DEVID, keyvalue, keyvalue_size);
-        // rv = g_event_notice_func(EZ_EVENT_DEVID_UPDATE, keyvalue, keyvalue_size);
     }
     else if (valuetype == sdk_keyvalue_masterkey)
     {

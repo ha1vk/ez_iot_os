@@ -1343,7 +1343,6 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
             else
             {
                 sdk_error = mkernel_internal_mqtt_error_begin + mqtt_result_code;
-                ezlog_e(TAG_CORE, "mqtt connect error");
             }
 
             break;
