@@ -36,14 +36,14 @@ typedef struct
     ez_char_t handle[32];
 } tslmap_metadata_t;
 
+#ifndef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
 /* private function */
 static void storage_devinfo2index(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev_fwver, ez_char_t index[32]);
 static ez_int32_t get_tsl_handle_count(cJSON *json_obj, ez_char_t *handle);
 static cJSON *tslmap_metadata_to_json(tslmap_metadata_t *struct_obj);
 static void json_to_tslmap_metadata(cJSON *json_obj, tslmap_metadata_t *struct_obj);
 static ez_int32_t find_dev_by_sn(cJSON *json_obj, ez_char_t *sn);
-
-/* private member */
+#endif
 
 ez_void_t tsl_storage_print(ez_void_t)
 {
@@ -52,6 +52,9 @@ ez_void_t tsl_storage_print(ez_void_t)
 
 ez_err_t tsl_storage_load(ez_char_t *dev_sn, ez_char_t **buf, ez_uint32_t *len)
 {
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
+    return EZ_KV_ERR_NOT_INIT;
+#else
     size_t length = CONFIG_EZIOT_TSL_PROFILE_SIZE;
     ez_err_t rv = EZ_KV_ERR_SUCC;
     tslmap_metadata_t tsl_metadata = {0};
@@ -93,10 +96,14 @@ done:
     cJSON_Delete(js_root);
 
     return rv;
+#endif
 }
 
 ez_err_t tsl_storage_save(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev_fwver, ez_char_t *buf, ez_int32_t len)
 {
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
+    return EZ_KV_ERR_NOT_INIT;
+#else
     ez_err_t rv = EZ_KV_ERR_SUCC;
     cJSON *js_root = NULL;
     cJSON *js_tslmap_item = NULL;
@@ -185,10 +192,14 @@ done:
     cJSON_Delete(js_root);
 
     return rv;
+#endif
 }
 
 ez_err_t tsl_storage_del(ez_char_t *dev_sn)
 {
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
+    return EZ_KV_ERR_NOT_INIT;
+#else
     ez_err_t rv = EZ_KV_ERR_SUCC;
     cJSON *js_root = NULL;
     ez_char_t *pbuf = NULL;
@@ -231,8 +242,10 @@ done:
     cJSON_Delete(js_root);
 
     return rv;
+#endif
 }
 
+#ifndef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
 static void storage_devinfo2index(ez_char_t *dev_sn, ez_char_t *dev_type, ez_char_t *dev_fwver, ez_char_t index[32])
 {
     ez_uchar_t md5_output[16] = {0};
@@ -244,8 +257,8 @@ static void storage_devinfo2index(ez_char_t *dev_sn, ez_char_t *dev_type, ez_cha
     mbedtls_md5_init(&md5_ctx);
     mbedtls_md5_starts(&md5_ctx);
 
-    mbedtls_md5_update(&md5_ctx, (unsigned char*)dev_type, ezos_strlen(dev_type));
-    mbedtls_md5_update(&md5_ctx, (unsigned char*)dev_fwver, ezos_strlen(dev_fwver));
+    mbedtls_md5_update(&md5_ctx, (unsigned char *)dev_type, ezos_strlen(dev_type));
+    mbedtls_md5_update(&md5_ctx, (unsigned char *)dev_fwver, ezos_strlen(dev_fwver));
     mbedtls_md5_finish(&md5_ctx, md5_output);
 
     mbedtls_base64_encode(base64_output, sizeof(base64_output), &olen, md5_output, sizeof(md5_output));
@@ -325,3 +338,4 @@ static ez_int32_t find_dev_by_sn(cJSON *json_obj, ez_char_t *sn)
 
     return index;
 }
+#endif

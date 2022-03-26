@@ -1,3 +1,4 @@
+
 #include "ez_iot_tsl.h"
 #include "ez_iot_core_def.h"
 #include "ez_iot_core_lowlvl.h"
@@ -62,8 +63,8 @@ static ez_void_t tsl_adapter_query_job_update(ez_char_t *dev_sn, dev_stauts_e st
 /* shadow adapter */
 static void tsl_adapter_shadow_inst(ez_char_t *dev_sn);
 static void tsl_adapter_shadow_uninst(ez_char_t *dev_sn);
-static ez_err_t business2cloud_imp(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram);
-static ez_err_t business2dev_imp(const ez_shadow_value_t *pvalue, ez_shadow_business2dev_param_t *ppram);
+ez_err_t business2cloud_imp(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram);
+ez_err_t business2dev_imp(const ez_shadow_value_t *pvalue, ez_shadow_business2dev_param_t *ppram);
 
 /* private variables */
 static ez_tsl_callbacks_t g_tsl_things_cbs = {0};
@@ -141,7 +142,7 @@ done:
     return rv;
 }
 
-static ez_err_t business2dev_imp(const ez_shadow_value_t *pvalue, ez_shadow_business2dev_param_t *ppram)
+ez_err_t business2dev_imp(const ez_shadow_value_t *pvalue, ez_shadow_business2dev_param_t *ppram)
 {
     ez_err_t rv = -1;
     ez_tsl_value_t tsl_value = {0};
@@ -163,7 +164,7 @@ static ez_err_t business2dev_imp(const ez_shadow_value_t *pvalue, ez_shadow_busi
     return rv;
 }
 
-static ez_err_t business2cloud_imp(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram)
+ez_err_t business2cloud_imp(ez_shadow_value_t *pvalue, ez_shadow_business2cloud_param_t *ppram)
 {
     ez_err_t rv = -1;
     ez_tsl_value_t *tsl_value = (ez_tsl_value_t *)pvalue;

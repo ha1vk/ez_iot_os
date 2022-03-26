@@ -77,11 +77,13 @@ EZOS_API ez_err_t ez_iot_tsl_property_report(const ez_char_t *sn, const ez_tsl_r
     CHECK_COND_DONE(NULL == key_info, EZ_TSL_ERR_PARAM_INVALID);
     CHECK_COND_DONE(NULL == key_info->domain, EZ_TSL_ERR_PARAM_INVALID);
 
+#ifndef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
     CHECK_COND_DONE(tsl_adapter_status_check((ez_char_t *)sn), EZ_TSL_ERR_PROFILE_LOADING);
 
     /* Legality check */
     rv = tsl_legality_property_check(sn, rsc_info, key_info, value);
     CHECK_RV_DONE(rv);
+#endif
 
     if (NULL != value)
     {
@@ -113,7 +115,28 @@ EZOS_API ez_err_t ez_iot_tsl_property_report(const ez_char_t *sn, const ez_tsl_r
     ezos_strncpy((char *)shadow_res.res_type, (char *)rsc_info->res_type, sizeof(shadow_res.res_type) - 1);
     shadow_res.local_index = ezos_atoi((char *)rsc_info->local_index);
 
-    CHECK_COND_DONE(ez_iot_shadow_push(&shadow_res, key_info->domain, key_info->key, pvalue), EZ_TSL_ERR_GENERAL);
+    rv = ez_iot_shadow_push(&shadow_res, key_info->domain, key_info->key, pvalue);
+#ifdef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
+    if (rv >= EZ_SHD_ERR_DEV_NOT_FOUND && rv <= EZ_SHD_ERR_KEY_NOT_FOUND)
+    {
+        extern ez_err_t business2dev_imp(const ez_shadow_value_t *pvalue, ez_shadow_business2dev_param_t *ppram);
+        extern ez_err_t business2cloud_imp(ez_shadow_value_t * pvalue, ez_shadow_business2cloud_param_t * ppram);
+        ez_shadow_module_t shadow_module = {0};
+        ez_shadow_business_t shadow_busi = {0};
+
+        shadow_module.num = 1;
+        shadow_module.business = &shadow_busi;
+        shadow_busi.business2cloud = business2cloud_imp;
+        shadow_busi.business2dev = business2dev_imp;
+        ezos_strncpy((char *)shadow_busi.key, key_info->key, sizeof(shadow_busi.key) - 1);
+
+        rv = ez_iot_shadow_reg(&shadow_res, key_info->domain, &shadow_module);
+        CHECK_COND_DONE(rv, EZ_TSL_ERR_GENERAL);
+
+        rv = ez_iot_shadow_push(&shadow_res, key_info->domain, key_info->key, pvalue);
+    }
+#endif
+    CHECK_COND_DONE(rv, EZ_TSL_ERR_GENERAL);
 
 done:
     FUNC_OUT();
@@ -138,11 +161,13 @@ ez_err_t ez_iot_tsl_event_report(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_in
     CHECK_COND_DONE(NULL == key_info->domain, EZ_TSL_ERR_PARAM_INVALID);
     CHECK_COND_DONE(make_event_value(value, &tsl_value), EZ_TSL_ERR_MEMORY);
 
+#ifndef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
     CHECK_COND_DONE(tsl_adapter_status_check((ez_char_t *)sn), EZ_TSL_ERR_PROFILE_LOADING);
 
     /* Legality check */
     rv = tsl_legality_event_check(sn, rsc_info, key_info, &tsl_value);
     CHECK_RV_DONE(rv);
+#endif
 
     ez_kernel_pubmsg_v3_t pubmsg = {0};
     pubmsg.msg_qos = QOS_T1;
@@ -198,6 +223,7 @@ EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pevinfo)
     FUNC_IN();
 
     ez_err_t rv = EZ_TSL_ERR_SUCC;
+#ifndef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
     ez_tsl_devinfo_t devinfo = {0};
 
     CHECK_COND_DONE(ez_false == g_tsl_is_inited, EZ_TSL_ERR_NOT_INIT);
@@ -217,8 +243,9 @@ EZOS_API ez_err_t ez_iot_tsl_reg(ez_tsl_devinfo_t *pevinfo)
     }
 
     tsl_adapter_add(pevinfo);
-
 done:
+#endif
+
     FUNC_OUT();
 
     return rv;
@@ -229,6 +256,7 @@ ez_err_t ez_iot_tsl_unreg(ez_char_t *dev_subserial)
     FUNC_IN();
 
     ez_err_t rv = EZ_TSL_ERR_SUCC;
+#ifndef CONFIG_EZIOT_TSL_LEGALITY_CHECK_NONE
     ez_char_t *dev_sn = dev_subserial;
 
     CHECK_COND_DONE(ez_false == g_tsl_is_inited, EZ_TSL_ERR_NOT_INIT);
@@ -241,6 +269,7 @@ ez_err_t ez_iot_tsl_unreg(ez_char_t *dev_subserial)
     tsl_adapter_del(dev_sn);
 
 done:
+#endif
     FUNC_OUT();
 
     return rv;
