@@ -214,7 +214,6 @@ static void ota_file_download_thread(void *arg)
     unsigned int offset = 0;
     int max_try_time = 0;
     int retry_flag = 0;
-    ezlog_e(TAG_OTA,"ota_file_download_thread start");
     ez_ota_info_t*  file_info = (ez_ota_info_t*)arg;
     max_try_time = file_info->retry_max;
     unsigned int total_len = file_info->total_size;

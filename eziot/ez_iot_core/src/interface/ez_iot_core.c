@@ -31,7 +31,7 @@ EZOS_API ez_err_t ez_iot_core_init(const ez_server_info_t *psrv_info, const ez_d
 
     ez_err_t rv = EZ_CORE_ERR_SUCC;
     ez_char_t devid[32] = {0};
-    ez_int32_t devid_len = sizeof(devid);
+    ez_size_t devid_len = sizeof(devid);
 
     if (g_is_inited)
     {
