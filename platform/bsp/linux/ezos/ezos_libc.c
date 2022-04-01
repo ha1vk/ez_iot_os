@@ -150,20 +150,3 @@ EZOS_API long int ezos_strtol(const char *nptr, char **endptr, int base)
 {
     return strtol(nptr, endptr, base);
 }
-
-#include <termios.h>
-#include <unistd.h>
-EZOS_API int ezos_cli_getchar(void)
-{
-    struct termios oldt;
-    tcgetattr(STDIN_FILENO, &oldt);
-    struct termios newt = oldt;
-    newt.c_lflag &= ~(ECHO | ICANON);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    return getchar();
-}
-
-EZOS_API int ezos_putchar(int c)
-{
-    return putchar(c);
-}

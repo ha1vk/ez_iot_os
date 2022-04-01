@@ -1076,7 +1076,7 @@ int aos_cli_printf(const char *msg, ...)
 
 int cli_getchar(char *inbuf)
 {
-    *inbuf = (char)ezos_cli_getchar();
+    *inbuf = (char)getchar();
     return 1;
 }
 
@@ -1088,7 +1088,7 @@ int cli_putstr(char *msg)
     pos = 0;
     while (pos < len)
     {
-        if ((ezos_putchar(*(char *)(msg + pos))) >= 0)
+        if ((putchar(*(char *)(msg + pos))) >= 0)
         {
             pos += 1; // move to next data block
             continue;

@@ -39,9 +39,9 @@ EZOS_API ezos_time_t ezos_time(ezos_time_t *__timer)
     return (ezos_time_t)time((time_t *)__timer);
 }
 
-EZOS_API struct ezos_tm * ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result)
+EZOS_API struct ezos_tm *ezos_localtime(const ezos_time_t *timep, struct ezos_tm *result)
 {
-    return (struct ezos_tm *)localtime_r((time_t *)timep, (struct tm *)result);;
+    return (struct ezos_tm *)localtime_r((time_t *)timep, (struct tm *)result);
 }
 
 EZOS_API void ezos_delay_ms(ez_ulong_t time_ms)
@@ -52,4 +52,10 @@ EZOS_API void ezos_delay_ms(ez_ulong_t time_ms)
         xTicksToWait = 1;
 
     vTaskDelay(xTicksToWait);
+}
+
+EZOS_API void ezos_tzset(const ez_char_t *timezone)
+{
+    setenv("TZ", timezone, 1);
+    tzset();
 }
