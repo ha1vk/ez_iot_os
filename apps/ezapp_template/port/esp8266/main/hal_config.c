@@ -44,7 +44,7 @@ static struct fdb_kvdb app_kvdb;
 static ez_mutex_t m_kv_mutex = NULL;
 
 #define EZ_KVDB_NAME "data"
-#define EZ_APP_KVDB_PART_NAME "app_kvdb"
+#define EZ_APP_KVDB_PART_NAME "ez_kvdb"
 #define EZ_SDK_KVDB_PART_NAME "sdk_kvdb"
 
 // for ezhal_kv interface adaptation
