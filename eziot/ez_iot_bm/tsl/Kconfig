@@ -10,7 +10,7 @@ config EZIOT_TSL_SHADOW_SUPPORT
 
 choice EZIOT_TSL_LEGALITY_CHECK_LEVEL
     prompt "Functional legality check level"
-    default EZIOT_TSL_LEGALITY_CHECK_WEAK
+    default EZIOT_TSL_LEGALITY_CHECK_NONE
     depends on EZIOT_TSL_ENABLE
 
 config EZIOT_TSL_LEGALITY_CHECK_NONE
