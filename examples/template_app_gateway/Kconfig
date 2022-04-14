@@ -1,4 +1,0 @@
-menuconfig EZIOT_EXAMPLES_GATEWAY_ENABLE
-    bool "Enable example gateway"
-    default n
-    depends on EZIOT_EXAMPLES_ENABLE
