@@ -47,8 +47,8 @@ initializer that should be kept in sync
 #define HTTPD_DEFAULT_CONFIG()                \
     {                                         \
         .task_priority = 5,                   \
-        .stack_size = 4096,                   \
-        .server_port = 80,                    \
+        .stack_size = CONFIG_EZIOT_COMPONENT_EZHTTPD_STACK_SIZE,                   \
+        .server_port = CONFIG_EZIOT_COMPONENT_EZHTTPD_SERVER_PORT,                    \
         .ctrl_port = 32768,                   \
         .max_open_sockets = 7,                \
         .max_uri_handlers = 8,                \

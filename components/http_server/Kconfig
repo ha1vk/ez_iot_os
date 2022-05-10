@@ -2,3 +2,13 @@
 menuconfig EZIOT_COMPONENT_EZHTTPD_ENABLE
     bool "Enable http_server"
     default y
+
+config EZIOT_COMPONENT_EZHTTPD_STACK_SIZE
+    int "Stack size of httpd server"
+    default 4096
+    depends on EZIOT_COMPONENT_EZHTTPD_ENABLE
+
+config EZIOT_COMPONENT_EZHTTPD_SERVER_PORT
+    int "port of httpd server"
+    default 80
+    depends on EZIOT_COMPONENT_EZHTTPD_ENABLE
