@@ -57,7 +57,7 @@ static ez_int32_t parse_sap_config(ez_char_t *buf, ez_int32_t buf_size)
     }
 
     ezos_memset(&g_dev_info, 0, sizeof(dev_info_t));
-    ezos_strncpy(g_dev_info.dev_productKey, CONFIG_EZIOT_COMPONENT_APP_PRODUCTKEY, sizeof(g_dev_info.dev_productKey) - 1);
+    ezos_strncpy(g_dev_info.dev_productKey, CONFIG_EZIOT_COMPONENT_APP_DEVICE_TYPE, sizeof(g_dev_info.dev_productKey) - 1);
     ezos_memcpy(g_dev_info.dev_subserial, buf + 73, 9);
     ezos_memcpy(g_dev_info.dev_deviceLicense, buf + 30, 6);
     g_dev_info.dev_auth_mode = 0;

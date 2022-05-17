@@ -80,7 +80,6 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
     {
         /* 设备未绑定/解绑, 清空网络配置及用户数据 */
         ezlog_d(TAG_APP, "The device is not bound");
-        network_connect_stop();
         network_reset();
         ezcloud_tsl_prop_reset();
     }
@@ -112,3 +111,18 @@ ez_void_t ezcloud_base_init(ez_void_t)
         ez_iot_base_bind_query();
     }
 }
+
+#ifdef CONFIG_EZIOT_COMPONENT_CLI_ENABLE
+#include "cli.h"
+
+static void bind(char *buf, int len, int argc, char **argv)
+{
+    if (argc > 1)
+    {
+        ez_iot_base_bind_near(argv[1]);
+    }
+}
+
+EZOS_CLI_EXPORT("bind", "device bind param : <token> e.g bind cf08393f8581407fad8c3d55dae434ff", bind);
+
+#endif

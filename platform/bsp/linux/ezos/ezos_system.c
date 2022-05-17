@@ -32,3 +32,8 @@ int ezos_get_uuid(char *uuid, short len)
     gethostname(uuid, len);
     return 0;
 }
+
+void ezos_reboot(void)
+{
+
+}

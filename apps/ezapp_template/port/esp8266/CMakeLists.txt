@@ -8,7 +8,9 @@ cmake_minimum_required(VERSION 2.8)
 ####### Prepare building environment ##########
 
 # Get SDK path
-if(NOT EZOS_PATH)
+if(IS_DIRECTORY $ENV{EZOS_PATH})
+    set(EZOS_PATH $ENV{EZOS_PATH})
+else()
     get_filename_component(EZOS_PATH ../../../../ ABSOLUTE)
 endif()
 

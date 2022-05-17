@@ -174,3 +174,8 @@ ezhal_wifi_state_e ezhal_get_wifi_state()
 {
     return g_wifi_connect_state;
 }
+
+void ezhal_set_country_code(char *CountryCode)
+{
+    //TODO 待适配
+}

@@ -36,15 +36,6 @@ extern "C"
     ez_bool_t hal_config_init(ez_void_t);
 
     /**
-     * @brief Get Device Product Profile
-     * 
-     * @param[out] val data read buffer
-     * @param[in] len the maximum length of val buffer
-     * @return read data length
-     */
-    ez_int32_t hal_config_product_load(ez_char_t *val, ez_int32_t len);
-
-    /**
      * @brief Get device license
      * 
      * @param[out] val data read buffer

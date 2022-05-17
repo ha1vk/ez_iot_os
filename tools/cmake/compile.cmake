@@ -524,21 +524,6 @@ macro(do_project_building name)
        message(FATAL_ERROR "=================\nCan not find main component(folder) in project folder!!\n=================")
    endif()
 
-    file(GLOB project_component_dirs ${EZOS_PATH}/examples/*)
-    foreach(component_dir ${project_component_dirs})
-        is_path_component(is_component ${component_dir})
-        if(is_component)
-            message(STATUS "find component: ${component_dir}")
-            get_filename_component(base_dir ${component_dir} NAME)
-            list(APPEND components_dirs ${component_dir})
-
-            if(EXISTS ${component_dir}/Kconfig)
-                message(STATUS "Find component Kconfig of ${base_dir}")
-                list(APPEND components_kconfig_files ${component_dir}/Kconfig)
-            endif()
-        endif()
-    endforeach()
-
     # Find components in bsp folder
     file(GLOB project_component_dirs ${EZOS_PATH}/platform/bsp/${PROJECT_NAME}/ezos)
     foreach(component_dir ${project_component_dirs})
@@ -580,6 +565,7 @@ macro(do_project_building name)
                         ${kconfig_defaults_files_args}
                         --menuconfig False
                         --env "EZOS_PATH=${EZOS_PATH}"
+                        --env "PROJECT_KCONFIG_PATH=${PROJECT_KCONFIG_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
@@ -593,6 +579,7 @@ macro(do_project_building name)
                         ${kconfig_defaults_files_args}
                         --menuconfig True
                         --env "EZOS_PATH=${EZOS_PATH}"
+                        --env "PROJECT_KCONFIG_PATH=${PROJECT_KCONFIG_PATH}"
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config

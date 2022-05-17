@@ -1,0 +1,8 @@
+config EZIOT_OS_ENABLE
+    bool "Enable eziot os interface"
+    default y
+
+config EZIOT_OS_BSP_ROOT
+    string "bsp path"
+    default ""
+    depends on EZIOT_OS_ENABLE

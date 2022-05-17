@@ -1,7 +1,6 @@
 ################# Add include #################
 set(PRIVATE_SRC_ROOT "../../..")
 
-list(APPEND ADD_INCLUDE "../inc")
 list(APPEND ADD_INCLUDE "${PRIVATE_SRC_ROOT}/bussiness/inc")
 list(APPEND ADD_INCLUDE "${PRIVATE_SRC_ROOT}/ezcloud/inc")
 list(APPEND ADD_INCLUDE "${PRIVATE_SRC_ROOT}/network/inc")
@@ -13,6 +12,7 @@ list(APPEND ADD_INCLUDE "${PRIVATE_SRC_ROOT}/product/inc")
 # list(APPEND ADD_SRCS  "src/lib1.c"
 #     )
 # aux_source_directory(./ ADD_SRCS)  # collect all source file in src dir, will set var ADD_SRCS
+aux_source_directory(./ ADD_SRCS)
 aux_source_directory(${PRIVATE_SRC_ROOT}/bussiness ADD_SRCS)
 aux_source_directory(${PRIVATE_SRC_ROOT}/ezcloud ADD_SRCS)
 aux_source_directory(${PRIVATE_SRC_ROOT}/network ADD_SRCS)
@@ -24,6 +24,8 @@ aux_source_directory(${PRIVATE_SRC_ROOT}/product ADD_SRCS)
 
 ###### Add required/dependent components ######
 # list(APPEND ADD_REQUIREMENTS component1)
+list(APPEND ADD_REQUIREMENTS cli)
+list(APPEND ADD_REQUIREMENTS FlashDB)
 list(APPEND ADD_REQUIREMENTS cJSON)
 list(APPEND ADD_REQUIREMENTS ezconn)
 list(APPEND ADD_REQUIREMENTS ezlist)
@@ -69,4 +71,4 @@ list(APPEND ADD_REQUIREMENTS ezos)
 ###############################################
 
 # register component, DYNAMIC or SHARED flags will make component compiled to dynamic(shared) lib
-register_component(${CONFIG_EZIOT_COMPONENT_APP_NAME})
+register_component()

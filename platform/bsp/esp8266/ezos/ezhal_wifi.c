@@ -4,7 +4,6 @@
 #include "freertos/event_groups.h"
 #include "esp_event_loop.h"
 #include "esp_wifi.h"
-#include "ezlog.h"
 #include "esp_err.h"
 #include "string.h"
 
@@ -27,21 +26,16 @@ static void wifi_disconnect_reason(uint8_t reason)
     {
     case WIFI_REASON_AUTH_FAIL:
     case WIFI_REASON_AUTH_EXPIRE:
-        ezlog_i(TAG_WIFI, "WIFI_REASON_PWD_ERROR(%d)", reason);
         g_wifi_connect_state = EZOS_WIFI_STATE_PASSWORD_ERROR;
         break;
     case WIFI_REASON_NO_AP_FOUND:
-        ezlog_i(TAG_WIFI, "WIFI_REASON_NO_AP_FOUND(%d)", reason);
         g_wifi_connect_state = EZOS_WIFI_STATE_NO_AP_FOUND;
         break;
     case WIFI_REASON_ASSOC_FAIL:
-        ezlog_i(TAG_WIFI, "WIFI_REASON_ASSOC_FAIL(%d)", reason);
         g_wifi_connect_state = EZOS_WIFI_STATE_UNKNOW;
         break;
 
     default:
-        ezlog_e(TAG_WIFI, "unknow reason(%d)", reason);
-
         break;
     }
     return;
@@ -51,64 +45,42 @@ static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
 {
     system_event_info_t *info = &event->event_info;
 
-    ezlog_d(TAG_WIFI, "enter!!event->event_id=%d!!!", event->event_id);
-
     switch (event->event_id)
     {
     case SYSTEM_EVENT_AP_START:
-        ezlog_i(TAG_WIFI, "AP_START SUCCESS!!!!!");
         break;
     case SYSTEM_EVENT_AP_STOP:
-        ezlog_i(TAG_WIFI, "AP_STOP SUCCESS!!!!!");
         break;
     case SYSTEM_EVENT_SCAN_DONE:
-        ezlog_i(TAG_WIFI, "SYSTEM_EVENT_SCAN_DONE!!!!!");
         xEventGroupSetBits(g_wifi_event_group, g_WIFI_SCAN_DONE_BIT);
         break;
     case SYSTEM_EVENT_STA_START:
-        ezlog_i(TAG_WIFI, "SYSTEM_EVENT_STA_START!!!!!");
         break;
     case SYSTEM_EVENT_STA_STOP:
-        ezlog_i(TAG_WIFI, "SYSTEM_EVENT_STA_STOP!!!!!");
         g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
         break;
     case SYSTEM_EVENT_STA_CONNECTED:
-        ezlog_i(TAG_WIFI, "SYSTEM_EVENT_STA_CONNECTED!!!!!");
         g_wifi_connect_state = EZOS_WIFI_STATE_CONNECT_SUCCESS;
         break;
     case SYSTEM_EVENT_STA_GOT_IP:
-        ezlog_i(TAG_WIFI, "got ip:%s",
-                ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
         break;
     case SYSTEM_EVENT_AP_STACONNECTED: /**< a station connected to ESP8266 soft-AP */
-        ezlog_w(TAG_WIFI, "AP_STA_CONNECTED");
-        ezlog_i(TAG_WIFI, "station:" MACSTR " join, AID=%d",
-                MAC2STR(event->event_info.sta_connected.mac),
-                event->event_info.sta_connected.aid);
         break;
     case SYSTEM_EVENT_AP_STAIPASSIGNED: /**< ESP8266 soft-AP assign an IP to a connected station */
-        ezlog_w(TAG_WIFI, "AP_STA_IPASSIGNED");
         g_wifi_connect_state = EZOS_WIFI_STATE_STA_CONNECTED;
         break;
     case SYSTEM_EVENT_AP_STADISCONNECTED: /**< a station disconnected from ESP8266 soft-AP */
-        ezlog_w(TAG_WIFI, "AP_STA_DISCONNECTED");
-        ezlog_i(TAG_WIFI, "station:" MACSTR "leave, AID=%d",
-                MAC2STR(event->event_info.sta_disconnected.mac),
-                event->event_info.sta_disconnected.aid);
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
-        ezlog_w(TAG_WIFI, "SYSTEM_EVENT_STA_DISCONNECTED");
         wifi_disconnect_reason(info->disconnected.reason);
 
         if (0 == g_wifi_disconnect_flag)
         {
-            ezlog_i(TAG_WIFI, "Device DISCONNECTED,start a new connect!");
             esp_wifi_connect();
         }
         break;
 
     default:
-        ezlog_e(TAG_WIFI, "unknow event id(%d)", event->event_id);
         break;
     }
     return ESP_OK;
@@ -116,12 +88,11 @@ static esp_err_t wifi_event_handler(void *ctx, system_event_t *event)
 
 int ezhal_wifi_init()
 {
-    ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
     if (g_wifi_init)
     {
-        ezlog_w(TAG_WIFI, "wifi inited.");
         return 0;
     }
+
     g_wifi_event_group = xEventGroupCreate();
     tcpip_adapter_init();
     ESP_ERROR_CHECK(esp_event_loop_init(wifi_event_handler, NULL));
@@ -156,7 +127,6 @@ int ezhal_sta_connect(char *ssid, char *password)
     wifi_config_t wifi_config;
     esp_err_t ret = ESP_OK;
 
-    ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
     g_wifi_disconnect_flag = 0;
     wifi_mode_t wifi_mode = WIFI_MODE_NULL;
     esp_wifi_get_mode(&wifi_mode);
@@ -170,13 +140,11 @@ int ezhal_sta_connect(char *ssid, char *password)
 
     if ((ssid == NULL) || (strlen((char *)(ssid)) == 0))
     {
-        ezlog_e(TAG_WIFI, "%s wifi config error, please check ssid!!!", __FUNCTION__);
         return -1;
     }
 
     if (strlen((char *)(ssid)) > 32)
     {
-        ezlog_e(TAG_WIFI, "%s wifi config error, ssid is too long!!!!", __FUNCTION__);
         return -1;
     }
     else
@@ -187,18 +155,15 @@ int ezhal_sta_connect(char *ssid, char *password)
     if (NULL == password)
     {
         wifi_config.sta.threshold.authmode = EZOS_WIFI_OPEN;
-        ezlog_i(TAG_WIFI, "connect to ap SSID:%.32s password: NULL", wifi_config.sta.ssid);
     }
     else
     {
         if (strlen((char *)(password)) > 64)
         {
-            ezlog_e(TAG_WIFI, "%s wifi config error, pwd is too long!!!!", __FUNCTION__);
             return -1;
         }
-        //wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA_WPA2_PSK;
+
         memcpy(wifi_config.ap.password, password, 64);
-        ezlog_i(TAG_WIFI, "connect to ap SSID:%.32s password:%s", wifi_config.sta.ssid, wifi_config.sta.password);
     }
 
     wifi_config.sta.listen_interval = 10;
@@ -213,16 +178,12 @@ int ezhal_sta_connect(char *ssid, char *password)
         switch (ret)
         {
         case ESP_ERR_WIFI_NOT_INIT:
-            ezlog_i(TAG_WIFI, "WiFi is not initialized by Ezviz_Wifi_Init! ret = %d", ret);
             break;
         case ESP_ERR_WIFI_CONN:
-            ezlog_i(TAG_WIFI, "WiFi internal error, station or soft-AP control block wrong! ret = %d", ret);
             break;
         case ESP_ERR_WIFI_SSID:
-            ezlog_i(TAG_WIFI, "SSID of AP which station connects is invalid! ret = %d", ret);
             break;
         default:
-            ezlog_i(TAG_WIFI, "unknown connect state ret = %d!", ret);
             break;
         }
         g_wifi_connect_state = EZOS_WIFI_STATE_UNKNOW;
@@ -232,7 +193,6 @@ int ezhal_sta_connect(char *ssid, char *password)
 
 int ezhal_sta_stop()
 {
-    ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
     g_wifi_connect_state = EZOS_WIFI_STATE_NOT_CONNECT;
     g_wifi_disconnect_flag = 1;
     esp_wifi_disconnect();
@@ -243,8 +203,6 @@ int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned
 {
     wifi_config_t wifi_config;
     int ssid_len = 0, pwd_len = 0;
-
-    ezlog_d(TAG_WIFI, "%s", __FUNCTION__);
 
     wifi_mode_t wifi_mode = WIFI_MODE_NULL;
     esp_wifi_get_mode(&wifi_mode);
@@ -257,13 +215,11 @@ int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned
 
     if ((ssid == NULL) || (strlen((char *)(ssid)) == 0))
     {
-        ezlog_e(TAG_WIFI, "%s wifi config  error, please check ssid!!!", __FUNCTION__);
         return -1;
     }
 
     if (NULL == password && 0 != auth_mode)
     {
-        ezlog_e(TAG_WIFI, "%s wifi config error, please set open mode or set pwd!!!", __FUNCTION__);
         return -1;
     }
 
@@ -271,7 +227,6 @@ int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned
 
     if (ssid_len > 32)
     {
-        ezlog_e(TAG_WIFI, "%s wifi config error, ssid is too long!!!!", __FUNCTION__);
         return -1;
     }
 
@@ -280,7 +235,6 @@ int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned
         pwd_len = strlen((char *)(password));
         if (pwd_len > 64)
         {
-            ezlog_e(TAG_WIFI, "%s wifi config error, pwd is too long!!!!", __FUNCTION__);
             return -1;
         }
 
@@ -294,8 +248,6 @@ int ezhal_ap_start(char *ssid, char *password, unsigned char auth_mode, unsigned
     wifi_config.ap.channel = channel;
 
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config));
-
-    ezlog_i(TAG_WIFI, "wifi_init_softap finished.SSID:%s password:%s", wifi_config.sta.ssid, wifi_config.sta.password);
 
     ESP_ERROR_CHECK(esp_wifi_start());
     g_wifi_start_flag = 1;
@@ -314,16 +266,13 @@ int ezhal_ap_stop()
     switch (wifi_mode)
     {
     case WIFI_MODE_AP:
-        ezlog_d(TAG_WIFI, "stop ap mode.");
         esp_wifi_disconnect();
         break;
     case WIFI_MODE_APSTA:
-        ezlog_d(TAG_WIFI, "stop apsta mode.");
         esp_wifi_disconnect();
         esp_wifi_deauth_sta(0);
         break;
     default:
-        ezlog_w(TAG_WIFI, "not ap or apsta mode, nothing to do");
         break;
     }
 
@@ -346,7 +295,6 @@ unsigned char ezhal_sta_get_scan_list(unsigned char max_ap_num, ezhal_wifi_list_
 {
     if (g_wifi_scan_start)
     {
-        ezlog_w(TAG_WIFI, "wifi scan already started.");
         return 0;
     }
     g_wifi_scan_start = true;
@@ -358,11 +306,8 @@ unsigned char ezhal_sta_get_scan_list(unsigned char max_ap_num, ezhal_wifi_list_
             .show_hidden = true,
         };
 
-    ezlog_d(TAG_WIFI, "%s enter!!", __FUNCTION__);
-
     if (max_ap_num == 0 || ap_list == NULL)
     {
-        ezlog_e(TAG_WIFI, "!%s parameter erroe!", __FUNCTION__);
         g_wifi_scan_start = false;
         return 0;
     }
@@ -375,13 +320,11 @@ unsigned char ezhal_sta_get_scan_list(unsigned char max_ap_num, ezhal_wifi_list_
     wifi_ap_record_t *tmp_list = (wifi_ap_record_t *)malloc(max_ap_num * sizeof(wifi_ap_record_t));
     if (NULL == tmp_list)
     {
-        ezlog_e(TAG_WIFI, "malloc tmp_list failed.");
         return -1;
     }
 
     ESP_ERROR_CHECK(esp_wifi_scan_start(&scanConf, true));
     xEventGroupWaitBits(g_wifi_event_group, g_WIFI_SCAN_DONE_BIT, 0, 1, portMAX_DELAY);
-    ezlog_i(TAG_WIFI, "WIFI scan done");
     xEventGroupClearBits(g_wifi_event_group, g_WIFI_SCAN_DONE_BIT);
 
     ez_uint16_t tmp_num = max_ap_num;
@@ -413,13 +356,10 @@ int ezhal_get_rssi(char *rssi)
         esp_wifi_sta_get_ap_info(&wifi_param);
         *rssi = wifi_param.rssi;
 
-        ezlog_i(TAG_WIFI, "Get Rssi success! rssi = %d", *rssi);
-
         ret = 0;
     }
     else
     {
-        ezlog_i(TAG_WIFI, "Wifi Disconnected, Rssi can't get.");
     }
 
     return ret;

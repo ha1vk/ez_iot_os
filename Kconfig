@@ -33,7 +33,7 @@ menu "ez-iot configuration"
 endmenu
 
 menu "os/bsp configuration"
-    source "${EZOS_PATH}/platform/bsp/${PROJECT_NAME}/ezos/Kconfig"
+    source "${EZOS_PATH}/platform/bsp/Kconfig"
 endmenu
 
 menu "components configuration"

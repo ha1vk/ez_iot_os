@@ -452,3 +452,26 @@ tsl_action_impl_t g_tsl_action_lst[] = {
     {"GetCountdown", "LightCtrl", "global", "0", action_getcountdown_down},
     {NULL, NULL, NULL, NULL, NULL},
 };
+
+#ifdef CONFIG_EZIOT_COMPONENT_CLI_ENABLE
+#include "cli.h"
+
+static void show_kv(char *buf, int len, int argc, char **argv)
+{
+    ez_char_t kv_buf[2048] = {0};
+    ez_int32_t kv_buf_len = sizeof(kv_buf);
+
+    if (argc > 1)
+    {
+        hal_config_get_string(argv[1], kv_buf, &kv_buf_len, "");
+        ezlog_hexdump(TAG_APP, 16, kv_buf, kv_buf_len);
+    }
+    else
+    {
+        hal_config_print();
+    }
+}
+
+EZOS_CLI_EXPORT("showkv", "show kv data, param : <key> e.g showkv or showkv Brightness", show_kv);
+
+#endif
