@@ -163,7 +163,7 @@ done:
 static ez_int32_t property_countdowncfg_get(tsl_prop_impl_t *thiz, ez_tsl_value_t *tsl_value)
 {
     ez_int32_t rv = -1;
- 
+
     property_get_wrapper(thiz, tsl_value, EZ_TSL_DATA_TYPE_OBJECT);
     rv = EZ_TSL_ERR_SUCC;
     return rv;
@@ -445,7 +445,7 @@ tsl_prop_impl_t g_tsl_prop_lst[] = {
     {"WorkMode", "RGBLightCtrl", "global", "0", property_workmode_set, property_workmode_get, MAKE_DEFVAL(string, "white")},
     {"TimeZoneCompose", "TimeMgr", "global", "0", property_timezonecompose_set, property_timezonecompose_get, MAKE_DEFVAL(string, "{\"timeFormat\":\"0\",\"timeZone\": \"UTC+08:00\",\"tzCode\": 42,\"daylightSavingTime\": 1,\"offsetTime\": 0,\"startMonth\": 0,\"startWeekIndex\": \"\",\"startWeekDay\": \"\",\"startTime\": \"08:00:00\",\"endMonth\": 0,\"endWeekIndex\": \"\",\"endWeekDay\": \"\",\"endTime\": \"08:00:00\"}")},
     {"NetStatus", "WifiStatus", "global", "0", NULL, property_netstatus_get, MAKE_DEFVAL(string, "{}")},
-    {NULL, NULL, NULL, NULL, NULL, NULL, 0},
+    {NULL, NULL, NULL, NULL, NULL, NULL, MAKE_DEFVAL(int, 0)},
 };
 
 tsl_action_impl_t g_tsl_action_lst[] = {
@@ -464,7 +464,7 @@ static void show_kv(char *buf, int len, int argc, char **argv)
     if (argc > 1)
     {
         hal_config_get_string(argv[1], kv_buf, &kv_buf_len, "");
-        ezlog_hexdump(TAG_APP, 16, kv_buf, kv_buf_len);
+        ezlog_hexdump(TAG_APP, 16, (ez_uchar_t *)kv_buf, kv_buf_len);
     }
     else
     {

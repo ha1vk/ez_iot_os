@@ -171,3 +171,22 @@ ez_void_t ezcloud_tsl_prop_reset(ez_void_t)
         ezcloud_tsl_prop_report(g_tsl_prop_lst[i].identify);
     }
 }
+
+#ifdef CONFIG_EZIOT_COMPONENT_CLI_ENABLE
+#include "cli.h"
+
+static void prop_report(char *buf, int len, int argc, char **argv)
+{
+    if (argc > 1)
+    {
+        ezcloud_tsl_prop_report(argv[1]);
+    }
+    else
+    {
+        tsl_prop_reportall();
+    }
+}
+
+EZOS_CLI_EXPORT("prop_report", "property report, param : <identifier> e.g prop_report or prop_report Brightness", prop_report);
+
+#endif

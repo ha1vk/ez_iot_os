@@ -20,6 +20,7 @@
 
 #include "ezlog.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 static FILE *g_update_handle = NULL;
 
@@ -30,9 +31,9 @@ static FILE *g_update_handle = NULL;
 ez_err_t hal_ota_begin(ez_size_t image_size)
 {
     ez_err_t rv = 0x00;
-    FILE *pfile  = fopen("ezapp_ota" , "w+");
+    g_update_handle  = fopen("ezapp_ota" , "w+");
 
-    if (NULL == pfile)
+    if (NULL == g_update_handle)
     {
         rv = 0X0050003B;
     }
@@ -47,7 +48,7 @@ ez_err_t hal_ota_write(const ez_void_t *data, ez_size_t size)
 {
     ez_err_t rv = 0x00;
 
-    if(size !=  fwrite(data, size, 1, g_update_handle))
+    if(size !=  fwrite(data, 1, size, g_update_handle))
     {
         rv = 0X0050003A;
     }
@@ -69,6 +70,8 @@ ez_err_t hal_ota_end(ez_void_t)
         rv = 0X0050003B;
     }
 
+    g_update_handle = NULL;
+
     return rv;
 }
 
@@ -78,8 +81,12 @@ ez_err_t hal_ota_action(ez_void_t)
 {
     ez_err_t rv = 0x00;
 
-    system("mv -f ezapp.bin ezapp.bin.old");
-    system("mv -f ezapp_ota ezapp.bin");
+    // 替换掉原文件
+    system("mv -f ezapp ezapp.old");
+    system("mv -f ezapp_ota ezapp");
+
+    // 退出程序等待重启
+    exit(0);
 
     return rv;
 }
