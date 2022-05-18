@@ -69,15 +69,3 @@ config EZIOT_EXAMPLES_DEV_FIRMWARE_VERSION
     string ""
     default "V1.2.0 build 201212"
     depends on EZIOT_EXAMPLES_ENABLE
-
-#choice
-#    prompt "Implementation method of kv interface"
-#    default EZIOT_EXAMPLES_KV_USING_KVDB
-#
-#    config EZIOT_EXAMPLES_KV_USING_MEMORY
-#        bool "11111"
-#    config EZIOT_EXAMPLES_KV_USING_FILE
-#        bool "33333"
-#    config EZIOT_EXAMPLES_KV_USING_KVDB
-#        bool "22222"
-#endchoice

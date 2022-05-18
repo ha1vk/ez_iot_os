@@ -20,11 +20,12 @@
 
 #include "ezos.h"
 #include "flashdb.h"
+#include <stdlib.h>
 
 static ez_mutex_t m_kv_mutex = NULL;
 static struct fdb_kvdb ez_kvdb;
-#define EZ_KVDB_NAME "app_kvdb"
-#define EZ_KVDB_PART_NAME "cache"
+#define EZ_KVDB_NAME "data"
+#define EZ_KVDB_PART_NAME "app_kvdb"
 #define EZ_KVDB_MAX_SIZE 1024 * 64
 #define EZ_KVDB_SEC_SIZE 1024 * 32
 
@@ -53,6 +54,11 @@ int example_kv_init(const void *default_kv)
     {
         return rv;
     }
+
+    // 生成数据库文件目录
+    char shell_cmd[64] = {0};
+    ezos_snprintf(shell_cmd, sizeof(shell_cmd) - 1, "mkdir -p %s", EZ_KVDB_PART_NAME);
+    system(shell_cmd);
 
     m_kv_mutex = ezos_mutex_create();
     fdb_kvdb_control(&ez_kvdb, FDB_KVDB_CTRL_SET_LOCK, (void *)example_kv_lock);

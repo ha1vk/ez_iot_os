@@ -98,7 +98,7 @@ static int ez_cloud_tsl_init()
     }
 
     ez_iot_tsl_init(&tsl_things_cbs);
-    ez_iot_tsl_reg(NULL, NULL);
+    ez_iot_tsl_reg(NULL);
 
     g_is_inited = ez_true;
     return 0;

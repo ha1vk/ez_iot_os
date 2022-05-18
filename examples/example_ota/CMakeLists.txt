@@ -10,7 +10,7 @@ if(CONFIG_EZIOT_EXAMPLES_OTA_ENABLE)
     # list(APPEND ADD_SRCS  "src/lib1.c"
     #     )
     # aux_source_directory(src ADD_SRCS)  # collect all source file in src dir, will set var ADD_SRCS
-    append_srcs_dir(ADD_SRCS "./")     # append source file in src dir to var ADD_SRCS
+    append_srcs_dir(ADD_SRCS "../${module_name}")     # append source file in src dir to var ADD_SRCS
     # list(REMOVE_ITEM COMPONENT_SRCS "src/test.c")
     ###############################################
 
@@ -21,7 +21,6 @@ if(CONFIG_EZIOT_EXAMPLES_OTA_ENABLE)
     list(APPEND ADD_REQUIREMENTS cli)
     list(APPEND ADD_REQUIREMENTS ez_iot_bm)
     list(APPEND ADD_REQUIREMENTS ez_iot_core)
-    list(APPEND ADD_REQUIREMENTS example_kv)
     list(APPEND ADD_REQUIREMENTS webclient)
     ###############################################
 
@@ -54,6 +53,4 @@ if(CONFIG_EZIOT_EXAMPLES_OTA_ENABLE)
     ###############################################
 
     # register component, DYNAMIC or SHARED flags will make component compiled to dynamic(shared) lib
-    register_component()
-
 endif()

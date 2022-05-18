@@ -7,9 +7,7 @@ if(CONFIG_EZIOT_EXAMPLES_KV_ENABLE)
     ###############################################
 
     ############## Add source files ###############
-    list(APPEND ADD_SRCS  "src/example_kv.c"
-                          "src/kv_imp_using_kvdb.c"
-        )
+    append_srcs_dir(ADD_SRCS "../${module_name}/src")     # append source file in src dir to var ADD_SRCS
     # aux_source_directory(src ADD_SRCS)  # collect all source file in src dir, will set var ADD_SRCS
     # append_srcs_dir(ADD_SRCS "src")     # append source file in src dir to var ADD_SRCS
     # list(REMOVE_ITEM COMPONENT_SRCS "src/test.c")
@@ -52,6 +50,5 @@ if(CONFIG_EZIOT_EXAMPLES_KV_ENABLE)
     ###############################################
 
     # register component, DYNAMIC or SHARED flags will make component compiled to dynamic(shared) lib
-    register_component()
 
 endif()

@@ -194,7 +194,7 @@ static int ez_cloud_tsl_init()
     }
 
     ez_iot_tsl_init(&tsl_things_cbs);
-    ez_iot_tsl_reg(NULL, NULL);
+    ez_iot_tsl_reg(NULL);
 
 #if defined(CONFIG_EZIOT_EXAMPLES_DEV_AUTH_MODE_SAP)
     ezos_strncpy(g_dev_subserial, CONFIG_EZIOT_EXAMPLES_DEV_SERIAL_NUMBER, sizeof(g_dev_subserial) - 1);
@@ -215,6 +215,7 @@ static ez_int32_t tsl_action2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_in
 static ez_int32_t tsl_property2cloud(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_info, const ez_tsl_key_t *key_info, ez_tsl_value_t *value_out)
 {
     ez_int32_t rv;
+    size_t length;
     void *p = NULL;
 
     ezlog_w(TAG_APP, "property sync");
@@ -232,6 +233,7 @@ static ez_int32_t tsl_property2cloud(const ez_char_t *sn, const ez_tsl_rsc_t *rs
     }
 
     value_out->type = default_kv_set[index].type;
+    length = (size_t)value_out->size;
 
     if (EZ_TSL_DATA_TYPE_BOOL == value_out->type ||
         EZ_TSL_DATA_TYPE_INT == value_out->type)
@@ -247,12 +249,16 @@ static ez_int32_t tsl_property2cloud(const ez_char_t *sn, const ez_tsl_rsc_t *rs
         p = value_out->value;
     }
 
-    rv = ezos_kv_raw_get(key_info->key, p, (ez_size_t *)&value_out->size);
-    if (EZ_KV_ERR_SUCC != rv || 0 == value_out->size)
+    rv = ezos_kv_raw_get(key_info->key, p, &length);
+    if (EZ_KV_ERR_SUCC != rv || 0 == length)
     {
         ezos_memcpy(p, default_kv_set[index].kv.value, default_kv_set[index].kv.value_len);
         value_out->size = default_kv_set[index].kv.value_len;
         rv = 0;
+    }
+    else
+    {
+        value_out->size = length;
     }
 
     return rv;
