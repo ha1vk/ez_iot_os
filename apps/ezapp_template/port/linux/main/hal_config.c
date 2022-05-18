@@ -328,11 +328,6 @@ static int kv_raw_get_ex(fdb_kvdb_t db, const char *key, void *value, size_t *le
     struct fdb_blob blob;
 
     size_t read_len = fdb_kv_get_blob(db, key, fdb_blob_make(&blob, value, *length));
-    if (NULL == value)
-    {
-        *length = read_len;
-        return EZ_KV_ERR_SUCC;
-    }
 
     *length = read_len;
     return EZ_KV_ERR_SUCC;

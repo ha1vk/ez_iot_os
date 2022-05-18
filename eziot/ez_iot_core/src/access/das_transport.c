@@ -656,7 +656,7 @@ static void das_message_receive_v3(MessageData *msg_data)
         }
 
         ezlog_d(TAG_CORE, "receive topic:%s, seq:%d", msg_topic, ptr_submsg->msg_seq);
-        ezlog_v(TAG_CORE, "receive payload:%s", ptr_submsg->buf);
+        ezlog_v(TAG_CORE, "receive payload:%s", (ez_char_t*)ptr_submsg->buf);
     } while (0);
 
     /**

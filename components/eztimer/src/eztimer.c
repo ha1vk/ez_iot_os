@@ -85,12 +85,12 @@ ez_int32_t eztimer_init(void)
     }
 
     ezos_memset(&g_list, 0, sizeof(g_list));
-    ezos_thread_create(&g_list.thread, "eztimer", timer_routine, (void *)&g_list, CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE, 13);
-    if (NULL == g_list.thread)
+    if (ezos_thread_create(&g_list.thread, "eztimer", timer_routine, (void *)&g_list, CONFIG_EZIOT_CONPONENT_TIMER_TASK_STACK_SIZE, 13))
     {
         ezos_mutex_unlock(g_status_mutex);
         return -1;
     }
+
     g_list.invalid = ez_true;
     g_list.msec = 100;
     ezlist_init(&g_list.list);

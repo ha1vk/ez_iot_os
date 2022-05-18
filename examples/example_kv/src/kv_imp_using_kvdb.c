@@ -84,16 +84,6 @@ int example_kv_raw_get(const char *key, void *value, size_t *length)
     struct fdb_blob blob;
 
     size_t read_len = fdb_kv_get_blob(&ez_kvdb, key, fdb_blob_make(&blob, value, *length));
-    if (read_len < 0)
-    {
-        return EZ_KV_ERR_READ;
-    }
-
-    if (NULL == value)
-    {
-        *length = read_len;
-        return EZ_KV_ERR_SUCC;
-    }
 
     *length = read_len;
     return EZ_KV_ERR_SUCC;
