@@ -849,6 +849,7 @@ static fdb_err_t del_kv(fdb_kvdb_t db, const char *key, fdb_kv_t old_kv, bool co
 {
     fdb_err_t result = FDB_NO_ERR;
     uint32_t dirty_status_addr;
+    struct fdb_kv kv;
 
 #if (KV_STATUS_TABLE_SIZE >= FDB_DIRTY_STATUS_TABLE_SIZE)
     uint8_t status_table[KV_STATUS_TABLE_SIZE];
@@ -858,7 +859,6 @@ static fdb_err_t del_kv(fdb_kvdb_t db, const char *key, fdb_kv_t old_kv, bool co
 
     /* need find KV */
     if (!old_kv) {
-        struct fdb_kv kv;
         /* find KV */
         if (find_kv(db, key, &kv)) {
             old_kv = &kv;
