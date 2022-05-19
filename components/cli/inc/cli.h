@@ -1,7 +1,7 @@
 #ifndef AOS_CLI_H
 #define AOS_CLI_H
 
-#include "ezos_gconfig.h"
+#include "ezos_config.h"
 #include "ezos_libc.h"
 
 #define CONFIG_AOS_CLI

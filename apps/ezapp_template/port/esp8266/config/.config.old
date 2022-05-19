@@ -49,7 +49,7 @@ CONFIG_EZIOT_TSL_DOWNLOAD_STACK_SIZE=5020
 # os/bsp configuration
 #
 CONFIG_EZIOT_OS_ENABLE=y
-CONFIG_EZIOT_OS_BSP_ROOT=""
+CONFIG_EZIOT_OS_BSP_ROOT="/opt/esp_sdk/ESP8266_RTOS_SDK"
 # end of os/bsp configuration
 
 #

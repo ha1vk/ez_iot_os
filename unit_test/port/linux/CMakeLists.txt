@@ -14,7 +14,7 @@ SET(ENV_LIB_PATH ${ENV_EZOS_PATH}/platform/bsp/${ENV_PROJECT_NAME}/build)
 SET(ENV_COMPONENT_PATH ${ENV_EZOS_PATH}/components)
 SET(ENV_EZIOT_PATH ${ENV_EZOS_PATH}/eziot)
 
-include(${ENV_CONFIG_PATH}/ezos_gconfig.cmake)
+include(${ENV_CONFIG_PATH}/ezos_config.cmake)
 ###############################################
 
 ############### Config toolchain ##############

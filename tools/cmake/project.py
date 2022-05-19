@@ -108,8 +108,8 @@ config_content += '\n'
 if update_config and config_content != config_content_old:
     with open(config_filename, "w") as f:
         f.write(config_content)
-    if os.path.exists("build/config/ezos_gconfig.mk"):
-        os.remove("build/config/ezos_gconfig.mk")
+    if os.path.exists("build/config/ezos_config.mk"):
+        os.remove("build/config/ezos_config.mk")
     print("generate config file at: {}".format(config_filename))
 
 # config

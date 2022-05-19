@@ -20,7 +20,7 @@
 #ifdef CONFIG_EZIOT_OS_RT
 #include <rtthread.h>
 #else
-#include <ezos_gconfig.h>
+#include <ezos_config.h>
 #endif
 
 #include <ezos_def.h>

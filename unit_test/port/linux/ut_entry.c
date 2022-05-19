@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ezos_gconfig.h"
+#include "ezos_config.h"
 #include "utest.h"
 
 int main(int argc, char **argv)

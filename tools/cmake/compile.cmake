@@ -105,9 +105,9 @@ function(register_component)
 
     # Add global config include
     if(${include_type} STREQUAL INTERFACE)
-        target_include_directories(${component_name} INTERFACE ${ezos_gconfig_dir})
+        target_include_directories(${component_name} INTERFACE ${ezos_config_dir})
     else()
-        target_include_directories(${component_name} PUBLIC ${ezos_gconfig_dir})
+        target_include_directories(${component_name} PUBLIC ${ezos_config_dir})
     endif()
 
     # Add requirements
@@ -307,9 +307,9 @@ macro(do_lib_building name)
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
-                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
-                        --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
-                        --output header ${PROJECT_PATH}/config/ezos_gconfig.h
+                        --output makefile ${PROJECT_PATH}/config/ezos_config.mk
+                        --output cmake  ${PROJECT_PATH}/config/ezos_config.cmake
+                        --output header ${PROJECT_PATH}/config/ezos_config.h
                         )
 
     set(generate_config_cmd_gui ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
@@ -321,9 +321,9 @@ macro(do_lib_building name)
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
-                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
-                        --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
-                        --output header ${PROJECT_PATH}/config/ezos_gconfig.h
+                        --output makefile ${PROJECT_PATH}/config/ezos_config.mk
+                        --output cmake  ${PROJECT_PATH}/config/ezos_config.cmake
+                        --output header ${PROJECT_PATH}/config/ezos_config.h
                         )
 
     execute_process(COMMAND ${generate_config_cmd} RESULT_VARIABLE cmd_res)
@@ -333,8 +333,8 @@ macro(do_lib_building name)
     endif()
 
     # Include confiurations
-    set(ezos_gconfig_dir "${PROJECT_PATH}/config")
-    include(${ezos_gconfig_dir}/ezos_gconfig.cmake)
+    set(ezos_config_dir "${PROJECT_PATH}/config")
+    include(${ezos_config_dir}/ezos_config.cmake)
     if(WIN32)
         set(EXT ".exe")
         set(DL_EXT ".dll")
@@ -436,9 +436,9 @@ macro(do_lib_building name)
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
-                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
-                        --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
-                        --output header ${PROJECT_PATH}/config/ezos_gconfig.h
+                        --output makefile ${PROJECT_PATH}/config/ezos_config.mk
+                        --output cmake  ${PROJECT_PATH}/config/ezos_config.cmake
+                        --output header ${PROJECT_PATH}/config/ezos_config.h
                         --addkv "ADD_EZOS_INC_DIRS" ${g_ezos_inc_dirs}
                         --addkv "ADD_EZOS_LIB_DIRS" ${g_ezos_lib_dirs}
                         --addkv "ADD_EZOS_LIB_DEPENS" ${g_ezos_lib_depens}
@@ -569,9 +569,9 @@ macro(do_project_building name)
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
-                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
-                        --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
-                        --output header ${PROJECT_PATH}/config/ezos_gconfig.h
+                        --output makefile ${PROJECT_PATH}/config/ezos_config.mk
+                        --output cmake  ${PROJECT_PATH}/config/ezos_config.cmake
+                        --output header ${PROJECT_PATH}/config/ezos_config.h
                         )
 
     set(generate_config_cmd_gui ${python}  ${EZOS_PATH}/tools/kconfig/genconfig.py
@@ -583,9 +583,9 @@ macro(do_project_building name)
                         --env "PROJECT_PATH=${PROJECT_SOURCE_DIR}"
                         --env "PROJECT_NAME=${PROJECT_NAME}"
                         --output config ${PROJECT_PATH}/config/.config
-                        --output makefile ${PROJECT_PATH}/config/ezos_gconfig.mk
-                        --output cmake  ${PROJECT_PATH}/config/ezos_gconfig.cmake
-                        --output header ${PROJECT_PATH}/config/ezos_gconfig.h
+                        --output makefile ${PROJECT_PATH}/config/ezos_config.mk
+                        --output cmake  ${PROJECT_PATH}/config/ezos_config.cmake
+                        --output header ${PROJECT_PATH}/config/ezos_config.h
                         )
 
     execute_process(COMMAND ${generate_config_cmd} RESULT_VARIABLE cmd_res)
@@ -594,8 +594,8 @@ macro(do_project_building name)
     endif()
 
     # Include confiurations
-    set(ezos_gconfig_dir "${PROJECT_PATH}/config")
-    include(${ezos_gconfig_dir}/ezos_gconfig.cmake)
+    set(ezos_config_dir "${PROJECT_PATH}/config")
+    include(${ezos_config_dir}/ezos_config.cmake)
     if(WIN32)
         set(EXT ".exe")
         set(DL_EXT ".dll")

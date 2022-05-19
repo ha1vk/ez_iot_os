@@ -1,4 +1,4 @@
-#include <ezos_gconfig.h>
+#include <ezos_config.h>
 #include <ezos_kv.h>
 #include <ezos_libc.h>
 
