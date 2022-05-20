@@ -52,13 +52,8 @@ typedef unsigned long   EZ_ULONG;
 typedef float           EZ_FLOAT;
 typedef double          EZ_DOUBLE;
 
-#if defined(ARCH_CPU_64BIT) || defined(_WIN64)
 typedef long unsigned int EZ_SIZE;
 typedef long int EZ_SSIZE;
-#else
-typedef unsigned int      EZ_SIZE;
-typedef int      EZ_SSIZE;
-#endif
 
 typedef int         EZ_BOOL;
 typedef int         EZ_ERR;

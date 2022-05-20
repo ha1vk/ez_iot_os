@@ -7,7 +7,7 @@ extern int ez_cloud_init();
 static int ez_cloud_ota_init();
 
 static ez_int32_t ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, ez_void_t *data, ez_int32_t len);
-static ez_int32_t download_data_cb(ez_int32_t total_len, ez_int32_t offset, ez_void_t *data, ez_int32_t len, ez_void_t *user_data);
+static ez_int32_t download_data_cb(ez_uint32_t total_len, ez_uint32_t offset, ez_void_t *data, ez_uint32_t len, ez_void_t *user_data);
 static ez_void_t download_result_cb(ez_ota_cb_result_e result, ez_void_t *user_data);
 static ez_void_t show_upgrade_info(ez_ota_upgrade_info_t *upgrade_infos);
 
@@ -109,7 +109,7 @@ static ez_int32_t ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, ez_
     return rv;
 }
 
-static ez_int32_t download_data_cb(ez_int32_t total_len, ez_int32_t offset, ez_void_t *data, ez_int32_t len, ez_void_t *user_data)
+static ez_int32_t download_data_cb(ez_uint32_t total_len, ez_uint32_t offset, ez_void_t *data, ez_uint32_t len, ez_void_t *user_data)
 {
     ez_ota_res_t pres = {0};
     ez_int16_t progress = ((offset + len) * (100 / 2) / total_len);
