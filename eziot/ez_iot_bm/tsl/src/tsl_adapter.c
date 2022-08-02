@@ -101,7 +101,6 @@ static ez_int32_t tsl_action_process(ez_kernel_submsg_v3_t *submsg)
 
     strip_msg_wrap(submsg->buf, &value_in);
     rv = g_tsl_things_cbs.action2dev(submsg->sub_serial, &rsc_info, &key_info, &value_in, &value_out);
-    CHECK_RV_DONE(rv);
 
     rsp_buf = assemble_rsp_code_msg(rv, &value_out);
     CHECK_COND_DONE(NULL == rsp_buf, EZ_TSL_ERR_MEMORY);
@@ -137,6 +136,64 @@ done:
         EZ_TSL_DATA_TYPE_OBJECT == value_out.type)
     {
         SAFE_FREE(value_out.value);
+    }
+
+    return rv;
+}
+
+static ez_int32_t tsl_attribute_process(ez_kernel_submsg_v3_t *submsg)
+{
+    ez_int32_t rv = -1;
+    ez_char_t *rsp_buf = NULL;
+    ez_char_t domain[32] = {0};
+    ez_char_t identifier[32] = {0};
+
+    ez_tsl_rsc_t rsc_info = {.res_type = submsg->resource_type, .local_index = submsg->resource_id};
+    ez_tsl_key_t key_info = {.domain = domain, .key = identifier};
+    ez_tsl_value_t value_in = {0};
+    value_in.type = EZ_TSL_DATA_TYPE_NULL;
+    ez_kernel_pubmsg_v3_t pubmsg = {0};
+
+    ezlog_i(TAG_TSL, "seq in: %d", submsg->msg_seq);
+
+    // example "domain/identifier"
+    ez_int32_t num = ezos_sscanf(submsg->ext_msg, "%32[^/]/%s", domain, identifier);
+    if (2 != num)
+    {
+        ezlog_e(TAG_TSL, "tsl key is illegal., msg:%s", submsg->ext_msg);
+        goto done;
+    }
+
+    strip_msg_wrap(submsg->buf, &value_in);
+    rv = g_tsl_things_cbs.property2dev(submsg->sub_serial, &rsc_info, &key_info, &value_in);
+
+    rsp_buf = assemble_rsp_code_msg(rv, NULL);
+    CHECK_COND_DONE(NULL == rsp_buf, EZ_TSL_ERR_MEMORY);
+
+    pubmsg.msg_response = 1;
+    pubmsg.msg_qos = QOS_T1;
+    pubmsg.msg_seq = submsg->msg_seq;
+    pubmsg.msg_body = rsp_buf;
+    pubmsg.msg_body_len = ezos_strlen(rsp_buf);
+
+    ezos_strncpy(pubmsg.resource_type, rsc_info.res_type, sizeof(pubmsg.resource_type) - 1);
+    ezos_strncpy(pubmsg.resource_id, rsc_info.local_index, sizeof(pubmsg.resource_id) - 1);
+    ezos_strncpy(pubmsg.module, TSL_MODULE_NAME, sizeof(pubmsg.module) - 1);
+    ezos_strncpy(pubmsg.method, TSL_ATTRIBUTE_METHOD_NAME, sizeof(pubmsg.module) - 1);
+    ezos_strncpy(pubmsg.msg_type, TSL_MSG_TYPE_SET_REPLY, sizeof(pubmsg.msg_type) - 1);
+    ezos_strncpy(pubmsg.ext_msg, submsg->ext_msg, sizeof(pubmsg.ext_msg) - 1);
+    ezos_strncpy(pubmsg.sub_serial, submsg->sub_serial, sizeof(pubmsg.sub_serial) - 1);
+
+    CHECK_COND_DONE(ez_kernel_send_v3(&pubmsg), EZ_TSL_ERR_GENERAL);
+
+done:
+    SAFE_FREE(rsp_buf);
+
+    if (EZ_TSL_DATA_TYPE_STRING == value_in.type ||
+        EZ_TSL_DATA_TYPE_ARRAY == value_in.type ||
+        EZ_TSL_DATA_TYPE_OBJECT == value_in.type)
+    {
+        SAFE_FREE(value_in.value);
     }
 
     return rv;
@@ -714,7 +771,7 @@ static void tsl_data_route_cb(ez_kernel_submsg_v3_t *psub_msg)
     }
     else if (0 == ezos_strcmp(psub_msg->method, TSL_ATTRIBUTE_METHOD_NAME))
     {
-        ezlog_e(TAG_TSL, "attr not support.");
+        tsl_attribute_process(psub_msg);
     }
 }
 
