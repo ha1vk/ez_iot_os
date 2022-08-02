@@ -227,9 +227,6 @@ EZOS_API ez_err_t ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
     CHECK_COND_DONE(!pubmsg->msg_body, EZ_CORE_ERR_PARAM_INVALID);
     CHECK_COND_DONE(!pubmsg->msg_body_len, EZ_CORE_ERR_PARAM_INVALID);
 
-    ezlog_i(TAG_CORE, "domain:%d ,cmd:%d, seq:%d, len:%d, data:%s", pubmsg->msg_domain_id,
-            pubmsg->msg_command_id, pubmsg->msg_seq, pubmsg->msg_body_len, pubmsg->msg_body);
-
     CHECK_COND_DONE(pubmsg->msg_body_len > CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX, EZ_CORE_ERR_OUT_RANGE);
 
     cRiskResult = check_cmd_risk_control(&g_ezdev_sdk_kernel, pubmsg->msg_domain_id, pubmsg->msg_command_id);
@@ -260,6 +257,9 @@ EZOS_API ez_err_t ez_kernel_send(ez_kernel_pubmsg_t *pubmsg)
         pubmsg->msg_seq = genaral_seq();
         new_pubmsg_exchange->msg_conntext.msg_seq = pubmsg->msg_seq;
     }
+
+    ezlog_w(TAG_CORE, "s: %d, seq:%d", pubmsg->msg_command_id, pubmsg->msg_seq);
+    ezlog_d(TAG_CORE, "len:%d, payload:%s", pubmsg->msg_body_len, pubmsg->msg_body);
 
     if (NULL != pubmsg->externel_ctx && 0 != pubmsg->externel_ctx_len)
     {
@@ -331,9 +331,6 @@ EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
     CHECK_COND_DONE(!pubmsg->msg_body, EZ_CORE_ERR_PARAM_INVALID);
     CHECK_COND_DONE(!pubmsg->msg_body_len, EZ_CORE_ERR_PARAM_INVALID);
 
-    ezlog_d(TAG_CORE, "module:%s, resource_type:%s, msg_type:%s, method:%s, seq:%d, len:%d",
-            pubmsg->resource_type, pubmsg->msg_type, pubmsg->method, pubmsg->ext_msg, pubmsg->msg_body_len, pubmsg->msg_seq);
-
     CHECK_COND_DONE(pubmsg->msg_body_len > CONFIG_EZIOT_CORE_MESSAGE_SIZE_MAX, EZ_CORE_ERR_OUT_RANGE);
 
     new_pubmsg_exchange = (ezdev_sdk_kernel_pubmsg_exchange_v3 *)ezos_malloc(sizeof(ezdev_sdk_kernel_pubmsg_exchange_v3));
@@ -354,6 +351,9 @@ EZOS_API ez_err_t ez_kernel_send_v3(ez_kernel_pubmsg_v3_t *pubmsg)
     {
         pubmsg->msg_seq = genaral_seq();
     }
+
+    ezlog_w(TAG_CORE, "s3:%s, seq:%d", pubmsg->ext_msg, pubmsg->msg_seq);
+    ezlog_d(TAG_CORE, "resource_id:%s, resource_type:%s, business_type:%s, payload:%s", pubmsg->resource_id, pubmsg->resource_type, pubmsg->method, pubmsg->msg_body);
 
     new_pubmsg_exchange->msg_conntext_v3.msg_body = (ez_char_t *)ezos_malloc(pubmsg->msg_body_len);
     CHECK_COND_DONE(!new_pubmsg_exchange->msg_conntext_v3.msg_body, EZ_CORE_ERR_MEMORY);

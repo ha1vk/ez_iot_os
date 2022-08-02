@@ -315,7 +315,7 @@ static ez_int32_t shadow_proc_do()
         if (g_shadow_status < shadow_core_status_max - 1)
         {
             ret = 2;
-            ezlog_w(TAG_SHD, "status chg++, %d", g_shadow_status++);
+            ezlog_w(TAG_SHD, "sta:%d", ++g_shadow_status);
         }
         shadow_module_unlock();
     }
@@ -402,7 +402,7 @@ static ez_void_t check_status_update()
     g_need_reset = ez_false;
     g_need_sync = ez_false;
     g_need_report = ez_false;
-    ezlog_w(TAG_SHD, "status chg, %d to %d", g_shadow_status, status_chg);
+    ezlog_d(TAG_SHD, "status chg, %d to %d", g_shadow_status, status_chg);
     g_shadow_status = (shadow_core_status_e)status_chg;
     shadow_module_unlock();
 }
@@ -501,7 +501,7 @@ static ez_int32_t shadow_proc_sync()
     node_index_set_t *pnode_index_set = NULL;
     node_index_t *pnode_index = NULL;
 
-    ezlog_w(TAG_SHD, "func sync");
+    ezlog_w(TAG_SHD, "sync");
 
     shadow_module_lock();
 
@@ -731,7 +731,7 @@ static ez_int32_t do_report(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t in
             ezos_memset(tlv.value, 0, SHADOW_PUSH_BUF_MAX);
             if (0 != node_key->dev2cloud(&tlv, &stGenParam))
             {
-                ezlog_e(TAG_SHD, "dev2cloud cb err");
+                ezlog_d(TAG_SHD, "dev2cloud cb err");
                 node_key->need_report = 0;
                 break;
             }
@@ -745,6 +745,7 @@ static ez_int32_t do_report(ez_char_t *devsn, ez_char_t *res_type, ez_int32_t in
         }
 
         ez_uint32_t seq = 0;
+        ezlog_w(TAG_SHD, "rp: %s", node_key->key);
         if (shadow_protocol_report(devsn, res_type, index, domain, node_key->key, json_value, node_key->stat_ver, &seq))
         {
             ezlog_e(TAG_SHD, "report v3:%d", rv);

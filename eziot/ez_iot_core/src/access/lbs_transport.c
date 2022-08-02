@@ -1654,15 +1654,14 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
         result_ = net_connect(authi_affair->socket_fd, sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_port, 5 * 1000, szRealIp);
         if (result_ != mkernel_internal_succ)
         {
-            ezlog_w(TAG_CORE, "lbs_connect net_work_connect host error, server:%s, ip:%s, port:%d", sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_ip, sdk_kernel->server_info.server_port);
-
+            ezlog_w(TAG_CORE, "lbs c1, code:%d, ip:%s", result_, sdk_kernel->server_info.server_ip);
             net_disconnect(authi_affair->socket_fd);
             authi_affair->socket_fd = -1;
 
             authi_affair->socket_fd = net_create(NULL);
             if (authi_affair->socket_fd == -1)
             {
-                ezlog_e(TAG_CORE, "lbs_connect net_work_create error");
+                ezlog_e(TAG_CORE, "lbs_connect create err2");
                 result_ = mkernel_internal_net_connect_error;
                 break;
             }
@@ -1675,7 +1674,7 @@ static mkernel_internal_error lbs_connect(ezdev_sdk_kernel *sdk_kernel, lbs_affa
             result_ = net_connect(authi_affair->socket_fd, sdk_kernel->server_info.server_ip, sdk_kernel->server_info.server_port, 5 * 1000, szRealIp);
             if (result_ != mkernel_internal_succ)
             {
-                ezlog_e(TAG_CORE, "lbs_connect net_work_connect ip error, server:%s, ip:%s, port:%d", sdk_kernel->server_info.server_name, sdk_kernel->server_info.server_ip, sdk_kernel->server_info.server_port);
+                ezlog_e(TAG_CORE, "lbs c2, code:%d, ip:%s", result_, sdk_kernel->server_info.server_ip);
                 if (mkernel_internal_net_gethostbyname_error != result_)
                 {
                     result_ = mkernel_internal_net_connect_error;

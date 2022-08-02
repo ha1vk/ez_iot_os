@@ -172,6 +172,7 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel *sdk_kernel)
             ezos_memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
             ezos_memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
             ezos_memcpy(context.lbs_domain, sdk_kernel->server_info.server_name, ezdev_sdk_ip_max_len);
+            ezlog_w(TAG_CORE, "switchover");
             broadcast_user_event(SDK_KERNEL_EVENT_SWITCHOVER, (void *)&context, sizeof(context));
             sdk_kernel->entr_state = sdk_entrance_normal;
         }
@@ -186,6 +187,7 @@ static mkernel_internal_error cnt_das_reg_do(ezdev_sdk_kernel *sdk_kernel)
             ezos_memcpy(context.session_key, sdk_kernel->session_key, ezdev_sdk_sessionkey_len);
             ezos_memcpy(context.das_domain, sdk_kernel->redirect_das_info.das_domain, ezdev_sdk_ip_max_len);
             ezos_memcpy(context.das_serverid, sdk_kernel->redirect_das_info.das_serverid, ezdev_sdk_ip_max_len);
+            ezlog_w(TAG_CORE, "online");
             broadcast_user_event(SDK_KERNEL_EVENT_ONLINE, (void *)&context, sizeof(context));
         }
     }
@@ -249,7 +251,7 @@ static mkernel_internal_error cnt_das_retry_do(ezdev_sdk_kernel *sdk_kernel)
             context.last_error = sdk_error;
             ezos_memcpy(context.das_ip, sdk_kernel->redirect_das_info.das_address, ezdev_sdk_ip_max_len);
             ezos_memcpy(context.lbs_ip, sdk_kernel->server_info.server_ip, ezdev_sdk_ip_max_len);
-            ezlog_e(TAG_CORE, "broadcast_user_event, sdk_kernel_event_break, code:%d", sdk_error);
+            ezlog_e(TAG_CORE, "offline");
             broadcast_user_event(SDK_KERNEL_EVENT_BREAK, (void *)&context, sizeof(context));
 
             sdk_kernel->cnt_state = sdk_cnt_unredirect;
@@ -322,7 +324,7 @@ mkernel_internal_error access_server_yield(ezdev_sdk_kernel *sdk_kernel)
         sdk_kernel->cnt_state = sdk_cnt_unredirect;
         sdk_kernel->lbs_redirect_times = 0;
         sdk_kernel->das_retry_times = 0;
-        ezlog_w(TAG_CORE, "das need redirect, code:%d", sdk_error);
+        ezlog_e(TAG_CORE, "das need redirect, code:%d", sdk_error);
     }
 
     return sdk_error;

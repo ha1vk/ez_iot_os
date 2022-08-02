@@ -140,7 +140,7 @@ mkernel_internal_error ezdev_generate_masterkey(mbedtls_ecdh_context* ctx_client
     {
         if(ctx_client == NULL||peer_pubkey== NULL||masterkey==NULL|| masterkey_len==NULL||peer_pubkey_len != ezdev_sdk_ecdh_key_len)
         {
-            ezlog_w(TAG_CORE, "generate_master_key input param error,len:%d",peer_pubkey_len);
+            ezlog_w(TAG_CORE, "gen master key invalid param, len:%d",peer_pubkey_len);
             sdk_error = mkernel_internal_input_param_invalid;
             break;
         }
@@ -149,14 +149,14 @@ mkernel_internal_error ezdev_generate_masterkey(mbedtls_ecdh_context* ctx_client
         ret = mbedtls_ecdh_read_public(ctx_client, input_key, ezdev_sdk_ecdh_key_len + 1);
         if(ret!=0)
         {
-            ezlog_w(TAG_CORE, "mbedtls_ecdh_read_public error,ret:%d", ret);
+            ezlog_w(TAG_CORE, "ec read_public error,ret:%d", ret);
             sdk_error = mkernel_internal_mbedtls_ecdh_read_public_err;
             break;
         }
         ret = mbedtls_ecdh_calc_secret(ctx_client, &master_key_len, masterkey, 1000, &rnd_pseudo_rand, &rnd_info );
         if(ret!=0)
         {
-            ezlog_w(TAG_CORE, "mbedtls_ecdh_calc_secret error,ret:%d", ret);
+            ezlog_e(TAG_CORE, "ec calc_secret err,ret:%d", ret);
             sdk_error = mkernel_internal_mbedtls_ecdh_calc_secret_err;
             break;
         }

@@ -295,6 +295,8 @@ static void tsl_adapter_shadow_inst(ez_char_t *dev_sn)
                         ezlog_e(TAG_TSL, "shadow register failed.");
                         continue;
                     }
+
+                    ezlog_i(TAG_TSL, "shd reg, id: %s", prop->identifier);
                 }
             }
         }

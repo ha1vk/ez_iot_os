@@ -964,8 +964,7 @@ static mkernel_internal_error das_send_pubmsg_v3(ezdev_sdk_kernel *sdk_kernel, e
                      pubmsg->resource_type, pubmsg->module, pubmsg->method, pubmsg->msg_type);
         }
 
-        ezlog_d(TAG_CORE, "publish topic:%s, seq:%d", publish_topic, pubmsg->msg_seq);
-        ezlog_v(TAG_CORE, "payload:%s", pubmsg->msg_body);
+        ezlog_d(TAG_CORE, "publish_topic:%s", publish_topic);
 
         ezos_memset(&mqtt_msg, 0, sizeof(mqtt_msg));
         mqtt_msg.qos = pubmsg->msg_qos;
@@ -1013,6 +1012,11 @@ static mkernel_internal_error das_send_pubmsg_v3(ezdev_sdk_kernel *sdk_kernel, e
             ezlog_e(TAG_CORE, "mqtt publish error");
             sdk_error = mkernel_internal_call_mqtt_pub_error;
             break;
+        }
+
+        if (mqtt_result_code == 0)
+        {
+            ezlog_w(TAG_CORE, "p: %d", pubmsg->msg_seq);
         }
 
     } while (0);
@@ -1343,6 +1347,7 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
             else
             {
                 sdk_error = mkernel_internal_mqtt_error_begin + mqtt_result_code;
+                ezlog_e(TAG_CORE, "mqtt c");
             }
 
             break;
@@ -1361,9 +1366,10 @@ static mkernel_internal_error das_mqttlogin2das(ezdev_sdk_kernel *sdk_kernel, EZ
     {
         MQTTNetDisconnect(&g_DasNetWork);
         MQTTNetFini(&g_DasNetWork);
+        ezlog_d(TAG_CORE, "mqtt c, ip:%s, port:%d, code:%d", sdk_kernel->redirect_das_info.das_address, sdk_kernel->redirect_das_info.das_port, sdk_error);
     }
 
-    ezlog_d(TAG_CORE, "mqtt connect, ip:%s, port:%d, code:%d", sdk_kernel->redirect_das_info.das_address, sdk_kernel->redirect_das_info.das_port, sdk_error);
+    ezlog_d(TAG_CORE, "mqtt c succ");
     return sdk_error;
 }
 
@@ -1417,7 +1423,6 @@ mkernel_internal_error das_reg(ezdev_sdk_kernel *sdk_kernel)
     if (sdk_error != mkernel_internal_succ)
     {
         das_mqtt_logout2das();
-        ezlog_w(TAG_CORE, "das_reg subscribe error");
     }
 
     ezlog_d(TAG_CORE, "das_reg result:%d", sdk_error);
@@ -1451,7 +1456,6 @@ mkernel_internal_error das_light_reg_v2(ezdev_sdk_kernel *sdk_kernel)
     if (sdk_error != mkernel_internal_succ)
     {
         das_mqtt_logout2das();
-        ezlog_w(TAG_CORE, "das_light_reg_v2 subscribe error");
     }
 
     ezlog_d(TAG_CORE, "das_light_reg result:%d", sdk_error);
@@ -1465,7 +1469,7 @@ mkernel_internal_error das_unreg(ezdev_sdk_kernel *sdk_kernel)
     sdk_error = das_subscribe_revc_topic(sdk_kernel, 0);
     if (sdk_error != mkernel_internal_succ)
     {
-        ezlog_w(TAG_CORE, "das_unreg unsubscribe error");
+        ezlog_d(TAG_CORE, "das_unreg unsubscribe error");
     }
     das_mqtt_logout2das();
     ezlog_i(TAG_CORE, "das_unreg complete");
