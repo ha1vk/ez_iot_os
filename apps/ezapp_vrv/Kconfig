@@ -1,0 +1,22 @@
+config EZIOT_COMPONENT_APP_NAME
+    string "ezapp custom module name"
+    default "ezapp"
+
+config EZIOT_COMPONENT_APP_DEVICE_TYPE
+    string "custom device type(for sap auth mode)"
+    default ""
+
+config EZIOT_COMPONENT_APP_FWV_MAJOR
+    int "The major version of firmware"
+    range 0 9
+    default 1
+
+config EZIOT_COMPONENT_APP_FWV_MINOR
+    int "The minor version of firmware"
+    range 0 9
+    default 0
+
+config EZIOT_COMPONENT_APP_FWV_MICRO
+    int "The micro version of firmware"
+    range 0 9
+    default 0
