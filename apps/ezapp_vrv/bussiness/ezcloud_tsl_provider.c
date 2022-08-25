@@ -9,19 +9,19 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
- * 
+ *
  * Contributors:
  * XuRongjun (xurongjun@ezvizlife.com) - Device Thing Specification Language Protocol
  *
  * Change Logs:
  * Date           Author       Notes
- * 2022-03-22     xurongjun    first version 
+ * 2022-03-22     xurongjun    first version
  *******************************************************************************/
 
 #include "ezcloud_tsl_provider.h"
 #include "ezcloud_tsl_control.h"
 #include "ezcloud_tsl_aircondition.h"
-#include "ezcloud_tsl_freshair.h"
+#include "ezcloud_tsl_airfresh.h"
 #include "hal_config.h"
 #include "ezlog.h"
 #include "cJSON.h"
@@ -33,13 +33,18 @@ tsl_prop_impl_t g_tsl_prop_lst[] = {
 
     // 动态资源 - 空调
     {"PowerSwitch", "PowerMgr", "AirCondition", NULL, aircondition_property_PowerSwitch_set, aircondition_property_PowerSwitch_get},
-    {"PowerSwitchCountdown", "PowerMgr", "AirCondition", NULL, aircondition_property_PowerSwitchCountdown_set, aircondition_property_PowerSwitchCountdown_get},
+    {"CountdownCfg", "LightCtrl", "AirCondition", NULL, aircondition_property_CountdownCfg_set, aircondition_property_CountdownCfg_get},
     {"Temperature", "AirConditionCtrl", "AirCondition", NULL, aircondition_property_Temperature_set, aircondition_property_Temperature_get},
     {"ACException", "AirConditionCtrl", "AirCondition", NULL, NULL, aircondition_property_ACException_get},
     {"RoomTemperature", "AirConditionCtrl", "AirCondition", NULL, aircondition_property_RoomTemperature_set, aircondition_property_RoomTemperature_get},
     {"WindSpeedLevel", "AirConditionCtrl", "AirCondition", NULL, aircondition_property_WindSpeedLevel_set, aircondition_property_WindSpeedLevel_get},
     {"WorkMode", "AirConditionCtrl", "AirCondition", NULL, aircondition_property_WorkMode_set, aircondition_property_WorkMode_get},
-    {"OutsideMachineWorkMode", "AirConditionCtrl", "AirCondition", NULL, aircondition_property_OutsideMachineWorkMode_set, aircondition_property_OutsideMachineWorkMode_get},
+
+    // 动态资源 - 新风机
+    {"PowerSwitch", "PowerMgr", "AirFresh", NULL, airfresh_property_PowerSwitch_set, airfresh_property_PowerSwitch_get},
+    {"CountdownCfg", "LightCtrl", "AirFresh", NULL, airfresh_property_CountdownCfg_set, airfresh_property_CountdownCfg_get},
+    {"WindSpeedLevel", "AirConditionCtrl", "AirFresh", NULL, airfresh_property_WindSpeedLevel_set, airfresh_property_WindSpeedLevel_get},
+    {"WorkMode", "AirConditionCtrl", "AirFresh", NULL, airfresh_property_WorkMode_set, airfresh_property_WorkMode_get},
 
     {NULL, NULL, NULL, NULL, NULL, NULL},
 };

@@ -9,13 +9,13 @@
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *   http://www.eclipse.org/org/documents/edl-v10.php.
- * 
+ *
  * Contributors:
  * XuRongjun (xurongjun@ezvizlife.com) - 空调物模型协议接口声明
  *
  * Change Logs:
  * Date           Author       Notes
- * 2022-07-27     xurongjun    first version 
+ * 2022-07-27     xurongjun    first version
  *******************************************************************************/
 
 #include <ezos.h>
@@ -34,22 +34,20 @@ extern "C"
 
     // 属性获取
     ez_int32_t aircondition_property_PowerSwitch_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
-    ez_int32_t aircondition_property_PowerSwitchCountdown_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
+    ez_int32_t aircondition_property_CountdownCfg_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_Temperature_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_ACException_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_RoomTemperature_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_WindSpeedLevel_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_WorkMode_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
-    ez_int32_t aircondition_property_OutsideMachineWorkMode_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value);
 
     // 属性下发
     ez_int32_t aircondition_property_PowerSwitch_set(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, const ez_tsl_value_t *tsl_value);
-    ez_int32_t aircondition_property_PowerSwitchCountdown_set(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, const ez_tsl_value_t *tsl_value);
+    ez_int32_t aircondition_property_CountdownCfg_set(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, const ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_Temperature_set(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, const ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_RoomTemperature_set(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, const ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_WindSpeedLevel_set(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, const ez_tsl_value_t *tsl_value);
     ez_int32_t aircondition_property_WorkMode_set(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, const ez_tsl_value_t *tsl_value);
-    ez_int32_t aircondition_property_OutsideMachineWorkMode_set(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, const ez_tsl_value_t *tsl_value);
 
 #ifdef __cplusplus
 }
