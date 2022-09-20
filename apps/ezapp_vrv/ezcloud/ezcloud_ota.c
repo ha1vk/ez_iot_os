@@ -52,6 +52,13 @@ static ez_int32_t download_data_cb(ez_uint32_t total_len, ez_uint32_t offset, ez
 
     if (0 == offset)
     {
+        rv = hal_ota_begin(total_len);
+        if (OTA_CODE_NONE != rv)
+        {
+            ezlog_e(TAG_APP, "ota begin err, rv = :%d", rv);
+            goto done;
+        }
+
         last_progress = 0;
         mbedtls_md5_init(&package_ctx->degist_ctx);
         mbedtls_md5_starts(&package_ctx->degist_ctx);
@@ -219,12 +226,6 @@ static ez_int32_t ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, ez_
         is_upgrading = ez_true;
         show_upgrade_info(upgrade_infos);
 
-        rv = hal_ota_begin(upgrade_infos->pota_files->size);
-        if (OTA_CODE_NONE != rv)
-        {
-            break;
-        }
-
         rv = ota_download_fun(upgrade_infos, 0);
         if (0 != rv)
         {
@@ -242,8 +243,8 @@ static ez_int32_t ota_event_notify(ez_ota_res_t *pres, ez_ota_event_e event, ez_
     }
     else
     {
+        ezlog_e(TAG_APP, "ota do err, rv = :%d", rv);
         is_upgrading = ez_false;
-        ezlog_e(TAG_APP, "ota begin err, rv = :%d", rv);
     }
 
     return rv;
