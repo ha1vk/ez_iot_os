@@ -36,6 +36,13 @@ extern "C"
     ez_void_t ezcloud_link_start(ez_void_t);
 
     /**
+     * @brief get device bind status
+     * 
+     * @return
+     */
+    ez_bool_t ezcloud_base_bind_status(ez_void_t);
+
+    /**
      * @brief 重置所有属性
      * 
      * @return ez_void_t 

@@ -53,6 +53,10 @@ extern "C"
 
     ez_int32_t provider_dynamic_rsc_query(const ez_char_t *res_type, ez_char_t index_lst[][4], ez_int32_t max_count);
 
+    ez_void_t provider_dynamic_rsc_report(ez_void_t);
+
+    ez_void_t provider_dynamic_rsc_reset(ez_void_t);
+
     extern tsl_prop_impl_t g_tsl_prop_lst[];
     extern tsl_action_impl_t g_tsl_action_lst[];
 #ifdef __cplusplus

@@ -180,4 +180,7 @@ ez_void_t ezcloud_tsl_init(ez_void_t)
 ez_void_t ezcloud_tsl_prop_reset(ez_void_t)
 {
     //do nothing
+
+    /* 临时逻辑兼容，绑定清空关联资源 */
+    provider_dynamic_rsc_reset();
 }

@@ -104,6 +104,31 @@ done:
     return count;
 }
 
+ez_void_t provider_dynamic_rsc_report(ez_void_t)
+{
+    tsl_prop_impl_t ctx = {"Resources", "DynamicResource", "global", "0", NULL, control_property_Resource_get};
+    ez_tsl_rsc_t rsc_info = {ctx.res_type, ctx.index};
+    ez_tsl_key_t key_info = {ctx.domain, ctx.identify};
+
+    // 上报更新属性
+    ez_iot_tsl_property_report(dev_info_get_sn(), &rsc_info, &key_info, NULL);
+}
+
+ez_void_t provider_dynamic_rsc_reset(ez_void_t)
+{
+    tsl_prop_impl_t ctx = {"Resources", "DynamicResource", "global", "0", NULL, control_property_Resource_get};
+    ez_tsl_rsc_t rsc_info = {ctx.res_type, ctx.index};
+    ez_tsl_key_t key_info = {ctx.domain, ctx.identify};
+    ez_char_t *_defval = "[{\"rc\":\"AirCondition\",\"rid\":\"AirCondition\",\"index\":[]},{\"rc\":\"AirFresh\",\"rid\":\"AirFreshRes\",\"index\":[]}]";
+
+    // 保存至flash
+    ez_tsl_value_t tsl_value = {.type = EZ_TSL_DATA_TYPE_ARRAY, .size = ezos_strlen(_defval), .value = _defval};
+    property_set_wrapper(&ctx, &rsc_info, &tsl_value);
+
+    // 上报更新属性
+    ez_iot_tsl_property_report(dev_info_get_sn(), &rsc_info, &key_info, NULL);
+}
+
 #ifdef CONFIG_EZIOT_COMPONENT_CLI_ENABLE
 #include "cli.h"
 

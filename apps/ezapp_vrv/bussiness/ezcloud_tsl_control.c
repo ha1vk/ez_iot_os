@@ -1,6 +1,7 @@
 #include <ezlog.h>
 #include "ezcloud_tsl_control.h"
 #include "ezcloud_tsl_storage.h"
+#include "ezcloud_link.h"
 
 #ifdef CONFIG_EZIOT_COMPONENT_CLI_ENABLE
 #include "cli.h"
@@ -10,7 +11,12 @@
 ez_int32_t control_property_Resource_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc_t *rsc_info, ez_tsl_value_t *tsl_value)
 {
     ez_int32_t rv = -1;
-    ez_char_t *_defval = "[{\"rc\":\"AirCondition\",\"rid\":\"AirCondition\",\"index\":[\"1\",\"2\"]},{\"rc\":\"AirFresh\",\"rid\":\"AirFreshRes\",\"index\":[\"130\"]}]";
+    ez_char_t *_defval = "[{\"rc\":\"AirCondition\",\"rid\":\"AirCondition\",\"index\":[]},{\"rc\":\"AirFresh\",\"rid\":\"AirFreshRes\",\"index\":[]}]";
+
+    if (!ezcloud_base_bind_status())
+    {
+        goto done;
+    }
 
     // sample1 两个空调: [{\"rc\":\"AirCondition\",\"rid\":\"AirCondition\",\"index\":[\"1\",\"2\"]}]
     // sample2 一个新风: [{\"rc\":\"AirFresh\",\"rid\":\"AirFreshRes\",\"index\":[\"1\"]}]
@@ -18,6 +24,7 @@ ez_int32_t control_property_Resource_get(tsl_prop_impl_t *thiz, const ez_tsl_rsc
 
     property_get_wrapper(thiz, rsc_info, tsl_value, EZ_TSL_DATA_TYPE_ARRAY, _defval);
 
+done:
     rv = EZ_TSL_ERR_SUCC;
     return rv;
 }

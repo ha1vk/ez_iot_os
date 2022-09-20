@@ -24,6 +24,7 @@
 #include "network.h"
 #include "ezcloud_link.h"
 #include "hal_config.h"
+#include "ezcloud_tsl_provider.h"
 
 #define KV_USER_ID "user_id"
 
@@ -60,6 +61,22 @@ static ez_bool_t is_user_switched(ez_void_t *data)
     return rv;
 }
 
+ez_bool_t ezcloud_base_bind_status(ez_void_t)
+{
+    ez_bool_t rv = ez_false;
+    ez_char_t user_id[32] = {0};
+    ez_int32_t length = sizeof(user_id);
+
+    hal_config_get_string(KV_USER_ID, user_id, &length, "");
+
+    if (0 != length)
+    {
+        rv = ez_true;
+    }
+
+    return rv;
+}
+
 static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *data, ez_int32_t len)
 {
     switch (event_type)
@@ -74,6 +91,9 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
         {
             ezcloud_tsl_prop_reset();
         }
+
+        /* 临时逻辑兼容，需绑定后再上报关联资源 */
+        provider_dynamic_rsc_report();
     }
     break;
     case EZ_EVENT_UNBINDING:
@@ -82,6 +102,11 @@ static ez_int32_t ez_base_notice_func(ez_base_event_e event_type, ez_void_t *dat
         ezlog_d(TAG_APP, "The device is not bound");
         network_reset();
         ezcloud_tsl_prop_reset();
+        hal_config_del(KV_USER_ID);
+
+        /* 临时逻辑兼容，绑定前不能再上报关联资源 */
+        ezos_delay_ms(2 * 1000);
+        ezos_reboot();
     }
     break;
     default:
