@@ -22,6 +22,8 @@
 #include "ezcloud_tsl_control.h"
 #include "ezcloud_tsl_aircondition.h"
 #include "ezcloud_tsl_airfresh.h"
+#include "ezcloud_tsl_storage.h"
+#include "device_info.h"
 #include "hal_config.h"
 #include "ezlog.h"
 #include "cJSON.h"
@@ -61,12 +63,7 @@ ez_int32_t provider_dynamic_rsc_query(const ez_char_t *res_type, ez_char_t index
     ez_tsl_value_t value = {.value = buf, .size = sizeof(buf)};
     ez_tsl_rsc_t rsc_info = {.res_type = g_tsl_prop_lst[0].res_type, .local_index = g_tsl_prop_lst[0].index};
 
-    if (NULL == g_tsl_prop_lst[0].func_get)
-    {
-        goto done;
-    }
-
-    g_tsl_prop_lst[0].func_get(&g_tsl_prop_lst[0], &rsc_info, &value);
+    property_get_wrapper(&g_tsl_prop_lst[0], &rsc_info, &value, EZ_TSL_DATA_TYPE_ARRAY, "");
 
     js_root = cJSON_Parse(value.value);
     if (NULL == js_root)
@@ -82,6 +79,7 @@ ez_int32_t provider_dynamic_rsc_query(const ez_char_t *res_type, ez_char_t index
         {
             continue;
         }
+
         cJSON *js_index_lst = cJSON_GetObjectItem(js_object, "index");
         if (NULL == js_index_lst || cJSON_Array != js_index_lst->type)
         {
@@ -91,12 +89,12 @@ ez_int32_t provider_dynamic_rsc_query(const ez_char_t *res_type, ez_char_t index
         for (size_t j = 0; j < cJSON_GetArraySize(js_index_lst); j++)
         {
             cJSON *js_index = cJSON_GetArrayItem(js_index_lst, j);
-            if (count > max_count)
+            if (j + 1 > max_count)
             {
                 break;
             }
 
-            ezos_strncpy(index_lst[j], js_index->valuestring, 4);
+            ezos_strncpy(index_lst[j], js_index->valuestring, 3);
             count++;
         }
     }

@@ -20,3 +20,8 @@ config EZIOT_COMPONENT_APP_FWV_MICRO
     int "The micro version of firmware"
     range 0 9
     default 0
+
+config EZIOT_COMPONENT_APP_MAX_RESOURCE
+    int "Maximum number of dynamic resource"
+    range 0 32
+    default 8

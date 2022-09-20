@@ -26,8 +26,6 @@
 #include "hal_config.h"
 #include "device_info.h"
 
-#define MAX_RSC_INDEX 32
-
 static ez_void_t ezcloud_tsl_prop_report(tsl_prop_impl_t *thiz, ez_char_t *index)
 {
     ez_tsl_rsc_t rsc_info = {.res_type = thiz->res_type, .local_index = index};
@@ -48,7 +46,7 @@ static ez_void_t tsl_prop_reportall(ez_void_t)
         }
 
         // 动态资源
-        ez_char_t index_lst[MAX_RSC_INDEX][4] = {0};
+        ez_char_t index_lst[CONFIG_EZIOT_COMPONENT_APP_MAX_RESOURCE][4] = {0};
         ez_int32_t count = provider_dynamic_rsc_query(g_tsl_prop_lst[i].res_type, index_lst, sizeof(index_lst) / sizeof(index_lst[0]));
         for (size_t j = 0; j < count; j++)
         {
@@ -64,6 +62,11 @@ static ez_int32_t tsl_action2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_in
 
     for (ez_int32_t i = 0; g_tsl_action_lst[i].identify; i++)
     {
+        if (0 != ezos_strcmp(rsc_info->res_type, g_tsl_prop_lst[i].res_type))
+        {
+            continue;
+        }
+
         if (0 != ezos_strcmp(key_info->domain, g_tsl_action_lst[i].domain))
         {
             continue;
@@ -87,6 +90,11 @@ static ez_int32_t tsl_property2cloud(const ez_char_t *sn, const ez_tsl_rsc_t *rs
 
     for (ez_int32_t i = 0; g_tsl_prop_lst[i].identify; i++)
     {
+        if (0 != ezos_strcmp(rsc_info->res_type, g_tsl_prop_lst[i].res_type))
+        {
+            continue;
+        }
+
         if (0 != ezos_strcmp(key_info->domain, g_tsl_prop_lst[i].domain))
         {
             continue;
@@ -115,6 +123,11 @@ static ez_int32_t tsl_property2dev(const ez_char_t *sn, const ez_tsl_rsc_t *rsc_
 
     for (ez_int32_t i = 0; g_tsl_prop_lst[i].identify; i++)
     {
+        if (0 != ezos_strcmp(rsc_info->res_type, g_tsl_prop_lst[i].res_type))
+        {
+            continue;
+        }
+
         if (0 != ezos_strcmp(key_info->domain, g_tsl_prop_lst[i].domain))
         {
             continue;
