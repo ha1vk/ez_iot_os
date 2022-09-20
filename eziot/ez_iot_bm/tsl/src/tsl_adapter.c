@@ -894,6 +894,7 @@ static ez_void_t strip_msg_wrap(ez_void_t *buf, ez_tsl_value_t *tsl_data)
 {
     cJSON *js_msg = NULL;
     cJSON *js_data = NULL;
+    cJSON *js_value = NULL;
 
     do
     {
@@ -909,6 +910,12 @@ static ez_void_t strip_msg_wrap(ez_void_t *buf, ez_tsl_value_t *tsl_data)
         {
             ezlog_e(TAG_TSL, "msg format error: %s", (char *)buf);
             break;
+        }
+
+        js_value = cJSON_GetObjectItem(js_data, "Value");
+        if (NULL != js_value)
+        {
+            js_data = js_value;
         }
 
         tsl_data->type = json_type_transform_dev(js_data->type);
