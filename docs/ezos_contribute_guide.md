@@ -26,17 +26,17 @@ Ezviz_OpenBiz/ez_iot_os->Ezviz_OpenBiz/ez_iot_os:merge
 
 ​	fork ez_iot_os源代码到自己github账户下。
 
-![fork_1](.\figures\pull_request\1_fork_1.png)
+![fork_1](./figures/pull_request/1_fork_1.png)
 
 
 
-![fork_2](.\figures\pull_request\2_fork_2.png)
+![fork_2](./figures/pull_request/2_fork_2.png)
 
 #### 2. clone
 
 ​	将fork（自己账户下）的仓库clone到本地
 
-![clone](.\figures\pull_request\3_clone.png)
+![clone](./figures/pull_request/3_clone.png)
 
 #### 3. 提交修改到fork的仓库
 
@@ -46,15 +46,15 @@ Ezviz_OpenBiz/ez_iot_os->Ezviz_OpenBiz/ez_iot_os:merge
 
 - 创建pull request
 
-![4_pull_request](.\figures\pull_request\4_pull_request.png)
+![4_pull_request](./figures/pull_request/4_pull_request.png)
 
 - 确认要提交的信息
 
-![](.\figures\pull_request\5_pull_request_2.png)
+![](./figures/pull_request/5_pull_request_2.png)
 
 - 填写描述信息
 
-![6_pull_request_3](.\figures\pull_request\6_pull_request_3.png)
+![6_pull_request_3](./figures/pull_request/6_pull_request_3.png)
 
 - 提交pull request
 
